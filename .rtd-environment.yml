@@ -1,0 +1,12 @@
+name: dkist
+
+channels:
+    - conda-forge
+
+dependencies:
+    - sunpy
+    - Cython
+    - matplotlib
+    - numpy
+   - pip:
+       - dkist-sphinx-theme
