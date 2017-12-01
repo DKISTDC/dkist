@@ -1,4 +1,4 @@
-Copyright (c) year, NSO / AURA
+Copyright (c) 2017, NSO / AURA
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
