@@ -6,8 +6,10 @@ from functools import partial
 
 import numpy as np
 import dask.array as da
+from asdf.tags.core.external_reference import ExternalArrayReference
 
-from .fits import BaseFITSLoader
+
+__all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 
 
 class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
@@ -16,9 +18,7 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
     contiguous array type from them.
     """
 
-    def __init__(self, reference_array, *, loader):
-        if not isinstance(loader, BaseFITSLoader):
-            raise ValueError("loader must be an instance of BaseFITSLoader")
+    def __init__(self, reference_array, *, loader, **kwargs):
 
         reference_array = np.asarray(reference_array, dtype=object)
 
@@ -30,7 +30,7 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
 
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
-            loader_array.flat[i] = loader(ele)
+            loader_array.flat[i] = loader(ele, **kwargs)
         self.loader_array = loader_array
 
     def _check_contents(self, reference_array):
@@ -38,7 +38,7 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         dtype = reference_array.flat[0].dtype
         for i, ele in enumerate(reference_array.flat):
             # TODO: Make these not asserts
-            # assert isinstance(ele, ExternalArrayReference)
+            assert isinstance(ele, ExternalArrayReference)
             assert ele.dtype == dtype
             assert ele.shape == shape
 
@@ -70,7 +70,7 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
 
     @property
     def array(self):
-        chunk = tuple(self.reference_array.flat[0].shape)
+        chunk = tuple(self.loader_array.flat[0].shape)
         aa = map(
-            partial(da.from_array, chunks=chunk), self.reference_array.flat)
+            partial(da.from_array, chunks=chunk), self.loader_array.flat)
         return da.stack(list(aa)).reshape(self.shape)

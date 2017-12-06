@@ -2,7 +2,16 @@ import glob
 import os.path
 from pathlib import Path
 
+import asdf
+import numpy as np
+
 from ndcube.ndcube import NDCubeBase
+
+from asdf.tags.core.external_reference import ExternalArrayReference
+
+from ..io import DaskFITSArrayContainer, AstropyFITSLoader
+
+__all__ = ['Dataset']
 
 
 class Dataset(NDCubeBase):
@@ -20,7 +29,7 @@ class Dataset(NDCubeBase):
         if not os.path.isdir(directory):
             raise ValueError("directory argument must be a directory")
         self.base_path = Path(directory)
-        asdf_files = glob.glob(self.base_path / "*.asdf")
+        asdf_files = glob.glob(str(self.base_path / "*.asdf"))
 
         if not asdf_files:
             raise ValueError("No asdf file found in directory.")
@@ -30,7 +39,24 @@ class Dataset(NDCubeBase):
 
         self.asdf_file = asdf_files[0]
 
-        # super().__init__(self, data, wcs)
+        data = self._asdf_to_array_container().array
+
+        super().__init__(data, DummyWCS())
+
+    def _asdf_to_array_container(self):
+        with asdf.AsdfFile.open(self.asdf_file) as ff:
+            pointer_array = np.array(ff.tree['dataset'])
+
+        return DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
+                                      basepath=str(self.base_path))
+
+    def __repr__(self):
+        """
+        Overload the NDData repr because it does not play nice with the dask delayed io.
+        """
+        prefix = self.__class__.__name__ + '('
+        body = str(self.data)
+        return ''.join([prefix, body, ')'])
 
     """
     Methods to be implemented.
