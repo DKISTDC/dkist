@@ -129,6 +129,7 @@ for i, filepath in enumerate(files):
         header = hdul[1].header
     time = parse_time(header['DATE-OBS'])
     if i == 0:
+        root_header = header
         start_time = time
     inds.append(i)
     times.append(time)

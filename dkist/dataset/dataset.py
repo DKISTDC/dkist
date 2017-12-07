@@ -5,16 +5,18 @@ from pathlib import Path
 import asdf
 import numpy as np
 
+import astropy.units as u
+
 from ndcube.ndcube import NDCubeBase
 
-from asdf.tags.core.external_reference import ExternalArrayReference
 
-from ..io import DaskFITSArrayContainer, AstropyFITSLoader
+from dkist.dataset.mixins import DatasetPlotMixin
+from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
 
 __all__ = ['Dataset']
 
 
-class Dataset(NDCubeBase):
+class Dataset(DatasetPlotMixin, NDCubeBase):
     """
     Load a DKIST dataset.
 
@@ -62,17 +64,32 @@ class Dataset(NDCubeBase):
         body = str(self.data)
         return ''.join([prefix, body, ')'])
 
-    """
-    Methods to be implemented.
-    """
-    def pixel_to_world(self, quantity_axis_list, origin=0):
+    def pixel_to_world(self, *quantity_axis_list):
+        return tuple(self.wcs(*quantity_axis_list, output='numericals_plus'))
+
+    def world_to_pixel(self, *quantity_axis_list):
+        return tuple(self.wcs.invert(*quantity_axis_list, output="numericals_plus"))
+
+    def world_axis_physical_types(self):
         raise NotImplementedError()
 
-    def world_to_pixel(self, quantity_axis_list, origin=0):
-        raise NotImplementedError()
-
+    @property
     def dimensions(self):
-        raise NotImplementedError()
+        return u.Quantity(self.data.shape, unit=u.pix)
 
-    def crop_by_coords(self, lower_left_corner, dimension_widths):
-        raise NotImplementedError()
+    def crop_by_coords(self, min_coord_values, interval_widths):
+        # The docstring is defined in NDDataBase
+
+        n_dim = len(self.dimensions)
+        if len(min_coord_values) != len(interval_widths) != n_dim:
+            raise ValueError("min_coord_values and interval_widths must have "
+                             "same number of elements as number of data dimensions.")
+        # Convert coords of lower left corner to pixel units.
+        lower_pixels = self.world_to_pixel(*min_coord_values)
+        upper_pixels = self.world_to_pixel(*[min_coord_values[i] + interval_widths[i]
+                                             for i in range(len(min_coord_values))])
+        # Round pixel values to nearest integer.
+        lower_pixels = [int(np.rint(l.value)) for l in lower_pixels]
+        upper_pixels = [int(np.rint(u.value)) for u in upper_pixels]
+        item = tuple([slice(lower_pixels[i], upper_pixels[i]) for i in range(n_dim)])
+        return self.data[item]
