@@ -4,6 +4,7 @@ from pathlib import Path
 
 from ndcube.ndcube import NDCubeBase
 
+
 class Dataset(NDCubeBase):
     """
     Load a DKIST dataset.
@@ -31,7 +32,6 @@ class Dataset(NDCubeBase):
 
         # super().__init__(self, data, wcs)
 
-
     """
     Methods to be implemented.
     """
@@ -46,6 +46,3 @@ class Dataset(NDCubeBase):
 
     def crop_by_coords(self, lower_left_corner, dimension_widths):
         raise NotImplementedError()
-
-
-
