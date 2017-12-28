@@ -10,6 +10,12 @@ deps-run: &cihelpers-install
     git clone --depth 1 -b circleci git://github.com/cadair/ci-helpers.git
     source ci-helpers/travis/setup_dependencies_common.sh
 
+build-run: &cihelpers-build
+  name: Run Main Command
+  command: |
+    source activate test
+    $MAIN_CMD $SETUP_CMD
+
 version: 2
 jobs:
   build:
@@ -20,12 +26,11 @@ jobs:
       - CONDA_DEPENDENCIES: "sphinx"
       - SUNPY_VERSION: "stable"
       - MAIN_CMD: "python setup.py"
-      - SETUP_CMD: "test"
+      - SETUP_CMD: "docs -W"
     docker:
       - image: continuumio/miniconda3
     steps:
       - checkout
       - run: *apt-install
       - run: *cihelpers-install
-      - run: which python
-      # - run: $MAIN_CMD $SETUP_CMD
+      - run: *cihelpers-build
