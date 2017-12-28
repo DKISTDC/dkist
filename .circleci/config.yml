@@ -21,7 +21,7 @@ pip-run: &pip-install
   command: |
     python3 -m venv venv
     . venv/bin/activate
-    pip install --user $PIP_DEPENDENCIES
+    pip install -q --user $PIP_DEPENDENCIES
 
 report-status: &report-status
   name: Report CI Status
