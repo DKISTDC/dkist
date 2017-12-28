@@ -1,8 +1,8 @@
 apt-run: &apt-install
   name: Install apt packages
   command: |
-    apt update
-    apt install -y graphviz npm
+    sudo apt update
+    sudo apt install -y graphviz npm
 
 deps-run: &cihelpers-install
   name: Install CI Helpers
@@ -28,14 +28,14 @@ version: 2
 jobs:
   build:
     environment:
-      - PIP_DEPENDENCIES: "sphinx"
+      - PIP_DEPENDENCIES: "sphinx git+git@bitbucket.org:dkistdc/dkist-sphinx-theme.git sunpy asdf gwcs"
       - MAIN_CMD: "python setup.py"
       - SETUP_CMD: "build_docs -W"
     docker:
       - image: circleci/python:3.6
     steps:
       - checkout
-      # - run: *apt-install
+      - run: *apt-install
       # - run: *cihelpers-install
       # - run: *cihelpers-build
       - run: *pip-install
