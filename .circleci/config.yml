@@ -6,14 +6,14 @@ deps-run: &cihelpers-install
 
 version: 2
 jobs:
-  environment:
-    - SUNPY_VERSION='stable'
-    - MAIN_CMD='python setup.py'
-    - SETUP_CMD='test'
+  # environment:
+  #   - SUNPY_VERSION='stable'
+  #   - MAIN_CMD='python setup.py'
+  #   - SETUP_CMD='test'
   build:
     docker:
       - image: continuumio/miniconda3
-  steps:
-    - checkout
-    - run: *cihelpers-install
-    - run: $MAIN_CMD $SETUP_CMD
+    steps:
+      - checkout
+      - run: *cihelpers-install
+      - run: $MAIN_CMD $SETUP_CMD
