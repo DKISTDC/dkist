@@ -20,6 +20,7 @@ version: 2
 jobs:
   build:
     environment:
+      - MPL_BACKEND: Agg
       - MINICONDA_BASE: "/opt/conda"
       - PYTHON_VERSION: "3.6"
       - CONDA_CHANNELS: "conda-forge"
