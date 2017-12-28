@@ -51,8 +51,4 @@ jobs:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
 
-      - run:
-          name: "Install commit status helper"
-          command: sudo npm install -g commit-status
-
       - run: *report-status
