@@ -2,7 +2,7 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     apt update
-    apt install -y graphviz
+    apt install -y graphviz npm
 
 deps-run: &cihelpers-install
   name: Install CI Helpers
@@ -23,8 +23,8 @@ jobs:
       - MPL_BACKEND: Agg
       - MINICONDA_BASE: "/opt/conda"
       - PYTHON_VERSION: "3.6"
-      - CONDA_APPEND_CHANNELS: "conda-forge"
-      - CONDA_DEPENDENCIES: "sphinx asdf gwcs sunpy"
+      # - CONDA_APPEND_CHANNELS: "conda-forge"
+      - CONDA_DEPENDENCIES: "sphinx"
       - MAIN_CMD: "python setup.py"
       - SETUP_CMD: "build_docs -W"
     docker:
