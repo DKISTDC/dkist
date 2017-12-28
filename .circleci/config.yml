@@ -2,7 +2,7 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     apt update
-    apt install graphviz texlive-latex-extra dvipng
+    apt install -y graphviz texlive-latex-extra dvipng
 
 deps-run: &cihelpers-install
   name: Install CI Helpers
@@ -14,18 +14,18 @@ version: 2
 jobs:
   build:
     environment:
-      - MINICONDA_BASE=/opt/conda
-      - PYTHON_VERSION=3.6
-      - CONDA_CHANNELS=conda-forge
-      - CONDA_DEPENDENCIES=sphinx
-      - SUNPY_VERSION=stable
-      - MAIN_CMD=python setup.py
-      - SETUP_CMD=test
+      - MINICONDA_BASE: "/opt/conda"
+      - PYTHON_VERSION: "3.6"
+      - CONDA_CHANNELS: "conda-forge"
+      - CONDA_DEPENDENCIES: "sphinx"
+      - SUNPY_VERSION: "stable"
+      - MAIN_CMD: "python setup.py"
+      - SETUP_CMD: "test"
     docker:
       - image: continuumio/miniconda3
     steps:
       - checkout
-      - run: *cihelpers-install
       - run: *apt-install
+      - run: *cihelpers-install
       - run: which python
       # - run: $MAIN_CMD $SETUP_CMD
