@@ -26,7 +26,7 @@ pip-run: &pip-install
 report-status: &report-status
   name: Report CI Status
   command: |
-    sudo npm install -g commit-status
+    npm install commit-status
     commit-status success docs "Your documentation built" $DOCS_URL
 
 version: 2
