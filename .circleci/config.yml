@@ -16,24 +16,30 @@ build-run: &cihelpers-build
     source activate test
     $MAIN_CMD $SETUP_CMD
 
+pip-run: &pip-install
+  name: Install Python dependencies
+  command: |
+    python3 -m venv venv
+    . venv/bin/activate
+    pip install -q --user $PIP_DEPENDENCIES
+    pip install -q --user .
+
 version: 2
 jobs:
   build:
     environment:
-      - MPL_BACKEND: Agg
-      - MINICONDA_BASE: "/opt/conda"
-      - PYTHON_VERSION: "3.6"
-      # - CONDA_APPEND_CHANNELS: "conda-forge"
-      - CONDA_DEPENDENCIES: "sphinx"
+      - PIP_DEPENDENCIES: "sphinx"
       - MAIN_CMD: "python setup.py"
       - SETUP_CMD: "build_docs -W"
     docker:
-      - image: continuumio/miniconda3
+      - image: circleci/python:3.6
     steps:
       - checkout
-      - run: *apt-install
-      - run: *cihelpers-install
-      - run: *cihelpers-build
+      # - run: *apt-install
+      # - run: *cihelpers-install
+      # - run: *cihelpers-build
+      - run: *pip-install
+      - run: $MAIN_CMD $SETUP_CMD
 
       - store_artifacts:
           path: docs/_build/html
