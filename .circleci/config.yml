@@ -9,9 +9,10 @@ jobs:
   build:
     environment:
       - MINICONDA_BASE=/opt/conda
-      - SUNPY_VERSION='stable'
-      - MAIN_CMD='python setup.py'
-      - SETUP_CMD='test'
+      - PYTHON_VERSION=3.6
+      - SUNPY_VERSION=stable
+      - MAIN_CMD=python setup.py
+      - SETUP_CMD=test
     docker:
       - image: continuumio/miniconda3
     steps:
