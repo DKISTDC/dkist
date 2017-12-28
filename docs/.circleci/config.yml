@@ -1,0 +1,19 @@
+deps-run: &cihelpers-install
+  name: Install CI Helpers
+  command: |
+    git clone --depth 1 git://github.com/astropy/ci-helpers.git
+    source ci-helpers/travis/setup_dependencies_common.sh
+
+version: 2
+jobs:
+  environment:
+    - SUNPY_VERSION='stable'
+    - MAIN_CMD='python setup.py'
+    - SETUP_CMD='test'
+  build:
+    docker:
+      - image: continuumio/miniconda3
+  steps:
+    - checkout
+    - run: *cihelpers-install
+    - run: $MAIN_CMD $SETUP_CMD
