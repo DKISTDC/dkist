@@ -21,14 +21,19 @@ pip-run: &pip-install
   command: |
     python3 -m venv venv
     . venv/bin/activate
-    pip install -q --user $PIP_DEPENDENCIES
-    pip install -q --user .
+    pip install --user $PIP_DEPENDENCIES
+
+report-status: &report-status
+  name: Report CI Status
+  command: |
+    sudo npm install -g commit-status
+    commit-status success docs "Your documentation built" $DOCS_URL
 
 version: 2
 jobs:
   build:
     environment:
-      - PIP_DEPENDENCIES: "sphinx git+git@bitbucket.org:dkistdc/dkist-sphinx-theme.git sunpy asdf gwcs"
+      - PIP_DEPENDENCIES: "sphinx git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git sunpy asdf gwcs"
       - MAIN_CMD: "python setup.py"
       - SETUP_CMD: "build_docs -W"
     docker:
@@ -36,8 +41,6 @@ jobs:
     steps:
       - checkout
       - run: *apt-install
-      # - run: *cihelpers-install
-      # - run: *cihelpers-build
       - run: *pip-install
       - run: $MAIN_CMD $SETUP_CMD
 
@@ -46,4 +49,10 @@ jobs:
 
       - run:
           name: "Built documentation is available at:"
-          command: echo "${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"
+          command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
+
+      - run:
+          name: "Install commit status helper"
+          command: sudo npm install -g commit-status
+
+      - run: *report-status
