@@ -2,7 +2,7 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz npm
+    sudo apt install -y graphviz npm node
 
 deps-run: &cihelpers-install
   name: Install CI Helpers
