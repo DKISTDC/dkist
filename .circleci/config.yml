@@ -26,8 +26,10 @@ pip-run: &pip-install
 report-status: &report-status
   name: Report CI Status
   command: |
-    npm install commit-status
-    commit-status success docs "Your documentation built" $DOCS_URL
+    sudo npm install -g commit-status
+    if [[ ! -z $CIRCLE_PR_NUMBER ]]; then
+        commit-status success docs "Your documentation built" $DOCS_URL
+    fi
 
 version: 2
 jobs:
