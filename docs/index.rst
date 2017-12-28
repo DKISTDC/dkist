@@ -1,7 +1,7 @@
 Documentation
 =============
 
-HELLO!
+HELLO WORLD!
 
 This is the documentation for dkist.
 A Python library of tools for obtaining, processing and interacting with DKIST data.
