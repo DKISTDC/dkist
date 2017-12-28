@@ -23,7 +23,7 @@ jobs:
       - MPL_BACKEND: Agg
       - MINICONDA_BASE: "/opt/conda"
       - PYTHON_VERSION: "3.6"
-      - CONDA_CHANNELS: "conda-forge"
+      - CONDA_APPEND_CHANNELS: "conda-forge"
       - CONDA_DEPENDENCIES: "sphinx"
       - SUNPY_VERSION: "stable"
       - MAIN_CMD: "python setup.py"
