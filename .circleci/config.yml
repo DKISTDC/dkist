@@ -10,6 +10,7 @@ jobs:
     environment:
       - MINICONDA_BASE=/opt/conda
       - PYTHON_VERSION=3.6
+      - CONDA_CHANNELS=conda-forge
       - SUNPY_VERSION=stable
       - MAIN_CMD=python setup.py
       - SETUP_CMD=test
