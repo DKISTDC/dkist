@@ -25,11 +25,12 @@ class Dataset(NDCubeBase):
         The directory holding the dataset.
     """
 
-    def __init__(self, directory):
+    @classmethod
+    def from_directory(cls, directory):
         if not os.path.isdir(directory):
             raise ValueError("directory argument must be a directory")
-        self.base_path = Path(directory)
-        asdf_files = glob.glob(str(self.base_path / "*.asdf"))
+        base_path = Path(directory)
+        asdf_files = glob.glob(str(base_path / "*.asdf"))
 
         if not asdf_files:
             raise ValueError("No asdf file found in directory.")
@@ -37,18 +38,21 @@ class Dataset(NDCubeBase):
             raise NotImplementedError("Multiple asdf files found in this"
                                       " directory. Can't handle this yet.")
 
-        self.asdf_file = asdf_files[0]
+        asdf_file = asdf_files[0]
 
-        data = self._asdf_to_array_container().array
-
-        super().__init__(data, DummyWCS())
-
-    def _asdf_to_array_container(self):
-        with asdf.AsdfFile.open(self.asdf_file) as ff:
+        with asdf.AsdfFile.open(asdf_file) as ff:
+            # TODO: without this it segfaults on access
+            asdf_tree = copy.deepcopy(ff.tree)
             pointer_array = np.array(ff.tree['dataset'])
 
-        return DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                      basepath=str(self.base_path))
+        array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
+                                                 basepath=str(base_path))
+
+        data = array_container.array
+
+        wcs = asdf_tree['gwcs']
+
+        return cls(data, wcs=wcs)
 
     def __repr__(self):
         """
