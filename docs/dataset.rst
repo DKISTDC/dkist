@@ -9,7 +9,6 @@ asdf file, the dataset will be loaded into an array.
 
 
 
-Reference / API
----------------
-
 .. automodapi:: dkist.dataset
+
+.. automodapi:: dkist.dataset.mixins

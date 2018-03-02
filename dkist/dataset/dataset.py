@@ -19,17 +19,17 @@ __all__ = ['Dataset']
 
 class Dataset(DatasetPlotMixin, NDCubeBase):
     """
-    Load a DKIST dataset.
+    The base class for DKIST datasets.
 
-    Parameters
-    ----------
-
-    directory : `str`
-        The directory holding the dataset.
+    This class is backed by `dask.array.Array` and `gwcs.wcs.WCS` objects.
     """
 
     @classmethod
     def from_directory(cls, directory):
+        """
+        Construct a `~dkist.dataset.Dataset` from a directory containing one
+        asdf file and a collection of FITS files.
+        """
         if not os.path.isdir(directory):
             raise ValueError("directory argument must be a directory")
         base_path = Path(directory)
@@ -66,9 +66,39 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         return ''.join([prefix, body, ')'])
 
     def pixel_to_world(self, *quantity_axis_list):
+        """
+        Convert a pixel coordinate to a data (world) coordinate by using
+        `~gwcs.wcs.WCS`.
+
+        Parameters
+        ----------
+        quantity_axis_list : iterable
+            An iterable of `~astropy.units.Quantity` with unit as pixel `pix`.
+            Note that these quantities must be entered as separate arguments, not as one list.
+
+        Returns
+        -------
+        coord : `list`
+            A list of arrays containing the output coordinates.
+        """
         return tuple(self.wcs(*quantity_axis_list, output='numericals_plus'))
 
     def world_to_pixel(self, *quantity_axis_list):
+        """
+        Convert a world coordinate to a data (pixel) coordinate by using
+        `~gwcs.wcs.WCS.invert`.
+
+        Parameters
+        ----------
+        quantity_axis_list : iterable
+            A iterable of `~astropy.units.Quantity`.
+            Note that these quantities must be entered as separate arguments, not as one list.
+
+        Returns
+        -------
+        coord : `list`
+            A list of arrays containing the output coordinates.
+        """
         return tuple(self.wcs.invert(*quantity_axis_list, output="numericals_plus"))
 
     def world_axis_physical_types(self):
@@ -76,6 +106,9 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
 
     @property
     def dimensions(self):
+        """
+        The dimensions of the data as a `~astropy.units.Quantity`.
+        """
         return u.Quantity(self.data.shape, unit=u.pix)
 
     def crop_by_coords(self, min_coord_values, interval_widths):
