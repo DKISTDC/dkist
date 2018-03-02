@@ -51,6 +51,12 @@ conf = ConfigParser()
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
 
+intersphinx_mapping['sunpy'] = ('http://docs.sunpy.org/en/stable/', None)
+intersphinx_mapping['ndcube'] = ('http://docs.sunpy.org/projects/ndcube/en/stable/', None)
+intersphinx_mapping['gwcs'] = ('http://gwcs.readthedocs.io/en/latest/', None)
+intersphinx_mapping['asdf'] = ('http://asdf.readthedocs.io/en/latest/', None)
+intersphinx_mapping['dask'] = ('http://dask.pydata.org/en/latest/', None)
+
 # -- General configuration ----------------------------------------------------
 
 # By default, highlight as Python 3.

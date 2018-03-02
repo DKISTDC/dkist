@@ -2,7 +2,7 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz npm node
+    sudo apt install -y graphviz
 
 deps-run: &cihelpers-install
   name: Install CI Helpers
@@ -23,21 +23,13 @@ pip-run: &pip-install
     . venv/bin/activate
     pip install -q --user $PIP_DEPENDENCIES
 
-report-status: &report-status
-  name: Report CI Status
-  command: |
-    sudo npm install -g commit-status
-    if [[ ! -z $CIRCLE_PR_NUMBER ]]; then
-        commit-status success docs "Your documentation built" $DOCS_URL
-    fi
-
 version: 2
 jobs:
   build:
     environment:
-      - PIP_DEPENDENCIES: "sphinx git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git sunpy asdf gwcs"
+      - PIP_DEPENDENCIES: "sphinx git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git sunpy git+https://github.com/spacetelescope/asdf gwcs dask[complete] astropy ndcube"
       - MAIN_CMD: "python setup.py"
-      - SETUP_CMD: "build_docs -W"
+      - SETUP_CMD: "build_docs -w"
     docker:
       - image: circleci/python:3.6
     steps:
@@ -52,5 +44,3 @@ jobs:
       - run:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
-
-      - run: *report-status
