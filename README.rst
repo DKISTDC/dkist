@@ -11,4 +11,5 @@ A Python library of tools for obtaining, processing and interacting with DKIST d
 License
 -------
 
-This project is Copyright (c) NSO / AURA and licensed under the terms of the BSD 3-Clause license. See the licenses folder for more information.
+This project is Copyright (c) NSO / AURA and licensed under the terms of the
+BSD 3-Clause license. See the licenses folder for more information.
