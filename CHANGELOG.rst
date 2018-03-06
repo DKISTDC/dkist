@@ -10,6 +10,8 @@ New Features
 - Add `dkist.dataset.Dataset` class to represent a dataset to the user [#1]
 - Add code for converting a nested list of `asdf.ExternalArrayReference`
   objects to a `dask.array.Array` [#1]
+- Add implementation of `dkist.dataset.Dataset.pixel_to_world` and
+  `dkist.dataset.Dataset.world_to_pixel` [#1]
 
 Bug Fixes
 ---------
