@@ -50,17 +50,18 @@ jobs:
 
 workflows:
   version: 2
-  egg-info:
+  test-code:
     jobs:
       - egg-info-36
       - egg-info-35
-  test-code:
-    jobs:
-      - tests
+      - tests:
+          requires:
+            - egg-info-36
+            - egg-info-35
+
   test-documentation:
     jobs:
       - html-docs
-
 
 notify:
   webhooks:
