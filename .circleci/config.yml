@@ -4,30 +4,17 @@ apt-run: &apt-install
     sudo apt update
     sudo apt install -y graphviz
 
-deps-run: &cihelpers-install
-  name: Install CI Helpers
-  command: |
-    git clone --depth 1 -b circleci git://github.com/cadair/ci-helpers.git
-    source ci-helpers/travis/setup_dependencies_common.sh
-
-build-run: &cihelpers-build
-  name: Run Main Command
-  command: |
-    source activate test
-    $MAIN_CMD $SETUP_CMD
-
 pip-run: &pip-install
   name: Install Python dependencies
   command: |
     python3 -m venv venv
     . venv/bin/activate
-    pip install -q --user $PIP_DEPENDENCIES
+    pip install -q -r requirements.txt
 
 version: 2
 jobs:
   build:
     environment:
-      - PIP_DEPENDENCIES: "sphinx git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git sunpy git+https://github.com/spacetelescope/asdf gwcs dask[complete] astropy ndcube"
       - MAIN_CMD: "python setup.py"
       - SETUP_CMD: "build_docs -w"
     docker:
