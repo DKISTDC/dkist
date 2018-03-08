@@ -1,3 +1,4 @@
+import os
 import pytest
 
 import numpy as np
@@ -14,6 +15,7 @@ from sunpy.coordinates.frames import Helioprojective
 
 
 from dkist.dataset import Dataset
+from dkist.data.test import rootdir
 
 
 @pytest.fixture
@@ -102,3 +104,22 @@ def test_crop_by_coords(dataset_3d):
 def test_crop_by_coords_bad_args(dataset_3d):
     with pytest.raises(ValueError):
         dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5)*u.arcsec)
+
+
+def test_load_from_directory():
+    ds = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    assert isinstance(ds.data, da.Array)
+    assert isinstance(ds.wcs, gwcs.WCS)
+    assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+
+
+def test_from_directory_no_asdf():
+    with pytest.raises(ValueError) as e:
+        Dataset.from_directory(rootdir)
+        assert "No asdf file found" in str(e)
+
+
+def test_from_directory_not_dir():
+    with pytest.raises(ValueError) as e:
+        Dataset.from_directory(os.path.join(rootdir, 'EIT', 'eit_2004-03-01T00:00:10.515000.asdf'))
+        assert "must be a directory" in str(e)
