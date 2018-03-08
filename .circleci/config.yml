@@ -33,7 +33,7 @@ jobs:
     steps:
       - checkout
       - run: *pip-install
-      - run: python setup.py test
+      - run: venv/bin/python setup.py test --coverage
 
   html-docs:
     docker:
@@ -46,10 +46,6 @@ jobs:
 
       - store_artifacts:
           path: docs/_build/html
-
-      - run:
-          name: "Built documentation is available at:"
-          command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
 
 
 workflows:
