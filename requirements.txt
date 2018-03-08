@@ -1,9 +1,14 @@
 # docs
 sphinx
 git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
+
 # Stable deps
 dask[complete]
+numpy
+scipy
+matplotlib
 ndcube
+
 # git deps
 git+https://github.com/Cadair/astropy@dkist
 git+https://github.com/Cadair/asdf@dkist
