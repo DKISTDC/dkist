@@ -5,11 +5,8 @@ from pathlib import Path
 
 import asdf
 import numpy as np
-
 import astropy.units as u
-
 from ndcube.ndcube import NDCubeBase
-
 
 from dkist.dataset.mixins import DatasetPlotMixin
 from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
@@ -39,7 +36,7 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
             raise ValueError("No asdf file found in directory.")
         elif len(asdf_files) > 1:
             raise NotImplementedError("Multiple asdf files found in this"
-                                      " directory. Can't handle this yet.")
+                                      " directory. Can't handle this yet.")  # pragma: no cover
 
         asdf_file = asdf_files[0]
 
@@ -61,9 +58,10 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         """
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
-        prefix = self.__class__.__name__ + '('
-        body = str(self.data)
-        return ''.join([prefix, body, ')'])
+        prefix = object.__repr__(self)[:-1] + '\n'
+        body = "{}\n".format(self.data)
+        body += "{!r}".format(self.wcs)[1:-1]
+        return ''.join([prefix, body, '>'])
 
     def pixel_to_world(self, *quantity_axis_list):
         """
@@ -81,7 +79,11 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        return tuple(self.wcs(*quantity_axis_list, output='numericals_plus'))
+        world = self.wcs(*quantity_axis_list, output='numericals_plus')
+        # Convert list to tuple as a more standard return type
+        if isinstance(world, list):
+            world = tuple(world)
+        return world
 
     def world_to_pixel(self, *quantity_axis_list):
         """
@@ -102,7 +104,7 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         return tuple(self.wcs.invert(*quantity_axis_list, output="numericals_plus"))
 
     def world_axis_physical_types(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     @property
     def dimensions(self):
@@ -115,7 +117,7 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         # The docstring is defined in NDDataBase
 
         n_dim = len(self.dimensions)
-        if len(min_coord_values) != len(interval_widths) != n_dim:
+        if (len(min_coord_values) != len(interval_widths)) or len(min_coord_values) != n_dim:
             raise ValueError("min_coord_values and interval_widths must have "
                              "same number of elements as number of data dimensions.")
         # Convert coords of lower left corner to pixel units.

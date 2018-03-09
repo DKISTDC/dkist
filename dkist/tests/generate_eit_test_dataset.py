@@ -69,10 +69,10 @@ def references_from_filenames(filename_array, relative_to=None):
     from astropy.io.fits.hdu.base import BITPIX2DTYPE
     from asdf.tags.core.external_reference import ExternalArrayReference
 
-    reference_array = np.empty_like(cube, dtype=object)
+    reference_array = np.empty_like(filename_array, dtype=object)
     for i, filepath in enumerate(filename_array.flat):
         with fits.open(filepath) as hdul:
-            hdu_index = 1
+            hdu_index = 0
             hdu = hdul[hdu_index]
             dtype = BITPIX2DTYPE[hdu.header['BITPIX']]
             shape = tuple(reversed(hdu.shape))
@@ -89,28 +89,8 @@ def references_from_filenames(filename_array, relative_to=None):
 
 
 def main():
-    path = Path('~/sunpy/data/jsocflare/').expanduser()
+    path = Path('~/Git/DKIST/dkist/dkist/data/test/EIT').expanduser()
     files = glob.glob(str(path / '*.fits'))
-
-    requestid = 'JSOC_20180111_1429'
-
-    if not files:
-        if requestid:
-            c = JSOCClient()
-            filesd = c.get_request(
-                requestid, path=str(path), overwrite=False).wait()
-            files = []
-            for f in filesd.values():
-                files.append(f['path'])
-        else:
-            results = Fido.search(
-                a.jsoc.Time('2017-09-06T12:00:00', '2017-09-06T12:02:00'),
-                a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Segment('image'),
-                a.jsoc.Notify("stuart@cadair.com"))
-
-            print(results)
-
-            files = Fido.fetch(results, path=str(path))
 
     files.sort()
     files = np.array(files)
@@ -122,55 +102,34 @@ def main():
     times = []
     # the dt from the first image
     seconds = []
-    # the wavelength
-    waves = []
 
     for i, filepath in enumerate(files):
         with fits.open(filepath) as hdul:
-            header = hdul[1].header
+            header = hdul[0].header
         time = parse_time(header['DATE-OBS'])
         if i == 0:
-            root_header = header
             start_time = time
         inds.append(i)
         times.append(time)
         seconds.append((time - start_time).total_seconds())
-        waves.append(header['WAVELNTH'])
-
-    # Construct an array and sort it by wavelength and time
-    arr = np.array((inds, seconds, waves)).T
-    sorter = np.lexsort((arr[:, 1], arr[:, 2]))
-
-    # Using this double-sorted array get the list indicies
-    list_sorter = np.array(arr[sorter][:, 0], dtype=int)
-
-    # Calculate the desired shape of the output array
-    n_waves = len(list(set(waves)))
-    shape = (n_waves, len(files) // n_waves)
-
-    # Construct a 2D array of filenames
-    cube = files[list_sorter].reshape(shape)
 
     # Extract a list of coordinates in time and wavelength
     # this assumes all wavelength images are taken at the same time
-    time_coords = np.array(
-        [t.isoformat() for t in times])[list_sorter].reshape(shape)[0, :]
-    wave_coords = np.array(waves)[list_sorter].reshape(shape)[:, 0]
+    time_coords = np.array([t.isoformat() for t in times])
 
     smap0 = sunpy.map.Map(files[0])
     spatial = map_to_transform(smap0)
 
-    timemodel = LookupTable(lookup_table=seconds[:shape[1]]*u.s)
-    wavemodel = LookupTable(lookup_table=waves[:shape[0]]*u.AA)
+    timemodel = LookupTable(lookup_table=seconds*u.s)
 
-    hcubemodel = wavemodel & timemodel & spatial
+    hcubemodel = timemodel & spatial
 
-    wave_frame = cf.SpectralFrame(axes_order=(0, ), unit=u.AA)
-    time_frame = cf.TemporalFrame(
-        axes_order=(1, ), unit=u.s, reference_time=Time(time_coords[0]))
-    sky_frame = cf.CelestialFrame(axes_order=(2, 3), name='helioprojective', reference_frame=smap0.coordinate_frame)
+    time_frame = cf.TemporalFrame(axes_order=(0, ), unit=u.s,
+                                  reference_time=Time(time_coords[0]))
+    sky_frame = cf.CelestialFrame(axes_order=(1, 2), name='helioprojective',
+                                  reference_frame=smap0.coordinate_frame)
 
-    sky_frame = cf.CompositeFrame([wave_frame, time_frame, sky_frame])
+    sky_frame = cf.CompositeFrame([time_frame, sky_frame])
 
     wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, output_frame=sky_frame)
 
@@ -178,10 +137,8 @@ def main():
 
     print(wcs(*[1*u.pix]*4, output="numericals_plus"))
 
-    ea = references_from_filenames(cube, relative_to=str(path))
+    ea = references_from_filenames(files, relative_to=str(path))
 
-    crpix1u, crpix2u = u.Quantity(smap0.reference_pixel)-1*u.pixel
-    shiftu = Shift(-crpix1u) & Shift(-crpix2u)
     tree = {
         'gwcs': wcs,
         'dataset': ea,
@@ -189,19 +146,9 @@ def main():
 
     with asdf.AsdfFile(tree) as ff:
         # ff.write_to("test.asdf")
-        filename = str(path / "aia_{}.asdf".format(time_coords[0]))
+        filename = str(path / "eit_{}.asdf".format(time_coords[0]))
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
-
-
-    # import sys; sys.exit(0)
-
-    from dkist.dataset import Dataset
-
-    ds = Dataset.from_directory(str(path))
-    print(repr(ds))
-    print(repr(ds.wcs))
-    print(ds.wcs(*[1*u.pix]*4, output="numericals_plus"))
 
 
 if __name__ == "__main__":
