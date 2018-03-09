@@ -36,7 +36,7 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
             raise ValueError("No asdf file found in directory.")
         elif len(asdf_files) > 1:
             raise NotImplementedError("Multiple asdf files found in this"
-                                      " directory. Can't handle this yet.")
+                                      " directory. Can't handle this yet.")  # pragma: no cover
 
         asdf_file = asdf_files[0]
 
@@ -104,7 +104,7 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         return tuple(self.wcs.invert(*quantity_axis_list, output="numericals_plus"))
 
     def world_axis_physical_types(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     @property
     def dimensions(self):
