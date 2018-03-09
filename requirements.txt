@@ -1,5 +1,6 @@
 # docs
 sphinx
+sphinx-astropy
 git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
 
 # Stable deps
@@ -11,7 +12,7 @@ ndcube
 
 # git deps
 git+https://github.com/Cadair/astropy@dkist
-git+https://github.com/Cadair/asdf@dkist
+git+https://github.com/spacetelescope/asdf
 git+https://github.com/Cadair/gwcs@dkist
 git+https://github.com/Cadair/sunpy@asdf_tags
 
