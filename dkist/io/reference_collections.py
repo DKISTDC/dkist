@@ -71,9 +71,6 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         Return an array type for the given array of external file references.
         """
 
-    def __array__(self):
-        return self.array
-
 
 @add_common_docstring(append=common_parameters)
 class NumpyFITSArrayContainer(BaseFITSArrayContainer):
@@ -82,12 +79,19 @@ class NumpyFITSArrayContainer(BaseFITSArrayContainer):
     in-memory numpy array.
     """
 
+    def __array__(self):
+        """
+        This dosen't seem to work if it returns a Dask array, so it's only
+        useful here.
+        """
+        return self.array
+
     @property
     def array(self):
         """
         The `~numpy.ndarray` associated with this array of references.
         """
-        aa = map(np.asarray, self.reference_array.flat)
+        aa = map(np.asarray, self.loader_array.flat)
         return np.stack(aa, axis=0).reshape(self.shape)
 
 
