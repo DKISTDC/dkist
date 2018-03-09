@@ -12,7 +12,7 @@ ndcube
 
 # git deps
 git+https://github.com/Cadair/astropy@dkist
-git+https://github.com/Cadair/asdf@dkist
+git+https://github.com/spacetelescope/asdf
 git+https://github.com/Cadair/gwcs@dkist
 git+https://github.com/Cadair/sunpy@asdf_tags
 
