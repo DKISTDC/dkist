@@ -1,2 +1,2 @@
 from .fits import BaseFITSLoader, AstropyFITSLoader
-from .dask import BaseFITSArrayContainer, NumpyFITSArrayContainer, DaskFITSArrayContainer
+from .reference_collections import BaseFITSArrayContainer, NumpyFITSArrayContainer, DaskFITSArrayContainer

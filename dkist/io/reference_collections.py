@@ -1,21 +1,40 @@
 """
-This file takes the lazy FITS loader classes and returns a dask array from them.
+This submodule provides tools for resolving arrays of
+`asdf.ExternalArrayReference` objects to Python array-like objects.
 """
 import abc
 from functools import partial
 
 import numpy as np
 import dask.array as da
+from sunpy.util.decorators import add_common_docstring
 from asdf.tags.core.external_reference import ExternalArrayReference
 
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 
 
+common_parameters = """
+
+    Parameters
+    ----------
+
+    reference_array : `~numpy.ndarray` or `list`
+        A (multi-dimensional) array of `asdf.ExternalArrayReference` objects.
+
+    loader : `dkist.io.fits.BaseFITSLoader`
+        The loader subclass to use to resolve each `~asdf.ExternalArrayReference`.
+
+    kwargs : `dict`
+        Extra keyword arguments are passed to the loader class.
+"""
+
+
+@add_common_docstring(append=common_parameters)
 class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
     """
-    Given an array of `~dkist.io.fits.BaseFITSLoader` instances construct a
-    contiguous array type from them.
+    This class provides an array-like interface to an array of
+    `asdf.ExternalArrayReference` objects.
     """
 
     def __init__(self, reference_array, *, loader, **kwargs):
@@ -34,6 +53,10 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         self.loader_array = loader_array
 
     def _check_contents(self, reference_array):
+        """
+        Validate that the array re fence objects are compatible with each other,
+        i.e. same dimensions and same dtype.
+        """
         shape = reference_array.flat[0].shape
         dtype = reference_array.flat[0].dtype
         for i, ele in enumerate(reference_array.flat):
@@ -52,24 +75,34 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         return self.array
 
 
+@add_common_docstring(append=common_parameters)
 class NumpyFITSArrayContainer(BaseFITSArrayContainer):
     """
-    Load it ALL INTO RAM.
+    Load an array of `~asdf.ExternalArrayReference` objects into a single
+    in-memory numpy array.
     """
 
     @property
     def array(self):
+        """
+        The `~numpy.ndarray` associated with this array of references.
+        """
         aa = map(np.asarray, self.reference_array.flat)
         return np.stack(aa, axis=0).reshape(self.shape)
 
 
+@add_common_docstring(append=common_parameters)
 class DaskFITSArrayContainer(BaseFITSArrayContainer):
     """
-    Do not load it all into RAM.
+    Load an array of `~asdf.ExternalArrayReference` objects into a
+    `dask.array.Array` object.
     """
 
     @property
     def array(self):
+        """
+        The `~dask.array.Array` associated with this array of references.
+        """
         chunk = tuple(self.loader_array.flat[0].shape)
         aa = map(
             partial(da.from_array, chunks=chunk), self.loader_array.flat)

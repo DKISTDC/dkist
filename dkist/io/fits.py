@@ -7,11 +7,29 @@ import os
 import abc
 
 from astropy.io import fits
+from sunpy.util.decorators import add_common_docstring
 
 __all__ = ['BaseFITSLoader', 'AstropyFITSLoader']
 
+common_parameters = """
 
+    Parameters
+    ----------
+
+    externalarray: `asdf.ExternalArrayReference`
+        The asdf array reference, must be to a FITS file (although this is not validated).
+
+    basepath: `str`
+        The base path for the filenames in the `asdf.ExternalArrayReference`,
+        if not specified the filepaths are treated as absolute.
+"""
+
+
+@add_common_docstring(append=common_parameters)
 class BaseFITSLoader(metaclass=abc.ABCMeta):
+    """
+    Base class for resolving an `asdf.ExternalArrayReference` to a FITS file.
+    """
 
     def __init__(self, externalarray, basepath=None):
         self.fitsarray = externalarray
@@ -45,6 +63,9 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
 
     @property
     def absolute_uri(self):
+        """
+        Construct a non-relative path to the file, using ``basepath`` if provided.
+        """
         if self.basepath:
             return os.path.join(self.basepath, self.fitsarray.fileuri)
         else:
@@ -52,6 +73,14 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
 
     @property
     def fits_header(self):
+        """
+        The FITS header for this file.
+
+        .. note::
+
+            This will be read from the file on access if it is not already cached.
+
+        """
         if not self._fits_header:
             self._fits_header = self._read_fits_header()
         return self._fits_header
@@ -59,8 +88,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     @property
     def fits_array(self):
         """
-        This method opens the FITS file and returns a reference to the desired
-        array.
+        The FITS array object.
         """
         if self._array is None:
             self._array = self._read_fits_array()
@@ -89,12 +117,16 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         """
 
 
+@add_common_docstring(append=common_parameters)
 class AstropyFITSLoader(BaseFITSLoader):
     """
-    A class that resolves FITS references in a lazy way.
+    Resolve an `~asdf.ExternalArrayReference` to a FITS file using `astropy.io.fits`.
     """
 
     def _read_fits_array(self):
+        """
+        Make sure we cache the header while we have the file open.
+        """
         with fits.open(self.absolute_uri, memmap=True, do_not_scale_image_data=False) as hdul:
             hdul.verify('fix')
             hdu = hdul[self.fitsarray.target]
@@ -103,6 +135,9 @@ class AstropyFITSLoader(BaseFITSLoader):
             return hdu.data
 
     def _read_fits_header(self):
+        """
+        Just read the header, used if the header is requested before the data.
+        """
         with fits.open(self.absolute_uri) as hdul:
             hdul.verify('fix')
             hdu = hdul[self.fitsarray.target]
