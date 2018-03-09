@@ -36,6 +36,8 @@ jobs:
       - run: python setup.py egg_info
 
   tests:
+    environment:
+      - MPLBACKEND: 'agg'
     docker:
       - image: circleci/python:3.6
     steps:
