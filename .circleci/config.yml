@@ -11,6 +11,14 @@ pip-run: &pip-install
     . venv/bin/activate
     pip install -q -r requirements.txt
 
+upload-coverage: &coverage
+  name: Upload coverage report to codecov
+  command: |
+    . venv/bin/activate
+    pip install codecov
+    codecov
+
+
 version: 2
 jobs:
   egg-info-36:
@@ -34,6 +42,7 @@ jobs:
       - checkout
       - run: *pip-install
       - run: venv/bin/python setup.py test --coverage
+      - run: *coverage
 
   html-docs:
     docker:
