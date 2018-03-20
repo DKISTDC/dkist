@@ -6,11 +6,11 @@ channels:
 dependencies:
   - python=3.6
   - sphinx
-  - sunpy
   - dask
-  - ndcube
   - pip:
     - git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
     - git+https://github.com/spacetelescope/asdf
     - git+https://github.com/spacetelescope/gwcs
+    - git+https://github.com/sunpy/sunpy
+    - ndcube
     - sphinx-astropy
