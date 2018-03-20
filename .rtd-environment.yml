@@ -13,3 +13,4 @@ dependencies:
     - git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
     - git+https://github.com/spacetelescope/asdf
     - git+https://github.com/spacetelescope/gwcs
+    - sphinx-astropy
