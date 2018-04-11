@@ -43,7 +43,10 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
 
         self._check_contents(reference_array)
 
+        # If the first dimension is one we are going to squash it.
         reference_shape = reference_array.flat[0].shape
+        if reference_shape[0] == 1:
+            reference_shape = reference_shape[1:]
 
         self.shape = tuple(list(reference_array.shape) + list(reference_shape))
 
@@ -108,6 +111,10 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
         The `~dask.array.Array` associated with this array of references.
         """
         chunk = tuple(self.loader_array.flat[0].shape)
+        # If the first dimension of the FITS array is 1 we are going to squash
+        # it with vstack, otherwise use stack to make a new dimension
+        stacker = da.vstack if chunk[0] == 1 else da.stack
         aa = map(
             partial(da.from_array, chunks=chunk), self.loader_array.flat)
-        return da.stack(list(aa)).reshape(self.shape)
+
+        return stacker(list(aa)).reshape(self.shape)
