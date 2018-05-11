@@ -57,7 +57,7 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
 
     def _check_contents(self, reference_array):
         """
-        Validate that the array re fence objects are compatible with each other,
+        Validate that the array reference objects are compatible with each other,
         i.e. same dimensions and same dtype.
         """
         shape = reference_array.flat[0].shape
