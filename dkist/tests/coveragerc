@@ -1,17 +1,16 @@
 [run]
-source = dkist
+source = {packagename}
 omit =
-   astropy_helpers/*
-   dkist/_dkist_init*
-   dkist/conftest*
-   dkist/cython_version*
-   dkist/setup_package*
-   dkist/*/setup_package*
-   dkist/*/*/setup_package*
-   dkist/tests/*
-   dkist/*/tests/*
-   dkist/*/*/tests/*
-   dkist/version*
+   {packagename}/_dkist_init*
+   {packagename}/conftest*
+   {packagename}/cython_version*
+   {packagename}/setup_package*
+   {packagename}/*/setup_package*
+   {packagename}/*/*/setup_package*
+   {packagename}/tests/*
+   {packagename}/*/tests/*
+   {packagename}/*/*/tests/*
+   {packagename}/version*
 
 [report]
 exclude_lines =
