@@ -7,7 +7,7 @@ import numpy as np
 import astropy.units as u
 from astropy.io import fits
 from astropy.time import Time
-from astropy.modeling.models import Shift, AffineTransformation2D, Pix2Sky_TAN, RotateNative2Celestial, Scale
+from astropy.modeling.models import Shift, AffineTransformation2D, Pix2Sky_TAN, RotateNative2Celestial, Multiply
 
 import gwcs
 from gwcs import coordinate_frames as cf
@@ -49,7 +49,7 @@ def map_to_transform(smap):
     cdelt1u, cdelt2u = smap.scale
     pcu = smap.rotation_matrix * u.arcsec
     shiftu = Shift(-crpix1u) & Shift(-crpix2u)
-    scaleu = Scale(cdelt1u) & Scale(cdelt2u)
+    scaleu = Multiply(cdelt1u) & Multiply(cdelt2u)
     rotu = AffineTransformation2D(pcu, translation=(0, 0)*u.arcsec)
     tanu = Pix2Sky_TAN()
     skyrotu = RotateNative2Celestial(crval1u, crval2u, 180*u.deg)
@@ -69,7 +69,7 @@ def references_from_filenames(filename_array, relative_to=None):
     from astropy.io.fits.hdu.base import BITPIX2DTYPE
     from asdf.tags.core.external_reference import ExternalArrayReference
 
-    reference_array = np.empty_like(cube, dtype=object)
+    reference_array = np.empty_like(filename_array, dtype=object)
     for i, filepath in enumerate(filename_array.flat):
         with fits.open(filepath) as hdul:
             hdu_index = 1
