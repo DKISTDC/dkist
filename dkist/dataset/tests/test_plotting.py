@@ -1,6 +1,8 @@
 import pytest
 import matplotlib.pyplot as plt
 
+pytestmark = pytest.mark.skip
+
 from .test_dataset import dataset_3d, identity_gwcs_3d, dataset, identity_gwcs, array
 
 

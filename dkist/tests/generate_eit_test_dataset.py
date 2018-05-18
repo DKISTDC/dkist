@@ -7,7 +7,7 @@ import numpy as np
 import astropy.units as u
 from astropy.io import fits
 from astropy.time import Time
-from astropy.modeling.models import Shift, AffineTransformation2D, Pix2Sky_TAN, RotateNative2Celestial, Scale
+from astropy.modeling.models import Shift, AffineTransformation2D, Pix2Sky_TAN, RotateNative2Celestial, Multiply
 
 import gwcs
 from gwcs import coordinate_frames as cf
@@ -15,8 +15,6 @@ from gwcs.lookup_table import LookupTable
 
 import sunpy.map
 from sunpy.time import parse_time
-from sunpy.net import Fido, attrs as a
-from sunpy.net.jsoc import JSOCClient
 
 
 def map_to_transform(smap):
@@ -49,7 +47,7 @@ def map_to_transform(smap):
     cdelt1u, cdelt2u = smap.scale
     pcu = smap.rotation_matrix * u.arcsec
     shiftu = Shift(-crpix1u) & Shift(-crpix2u)
-    scaleu = Scale(cdelt1u) & Scale(cdelt2u)
+    scaleu = Multiply(cdelt1u) & Multiply(cdelt2u)
     rotu = AffineTransformation2D(pcu, translation=(0, 0)*u.arcsec)
     tanu = Pix2Sky_TAN()
     skyrotu = RotateNative2Celestial(crval1u, crval2u, 180*u.deg)

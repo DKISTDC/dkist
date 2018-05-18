@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from sunpy.visualization.imageanimator import ImageAnimator
+from sunpy.visualization.animator import ImageAnimator
 from ndcube.mixins import NDCubePlotMixin
 
 __all__ = ['DatasetPlotMixin']
