@@ -64,20 +64,29 @@ def references_from_filenames(filenames, array_shape, hdu_index=0, relative_to=N
 
 def spatial_model_from_header(header):
     """
-    Given a FITS compliant header with CTYPE1,2 as HPLN, HPLT return a
+    Given a FITS compliant header with CTYPEx,y as HPLN, HPLT return a
     `~astropy.modeling.CompositeModel` for the transform.
 
-    The ordering of ctype1 and ctype2 should be LON, LAT
+    This function finds the HPLN and HPLT keys in the header and returns a
+    model in Lon, Lat order.
     """
+    latind = None
+    lonind = None
+    for k, v in header.items():
+        if isinstance(v, str) and "HPLN" in v:
+            lonind = int(k[5:])
+        if isinstance(v, str) and "HPLT" in v:
+            latind = int(k[5:])
 
-    assert header['CTYPE1'].startswith("HPLN")
-    assert header['CTYPE2'].startswith("HPLT")
+    if latind is None or lonind is None:
+        raise ValueError("Could not extract HPLN and HPLT from the header.")
 
-    crpix1, crpix2 = (header['CRPIX1'], header['CRPIX2']) * u.pixel
-    crval1, crval2 = (header['CRVAL1'], header['CRVAL2']) * u.arcsec
-    cdelt1, cdelt2 = (header['CDELT1'], header['CDELT2']) * (u.arcsec/u.pix)
-    pc = np.matrix([[header['PC1_1'], header['PC1_2']],
-                    [header['PC2_1'], header['PC2_2']]])
+    # TODO: Add proper unit support
+    crpix1, crpix2 = (header[f'CRPIX{lonind}'], header[f'CRPIX{latind}']) * u.pixel
+    crval1, crval2 = (header[f'CRVAL{lonind}'], header[f'CRVAL{latind}']) * u.arcsec
+    cdelt1, cdelt2 = (header[f'CDELT{lonind}'], header[f'CDELT{latind}']) * (u.arcsec/u.pix)
+    pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
+                    [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * u.arcsec
 
     return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2)
 
