@@ -28,13 +28,6 @@ jobs:
       - checkout
       - run: python setup.py egg_info
 
-  egg-info-35:
-    docker:
-      - image: circleci/python:3.5
-    steps:
-      - checkout
-      - run: python setup.py egg_info
-
   tests:
     environment:
       - MPLBACKEND: 'agg'
@@ -64,11 +57,9 @@ workflows:
   test-code:
     jobs:
       - egg-info-36
-      - egg-info-35
       - tests:
           requires:
             - egg-info-36
-            - egg-info-35
 
   test-documentation:
     jobs:
