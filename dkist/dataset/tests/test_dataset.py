@@ -30,7 +30,7 @@ def identity_gwcs():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = m.Scale(1*u.arcsec/u.pixel) & m.Scale(1*u.arcsec/u.pixel)
+    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"))
     return gwcs.wcs.WCS(forward_transform=identity, output_frame=sky_frame)
@@ -41,7 +41,7 @@ def identity_gwcs_3d():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = m.Scale(1*u.arcsec/u.pixel) & m.Scale(1*u.arcsec/u.pixel) & m.Scale(1*u.nm/u.pixel)
+    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.nm/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)

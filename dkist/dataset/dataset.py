@@ -6,7 +6,10 @@ from pathlib import Path
 import asdf
 import numpy as np
 import astropy.units as u
-from ndcube.ndcube import NDCubeBase
+try:
+    from ndcube.ndcube import NDCubeABC
+except ImportError:
+    from ndcube.ndcube import NDCubeBase as NDCubeABC
 
 from dkist.dataset.mixins import DatasetPlotMixin
 from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
@@ -14,7 +17,7 @@ from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
 __all__ = ['Dataset']
 
 
-class Dataset(DatasetPlotMixin, NDCubeBase):
+class Dataset(NDCubeABC):
     """
     The base class for DKIST datasets.
 
