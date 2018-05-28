@@ -8,6 +8,10 @@ DKIST User Tools
 A Python library of tools for obtaining, processing and interacting with DKIST
 data.
 
+A GOOSE! QUICK HIDE!
+
+Hi bob
+
 
 License
 -------

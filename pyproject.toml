@@ -1,3 +1,5 @@
+[tool.dkistbot]
+  towncrier_status_url = "https://github.com/DKISTDC/dkist"
 [tool.towncrier]
     package = "dkist"
     filename = "CHANGELOG.rst"
