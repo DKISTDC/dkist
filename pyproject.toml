@@ -7,7 +7,7 @@
   changelog_check = false
   autoclose_stale_pull_request = false
 
-  [tool.sunpybot.towncrier_changelog]
+  [tool.dkistbot.towncrier_changelog]
    changelog_skip_label = "no changelog"
    help_url = "https://github.com/DKISTDC/dkist/changelog/README.rst"
 
