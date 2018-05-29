@@ -1,3 +1,15 @@
+[tool.dkistbot]
+  check_towncrier_changelog = true
+  check_milestone = true
+  post_pr_comment = false
+
+  # Disable other astropy skills
+  changelog_check = false
+  autoclose_stale_pull_request = false
+
+  [tool.sunpybot.towncrier_changelog]
+   help_url = "https://github.com/DKISTDC/dkist/changelog/README.rst"
+
 [tool.towncrier]
     package = "dkist"
     filename = "CHANGELOG.rst"
