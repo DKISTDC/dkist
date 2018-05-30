@@ -1,0 +1,1 @@
+Add `dkist.dataset.Dataset` class to represent a dataset to the user.

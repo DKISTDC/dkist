@@ -1,0 +1,1 @@
+Add implementation of `dkist.dataset.Dataset.pixel_to_world` and `dkist.dataset.Dataset.world_to_pixel`.
