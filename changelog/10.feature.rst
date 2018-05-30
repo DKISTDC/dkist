@@ -1,0 +1,2 @@
+Add functionality for making asdf files from collections of calibrated FITS
+files.
