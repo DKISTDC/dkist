@@ -1,8 +1,16 @@
 import astropy.units as u
 from astropy.io import fits
 from astropy.table import Table
+from astropy.time import Time
+from sunpy.coordinates import Helioprojective
 
 import gwcs.coordinate_frames as cf
+from gwcs.lookup_table import LookupTable
+
+from dkist.asdf_maker.helpers import (references_from_filenames, make_asdf,
+                                      spatial_model_from_quantity, linear_spectral_model,
+                                      linear_time_model, time_model_from_date_obs,
+                                      spatial_model_from_header)
 
 
 def headers_from_filenames(filenames, hdu=0):
@@ -87,6 +95,148 @@ def build_pixel_frame(header):
                               unit=[u.pixel]*header['DNAXIS'],
                               axes_names=[header[f'DPNAME{n}'] for n in range(header['DNAXIS'], 0, -1)],
                               name='pixel')
+
+
+class TransformBuilder:
+    """
+    This class builds compound models and frames in order when given axes types.
+    """
+
+    def __init__(self, headers):
+        self.headers = headers
+        self.header = self.headers[0]
+        self.reset()
+        self._build()
+
+    @property
+    def frames(self):
+        """
+        The coordinate frames, in Python order.
+        """
+        return self._frames
+
+    @property
+    def transform(self):
+        """
+        Return the compound model.
+        """
+        tf = self._transforms[0]
+
+        for i in range(1, len(tf)):
+            tf = tf & self._transforms[i]
+
+        return tf
+
+    """
+    Internal Stuff
+    """
+
+    def _build(self):
+        """
+        Build the state of the thing.
+        """
+        type_map = {'STOKES': self.make_stokes,
+                    'TEMPORAL': self.make_temporal,
+                    'SPECTRAL': self.make_spectral,
+                    'SPATIAL': self.make_spatial}
+
+        while self._i < self.header['DNAXIS']:  # < because FITS is i+1
+            atype = self.axes_types[self._i]
+            type_map[atype]()
+
+    @property
+    def axes_types(self):
+        """
+        The list of DTYPEn for the first header.
+        """
+        return [self.header[f'DTYPE{n}'] for n in range(self.header['DNAXIS'], 0, -1)]
+
+    def reset(self):
+        """
+        Reset the builder.
+        """
+        self._i = 0
+        self._frames = []
+        self._transforms = []
+
+    def n(self, i):
+        """
+        Convert a Python index ``i`` to a FITS order index for keywords ``n``.
+        """
+        return range(self.header['DNAXIS'], 0, -1)[i]
+
+    def get_units(self, *iargs):
+        """
+        Get zee units
+        """
+        u = [self.header.get(f'DUNIT{self.n(i)}', None) for i in iargs]
+
+        return u
+
+    def make_stokes(self):
+        """
+        Add a stokes axes to the builder.
+        """
+        n = self.n(self._i)
+
+        name = self.header[f'DWNAME{n}']
+        self._frames.append(cf.StokesFrame(axes_order=(self._i,), name=name))
+        self._transforms.append(LookupTable([0, 1, 2, 3] * u.pixel))
+
+        self._i += 1
+
+    def make_temporal(self):
+        """
+        Add a temporal axes to the builder.
+        """
+        n = self.n(self._i)
+        name = self.header[f'DWNAME{n}']
+        self._frames.append(cf.TemporalFrame(axes_order=(self._i,),
+                                             name=name,
+                                             unit=self.get_units(self._i),
+                                             reference_time=Time(self.header['DATE-BGN'])))
+        self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.headers],
+                                                         self.header['DATE-BGN']))
+
+        self._i += 1
+
+    def make_spatial(self):
+        """
+        Add a helioprojective spatial pair to the builder.
+
+        .. note::
+            This increments the counter by two.
+
+        """
+        i = self._i
+        n = self.n(self._i)
+        name = self.header[f'DWNAME{n}']
+        name = name.split(' ')[0]
+        axes_names = [(self.header[f'DWNAME{n}'].rsplit(' ')[1]) for n in (i, self.n(i+1))]
+
+        obstime = Time(self.header['DATE-BGN'])
+        self._frames.append(cf.CelestialFrame(axes_order=(i, i+1), name=name,
+                                              reference_frame=Helioprojective(obstime=obstime),
+                                              axes_names=axes_names,
+                                              unit=self.get_units(self._i, self._i+1)))
+
+        self._transforms.append(spatial_model_from_header(self.header))
+
+        self._i += 2
+
+    def make_spectral(self):
+        """
+        Add a spectral axes.
+        """
+        n = self.n(self._i)
+        name = self.header[f'DWNAME{n}']
+        self._frames.append(cf.SpectralFrame(axes_order=(self._i,),
+                                             unit=self.get_units(self._i),
+                                             name=name))
+        self._transforms.append(linear_spectral_model(self.header[f'CDELT{n}']*u.nm,
+                                                      self.header[f'CRVAL{n}']*u.nm))
+
+        self._i += 1
 
 
 def gwcs_from_filenames(filenames, hdu=0):
