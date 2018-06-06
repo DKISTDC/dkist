@@ -82,7 +82,7 @@ class Dataset(NDCubeABC):
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        world = self.wcs(*quantity_axis_list, output='numericals_plus')
+        world = self.wcs(*quantity_axis_list, with_units=True)
         # Convert list to tuple as a more standard return type
         if isinstance(world, list):
             world = tuple(world)
@@ -104,7 +104,7 @@ class Dataset(NDCubeABC):
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        return tuple(self.wcs.invert(*quantity_axis_list, output="numericals_plus"))
+        return tuple(self.wcs.invert(*quantity_axis_list, with_units=True))
 
     def world_axis_physical_types(self):
         raise NotImplementedError()  # pragma: no cover
