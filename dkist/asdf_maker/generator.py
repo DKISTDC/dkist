@@ -4,6 +4,7 @@ from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates import Helioprojective
 
+import gwcs
 import gwcs.coordinate_frames as cf
 from gwcs.lookup_table import LookupTable
 
@@ -40,8 +41,7 @@ def validate_headers(headers):
     h0 = next(headers)
     out_headers.append(h0)
 
-    t = Table(names=h0.keys())
-    t.add_row(h0)
+    t = Table(list(zip(h0.values())), names=list(h0.keys()))
 
     for h in headers:
         t.add_row(h)
@@ -53,19 +53,22 @@ def validate_headers(headers):
 
     # For some keys all the values must be the same
     same_keys = ['NAXIS', 'DNAXIS']
-    naxis_same_keys = ['NAXISn', 'CTYPEn', 'CRPIXn', 'CRVALn']
+    naxis_same_keys = ['NAXISn', 'CTYPEn', 'CRVALn']  # 'CRPIXn'
     dnaxis_same_keys = ['DNAXISn', 'DTYPEn', 'DPNAMEn', 'DWNAMEn']
     # Expand n in NAXIS keys
     for nsk in naxis_same_keys:
         for naxis in range(1, t['NAXIS'][0] + 1):
-            same_keys.append(nsk.replace('n', naxis))
+            same_keys.append(nsk.replace('n', str(naxis)))
     # Expand n in DNAXIS keys
     for dsk in dnaxis_same_keys:
         for dnaxis in range(1, t['DNAXIS'][0] + 1):
-            same_keys.append(nsk.replace('n', dnaxis))
+            same_keys.append(dsk.replace('n', str(dnaxis)))
 
     validate_t = t[same_keys]
-    assert (validate_t == validate_t[0]).all()
+
+    for col in validate_t.columns.values():
+        if not all(col == col[0]):
+            raise ValueError(f"The {col.name} values did not all match:\n {col}")
 
     return out_headers
 
@@ -122,7 +125,7 @@ class TransformBuilder:
         """
         tf = self._transforms[0]
 
-        for i in range(1, len(tf)):
+        for i in range(1, len(self._transforms)):
             tf = tf & self._transforms[i]
 
         return tf
@@ -255,5 +258,9 @@ def gwcs_from_filenames(filenames, hdu=0):
 
     pixel_frame = build_pixel_frame(header)
 
-    # The physical types of the axes
-    # axes_types = [header[f'DTYPE{n}'] for n in range(header['DNAXIS'], 0, -1)]
+    builder = TransformBuilder(headers)
+    world_frame = cf.CompositeFrame(builder.frames)
+
+    return gwcs.WCS(forward_transform=builder.transform,
+                    input_frame=pixel_frame,
+                    output_frame=world_frame)
