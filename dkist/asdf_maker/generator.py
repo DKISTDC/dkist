@@ -1,3 +1,4 @@
+import numpy as np
 import astropy.units as u
 from astropy.io import fits
 from astropy.table import Table
@@ -18,7 +19,18 @@ def headers_from_filenames(filenames, hdu=0):
     """
     A generator to get the headers from filenames.
     """
-    return (fits.getheader(fname, hdu=hdu) for fname in filenames)
+    return [fits.getheader(fname, hdu=hdu) for fname in filenames]
+
+
+def table_from_headers(headers):
+    h0 = headers[0]
+
+    t = Table(list(zip(h0.values())), names=list(h0.keys()))
+
+    for h in headers[1:]:
+        t.add_row(h)
+
+    return t
 
 
 def validate_headers(headers):
@@ -37,15 +49,7 @@ def validate_headers(headers):
     out_headers : `list`
         A list of headers.
     """
-    out_headers = []
-    h0 = next(headers)
-    out_headers.append(h0)
-
-    t = Table(list(zip(h0.values())), names=list(h0.keys()))
-
-    for h in headers:
-        t.add_row(h)
-        out_headers.append(h)
+    t = table_from_headers(headers)
 
     """
     Let's do roughly the minimal amount of verification here.
@@ -70,7 +74,7 @@ def validate_headers(headers):
         if not all(col == col[0]):
             raise ValueError(f"The {col.name} values did not all match:\n {col}")
 
-    return out_headers
+    return headers
 
 
 def build_pixel_frame(header):
@@ -242,17 +246,16 @@ class TransformBuilder:
         self._i += 1
 
 
-def gwcs_from_filenames(filenames, hdu=0):
+def gwcs_from_headers(headers):
     """
-    Given an iterable of filenames, build a gwcs for the dataset.
+    Given a list of headers build a gwcs.
+
+    Parameters
+    ----------
+
+    headers : `list`
+        A list of headers. These are expected to have already been validated.
     """
-
-    # headers is an iterator
-    headers = headers_from_filenames(filenames, hdu=hdu)
-
-    # headers is a now list
-    headers = validate_headers(headers)
-
     # Now we know the headers are consistent, a lot of parts only need the first one.
     header = headers[0]
 
@@ -264,3 +267,51 @@ def gwcs_from_filenames(filenames, hdu=0):
     return gwcs.WCS(forward_transform=builder.transform,
                     input_frame=pixel_frame,
                     output_frame=world_frame)
+
+
+def sorter_DINDEX(headers):
+    """
+    A sorting function based on the values of DINDEX in the header.
+    """
+    t = table_from_headers(headers)
+    dataset_axes = headers[0]['DNAXIS']
+    array_axes = headers[0]['DAAXES']
+    keys = [f'DINDEX{k}' for k in range(dataset_axes, array_axes, -1)]
+    t = np.array(t[keys])
+    return np.argsort(t, order=keys)
+
+
+def asdf_tree_from_filenames(filenames, hdu=0):
+    """
+    Build a DKIST asdf tree from a list of (unsorted) filenames.
+
+    Parameters
+    ----------
+
+    filenames : `list`
+        The filenames to process into a DKIST asdf dataset.
+
+    hdu : `int`
+        The HDU to read from the FITS files.
+    """
+    # headers is an iterator
+    headers = headers_from_filenames(filenames, hdu=hdu)
+
+    # headers is a now list
+    headers = validate_headers(headers)
+
+    # Sort the filenames into DS order.
+    sorted_filenames = np.array(filenames)[sorter_DINDEX(headers)]
+
+    # Get the array shape
+    shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'], headers[0]['DAAXES'], -1)))
+
+    # References from filenames
+    reference_array = references_from_filenames(sorted_filenames, array_shape=shape)
+
+    tree = {'dataset': reference_array,
+            'gwcs': gwcs_from_headers(headers)}
+
+    # TODO: Write a schema for the tree.
+
+    return tree
