@@ -304,7 +304,8 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     sorted_filenames = np.array(filenames)[sorter_DINDEX(headers)]
 
     # Get the array shape
-    shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'], headers[0]['DAAXES'], -1)))
+    shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
+                                                           headers[0]['DAAXES'], -1)))
 
     # References from filenames
     reference_array = references_from_filenames(sorted_filenames, array_shape=shape)
