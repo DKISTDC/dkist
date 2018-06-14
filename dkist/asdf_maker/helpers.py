@@ -146,6 +146,23 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
         return LookupTable(deltas)
 
 
+def spectral_model_from_framewave(framewav):
+    """
+    Construct a linear or lookup table model for wavelength based on the
+    framewav keys.
+    """
+    framewav = u.Quantity(framewav, unit=u.nm)
+    wave_bgn = framewav[0]
+
+    deltas = wave_bgn - framewav
+    ddeltas = (deltas[:-1] - deltas[1:])
+    if u.allclose(ddeltas[0], ddeltas):
+        slope = ddeltas[0]
+        return linear_spectral_model(slope, wave_bgn)
+    else:
+        return LookupTable(framewav)
+
+
 def make_asdf(filename, *, dataset, gwcs, **kwargs):
     """
     Save an asdf file.

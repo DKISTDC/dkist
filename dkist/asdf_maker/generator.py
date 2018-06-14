@@ -1,18 +1,17 @@
-import numpy as np
-import astropy.units as u
 from astropy.io import fits
-from astropy.table import Table
 from astropy.time import Time
-from sunpy.coordinates import Helioprojective
+
+import numpy as np
 
 import gwcs
 import gwcs.coordinate_frames as cf
+import astropy.units as u
+from astropy.table import Table
+from dkist.asdf_maker.helpers import (linear_spectral_model,
+                                      references_from_filenames, spatial_model_from_header,
+                                      time_model_from_date_obs, spectral_model_from_framewave)
 from gwcs.lookup_table import LookupTable
-
-from dkist.asdf_maker.helpers import (references_from_filenames, make_asdf,
-                                      spatial_model_from_quantity, linear_spectral_model,
-                                      linear_time_model, time_model_from_date_obs,
-                                      spatial_model_from_header)
+from sunpy.coordinates import Helioprojective
 
 
 def headers_from_filenames(filenames, hdu=0):
@@ -147,9 +146,13 @@ class TransformBuilder:
                     'SPECTRAL': self.make_spectral,
                     'SPATIAL': self.make_spatial}
 
+        xx = 0
         while self._i < self.header['DNAXIS']:  # < because FITS is i+1
             atype = self.axes_types[self._i]
             type_map[atype]()
+            xx += 1
+            if xx > 100:
+                raise ValueError("Infinite loop in header parsing")
 
     @property
     def axes_types(self):
@@ -219,7 +222,7 @@ class TransformBuilder:
         n = self.n(self._i)
         name = self.header[f'DWNAME{n}']
         name = name.split(' ')[0]
-        axes_names = [(self.header[f'DWNAME{n}'].rsplit(' ')[1]) for n in (i, self.n(i+1))]
+        axes_names = [(self.header[f'DWNAME{nn}'].rsplit(' ')[1]) for nn in (n, self.n(i+1))]
 
         obstime = Time(self.header['DATE-BGN'])
         self._frames.append(cf.CelestialFrame(axes_order=(i, i+1), name=name,
@@ -233,17 +236,40 @@ class TransformBuilder:
 
     def make_spectral(self):
         """
-        Add a spectral axes.
+        Decide how to make a spectral axes.
         """
         n = self.n(self._i)
         name = self.header[f'DWNAME{n}']
         self._frames.append(cf.SpectralFrame(axes_order=(self._i,),
                                              unit=self.get_units(self._i),
                                              name=name))
-        self._transforms.append(linear_spectral_model(self.header[f'CDELT{n}']*u.nm,
-                                                      self.header[f'CRVAL{n}']*u.nm))
+
+        if "WAVE" in self.header.get(f'CTYPE{n}', ''):
+            transform = self.make_spectral_from_wcs()
+        elif "FRAMEWAV" in self.header.keys():
+            transform = self.make_spectral_from_dataset()
+        else:
+            raise ValueError("Could not parse spectral WCS information from this header.")
+
+        self._transforms.append(transform)
 
         self._i += 1
+
+    def make_spectral_from_dataset(self):
+        """
+        Make a spectral axes from (VTF) dataset info.
+        """
+        n = self.n(self._i)
+        framewave = [h['FRAMEWAV'] for h in self.headers[:self.header[f'DNAXIS{n}']]]
+        return spectral_model_from_framewave(framewave)
+
+    def make_spectral_from_wcs(self):
+        """
+        Add a spectral axes from the FITS-WCS keywords.
+        """
+        n = self.n(self._i)
+        return linear_spectral_model(self.header[f'CDELT{n}']*u.nm,
+                                     self.header[f'CRVAL{n}']*u.nm)
 
 
 def gwcs_from_headers(headers):
