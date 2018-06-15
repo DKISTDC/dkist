@@ -100,11 +100,6 @@ def test_make_asdf(header_filenames, tmpdir):
     fname = tmpdir.join("test.asdf")
     asdf_file = make_asdf(fname, dataset=tree['dataset'], gwcs=tree['gwcs'])
 
-    # with asdf.AsdfFile.open(asdf_file) as af:
-    #     assert_tree_match(tree, af.tree)
-
     with open(asdf_file, "rb") as fd:
         af = asdf.AsdfFile()
         af = asdf.AsdfFile._open_asdf(af, fd)
-
-
