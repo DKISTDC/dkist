@@ -1,6 +1,10 @@
 import os
+import tempfile
 import glob
+from zipfile import ZipFile
+from unittest.mock import patch
 
+import asdf
 import pytest
 import numpy as np
 from astropy.io import fits
@@ -8,10 +12,14 @@ from astropy.modeling import Model
 import gwcs
 import gwcs.coordinate_frames as cf
 
-from dkist.asdf_maker.generator import TransformBuilder, gwcs_from_headers
+from dkist.asdf_maker.helpers import make_asdf
+from dkist.asdf_maker.generator import (TransformBuilder, gwcs_from_headers,
+                                        asdf_tree_from_filenames,
+                                        headers_from_filenames, validate_headers)
 
 from dkist.data.test import rootdir
-HEADER_DIR = os.path.join(rootdir, 'datasetheaders')
+
+DATA_DIR = os.path.join(rootdir, 'datasettestfiles')
 
 
 def make_header_files():
@@ -20,31 +28,50 @@ def make_header_files():
 
     It's here because I don't know where else to put it.
     """
+    os.makedirs(DATA_DIR) if not os.path.exists(DATA_DIR) else None
     from dkistdataratemodel.units import frame
     from dkist_data_model.generator.dataproducts.visp import CalibratedVISP
     visp = CalibratedVISP(end_condition=20*frame)
 
-    headers = np.array([header for header in visp.generate_metadata('sp_5_raster',
-                                                                    metadata_type="file")])
-    for i, (head, comments) in enumerate(headers):
-        header = fits.Header(head)
-        for k, c in comments.items():
-            header.comments[k] = c
-        header.totextfile(os.path.join(HEADER_DIR, f'visp_sp5_{i+1:02d}'), overwrite=True)
+    visp_files = visp.to_fits("sp_5_labelled",
+                              path_template=os.path.join(DATA_DIR, 'visp_5d_{i:02d}.fits'))
+
+    with ZipFile(os.path.join(DATA_DIR, "visp.zip"), "w") as myzip:
+        for fname in visp_files:
+            myzip.write(fname, os.path.split(fname)[1])
+            os.remove(fname)
+
+    from dkist_data_model.generator.dataproducts.vtf import CalibratedVTF
+    vtf = CalibratedVTF(end_condition=96*frame)
+
+    vtf_files = vtf.to_fits("5d_test",
+                            path_template=os.path.join(DATA_DIR, 'vtf_5d_{i:02d}.fits'))
+
+    with ZipFile(os.path.join(DATA_DIR, "vtf.zip"), "w") as myzip:
+        for fname in vtf_files:
+            myzip.write(fname, os.path.split(fname)[1])
+            os.remove(fname)
 
 
-@pytest.fixture
-def header_filenames():
-    files = glob.glob(os.path.join(HEADER_DIR, '*'))
+def extract(name):
+    atmpdir = tempfile.mkdtemp()
+    with ZipFile(os.path.join(DATA_DIR, name)) as myzip:
+        myzip.extractall(atmpdir)
+    return atmpdir
+
+
+@pytest.fixture(params=["vtf.zip", "visp.zip"])
+def header_filenames(request):
+    files = glob.glob(os.path.join(extract(request.param), '*'))
     files.sort()
     return files
 
 
-@pytest.fixture
-def transform_builder():
-    files = glob.glob(os.path.join(HEADER_DIR, '*'))
+@pytest.fixture(params=["vtf.zip", "visp.zip"])
+def transform_builder(request):
+    files = glob.glob(os.path.join(extract(request.param), '*'))
     files.sort()
-    headers = [fits.Header.fromtextfile(f) for f in files]
+    headers = headers_from_filenames(files)
     return TransformBuilder(headers)
 
 
@@ -63,13 +90,19 @@ def test_frames(transform_builder):
     assert all([isinstance(frame, cf.CoordinateFrame) for frame in frames])
 
 
-def headers_from_textfiles(filenames, hdu=0):
-    """
-    This is a patched version of headers_from_filenames for testing with.
-    """
-    return [fits.Header.fromtextfile(fname) for fname in filenames]
-
-
 def test_gwcs_from_files(header_filenames):
-    w = gwcs_from_headers(headers_from_textfiles(header_filenames))
+    w = gwcs_from_headers(headers_from_filenames(header_filenames))
     assert isinstance(w, gwcs.WCS)
+
+
+def test_asdf_tree(header_filenames):
+    tree = asdf_tree_from_filenames(header_filenames)
+    assert isinstance(tree, dict)
+
+
+def test_validator(header_filenames):
+    headers = headers_from_filenames(header_filenames)
+    headers[10]['NAXIS'] = 5
+    with pytest.raises(ValueError) as excinfo:
+        validate_headers(headers)
+        assert "NAXIS" in str(excinfo)

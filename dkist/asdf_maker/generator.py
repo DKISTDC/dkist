@@ -152,7 +152,7 @@ class TransformBuilder:
             type_map[atype]()
             xx += 1
             if xx > 100:
-                raise ValueError("Infinite loop in header parsing")
+                raise ValueError("Infinite loop in header parsing")  # pragma: no cover
 
     @property
     def axes_types(self):
@@ -249,7 +249,7 @@ class TransformBuilder:
         elif "FRAMEWAV" in self.header.keys():
             transform = self.make_spectral_from_dataset()
         else:
-            raise ValueError("Could not parse spectral WCS information from this header.")
+            raise ValueError("Could not parse spectral WCS information from this header.")  # pragma: no cover
 
         self._transforms.append(transform)
 
