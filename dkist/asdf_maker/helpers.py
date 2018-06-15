@@ -42,7 +42,8 @@ def references_from_filenames(filenames, array_shape, hdu_index=0, relative_to=N
     filenames = np.asanyarray(filenames)
     reference_array = np.empty(array_shape, dtype=object)
     if filenames.size != reference_array.size:
-        raise ValueError("Not enough filenames supplied for array_shape")
+        raise ValueError(f"An incorrect number of filenames ({filenames.size})"
+                         f" supplied for array_shape ({array_shape})")
 
     for i, filepath in enumerate(filenames.flat):
         with fits.open(filepath) as hdul:
