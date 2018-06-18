@@ -82,27 +82,39 @@ def spatial_model_from_header(header):
     if latind is None or lonind is None:
         raise ValueError("Could not extract HPLN and HPLT from the header.")
 
-    # TODO: Add proper unit support
-    crpix1, crpix2 = (header[f'CRPIX{lonind}'], header[f'CRPIX{latind}']) * u.pixel
+    latproj = header[f'CTYPE{latind}'][5:]
+    lonproj = header[f'CTYPE{lonind}'][5:]
+
+    if latproj != lonproj:
+        raise ValueError("The projection of the two spatial axes did not match.")
+
+    cunit1, cunit2 = u.Unit(header[f'CUNIT{lonind}']), u.Unit(header[f'CUNIT{latind}'])
+    crpix1, crpix2 = header[f'CRPIX{lonind}'] * cunit1, header[f'CRPIX{latind}'] * cunit2
     crval1, crval2 = (header[f'CRVAL{lonind}'], header[f'CRVAL{latind}']) * u.arcsec
     cdelt1, cdelt2 = (header[f'CDELT{lonind}'], header[f'CDELT{latind}']) * (u.arcsec/u.pix)
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
                     [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * u.arcsec
 
-    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2)
+    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
+                                       projection=latproj)
 
 
-def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2):
+def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
+                                projection='TAN'):
     """
     Given quantity representations of a HPLx FITS WCS return a model for the
     spatial transform.
 
     The ordering of ctype1 and ctype2 should be LON, LAT
     """
+
+    # TODO: Find this from somewhere else or extend it or something
+    projections = {'TAN': Pix2Sky_TAN()}
+
     shiftu = Shift(-crpix1) & Shift(-crpix2)
     scale = Multiply(cdelt1) & Multiply(cdelt2)
     rotu = AffineTransformation2D(pc, translation=(0, 0)*u.arcsec)
-    tanu = Pix2Sky_TAN()  # lon, lat
+    tanu = projections[projection]
     skyrotu = RotateNative2Celestial(crval1, crval2, 180*u.deg)
     return shiftu | scale | rotu | tanu | skyrotu
 
