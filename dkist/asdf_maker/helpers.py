@@ -89,11 +89,12 @@ def spatial_model_from_header(header):
         raise ValueError("The projection of the two spatial axes did not match.")
 
     cunit1, cunit2 = u.Unit(header[f'CUNIT{lonind}']), u.Unit(header[f'CUNIT{latind}'])
-    crpix1, crpix2 = header[f'CRPIX{lonind}'] * cunit1, header[f'CRPIX{latind}'] * cunit2
-    crval1, crval2 = (header[f'CRVAL{lonind}'], header[f'CRVAL{latind}']) * u.arcsec
-    cdelt1, cdelt2 = (header[f'CDELT{lonind}'], header[f'CDELT{latind}']) * (u.arcsec/u.pix)
+    crpix1, crpix2 = header[f'CRPIX{lonind}'] * u.pix, header[f'CRPIX{latind}'] * u.pix
+    crval1, crval2 = (header[f'CRVAL{lonind}'] * cunit1, header[f'CRVAL{latind}'] * cunit2)
+    cdelt1, cdelt2 = (header[f'CDELT{lonind}'] * (cunit1 / u.pix),
+                      header[f'CDELT{latind}'] * (cunit2 / u.pix))
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
-                    [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * u.arcsec
+                    [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * cunit1
 
     return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
                                        projection=latproj)
