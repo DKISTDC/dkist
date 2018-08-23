@@ -44,8 +44,8 @@ def make_tree_input_map(tree):
     for i, inp in enumerate(tree.inputs):
 
         if tree.isleaf or tree.value != "&":
-            # If the tree is a leaf node then the input maps to the original tree.
-            return {tree: {inp}}
+            # If the tree is a leaf node then the inputs map to the original tree.
+            return {tree: set(tree.inputs)}
 
         # If this input number is less than the number of inputs in the left
         # hand side of the tree then the input maps to the LHS of the tree. If
@@ -65,6 +65,21 @@ def get_tree_with_input(ti_map, input):
     for t, inputs in ti_map.items():
         if input in inputs:
             return t
+
+
+def make_forward_input_map(tree):
+    """
+    Given a tree, generate a mapping of inputs to the tree, to inputs of it's
+    branches.
+    """
+    inp_map = {}
+    assert tree.value == "&"
+    for i, ori_inp in enumerate(tree.inputs):
+        if i < len(tree.left.inputs):
+            inp_map[ori_inp] = tree.left.inputs[i]
+        else:
+            inp_map[ori_inp] = tree.right.inputs[i - len(tree.left.inputs)]
+    return inp_map
 
 
 def remove_input_frame(tree, inp, remove_coupled_trees=False):
@@ -107,6 +122,9 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
         # Otherwise, we know this tree has the input, so we just drop it.
         return []
 
+    # map the input names of this tree to the names of it's children
+    inp_map = make_forward_input_map(tree)
+
     new_trees = []
     for tree in (tree.left, tree.right):
         # Generate the input mapping
@@ -114,7 +132,7 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
         # Keep a list of the left and right trees for this tree
         sub_trees = list(ti_map.keys())
         # Find if the input we are after is in one of the subtrees for this tree.
-        sub_tree = get_tree_with_input(ti_map, inp)
+        sub_tree = get_tree_with_input(ti_map, inp_map[inp])
         if sub_tree is None:
             # If we don't have the input, then we save the original tree unmodified.
             new_trees.append(tree)
@@ -137,6 +155,7 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
                 new_trees.append(tree)
 
         # TODO: What if we need to recurse down the tree another many levels?!
+        # We shouldn't? All the inputs have to be at the top level of the expression??
         # new_trees += remove_input_frame(sub_tree, inp, remove_coupled_trees)
 
     return new_trees
