@@ -3,6 +3,9 @@ import pytest
 from astropy.modeling.core import Model
 from astropy.modeling.models import Identity, Pix2Sky_AZP
 
+import astropy.units as u
+from astropy.modeling.models import Identity, Pix2Sky_AZP, Shift, Multiply
+
 from dkist.utils.model_tools import make_tree_input_map, remove_input_frame, re_model_trees
 
 
@@ -30,6 +33,16 @@ def single_non_separable():
 def double_non_separable():
     return (Pix2Sky_AZP() | Identity(2)) & Identity(1)
 
+@pytest.fixture
+def spatial_like():
+    crpix1, crpix2 = (100, 100)*u.pix
+    cdelt1, cdelt2 = (10, 10)*(u.arcsec/u.pix)
+
+    shiftu = Shift(-crpix1) & Shift(-crpix2)
+    scale = Multiply(cdelt1) & Multiply(cdelt2)
+
+    return (shiftu | scale) & Identity(1)
+
 
 def test_input_map(triple_input_flat):
     ti_map = make_tree_input_map(triple_input_flat._tree)
@@ -51,6 +64,13 @@ def test_leaf_map(triple_input_nested):
     ti_map = make_tree_input_map(tree)
     assert list(ti_map.keys())[1] is tree.right
     assert isinstance(list(ti_map.keys())[1].value, Model)
+
+
+def test_spatial_remove(spatial_like):
+    tree = spatial_like._tree
+    trees = remove_input_frame(tree, 2)
+    assert len(trees) == 1
+    assert len(trees[0].inputs) == 2
 
 
 def test_remove_non_sep(single_non_separable):
