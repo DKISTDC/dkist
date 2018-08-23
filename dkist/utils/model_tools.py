@@ -6,7 +6,7 @@ I would imagine this will end up in gwcs or maybe even astropy at somepoint.
 
 from collections import defaultdict
 
-from astropy.modeling import Model, separable
+from astropy.modeling import separable
 from astropy.modeling.core import BINARY_OPERATORS, _model_oper
 
 
@@ -43,19 +43,9 @@ def make_tree_input_map(tree):
     tree_input_map = defaultdict(set)
     for i, inp in enumerate(tree.inputs):
 
-        if isinstance(tree.value, Model):
-            # In the situation where the value is a model, we just have the
-            # given input for this tree. Here the tree is the root tree and not
-            # a child of the tree.
-
-            # TODO: Rethink this to use `isleaf`?
+        if tree.isleaf or tree.value != "&":
+            # If the tree is a leaf node then the input maps to the original tree.
             return {tree: {inp}}
-
-        if tree.value != "&":
-            # Because we are only dealing with extra inputs to the tree we
-            # should only have to parse trees with & as the operator. If we hit
-            # this something has gone wrong.
-            raise Exception("We should never get here.")
 
         # If this input number is less than the number of inputs in the left
         # hand side of the tree then the input maps to the LHS of the tree. If
@@ -104,6 +94,19 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
         A list of all the trees. Can have the `&` operator applied to
         reconstruct a `CompoundModel`.
     """
+    # If the input is not found, noop
+    if inp not in tree.inputs:
+        return [tree]
+
+    if tree.value != "&":
+        # If the input is not a "&" then we have to respect remove_coupled_trees
+        sep = tree_is_separable(tree)
+        if all(~sep):
+            if not remove_coupled_trees:
+                return [tree]
+        # Otherwise, we know this tree has the input, so we just drop it.
+        return []
+
     new_trees = []
     for tree in (tree.left, tree.right):
         # Generate the input mapping
@@ -128,7 +131,7 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
         sep = tree_is_separable(sub_tree)
         if all(~sep):
             if remove_coupled_trees:
-                sub_trees.remove(sub_trees)
+                sub_trees.remove(sub_tree)
                 new_trees += sub_trees
             else:
                 new_trees.append(tree)
