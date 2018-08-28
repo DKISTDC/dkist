@@ -1,9 +1,15 @@
 """
 This module contains tools for slicing gwcs objects.
 """
+from copy import deepcopy
 
-from astropy.modeling import Model, Parameter
-from astropy.modeling.models import Identity
+import astropy.units as u
+from astropy.modeling import Model, Parameter, separable
+from astropy.modeling.models import Identity, Shift
+
+import gwcs.coordinate_frames as cf
+
+from dkist.utils.model_tools import remove_input_frame, re_model_trees
 
 
 __all__ = ['GWCSSlicer', 'FixedParameter']
@@ -44,13 +50,13 @@ class GWCSSlicer:
     Examples
     --------
 
-    >>> myslicedgwcs = Slicer(mygwcs)[10, : , 0]
+    >>> myslicedgwcs = Slicer(mygwcs)[10, : , 0]  # doctest: +SKIP
     """
     def __init__(self, gwcs, copy=False):
         if copy:
-            gwcs = copy.deepcopy(gwcs)
+            gwcs = deepcopy(gwcs)
         self.gwcs = gwcs
-        self.naxis = wcsobj.forward_transform.n_inputs
+        self.naxis = self.gwcs.forward_transform.n_inputs
         self.separable = separable.is_separable(self.gwcs.forward_transform)
         self._compare_frames_separable()
 
@@ -86,7 +92,7 @@ class GWCSSlicer:
         for pair in coupled_axes:
             for ax in pair:
                 if self.separable[ax]:
-                    raise ValueError("Panic")
+                    raise ValueError("Panic")  # pragma: no cover
 
     def _get_axes_map(self, frames):
         """
@@ -101,7 +107,9 @@ class GWCSSlicer:
 
     def _new_output_frame(self, axes):
         """
-        remove the frames for all axes and return a new output frame
+        remove the frames for all axes and return a new output frame.
+
+        This method assumes axes has already been sanitized for non-separable axes.
         """
         frames = self._get_frames()
         axes_map = self._get_axes_map(frames)
@@ -115,6 +123,16 @@ class GWCSSlicer:
             return frames[0]
         else:
             return cf.CompositeFrame(frames, name=self.gwcs.output_frame.name)
+
+    def _list_to_compound(self, models):
+        """
+        Convert a list of models into a compound model using the ``&`` operator.
+        """
+        # Convert the list of models into a CompoundModel
+        comp_m = models[0]
+        for m in models[1:]:
+            comp_m = comp_m & m
+        return comp_m
 
     def _sanitize(self, item):
         """
@@ -143,16 +161,6 @@ class GWCSSlicer:
 
         return item
 
-    def _list_to_compound(self, models):
-        """
-        Convert a list of models into a compound model using the ``&`` operator.
-        """
-        # Convert the list of models into a CompoundModel
-        comp_m = models[0]
-        for m in models[1:]:
-            comp_m = comp_m & m
-        return comp_m
-
     def __getitem__(self, item):
         """
         Once the item is sanitized, we fix the parameter if the item is an integer,
@@ -162,29 +170,24 @@ class GWCSSlicer:
         item = self._sanitize(item)
 
         prepend = []
-        append = []
         axes_to_drop = []
 
-        # Iterate over all the axes and keep a list of models to append or
-        # prepend to the transform, and a list of axes to remove from the wcs
-        # completely.
+        # Iterate over all the axes and keep a list of models prepend to the
+        # transform, and a list of axes to remove from the wcs completely.
 
-        # We always add a model to prepend and append lists so that we maintain
-        # consistency with the number of axes. If prepend or append is entirely
-        # identity models, they are not used.
+        # We always add a model to prepend list so that we maintain consistency
+        # with the number of axes. If prepend is entirely identity models, it
+        # is not used.
         for i, ax in enumerate(item):
             if isinstance(ax, int):
                 if self.separable[i]:
                     axes_to_drop.append(i)
                 else:
                     prepend.append(FixedParameter(ax*u.pix))
-                    append.append(Identity(1))
             elif ax.start:
                 prepend.append(Shift(ax.start*u.pix))
-                append.append(Identity(1))
             else:
                 prepend.append(Identity(1))
-                append.append(Identity(1))
 
         model = self.gwcs.forward_transform
         for drop_ax in axes_to_drop:
@@ -194,9 +197,6 @@ class GWCSSlicer:
 
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
-
-        if not all([isinstance(a, Identity) for a in append]):
-            model = model | self._list_to_compound(append)
 
         new_in_frame = self.gwcs.input_frame
         new_out_frame = self.gwcs.output_frame
