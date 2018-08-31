@@ -17,6 +17,7 @@ htmlcov
 MANIFEST
 .ipynb_checkpoints
 .pytest_cache
+.eggs
 
 # Sphinx
 docs/api
