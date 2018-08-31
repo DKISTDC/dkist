@@ -129,3 +129,8 @@ def test_error_step(slicer_3d):
 def test_error_type(slicer_3d):
     with pytest.raises(ValueError):
         sl = slicer_3d["laksjdkslja"]
+
+def test_roundtrip(slicer_3d):
+    wcs = slicer_3d[10:, 10, 10]
+    w = wcs(10*u.pix, with_units=True)
+    wcs.invert(w, with_units=True)

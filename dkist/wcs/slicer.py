@@ -137,17 +137,27 @@ class GWCSSlicer:
         """
         iframe = self.gwcs.input_frame
         assert isinstance(iframe, cf.CoordinateFrame) and not isinstance(iframe, cf.CompositeFrame)
+        assert iframe._reference_position is None and iframe._reference_frame is None
+
         mods = ("axes_type", "unit", "axes_names")
-        copys = ("name,")
+        copys = ("name",)
 
         attrs = {}
         for ax in axes:
             for m in mods:
                 n = list(getattr(iframe, m))
-                new = n.pop(ax)
-                attrs[m] = new
+                n.pop(ax)
+                attrs[m] = tuple(n)
+
+        for at in copys:
+            attrs[at] = getattr(iframe, at)
+
         attrs["naxes"] = iframe.naxes - len(axes)
 
+        attrs["axes_order"] = tuple(range(attrs["naxes"]))
+
+        r = type(iframe)(**attrs)
+        return r
 
 
     def _list_to_compound(self, models):
@@ -228,7 +238,7 @@ class GWCSSlicer:
         new_in_frame = self.gwcs.input_frame
         new_out_frame = self.gwcs.output_frame
         if axes_to_drop:
-            # new_in_frame = self._new_input_frame(axes_to_drop)
+            new_in_frame = self._new_input_frame(axes_to_drop)
             new_out_frame = self._new_output_frame(axes_to_drop)
 
         # Update the gwcs
