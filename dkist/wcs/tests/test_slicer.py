@@ -1,6 +1,7 @@
 import pytest
 
 import astropy.units as u
+from astropy.coordinates import SkyCoord
 from astropy.modeling.models import Identity
 
 from sunpy.coordinates.frames import Helioprojective
@@ -130,7 +131,10 @@ def test_error_type(slicer_3d):
     with pytest.raises(ValueError):
         sl = slicer_3d["laksjdkslja"]
 
+
 def test_roundtrip(slicer_3d):
     wcs = slicer_3d[10:, 10, 10]
     w = wcs(10*u.pix, with_units=True)
-    wcs.invert(w, with_units=True)
+    assert isinstance(w, SkyCoord)
+    p = wcs.invert(w, with_units=True)
+    assert len(p) == 2
