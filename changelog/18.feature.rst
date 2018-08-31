@@ -1,0 +1,1 @@
+Add framework for slicing gwcses.
