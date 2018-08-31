@@ -195,7 +195,8 @@ class GWCSSlicer:
             else:
                 item.append(slice(None))
 
-        return item
+        # Reverse the slice to match the physical coordinates and not the pixel ones
+        return item[::-1]
 
     def __getitem__(self, item):
         """
