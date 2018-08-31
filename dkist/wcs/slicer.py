@@ -161,6 +161,10 @@ class GWCSSlicer:
 
         return item
 
+    def _input_units(self):
+        ft = self.gwcs.forward_transform
+        return {inp: ft.input_units.get(ft.inputs[inp], 1) for inp in range(ft.n_inputs)}
+
     def __getitem__(self, item):
         """
         Once the item is sanitized, we fix the parameter if the item is an integer,
@@ -178,14 +182,15 @@ class GWCSSlicer:
         # We always add a model to prepend list so that we maintain consistency
         # with the number of axes. If prepend is entirely identity models, it
         # is not used.
+        input_units = self._input_units()
         for i, ax in enumerate(item):
             if isinstance(ax, int):
                 if self.separable[i]:
                     axes_to_drop.append(i)
                 else:
-                    prepend.append(FixedParameter(ax*u.pix))
+                    prepend.append(FixedParameter(ax*input_units[i]))
             elif ax.start:
-                prepend.append(Shift(ax.start*u.pix))
+                prepend.append(Shift(ax.start*input_units[i]))
             else:
                 prepend.append(Identity(1))
 
