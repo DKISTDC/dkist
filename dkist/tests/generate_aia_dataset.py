@@ -92,7 +92,8 @@ def main():
     path = Path('~/sunpy/data/jsocflare/').expanduser()
     files = glob.glob(str(path / '*.fits'))
 
-    requestid = 'JSOC_20180111_1429'
+    # requestid = 'JSOC_20180831_1097'
+    requestid = None
 
     if not files:
         if requestid:
@@ -163,25 +164,30 @@ def main():
     timemodel = LookupTable(lookup_table=seconds[:shape[1]]*u.s)
     wavemodel = LookupTable(lookup_table=waves[:shape[0]]*u.AA)
 
-    hcubemodel = wavemodel & timemodel & spatial
+    hcubemodel = spatial & timemodel & wavemodel
 
-    wave_frame = cf.SpectralFrame(axes_order=(0, ), unit=u.AA)
+    wave_frame = cf.SpectralFrame(axes_order=(3, ), unit=u.AA)
     time_frame = cf.TemporalFrame(
-        axes_order=(1, ), unit=u.s, reference_time=Time(time_coords[0]))
-    sky_frame = cf.CelestialFrame(axes_order=(2, 3), name='helioprojective', reference_frame=smap0.coordinate_frame)
+        axes_order=(2, ), unit=u.s, reference_time=Time(time_coords[0]))
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=smap0.coordinate_frame)
 
-    sky_frame = cf.CompositeFrame([wave_frame, time_frame, sky_frame])
+    sky_frame = cf.CompositeFrame([sky_frame, time_frame, wave_frame])
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=4,
+                                        axes_order=(0, 1, 2, 3),
+                                        axes_type=("pixel", "pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "time", "wavelength"),
+                                        unit=(u.pix, u.pix, u.pix, u.pix))
 
-    wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, output_frame=sky_frame)
+    wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, input_frame=detector_frame,
+                       output_frame=sky_frame)
 
     print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, output="numericals_plus"))
+    print(wcs(*[1*u.pix]*4, with_units=True))
 
     ea = references_from_filenames(cube, relative_to=str(path))
 
-    crpix1u, crpix2u = u.Quantity(smap0.reference_pixel)-1*u.pixel
-    shiftu = Shift(-crpix1u) & Shift(-crpix2u)
     tree = {
         'gwcs': wcs,
         'dataset': ea,
@@ -193,7 +199,6 @@ def main():
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
 
-
     # import sys; sys.exit(0)
 
     from dkist.dataset import Dataset
@@ -201,7 +206,7 @@ def main():
     ds = Dataset.from_directory(str(path))
     print(repr(ds))
     print(repr(ds.wcs))
-    print(ds.wcs(*[1*u.pix]*4, output="numericals_plus"))
+    print(ds.wcs(*[1*u.pix]*4, with_units=True))
 
 
 if __name__ == "__main__":

@@ -11,13 +11,13 @@ try:
 except ImportError:
     from ndcube.ndcube import NDCubeBase as NDCubeABC
 
-from dkist.dataset.mixins import DatasetPlotMixin
+from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
 from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
 
 __all__ = ['Dataset']
 
 
-class Dataset(NDCubeABC):
+class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
     """
     The base class for DKIST datasets.
 

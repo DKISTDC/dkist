@@ -1,9 +1,22 @@
 import matplotlib.pyplot as plt
 
+from astropy.nddata.mixins.ndslicing import NDSlicingMixin
 from sunpy.visualization.animator import ImageAnimator
 from ndcube.mixins import NDCubePlotMixin
 
+from gwcs import WCS
+from dkist.wcs.slicer import GWCSSlicer
+
 __all__ = ['DatasetPlotMixin']
+
+
+class DatasetSlicingMixin(NDSlicingMixin):
+    def _slice_wcs(self, item):
+        if self.wcs is None:
+            return None
+        if isinstance(self.wcs, WCS):
+            return GWCSSlicer(self.wcs, copy=True)[item]
+        return self.wcs[item]
 
 
 class DatasetPlotMixin(NDCubePlotMixin):
