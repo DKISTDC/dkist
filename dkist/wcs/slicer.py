@@ -105,6 +105,13 @@ class GWCSSlicer:
 
         return axes_map
 
+    def _input_units(self):
+        """
+        Return a dict mapping input number to a "unit". If the model does not use units, return 1.
+        """
+        ft = self.gwcs.forward_transform
+        return {inp: ft.input_units.get(ft.inputs[inp], 1) for inp in range(ft.n_inputs)}
+
     def _new_output_frame(self, axes):
         """
         remove the frames for all axes and return a new output frame.
@@ -123,6 +130,25 @@ class GWCSSlicer:
             return frames[0]
         else:
             return cf.CompositeFrame(frames, name=self.gwcs.output_frame.name)
+
+    def _new_input_frame(self, axes):
+        """
+        remove the given axes from the input frame.
+        """
+        iframe = self.gwcs.input_frame
+        assert isinstance(iframe, cf.CoordinateFrame) and not isinstance(iframe, cf.CompositeFrame)
+        mods = ("axes_type", "unit", "axes_names")
+        copys = ("name,")
+
+        attrs = {}
+        for ax in axes:
+            for m in mods:
+                n = list(getattr(iframe, m))
+                new = n.pop(ax)
+                attrs[m] = new
+        attrs["naxes"] = iframe.naxes - len(axes)
+
+
 
     def _list_to_compound(self, models):
         """
@@ -160,10 +186,6 @@ class GWCSSlicer:
                 item.append(slice(None))
 
         return item
-
-    def _input_units(self):
-        ft = self.gwcs.forward_transform
-        return {inp: ft.input_units.get(ft.inputs[inp], 1) for inp in range(ft.n_inputs)}
 
     def __getitem__(self, item):
         """
