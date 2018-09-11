@@ -11,10 +11,7 @@ import astropy.units as u
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
-try:
-    from ndcube.ndcube import NDCubeABC
-except ImportError:
-    from ndcube.ndcube import NDCubeBase as NDCubeABC
+from ndcube.ndcube import NDCubeABC
 
 
 __all__ = ['Dataset']
