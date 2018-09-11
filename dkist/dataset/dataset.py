@@ -2,17 +2,20 @@ import copy
 import glob
 import os.path
 from pathlib import Path
+from textwrap import dedent
+
+import numpy as np
 
 import asdf
-import numpy as np
 import astropy.units as u
+from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+
 try:
     from ndcube.ndcube import NDCubeABC
 except ImportError:
     from ndcube.ndcube import NDCubeBase as NDCubeABC
 
-from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
-from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
 
 __all__ = ['Dataset']
 
@@ -57,54 +60,72 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         return cls(data, wcs=wcs)
 
+    @property
+    def pixel_axes_names(self):
+        return self.wcs.input_frame.axes_names[::-1]
+
+    @property
+    def world_axes_names(self):
+        return self.wcs.output_frame.axes_names[::-1]
+
     def __repr__(self):
         """
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
-        prefix = object.__repr__(self)[:-1] + '\n'
-        body = "{}\n".format(self.data)
-        body += "{!r}".format(self.wcs)[1:-1]
-        return ''.join([prefix, body, '>'])
+        prefix = object.__repr__(self)
+
+        pnames = ', '.join(self.pixel_axes_names)
+        wnames = ', '.join(self.world_axes_names)
+        output = dedent(f"""\
+        {prefix}
+        {self.data!r}
+        WCS<pixel_axes_names=({pnames}),
+            world_axes_names=({wnames})>""")
+        return output
 
     def pixel_to_world(self, *quantity_axis_list):
         """
         Convert a pixel coordinate to a data (world) coordinate by using
         `~gwcs.wcs.WCS`.
 
+        This method expects input and returns output in the same order as the
+        array dimensions. (Which is the reverse of the underlying WCS object.)
+
         Parameters
         ----------
         quantity_axis_list : iterable
             An iterable of `~astropy.units.Quantity` with unit as pixel `pix`.
-            Note that these quantities must be entered as separate arguments, not as one list.
 
         Returns
         -------
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        world = self.wcs(*quantity_axis_list, with_units=True)
+        world = self.wcs(*quantity_axis_list[::-1], with_units=True)
         # Convert list to tuple as a more standard return type
         if isinstance(world, list):
             world = tuple(world)
-        return world
+        return world[::-1]
 
     def world_to_pixel(self, *quantity_axis_list):
         """
         Convert a world coordinate to a data (pixel) coordinate by using
         `~gwcs.wcs.WCS.invert`.
 
+        This method expects input and returns output in the same order as the
+        array dimensions. (Which is the reverse of the underlying WCS object.)
+
         Parameters
         ----------
         quantity_axis_list : iterable
             A iterable of `~astropy.units.Quantity`.
-            Note that these quantities must be entered as separate arguments, not as one list.
 
         Returns
         -------
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        return tuple(self.wcs.invert(*quantity_axis_list, with_units=True))
+        return tuple(self.wcs.invert(*quantity_axis_list[::-1], with_units=True))[::-1]
 
     def world_axis_physical_types(self):
         raise NotImplementedError()  # pragma: no cover
@@ -131,4 +152,4 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         lower_pixels = [int(np.rint(l.value)) for l in lower_pixels]
         upper_pixels = [int(np.rint(u.value)) for u in upper_pixels]
         item = tuple([slice(lower_pixels[i], upper_pixels[i]) for i in range(n_dim)])
-        return self.data[item]
+        return self[item]

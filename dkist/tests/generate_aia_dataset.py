@@ -166,11 +166,12 @@ def main():
 
     hcubemodel = spatial & timemodel & wavemodel
 
-    wave_frame = cf.SpectralFrame(axes_order=(3, ), unit=u.AA)
+    wave_frame = cf.SpectralFrame(axes_order=(3, ), unit=u.AA, name="wavelength", axes_names=("wavelength", ))
     time_frame = cf.TemporalFrame(
-        axes_order=(2, ), unit=u.s, reference_time=Time(time_coords[0]))
+        axes_order=(2, ), unit=u.s, reference_time=Time(time_coords[0]), name="time", axes_names=("time", ))
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
-                                  reference_frame=smap0.coordinate_frame)
+                                  reference_frame=smap0.coordinate_frame,
+                                  axes_names=("helioprojective longitude", "helioprojective latitude"))
 
     sky_frame = cf.CompositeFrame([sky_frame, time_frame, wave_frame])
     detector_frame = cf.CoordinateFrame(name="detector", naxes=4,
