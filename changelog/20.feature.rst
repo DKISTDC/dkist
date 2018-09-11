@@ -1,0 +1,3 @@
+Implement dataset slicing. This orders the results of WCS related methods on
+the dataset class in reverse order to that of the underlying WCS. So it is not
+so jarring that the array and WCS are in reverse order.
