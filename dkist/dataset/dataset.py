@@ -69,7 +69,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         if self.wcs.output_frame:
             return self.wcs.output_frame.axes_names[::-1]
         else:
-            return ('',)*self.data.ndim
+            return ('',)*self.data.ndim  # pragma: no cover  # We should never hit this
 
     def __repr__(self):
         """
@@ -153,6 +153,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         if (len(min_coord_values) != len(interval_widths)) or len(min_coord_values) != n_dim:
             raise ValueError("min_coord_values and interval_widths must have "
                              "same number of elements as number of data dimensions.")
+
         # Convert coords of lower left corner to pixel units.
         lower_pixels = self.world_to_pixel(*min_coord_values)
         upper_pixels = self.world_to_pixel(*[min_coord_values[i] + interval_widths[i]

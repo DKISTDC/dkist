@@ -57,7 +57,6 @@ class GWCSSlicer:
         self.gwcs = gwcs
         self.naxis = self.gwcs.forward_transform.n_inputs
         self.separable = self._build_separable_array()
-        # self._compare_frames_separable()
 
     def _get_frames(self):
         """

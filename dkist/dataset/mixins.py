@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 
+import gwcs
 from astropy.nddata.mixins.ndslicing import NDSlicingMixin
 from sunpy.visualization.animator import ImageAnimator
 from ndcube.mixins import NDCubePlotMixin
 
-from gwcs import WCS
 from dkist.wcs.slicer import GWCSSlicer
 
 __all__ = ['DatasetPlotMixin']
@@ -14,13 +14,13 @@ class DatasetSlicingMixin(NDSlicingMixin):
     def _slice_wcs(self, item):
         if self.wcs is None:
             return None
-        if isinstance(self.wcs, WCS):
+        if isinstance(self.wcs, gwcs.WCS):
             # Reverse the item so the pixel slice matches the cartesian WCS
             return GWCSSlicer(self.wcs, copy=True)[item[::-1]]
         return self.wcs[item]
 
 
-class DatasetPlotMixin(NDCubePlotMixin):
+class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
     """
     Handle plotting operations for Dataset.
     """
