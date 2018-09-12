@@ -8,7 +8,6 @@ from astropy.modeling import Model
 from astropy.modeling.models import Linear1D
 
 import asdf
-from asdf.tests.helpers import assert_tree_match
 from gwcs.lookup_table import LookupTable
 
 from dkist.asdf_maker.generator import asdf_tree_from_filenames

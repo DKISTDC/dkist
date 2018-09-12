@@ -33,20 +33,20 @@ def test_frames(transform_builder):
 
 def test_input_name_ordering(wcs):
     # Check the ordering of the input and output frames
-    allowed_pixel_names = (('stokes', 'scan number', 'wavelength position', 'spatial y', 'spatial x'),
-                           ('stokes', 'scan number', 'raster position', 'slit position', 'wavelength'))
+    allowed_pixel_names = (('spatial x', 'spatial y', 'wavelength position', 'scan number', 'stokes'),
+                           ('wavelength', 'slit position', 'raster position', 'scan number', 'stokes'))
     assert wcs.input_frame.axes_names in allowed_pixel_names
 
 
 def test_output_name_ordering(wcs):
-    allowed_world_names = (('stokes', '', '', 'longitude', 'latitude'),
-                           ('stokes', '', 'longitude', 'latitude', ''))
+    allowed_world_names = (('latitude', 'longitude', 'wavelength', 'time', 'stokes'),
+                           ('wavelength', 'latitude', 'longitude', 'time', 'stokes'))
     assert wcs.output_frame.axes_names in allowed_world_names
 
 
 def test_output_frames(wcs):
-    allowed_frame_orders = ((cf.StokesFrame, cf.TemporalFrame, cf.SpectralFrame, cf.CelestialFrame),
-                            (cf.StokesFrame, cf.TemporalFrame, cf.CelestialFrame, cf.SpectralFrame))
+    allowed_frame_orders = ((cf.CelestialFrame, cf.SpectralFrame, cf.TemporalFrame, cf.StokesFrame),
+                            (cf.SpectralFrame, cf.CelestialFrame, cf.TemporalFrame, cf.StokesFrame))
     types = tuple((type(frame) for frame in wcs.output_frame.frames))
     assert types in allowed_frame_orders
 

@@ -98,13 +98,13 @@ def build_pixel_frame(header):
     pixel_frame : `gwcs.coordinate_frames.CoordinateFrame`
         The pixel frame.
     """
-    axes_types = [header[f'DTYPE{n}'] for n in range(header['DNAXIS'], 0, -1)]
+    axes_types = [header[f'DTYPE{n}'] for n in range(1, header['DNAXIS'] + 1)]
 
     return cf.CoordinateFrame(naxes=header['DNAXIS'],
                               axes_type=axes_types,
                               axes_order=range(header['DNAXIS']),
                               unit=[u.pixel]*header['DNAXIS'],
-                              axes_names=[header[f'DPNAME{n}'] for n in range(header['DNAXIS'], 0, -1)],
+                              axes_names=[header[f'DPNAME{n}'] for n in range(1, header['DNAXIS'] + 1)],
                               name='pixel')
 
 
@@ -164,7 +164,7 @@ class TransformBuilder:
         """
         The list of DTYPEn for the first header.
         """
-        return [self.header[f'DTYPE{n}'] for n in range(self.header['DNAXIS'], 0, -1)]
+        return [self.header[f'DTYPE{n}'] for n in range(1, self.header['DNAXIS'] + 1)]
 
     def reset(self):
         """
@@ -182,7 +182,8 @@ class TransformBuilder:
         """
         Convert a Python index ``i`` to a FITS order index for keywords ``n``.
         """
-        return range(self.header['DNAXIS'], 0, -1)[i]
+        # return range(self.header['DNAXIS'], 0, -1)[i]
+        return i + 1
 
     def get_units(self, *iargs):
         """
@@ -209,6 +210,7 @@ class TransformBuilder:
         name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.TemporalFrame(axes_order=(self._i,),
                                              name=name,
+                                             axes_names=(name,),
                                              unit=self.get_units(self._i),
                                              reference_time=Time(self.header['DATE-BGN'])))
         self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.headers],
@@ -245,6 +247,7 @@ class TransformBuilder:
         """
         name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.SpectralFrame(axes_order=(self._i,),
+                                             axes_names=(name,),
                                              unit=self.get_units(self._i),
                                              name=name))
 
