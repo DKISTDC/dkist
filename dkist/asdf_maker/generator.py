@@ -372,6 +372,7 @@ def dataset_from_fits(path, asdf_filename, hdu=0):
     files = path.glob("*fits")
 
     tree = asdf_tree_from_filenames(list(files), hdu=hdu)
+    print(tree)
 
     with asdf.AsdfFile(tree) as afile:
         afile.write_to(str(path/asdf_filename))
