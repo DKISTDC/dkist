@@ -16,7 +16,7 @@ from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_dat
                                       references_from_filenames, spatial_model_from_header,
                                       spectral_model_from_framewave)
 
-__all__ = ['asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
+__all__ = ['dataset_from_fits', 'asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
            'build_pixel_frame', 'validate_headers', 'table_from_headers',
            'headers_from_filenames']
 
