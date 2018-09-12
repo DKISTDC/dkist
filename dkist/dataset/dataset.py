@@ -2,22 +2,22 @@ import copy
 import glob
 import os.path
 from pathlib import Path
+from textwrap import dedent
 
 import asdf
 import numpy as np
 import astropy.units as u
-try:
-    from ndcube.ndcube import NDCubeABC
-except ImportError:
-    from ndcube.ndcube import NDCubeBase as NDCubeABC
+from astropy.utils import isiterable
+from ndcube.ndcube import NDCubeABC
 
-from dkist.dataset.mixins import DatasetPlotMixin
-from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+
 
 __all__ = ['Dataset']
 
 
-class Dataset(NDCubeABC):
+class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
     """
     The base class for DKIST datasets.
 
@@ -57,35 +57,63 @@ class Dataset(NDCubeABC):
 
         return cls(data, wcs=wcs)
 
+    @property
+    def pixel_axes_names(self):
+        if self.wcs.input_frame:
+            return self.wcs.input_frame.axes_names[::-1]
+        else:
+            return ('',)*self.data.ndim
+
+    @property
+    def world_axes_names(self):
+        if self.wcs.output_frame:
+            return self.wcs.output_frame.axes_names[::-1]
+        else:
+            return ('',)*self.data.ndim  # pragma: no cover  # We should never hit this
+
     def __repr__(self):
         """
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
-        prefix = object.__repr__(self)[:-1] + '\n'
-        body = "{}\n".format(self.data)
-        body += "{!r}".format(self.wcs)[1:-1]
-        return ''.join([prefix, body, '>'])
+        prefix = object.__repr__(self)
+
+        pnames = ', '.join(self.pixel_axes_names)
+        wnames = ', '.join(self.world_axes_names)
+        output = dedent(f"""\
+        {prefix}
+        {self.data!r}
+        WCS<pixel_axes_names=({pnames}),
+            world_axes_names=({wnames})>""")
+        return output
 
     def pixel_to_world(self, *quantity_axis_list):
         """
         Convert a pixel coordinate to a data (world) coordinate by using
         `~gwcs.wcs.WCS`.
 
+        This method expects input and returns output in the same order as the
+        array dimensions. (Which is the reverse of the underlying WCS object.)
+
         Parameters
         ----------
         quantity_axis_list : iterable
             An iterable of `~astropy.units.Quantity` with unit as pixel `pix`.
-            Note that these quantities must be entered as separate arguments, not as one list.
 
         Returns
         -------
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        world = self.wcs(*quantity_axis_list, with_units=True)
+        world = self.wcs(*quantity_axis_list[::-1], with_units=True)
+
         # Convert list to tuple as a more standard return type
         if isinstance(world, list):
             world = tuple(world)
+
+        # If our return is an iterable then reverse it to match pixel dims.
+        if isiterable(world):
+            return world[::-1]
+
         return world
 
     def world_to_pixel(self, *quantity_axis_list):
@@ -93,18 +121,20 @@ class Dataset(NDCubeABC):
         Convert a world coordinate to a data (pixel) coordinate by using
         `~gwcs.wcs.WCS.invert`.
 
+        This method expects input and returns output in the same order as the
+        array dimensions. (Which is the reverse of the underlying WCS object.)
+
         Parameters
         ----------
         quantity_axis_list : iterable
             A iterable of `~astropy.units.Quantity`.
-            Note that these quantities must be entered as separate arguments, not as one list.
 
         Returns
         -------
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        return tuple(self.wcs.invert(*quantity_axis_list, with_units=True))
+        return tuple(self.wcs.invert(*quantity_axis_list[::-1], with_units=True))[::-1]
 
     def world_axis_physical_types(self):
         raise NotImplementedError()  # pragma: no cover
@@ -123,6 +153,7 @@ class Dataset(NDCubeABC):
         if (len(min_coord_values) != len(interval_widths)) or len(min_coord_values) != n_dim:
             raise ValueError("min_coord_values and interval_widths must have "
                              "same number of elements as number of data dimensions.")
+
         # Convert coords of lower left corner to pixel units.
         lower_pixels = self.world_to_pixel(*min_coord_values)
         upper_pixels = self.world_to_pixel(*[min_coord_values[i] + interval_widths[i]
@@ -131,4 +162,4 @@ class Dataset(NDCubeABC):
         lower_pixels = [int(np.rint(l.value)) for l in lower_pixels]
         upper_pixels = [int(np.rint(u.value)) for u in upper_pixels]
         item = tuple([slice(lower_pixels[i], upper_pixels[i]) for i in range(n_dim)])
-        return self.data[item]
+        return self[item]

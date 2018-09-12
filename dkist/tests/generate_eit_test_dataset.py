@@ -120,20 +120,25 @@ def main():
 
     timemodel = LookupTable(lookup_table=seconds*u.s)
 
-    hcubemodel = timemodel & spatial
+    hcubemodel = spatial & timemodel
 
-    time_frame = cf.TemporalFrame(axes_order=(0, ), unit=u.s,
-                                  reference_time=Time(time_coords[0]))
-    sky_frame = cf.CelestialFrame(axes_order=(1, 2), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=smap0.coordinate_frame)
+    time_frame = cf.TemporalFrame(axes_order=(2, ), unit=u.s,
+                                  reference_time=Time(time_coords[0]))
 
-    sky_frame = cf.CompositeFrame([time_frame, sky_frame])
+    sky_frame = cf.CompositeFrame([sky_frame, time_frame])
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
+                                        axes_order=(0, 1, 2),
+                                        axes_type=("pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
 
-    wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, output_frame=sky_frame)
+    wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, input_frame=detector_frame,
+                       output_frame=sky_frame)
 
     print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, output="numericals_plus"))
+    print(wcs(*[1*u.pix]*4, with_units=True))
 
     ea = references_from_filenames(files, relative_to=str(path))
 
