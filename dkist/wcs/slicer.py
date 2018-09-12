@@ -3,7 +3,6 @@ This module contains tools for slicing gwcs objects.
 """
 from copy import deepcopy
 
-import astropy.units as u
 from astropy.modeling import Model, Parameter, separable
 from astropy.modeling.models import Identity, Shift
 
@@ -57,8 +56,8 @@ class GWCSSlicer:
             gwcs = deepcopy(gwcs)
         self.gwcs = gwcs
         self.naxis = self.gwcs.forward_transform.n_inputs
-        self.separable = separable.is_separable(self.gwcs.forward_transform)
-        self._compare_frames_separable()
+        self.separable = self._build_separable_array()
+        # self._compare_frames_separable()
 
     def _get_frames(self):
         """
@@ -83,16 +82,15 @@ class GWCSSlicer:
 
         return coupled_axes
 
-    def _compare_frames_separable(self):
+    def _build_separable_array(self):
         """
-        Validate that the coupled (via frames) and separable (via the model)
-        information matches.
+        Combine the information on seprability from the forward transform with
+        copupling information from the output frames.
         """
-        coupled_axes = self._get_coupled_axes()
-        for pair in coupled_axes:
-            for ax in pair:
-                if self.separable[ax]:
-                    raise ValueError("Panic")  # pragma: no cover
+        mseparable = separable.is_separable(self.gwcs.forward_transform)
+        coupled = self._get_coupled_axes()
+        mseparable[coupled] = False
+        return mseparable
 
     def _get_axes_map(self, frames):
         """
@@ -110,7 +108,7 @@ class GWCSSlicer:
         Return a dict mapping input number to a "unit". If the model does not use units, return 1.
         """
         ft = self.gwcs.forward_transform
-        return {inp: ft.input_units.get(ft.inputs[inp], 1) for inp in range(ft.n_inputs)}
+        return {inp: ft.input_units.get(ft.inputs[inp], 1) if ft.input_units else 1 for inp in range(ft.n_inputs)}
 
     def _new_output_frame(self, axes):
         """
@@ -159,7 +157,6 @@ class GWCSSlicer:
         r = type(iframe)(**attrs)
         return r
 
-
     def _list_to_compound(self, models):
         """
         Convert a list of models into a compound model using the ``&`` operator.
@@ -179,7 +176,7 @@ class GWCSSlicer:
         (if the slice.start is None then no operation is done on that axis)
         or an integer if the value of the axis is to be fixed.
         """
-        if not isinstance(item, (tuple, list)): # We just have a single int
+        if not isinstance(item, (tuple, list)):  # We just have a single int
             item = (item,)
 
         item = list(item)
@@ -236,7 +233,7 @@ class GWCSSlicer:
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
 
-        new_in_frame = self.gwcs.input_frame
+        new_in_frame = self.gwcs.input_frame if self.gwcs.input_frame else "pixel frame"
         new_out_frame = self.gwcs.output_frame
         if axes_to_drop:
             new_in_frame = self._new_input_frame(axes_to_drop)

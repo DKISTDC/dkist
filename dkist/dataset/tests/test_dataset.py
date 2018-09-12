@@ -71,7 +71,6 @@ def dataset_3d(identity_gwcs_3d):
 def test_repr(dataset):
     r = repr(dataset)
     assert str(dataset.data) in r
-    assert repr(dataset.wcs)[1:-1] in r
 
 
 def test_wcs_roundtrip(dataset):
@@ -97,8 +96,8 @@ def test_dimensions(dataset, dataset_3d):
 def test_crop_by_coords(dataset_3d):
     arr = dataset_3d.crop_by_coords((5, 5, 5)*u.arcsec, (5, 5, 5)*u.arcsec)
     da_crop = dataset_3d.data[5:10, 5:10, 5:10]
-    assert arr.shape == da_crop.shape
-    assert np.allclose(arr, da_crop)
+    assert arr.data.shape == da_crop.shape
+    assert np.allclose(arr.data, da_crop)
 
 
 def test_crop_by_coords_bad_args(dataset_3d):

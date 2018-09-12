@@ -4,14 +4,14 @@ import os.path
 from pathlib import Path
 from textwrap import dedent
 
-import numpy as np
-
 import asdf
+import numpy as np
 import astropy.units as u
-from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-
+from astropy.utils import isiterable
 from ndcube.ndcube import NDCubeABC
+
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
 
 
 __all__ = ['Dataset']
@@ -59,11 +59,17 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
     @property
     def pixel_axes_names(self):
-        return self.wcs.input_frame.axes_names[::-1]
+        if self.wcs.input_frame:
+            return self.wcs.input_frame.axes_names[::-1]
+        else:
+            return ('',)*self.data.ndim
 
     @property
     def world_axes_names(self):
-        return self.wcs.output_frame.axes_names[::-1]
+        if self.wcs.output_frame:
+            return self.wcs.output_frame.axes_names[::-1]
+        else:
+            return ('',)*self.data.ndim
 
     def __repr__(self):
         """
@@ -99,10 +105,16 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             A list of arrays containing the output coordinates.
         """
         world = self.wcs(*quantity_axis_list[::-1], with_units=True)
+
         # Convert list to tuple as a more standard return type
         if isinstance(world, list):
             world = tuple(world)
-        return world[::-1]
+
+        # If our return is an iterable then reverse it to match pixel dims.
+        if isiterable(world):
+            return world[::-1]
+
+        return world
 
     def world_to_pixel(self, *quantity_axis_list):
         """
