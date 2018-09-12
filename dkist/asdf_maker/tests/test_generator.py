@@ -1,12 +1,14 @@
+import pathlib
+
 import pytest
 
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model
 
-from dkist.asdf_maker.generator import (gwcs_from_headers,
-                                        asdf_tree_from_filenames,
-                                        headers_from_filenames, validate_headers)
+from dkist.dataset import Dataset
+from dkist.asdf_maker.generator import (validate_headers, dataset_from_fits, gwcs_from_headers,
+                                        headers_from_filenames, asdf_tree_from_filenames)
 
 
 @pytest.fixture
@@ -62,3 +64,10 @@ def test_validator(header_filenames):
     with pytest.raises(ValueError) as excinfo:
         validate_headers(headers)
         assert "NAXIS" in str(excinfo)
+
+
+def test_make_asdf(header_filenames, tmpdir):
+    path = pathlib.Path(header_filenames[0])
+    dataset_from_fits(path.parent, "test.asdf")
+    assert (path.parent/"test.asdf").exists()
+    assert isinstance(Dataset.from_directory(str(path.parent)), Dataset)

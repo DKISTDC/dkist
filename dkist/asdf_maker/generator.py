@@ -1,18 +1,20 @@
-from astropy.io import fits
-from astropy.time import Time
+import pathlib
 
 import numpy as np
 
+import asdf
 import gwcs
-import gwcs.coordinate_frames as cf
 import astropy.units as u
+import gwcs.coordinate_frames as cf
+from astropy.io import fits
+from astropy.time import Time
 from astropy.table import Table
-from dkist.asdf_maker.helpers import (linear_spectral_model,
-                                      references_from_filenames, spatial_model_from_header,
-                                      time_model_from_date_obs, spectral_model_from_framewave)
 from gwcs.lookup_table import LookupTable
 from sunpy.coordinates import Helioprojective
 
+from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_date_obs,
+                                      references_from_filenames, spatial_model_from_header,
+                                      spectral_model_from_framewave)
 
 __all__ = ['asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
            'build_pixel_frame', 'validate_headers', 'table_from_headers',
@@ -347,3 +349,29 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     # TODO: Write a schema for the tree.
 
     return tree
+
+
+def dataset_from_fits(path, asdf_filename, hdu=0):
+    """
+    Given a path containing FITS files write an asdf file in the same path.
+
+    Parameters
+    ----------
+    path : `pathlib.Path` or `str`
+        The path to read the FITS files (with a `.fits` file extension) from and save the asdf file.
+
+    asdf_filename : `str`
+        The filename to save the asdf with in the path.
+
+    hdu : `int`
+        The HDU to read from the FITS files.
+
+    """
+    path = pathlib.Path(path)
+
+    files = path.glob("*fits")
+
+    tree = asdf_tree_from_filenames(list(files), hdu=hdu)
+
+    with asdf.AsdfFile(tree) as afile:
+        afile.write_to(str(path/asdf_filename))

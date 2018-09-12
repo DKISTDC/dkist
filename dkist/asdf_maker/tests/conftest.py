@@ -78,5 +78,5 @@ def make_header_files():
 
 
 # If we just run this file, then make the header zips
-if __name__ == '__main':
+if __name__ == '__main__':
     make_header_files()
