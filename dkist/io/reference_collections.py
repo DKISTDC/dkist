@@ -7,9 +7,9 @@ from functools import partial
 
 import numpy as np
 import dask.array as da
+
 from sunpy.util.decorators import add_common_docstring
 from asdf.tags.core.external_reference import ExternalArrayReference
-
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 

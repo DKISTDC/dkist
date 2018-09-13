@@ -2,19 +2,19 @@ import os
 import glob
 from pathlib import Path
 
-import asdf
 import numpy as np
-import astropy.units as u
-from astropy.io import fits
-from astropy.time import Time
-from astropy.modeling.models import Shift, AffineTransformation2D, Pix2Sky_TAN, RotateNative2Celestial, Multiply
 
+import asdf
 import gwcs
-from gwcs import coordinate_frames as cf
-from gwcs.lookup_table import LookupTable
-
 import sunpy.map
+import astropy.units as u
+from gwcs import coordinate_frames as cf
+from astropy.io import fits
 from sunpy.time import parse_time
+from astropy.time import Time
+from gwcs.lookup_table import LookupTable
+from astropy.modeling.models import (Shift, Multiply, Pix2Sky_TAN,
+                                     AffineTransformation2D, RotateNative2Celestial)
 
 
 def map_to_transform(smap):

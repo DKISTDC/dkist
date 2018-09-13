@@ -3,13 +3,11 @@ This module contains tools for slicing gwcs objects.
 """
 from copy import deepcopy
 
-from astropy.modeling import Model, Parameter, separable
-from astropy.modeling.models import Identity, Shift
-
 import gwcs.coordinate_frames as cf
+from astropy.modeling import Model, Parameter, separable
+from astropy.modeling.models import Shift, Identity
 
-from dkist.utils.model_tools import remove_input_frame, re_model_trees
-
+from dkist.utils.model_tools import re_model_trees, remove_input_frame
 
 __all__ = ['GWCSSlicer', 'FixedParameter']
 

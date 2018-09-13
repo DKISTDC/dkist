@@ -4,9 +4,8 @@ import pytest
 
 import gwcs
 import gwcs.coordinate_frames as cf
+from astropy.modeling import Model, models
 from gwcs.lookup_table import LookupTable
-from astropy.modeling import Model
-from astropy.modeling import models
 
 from dkist.dataset import Dataset
 from dkist.asdf_maker.generator import (validate_headers, dataset_from_fits, gwcs_from_headers,

@@ -1,16 +1,15 @@
 import pytest
 
 import astropy.units as u
+import gwcs.coordinate_frames as cf
+from gwcs import WCS
 from astropy.coordinates import SkyCoord
 from astropy.modeling.models import Identity
-
 from sunpy.coordinates.frames import Helioprojective
 
-from gwcs import WCS
-import gwcs.coordinate_frames as cf
-
-from dkist.wcs.slicer import FixedParameter, GWCSSlicer
 from dkist.conftest import spatial_like
+from dkist.wcs.slicer import GWCSSlicer, FixedParameter
+
 
 def test_fixed_parameter():
     fp = FixedParameter(1)

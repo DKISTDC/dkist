@@ -4,15 +4,15 @@ import os.path
 from pathlib import Path
 from textwrap import dedent
 
-import asdf
 import numpy as np
+
+import asdf
 import astropy.units as u
 from astropy.utils import isiterable
 from ndcube.ndcube import NDCubeABC
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
-
 
 __all__ = ['Dataset']
 

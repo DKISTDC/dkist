@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 
 import gwcs
-from astropy.nddata.mixins.ndslicing import NDSlicingMixin
-from sunpy.visualization.animator import ImageAnimator
 from ndcube.mixins import NDCubePlotMixin
+from sunpy.visualization.animator import ImageAnimator
+from astropy.nddata.mixins.ndslicing import NDSlicingMixin
 
 from dkist.wcs.slicer import GWCSSlicer
 
