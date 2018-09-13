@@ -9,7 +9,6 @@ from collections import defaultdict
 from astropy.modeling import separable
 from astropy.modeling.core import BINARY_OPERATORS, _model_oper
 
-
 OPERATORS = dict((oper, _model_oper(oper)) for oper in BINARY_OPERATORS)
 
 

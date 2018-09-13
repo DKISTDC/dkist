@@ -1,16 +1,16 @@
 import os
 
-import asdf
 import numpy as np
-import astropy.units as u
-from astropy.time import Time
-from astropy.io import fits
-from astropy.io.fits.hdu.base import BITPIX2DTYPE
-from astropy.modeling.models import (Shift, Multiply, AffineTransformation2D, Pix2Sky_TAN,
-                                     RotateNative2Celestial, Linear1D)
-from gwcs.lookup_table import LookupTable
-from asdf.tags.core.external_reference import ExternalArrayReference
 
+import asdf
+import astropy.units as u
+from astropy.io import fits
+from astropy.time import Time
+from gwcs.lookup_table import LookupTable
+from astropy.modeling.models import (Shift, Linear1D, Multiply, Pix2Sky_TAN,
+                                     AffineTransformation2D, RotateNative2Celestial)
+from astropy.io.fits.hdu.base import BITPIX2DTYPE
+from asdf.tags.core.external_reference import ExternalArrayReference
 
 __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear_spectral_model',
            'spatial_model_from_quantity', 'spatial_model_from_header', 'references_from_filenames']

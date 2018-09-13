@@ -1,14 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 # Packages may add whatever they like to this file, but
-# should keep this content at the top.
-# ----------------------------------------------------------------------------
-from ._dkist_init import *
-# ----------------------------------------------------------------------------
-
 # Enforce Python version check during package import.
 # This is the same check as the one at the top of setup.py
 import sys
+
+from ._dkist_init import *
 
 __minimum_python_version__ = "3.6"
 

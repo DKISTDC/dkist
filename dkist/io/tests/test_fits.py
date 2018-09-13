@@ -1,14 +1,14 @@
 import os
 
-import asdf
-import pytest
 import numpy as np
-from astropy.io import fits
+import pytest
 from numpy.testing import assert_allclose
 
-from dkist.data.test import rootdir
-from dkist.io.fits import AstropyFITSLoader
+import asdf
+from astropy.io import fits
 
+from dkist.io.fits import AstropyFITSLoader
+from dkist.data.test import rootdir
 
 eitdir = os.path.join(rootdir, 'EIT')
 

@@ -1,9 +1,10 @@
 import pytest
 import matplotlib.pyplot as plt
 
+from .test_dataset import array, dataset, dataset_3d, identity_gwcs, identity_gwcs_3d
+
 pytestmark = pytest.mark.skip
 
-from .test_dataset import dataset_3d, identity_gwcs_3d, dataset, identity_gwcs, array
 
 
 @pytest.mark.mpl_image_compare

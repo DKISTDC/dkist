@@ -1,14 +1,15 @@
 import os
 
-import asdf
-import pytest
 import numpy as np
+import pytest
 import dask.array as da
 from numpy.testing import assert_allclose
 
-from dkist.data.test import rootdir
+import asdf
+
 from dkist.io.fits import AstropyFITSLoader
-from dkist.io.reference_collections import NumpyFITSArrayContainer, DaskFITSArrayContainer
+from dkist.data.test import rootdir
+from dkist.io.reference_collections import DaskFITSArrayContainer, NumpyFITSArrayContainer
 
 eitdir = os.path.join(rootdir, "EIT")
 
