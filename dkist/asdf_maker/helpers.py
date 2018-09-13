@@ -129,7 +129,7 @@ def linear_spectral_model(spectral_width: u.nm, reference_val: u.nm):
 
 
 @u.quantity_input
-def linear_time_model(cadence: u.s, reference_val: u.s = None):
+def linear_time_model(cadence: u.s, reference_val: u.s = 0*u.s):
     """
     A linear model in a temporal dimension. The reference pixel is always 0.
     """
