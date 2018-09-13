@@ -1,0 +1,2 @@
+Add a ``dataset_from_fits`` function that generates an asdf file in a directory
+with a set of FITS files.

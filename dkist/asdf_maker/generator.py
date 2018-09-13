@@ -1,20 +1,22 @@
-from astropy.io import fits
-from astropy.time import Time
+import pathlib
 
 import numpy as np
 
+import asdf
 import gwcs
-import gwcs.coordinate_frames as cf
 import astropy.units as u
+import gwcs.coordinate_frames as cf
+from astropy.io import fits
+from astropy.time import Time
 from astropy.table import Table
-from dkist.asdf_maker.helpers import (linear_spectral_model,
-                                      references_from_filenames, spatial_model_from_header,
-                                      time_model_from_date_obs, spectral_model_from_framewave)
 from gwcs.lookup_table import LookupTable
 from sunpy.coordinates import Helioprojective
 
+from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_date_obs,
+                                      references_from_filenames, spatial_model_from_header,
+                                      spectral_model_from_framewave)
 
-__all__ = ['asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
+__all__ = ['dataset_from_fits', 'asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
            'build_pixel_frame', 'validate_headers', 'table_from_headers',
            'headers_from_filenames']
 
@@ -98,13 +100,13 @@ def build_pixel_frame(header):
     pixel_frame : `gwcs.coordinate_frames.CoordinateFrame`
         The pixel frame.
     """
-    axes_types = [header[f'DTYPE{n}'] for n in range(header['DNAXIS'], 0, -1)]
+    axes_types = [header[f'DTYPE{n}'] for n in range(1, header['DNAXIS'] + 1)]
 
     return cf.CoordinateFrame(naxes=header['DNAXIS'],
                               axes_type=axes_types,
                               axes_order=range(header['DNAXIS']),
                               unit=[u.pixel]*header['DNAXIS'],
-                              axes_names=[header[f'DPNAME{n}'] for n in range(header['DNAXIS'], 0, -1)],
+                              axes_names=[header[f'DPNAME{n}'] for n in range(1, header['DNAXIS'] + 1)],
                               name='pixel')
 
 
@@ -114,8 +116,16 @@ class TransformBuilder:
     """
 
     def __init__(self, headers):
-        self.headers = headers
-        self.header = self.headers[0]
+        self.header = headers[0]
+
+        # Reshape the headers to match the Dataset shape, so we can extract headers along various axes.
+        shape = tuple((self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
+                                                                self.header['DAAXES'], -1)))
+        arr_headers = np.empty(shape, dtype=object)
+        for i in range(arr_headers.size):
+            arr_headers.flat[i] = headers[i]
+
+        self.headers = arr_headers
         self.reset()
         self._build()
 
@@ -164,7 +174,7 @@ class TransformBuilder:
         """
         The list of DTYPEn for the first header.
         """
-        return [self.header[f'DTYPE{n}'] for n in range(self.header['DNAXIS'], 0, -1)]
+        return [self.header[f'DTYPE{n}'] for n in range(1, self.header['DNAXIS'] + 1)]
 
     def reset(self):
         """
@@ -174,17 +184,34 @@ class TransformBuilder:
         self._frames = []
         self._transforms = []
 
-    def n(self, i):
+    @property
+    def n(self):
+        return self._n(self._i)
+
+    def _n(self, i):
         """
         Convert a Python index ``i`` to a FITS order index for keywords ``n``.
         """
-        return range(self.header['DNAXIS'], 0, -1)[i]
+        # return range(self.header['DNAXIS'], 0, -1)[i]
+        return i + 1
+
+    @property
+    def slice_for_n(self):
+        i = self._i - self.header['DAAXES']
+        naxes = self.header['DEAXES']
+        ss = [0] * naxes
+        ss[i] = slice(None)
+        return ss
+
+    @property
+    def slice_headers(self):
+        return self.headers[self.slice_for_n]
 
     def get_units(self, *iargs):
         """
         Get zee units
         """
-        u = [self.header.get(f'DUNIT{self.n(i)}', None) for i in iargs]
+        u = [self.header.get(f'DUNIT{self._n(i)}', None) for i in iargs]
 
         return u
 
@@ -192,9 +219,7 @@ class TransformBuilder:
         """
         Add a stokes axes to the builder.
         """
-        n = self.n(self._i)
-
-        name = self.header[f'DWNAME{n}']
+        name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.StokesFrame(axes_order=(self._i,), name=name))
         self._transforms.append(LookupTable([0, 1, 2, 3] * u.pixel))
 
@@ -204,13 +229,14 @@ class TransformBuilder:
         """
         Add a temporal axes to the builder.
         """
-        n = self.n(self._i)
-        name = self.header[f'DWNAME{n}']
+
+        name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.TemporalFrame(axes_order=(self._i,),
                                              name=name,
+                                             axes_names=(name,),
                                              unit=self.get_units(self._i),
                                              reference_time=Time(self.header['DATE-BGN'])))
-        self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.headers],
+        self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.slice_headers],
                                                          self.header['DATE-BGN']))
 
         self._i += 1
@@ -224,10 +250,9 @@ class TransformBuilder:
 
         """
         i = self._i
-        n = self.n(self._i)
-        name = self.header[f'DWNAME{n}']
+        name = self.header[f'DWNAME{self.n}']
         name = name.split(' ')[0]
-        axes_names = [(self.header[f'DWNAME{nn}'].rsplit(' ')[1]) for nn in (n, self.n(i+1))]
+        axes_names = [(self.header[f'DWNAME{nn}'].rsplit(' ')[1]) for nn in (self.n, self._n(i+1))]
 
         obstime = Time(self.header['DATE-BGN'])
         self._frames.append(cf.CelestialFrame(axes_order=(i, i+1), name=name,
@@ -243,13 +268,13 @@ class TransformBuilder:
         """
         Decide how to make a spectral axes.
         """
-        n = self.n(self._i)
-        name = self.header[f'DWNAME{n}']
+        name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.SpectralFrame(axes_order=(self._i,),
+                                             axes_names=(name,),
                                              unit=self.get_units(self._i),
                                              name=name))
 
-        if "WAVE" in self.header.get(f'CTYPE{n}', ''):
+        if "WAVE" in self.header.get(f'CTYPE{self.n}', ''):
             transform = self.make_spectral_from_wcs()
         elif "FRAMEWAV" in self.header.keys():
             transform = self.make_spectral_from_dataset()
@@ -264,17 +289,15 @@ class TransformBuilder:
         """
         Make a spectral axes from (VTF) dataset info.
         """
-        n = self.n(self._i)
-        framewave = [h['FRAMEWAV'] for h in self.headers[:self.header[f'DNAXIS{n}']]]
+        framewave = [h['FRAMEWAV'] for h in self.slice_headers[:self.header[f'DNAXIS{self.n}']]]
         return spectral_model_from_framewave(framewave)
 
     def make_spectral_from_wcs(self):
         """
         Add a spectral axes from the FITS-WCS keywords.
         """
-        n = self.n(self._i)
-        return linear_spectral_model(self.header[f'CDELT{n}']*u.nm,
-                                     self.header[f'CRVAL{n}']*u.nm)
+        return linear_spectral_model(self.header[f'CDELT{self.n}']*u.nm,
+                                     self.header[f'CRVAL{self.n}']*u.nm)
 
 
 def gwcs_from_headers(headers):
@@ -287,7 +310,6 @@ def gwcs_from_headers(headers):
     headers : `list`
         A list of headers. These are expected to have already been validated.
     """
-    # Now we know the headers are consistent, a lot of parts only need the first one.
     header = headers[0]
 
     pixel_frame = build_pixel_frame(header)
@@ -331,13 +353,18 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     # headers is a now list
     headers = validate_headers(headers)
 
+    sort_inds = sorter_DINDEX(headers)
+
+    sort_heads = ((head, sort_inds[i]) for i, head in enumerate(headers))
+    heads = sorted(sort_heads, key=lambda h: h[1])
+    headers = [head[0] for head in heads]
+
     # Sort the filenames into DS order.
-    sorted_filenames = np.array(filenames)[sorter_DINDEX(headers)]
+    sorted_filenames = np.array(filenames)[sort_inds]
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
-
     # References from filenames
     reference_array = references_from_filenames(sorted_filenames, array_shape=shape)
 
@@ -347,3 +374,30 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     # TODO: Write a schema for the tree.
 
     return tree
+
+
+def dataset_from_fits(path, asdf_filename, hdu=0):
+    """
+    Given a path containing FITS files write an asdf file in the same path.
+
+    Parameters
+    ----------
+    path : `pathlib.Path` or `str`
+        The path to read the FITS files (with a `.fits` file extension) from and save the asdf file.
+
+    asdf_filename : `str`
+        The filename to save the asdf with in the path.
+
+    hdu : `int`
+        The HDU to read from the FITS files.
+
+    """
+    path = pathlib.Path(path)
+
+    files = path.glob("*fits")
+
+    tree = asdf_tree_from_filenames(list(files), hdu=hdu)
+    print(tree)
+
+    with asdf.AsdfFile(tree) as afile:
+        afile.write_to(str(path/asdf_filename))
