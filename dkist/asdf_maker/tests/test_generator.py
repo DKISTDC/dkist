@@ -4,7 +4,9 @@ import pytest
 
 import gwcs
 import gwcs.coordinate_frames as cf
+from gwcs.lookup_table import LookupTable
 from astropy.modeling import Model
+from astropy.modeling import models
 
 from dkist.dataset import Dataset
 from dkist.asdf_maker.generator import (validate_headers, dataset_from_fits, gwcs_from_headers,
@@ -51,6 +53,15 @@ def test_output_frames(wcs):
                             (cf.SpectralFrame, cf.CelestialFrame, cf.TemporalFrame, cf.StokesFrame))
     types = tuple((type(frame) for frame in wcs.output_frame.frames))
     assert types in allowed_frame_orders
+
+
+def test_transform_models(wcs):
+    # Test that there is one lookup table and two linear models for both the
+    # wcses
+    sms = wcs.forward_transform._submodels
+    smtypes = [type(m) for m in sms]
+    assert sum(mt is models.Linear1D for mt in smtypes) == 2
+    assert sum(mt is LookupTable for mt in smtypes) == 1
 
 
 def test_asdf_tree(header_filenames):

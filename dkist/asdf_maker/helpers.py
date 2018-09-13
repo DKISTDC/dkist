@@ -152,12 +152,15 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
     # Work out if we have a uniform delta (i.e. a linear model)
     ddelta = (deltas.to(u.s)[:-1] - deltas.to(u.s)[1:])
 
-    if u.allclose(ddelta[0], ddelta):
+    # If the length of the axis is one, then return a very simple model
+    if ddelta.size == 0:
+        return linear_time_model(cadence=0*u.s, reference_val=0*u.s)
+    elif u.allclose(ddelta[0], ddelta):
         slope = ddelta[0]
         intercept = 0 * u.s
         return linear_time_model(cadence=slope, reference_val=intercept)
     else:
-        return LookupTable(deltas)
+        return LookupTable(deltas.to(u.s))
 
 
 def spectral_model_from_framewave(framewav):
@@ -170,6 +173,9 @@ def spectral_model_from_framewave(framewav):
 
     deltas = wave_bgn - framewav
     ddeltas = (deltas[:-1] - deltas[1:])
+    # If the length of the axis is one, then return a very simple model
+    if ddeltas.size == 0:
+        return linear_spectral_model(0*u.nm, wave_bgn)
     if u.allclose(ddeltas[0], ddeltas):
         slope = ddeltas[0]
         return linear_spectral_model(slope, wave_bgn)

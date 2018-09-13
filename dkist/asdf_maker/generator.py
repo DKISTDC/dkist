@@ -116,8 +116,16 @@ class TransformBuilder:
     """
 
     def __init__(self, headers):
-        self.headers = headers
-        self.header = self.headers[0]
+        self.header = headers[0]
+
+        # Reshape the headers to match the Dataset shape, so we can extract headers along various axes.
+        shape = tuple((self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
+                                                                self.header['DAAXES'], -1)))
+        arr_headers = np.empty(shape, dtype=object)
+        for i in range(arr_headers.size):
+            arr_headers.flat[i] = headers[i]
+
+        self.headers = arr_headers
         self.reset()
         self._build()
 
@@ -187,6 +195,18 @@ class TransformBuilder:
         # return range(self.header['DNAXIS'], 0, -1)[i]
         return i + 1
 
+    @property
+    def slice_for_n(self):
+        i = self._i - self.header['DAAXES']
+        naxes = self.header['DEAXES']
+        ss = [0] * naxes
+        ss[i] = slice(None)
+        return ss
+
+    @property
+    def slice_headers(self):
+        return self.headers[self.slice_for_n]
+
     def get_units(self, *iargs):
         """
         Get zee units
@@ -209,13 +229,14 @@ class TransformBuilder:
         """
         Add a temporal axes to the builder.
         """
+
         name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.TemporalFrame(axes_order=(self._i,),
                                              name=name,
                                              axes_names=(name,),
                                              unit=self.get_units(self._i),
                                              reference_time=Time(self.header['DATE-BGN'])))
-        self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.headers],
+        self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.slice_headers],
                                                          self.header['DATE-BGN']))
 
         self._i += 1
@@ -268,7 +289,7 @@ class TransformBuilder:
         """
         Make a spectral axes from (VTF) dataset info.
         """
-        framewave = [h['FRAMEWAV'] for h in self.headers[:self.header[f'DNAXIS{self.n}']]]
+        framewave = [h['FRAMEWAV'] for h in self.slice_headers[:self.header[f'DNAXIS{self.n}']]]
         return spectral_model_from_framewave(framewave)
 
     def make_spectral_from_wcs(self):
@@ -289,7 +310,6 @@ def gwcs_from_headers(headers):
     headers : `list`
         A list of headers. These are expected to have already been validated.
     """
-    # Now we know the headers are consistent, a lot of parts only need the first one.
     header = headers[0]
 
     pixel_frame = build_pixel_frame(header)
@@ -333,13 +353,18 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     # headers is a now list
     headers = validate_headers(headers)
 
+    sort_inds = sorter_DINDEX(headers)
+
+    sort_heads = ((head, sort_inds[i]) for i, head in enumerate(headers))
+    heads = sorted(sort_heads, key=lambda h: h[1])
+    headers = [head[0] for head in heads]
+
     # Sort the filenames into DS order.
-    sorted_filenames = np.array(filenames)[sorter_DINDEX(headers)]
+    sorted_filenames = np.array(filenames)[sort_inds]
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
-
     # References from filenames
     reference_array = references_from_filenames(sorted_filenames, array_shape=shape)
 
