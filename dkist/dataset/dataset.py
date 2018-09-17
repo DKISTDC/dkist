@@ -43,7 +43,16 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         asdf_file = asdf_files[0]
 
-        with asdf.AsdfFile.open(asdf_file) as ff:
+        return cls.from_asdf(asdf_file)
+
+    @classmethod
+    def from_asdf(cls, filepath):
+        """
+        Construct a dataset object from a filepath of a suitable asdf file.
+        """
+        filepath = Path(filepath)
+        base_path = filepath.parent
+        with asdf.AsdfFile.open(str(filepath)) as ff:
             # TODO: without this it segfaults on access
             asdf_tree = copy.deepcopy(ff.tree)
             pointer_array = np.array(ff.tree['dataset'])
@@ -62,7 +71,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         if self.wcs.input_frame:
             return self.wcs.input_frame.axes_names[::-1]
         else:
-            return ('',)*self.data.ndim
+            return ('',) * self.data.ndim
 
     @property
     def world_axes_names(self):
