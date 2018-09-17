@@ -86,7 +86,7 @@ class GWCSSlicer:
         """
         mseparable = separable.is_separable(self.gwcs.forward_transform)
         coupled = self._get_coupled_axes()
-        mseparable[coupled] = False
+        mseparable[tuple(coupled)] = False
         return mseparable
 
     def _get_axes_map(self, frames):
