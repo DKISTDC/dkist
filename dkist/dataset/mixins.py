@@ -7,10 +7,13 @@ from astropy.nddata.mixins.ndslicing import NDSlicingMixin
 
 from dkist.wcs.slicer import GWCSSlicer
 
-__all__ = ['DatasetPlotMixin']
+__all__ = ['DatasetPlotMixin', 'DatasetSlicingMixin']
 
 
 class DatasetSlicingMixin(NDSlicingMixin):
+    """
+    A class to override the wcs slicing behavior of `astropy.nddata.mixins.NDSlicingMixin`.
+    """
     def _slice_wcs(self, item):
         if self.wcs is None:
             return None

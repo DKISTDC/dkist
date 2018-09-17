@@ -29,8 +29,8 @@ rst_epilog += """
 """
 
 intersphinx_mapping.pop("h5py")
-intersphinx_mapping['sunpy'] = ('http://docs.sunpy.org/en/stable/', None)
-intersphinx_mapping['ndcube'] = ('http://docs.sunpy.org/projects/ndcube/en/stable/', None)
+intersphinx_mapping['sunpy'] = ('http://docs.sunpy.org/en/latest/', None)
+intersphinx_mapping['ndcube'] = ('http://docs.sunpy.org/projects/ndcube/en/latest/', None)
 intersphinx_mapping['gwcs'] = ('http://gwcs.readthedocs.io/en/latest/', None)
 intersphinx_mapping['asdf'] = ('http://asdf.readthedocs.io/en/latest/', None)
 intersphinx_mapping['dask'] = ('http://dask.pydata.org/en/latest/', None)
@@ -88,18 +88,9 @@ napoleon_google_docstring = False
 latex_documents = [('index', project + '.tex', project + u' Documentation',
                     author, 'manual')]
 
-
-# -- Options for manual page output -------------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [('index', project.lower(), project + u' Documentation',
-              [author], 1)]
-
-
 # -- Options for the edit_on_github extension ---------------------------------
 
-if eval(setup_cfg.get('edit_on_github')):
+if str(setup_cfg.get('edit_on_github')).lower() == "true":
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
     versionmod = __import__(setup_cfg['package_name'] + '.version')
