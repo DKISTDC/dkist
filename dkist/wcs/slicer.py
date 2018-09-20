@@ -23,13 +23,41 @@ class FixedParameter(Model):
     inputs = tuple()
     outputs = ('x',)
 
-    @staticmethod
-    def evaluate(value):
+    @classmethod
+    def evaluate(cls, value):
         return value[0]
 
     @property
     def inverse(self):
         return Identity(1)
+
+
+def make_parameter_fixer(constructed_inputs):
+    class FixedParameters(Model):
+        fixed_inputs = constructed_inputs
+        inputs = tuple(f"n{i}" for i in range(len(constructed_inputs)) if not constructed_inputs[i])
+        outputs = tuple(f"p{i}" for i in range(len(constructed_inputs)))
+
+        @classmethod
+        def evaluate(cls, *inputs):
+            ginput = 0
+            outputs = []
+            for finp in cls.fixed_inputs:
+                if finp:
+                    outputs.append(finp)
+                else:
+                    outputs.append(inputs[ginput])
+                    ginput += 1
+            return tuple(outputs)
+
+
+        @property
+        def inverse(self):
+            m = Identity(1)
+            for i in range(1, len(self.fixed_inputs)):
+                m &= Identity(1)
+            return m
+    return FixedParameters
 
 
 class GWCSSlicer:
@@ -202,6 +230,7 @@ class GWCSSlicer:
 
         prepend = []
         axes_to_drop = []
+        inputs = []
 
         # Iterate over all the axes and keep a list of models prepend to the
         # transform, and a list of axes to remove from the wcs completely.
@@ -215,10 +244,14 @@ class GWCSSlicer:
                 if self.separable[i]:
                     axes_to_drop.append(i)
                 else:
-                    prepend.append(FixedParameter(ax*input_units[i]))
+                    inputs.append(ax*input_units[i])
+                    prepend.append(Identity(1))
+                    # prepend.append(FixedParameter(ax*input_units[i]))
             elif ax.start:
+                inputs.append(None)
                 prepend.append(Shift(ax.start*input_units[i]))
             else:
+                inputs.append(None)
                 prepend.append(Identity(1))
 
         model = self.gwcs.forward_transform
@@ -229,6 +262,10 @@ class GWCSSlicer:
 
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
+
+        print(inputs)
+        if not all([a is None for a in inputs]):
+            model = make_parameter_fixer(inputs)() | model
 
         new_in_frame = self.gwcs.input_frame if self.gwcs.input_frame else "pixel frame"
         new_out_frame = self.gwcs.output_frame
