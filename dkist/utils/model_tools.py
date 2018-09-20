@@ -124,9 +124,38 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
     # map the input names of this tree to the names of it's children
     inp_map = make_forward_input_map(tree)
 
+    # Map the names of the inputs of tree to the two subtrees of tree
+    global_input_map = make_tree_input_map(tree)
+
     ori_trees = [tree.left, tree.right]
     new_trees = []
     for i, stree in enumerate(ori_trees):
+        # Before we check the sub_trees of this side of the tree, let us check
+        # if we have a situation where we can just discard or keep one half of
+        # the original tree.
+
+        # Get the names of the inputs for this subtree
+        global_inputs = tuple(global_input_map[stree])
+        # If the input we want to drop is not in this subtree, we keep it and
+        # check the next subtree.
+        if inp not in global_inputs:
+            new_trees.append(stree)
+            continue
+        # If the input is in this subtree, and this subtree only takes one
+        # input (which is the input we want to drop) drop this subtree and then
+        # check the next one. (In the case where we have dropped this tree we
+        # would expect the next iteration (if there is one) to keep the other
+        # half of the tree, i.e. meet the above if criteria).
+        elif len(global_inputs) == 1 and global_inputs[0] == inp:
+            continue
+
+        # If we haven't been able to drop the input by splitting the original
+        # tree, then we need to split one of the subtrees.
+
+        # TODO: Can we now shortcut the rest of this block by recursively
+        # calling the function again? We would need to add a separable check in
+        # somewhere above this point.
+
         # Generate the input mapping
         ti_map = make_tree_input_map(stree)
         # Keep a list of the left and right trees for this tree
