@@ -3,33 +3,62 @@ This module contains tools for slicing gwcs objects.
 """
 from copy import deepcopy
 
+import numpy as np
+
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, Parameter, separable
 from astropy.modeling.models import Shift, Identity
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
 
-__all__ = ['GWCSSlicer', 'FixedParameter']
+__all__ = ['GWCSSlicer', 'FixedInputs']
 
 
-class FixedParameter(Model):
-    """
-    A Model that injects a parameter as an output.
+class FixedInputs(Model):
+    _name = "FixedInputs"
+    def __init__(self, input_specification):
+        self.input_specification = input_specification
 
-    The inverse of this model does nothing (is the ``Identity`` model), as the
-    parameter is only defined in the input direction.
-    """
-    value = Parameter()
-    inputs = tuple()
-    outputs = ('x',)
+    @property
+    def inputs(self):
+        return tuple(f"n{i}" for i in range(len(self.input_specification)) if not self.input_specification[i])
 
-    @staticmethod
-    def evaluate(value):
-        return value[0]
+    @property
+    def outputs(self):
+        return tuple(f"p{i}" for i in range(len(self.input_specification)))
+
+    def _check_arrays_same_size(self, arrays):
+        shapes = [np.asanyarray(arr).shape for arr in arrays]
+        shape0 = shapes.pop(0)
+        return all([sha == shape0 for sha in shapes])
+
+    def evaluate(self, *inputs):
+        ginput = 0
+        outputs = []
+
+        if self._check_arrays_same_size(inputs):
+            shape = np.asanyarray(inputs[0]).shape
+        else:
+            shape = tuple()  # pragma: no cover
+        shape_arr = np.zeros(shape)
+
+        for finp in self.input_specification:
+            if finp:
+                if not shape:
+                    outputs.append(finp)  # pragma: no cover
+                else:
+                    outputs.append(shape_arr + finp)
+            else:
+                outputs.append(inputs[ginput])
+                ginput += 1
+        return tuple(outputs)
 
     @property
     def inverse(self):
-        return Identity(1)
+        m = Identity(1)
+        for i in range(1, len(self.input_specification)):
+            m &= Identity(1)
+        return m
 
 
 class GWCSSlicer:
@@ -44,14 +73,19 @@ class GWCSSlicer:
     copy : `bool`
         A flag to determine if the input gwcs should be copied.
 
+    pixel_order : `bool`
+        If true it assumes the slice is in numpy order and therefore reversed
+        from the ordering of the gwcs.
+
     Examples
     --------
 
     >>> myslicedgwcs = Slicer(mygwcs)[10, : , 0]  # doctest: +SKIP
     """
-    def __init__(self, gwcs, copy=False):
+    def __init__(self, gwcs, copy=False, pixel_order=True):
         if copy:
             gwcs = deepcopy(gwcs)
+        self.pixel_order = pixel_order
         self.gwcs = gwcs
         self.naxis = self.gwcs.forward_transform.n_inputs
         self.separable = self._build_separable_array()
@@ -86,7 +120,7 @@ class GWCSSlicer:
         """
         mseparable = separable.is_separable(self.gwcs.forward_transform)
         coupled = self._get_coupled_axes()
-        mseparable[coupled] = False
+        mseparable[tuple(coupled)] = False
         return mseparable
 
     def _get_axes_map(self, frames):
@@ -138,11 +172,11 @@ class GWCSSlicer:
         copys = ("name",)
 
         attrs = {}
-        for ax in axes:
-            for m in mods:
-                n = list(getattr(iframe, m))
+        for m in mods:
+            n = list(getattr(iframe, m))
+            for ax in axes:
                 n.pop(ax)
-                attrs[m] = tuple(n)
+            attrs[m] = tuple(n)
 
         for at in copys:
             attrs[at] = getattr(iframe, at)
@@ -190,7 +224,10 @@ class GWCSSlicer:
                 item.append(slice(None))
 
         # Reverse the slice to match the physical coordinates and not the pixel ones
-        return item
+        if self.pixel_order:
+            return item[::-1]
+        else:
+            return item
 
     def __getitem__(self, item):
         """
@@ -200,6 +237,7 @@ class GWCSSlicer:
         """
         item = self._sanitize(item)
 
+        inputs = []
         prepend = []
         axes_to_drop = []
 
@@ -215,13 +253,17 @@ class GWCSSlicer:
                 if self.separable[i]:
                     axes_to_drop.append(i)
                 else:
-                    prepend.append(FixedParameter(ax*input_units[i]))
+                    inputs.append(ax*input_units[i])
+                    prepend.append(Identity(1))
             elif ax.start:
+                inputs.append(None)
                 prepend.append(Shift(ax.start*input_units[i]))
             else:
+                inputs.append(None)
                 prepend.append(Identity(1))
 
         model = self.gwcs.forward_transform
+        axes_to_drop.sort(reverse=True)
         for drop_ax in axes_to_drop:
             inp = model._tree.inputs[drop_ax]
             trees = remove_input_frame(model._tree, inp)
@@ -229,6 +271,9 @@ class GWCSSlicer:
 
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
+
+        if not all([a is None for a in inputs]):
+            model = FixedInputs(inputs) | model
 
         new_in_frame = self.gwcs.input_frame if self.gwcs.input_frame else "pixel frame"
         new_out_frame = self.gwcs.output_frame

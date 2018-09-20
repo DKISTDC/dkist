@@ -56,16 +56,6 @@ def make_tree_input_map(tree):
     return tree_input_map
 
 
-def get_tree_with_input(ti_map, input):
-    """
-    Given the input name and a tree input mapping, return the tree which takes
-    the input.
-    """
-    for t, inputs in ti_map.items():
-        if input in inputs:
-            return t
-
-
 def make_forward_input_map(tree):
     """
     Given a tree, generate a mapping of inputs to the tree, to inputs of it's
@@ -124,39 +114,46 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
     # map the input names of this tree to the names of it's children
     inp_map = make_forward_input_map(tree)
 
+    # Map the names of the inputs of tree to the two subtrees of tree
+    input_tree_map = make_tree_input_map(tree)
+
     new_trees = []
-    for tree in (tree.left, tree.right):
-        # Generate the input mapping
-        ti_map = make_tree_input_map(tree)
-        # Keep a list of the left and right trees for this tree
-        sub_trees = list(ti_map.keys())
-        # Find if the input we are after is in one of the subtrees for this tree.
-        sub_tree = get_tree_with_input(ti_map, inp_map[inp])
-        if sub_tree is None:
-            # If we don't have the input, then we save the original tree unmodified.
-            new_trees.append(tree)
+    for stree in (tree.left, tree.right):
+        # Given the two halves of this tree, and one input we want to remove,
+        # let us check if we can drop one half of this tree or if we need to
+        # split one of these subtrees.
+
+        # Get the names of the inputs for this subtree
+        tree_inputs = tuple(input_tree_map[stree])
+        # If the input we want to drop is not in this subtree, we keep it and
+        # check the next subtree.
+        if inp not in tree_inputs:
+            new_trees.append(stree)
             continue
 
-        # If this subtree only has one input, we drop it and keep all the other one.
-        if len(sub_tree.inputs) == 1:
-            sub_trees.remove(sub_tree)
-            new_trees += sub_trees
+        # If the input is in this subtree, and this subtree only takes one
+        # input (which is the input we want to drop) drop this subtree and then
+        # check the next one. (In the case where we have dropped this tree we
+        # would expect the next iteration (if there is one) to keep the other
+        # half of the tree, i.e. meet the above if criteria).
+        elif len(tree_inputs) == 1:
+            continue
 
-        # If we have more than one input, but they are not separable then we
-        # either drop the whole subtree or we keep the original tree
-        # unmodified.
-        sep = tree_is_separable(sub_tree)
-        if all(~sep):
-            if remove_coupled_trees:
-                sub_trees.remove(sub_tree)
-                new_trees += sub_trees
+        # Finally if the subtree with the input we want to drop has more than
+        # one input, then we need to determine how to handle it based on if the
+        # inputs are separable or not.
+        else:
+            sep = tree_is_separable(stree)
+            # If they are separable, then we either keep the whole tree and
+            # move on, or we drop the subtree if we are removing whole coupled
+            # trees
+            if all(~sep):
+                if not remove_coupled_trees:
+                    new_trees.append(stree)
+                    continue
+            # Otherwise we split up the subtree by recusing down the tree.
             else:
-                new_trees.append(tree)
-
-        # TODO: What if we need to recurse down the tree another many levels?!
-        # We shouldn't? All the inputs have to be at the top level of the expression??
-        # new_trees += remove_input_frame(sub_tree, inp, remove_coupled_trees)
-
+                new_trees += remove_input_frame(stree, inp_map[inp], remove_coupled_trees)
     return new_trees
 
 

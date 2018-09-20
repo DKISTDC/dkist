@@ -1,0 +1,1 @@
+Fix incorrect compound model tree splitting when the split needed to happen at the top layer

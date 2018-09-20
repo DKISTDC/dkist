@@ -17,8 +17,8 @@ from dkist.data.test import rootdir
 
 @pytest.fixture
 def array():
-    shape = np.random.randint(100, size=2)
-    x = np.random.random(shape)
+    shape = np.random.randint(1, 100, size=2)
+    x = np.random.random(shape) + 10  # Make sure we can actually slice the thing later
     return da.from_array(x, tuple(shape))
 
 
@@ -49,7 +49,35 @@ def identity_gwcs_3d():
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
 
     frame = cf.CompositeFrame([sky_frame, wave_frame])
-    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame)
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
+                                        axes_order=(0, 1, 2),
+                                        axes_type=("pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
+
+
+@pytest.fixture
+def identity_gwcs_4d():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = (m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) &
+                m.Multiply(1*u.nm/u.pixel) & m.Multiply(1*u.nm/u.pixel))
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
+    time_frame = cf.TemporalFrame(axes_order=(3, ), unit=u.s)
+
+    frame = cf.CompositeFrame([sky_frame, wave_frame, time_frame])
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=4,
+                                        axes_order=(0, 1, 2, 3),
+                                        axes_type=("pixel", "pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z", "s"), unit=(u.pix, u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
 
 
 @pytest.fixture
@@ -68,6 +96,15 @@ def dataset_3d(identity_gwcs_3d):
     array = da.from_array(x, tuple(shape))
 
     return Dataset(array, wcs=identity_gwcs_3d)
+
+
+@pytest.fixture
+def dataset_4d(identity_gwcs_4d):
+    shape = (50, 60, 70, 80)
+    x = np.random.random(shape)
+    array = da.from_array(x, tuple(shape))
+
+    return Dataset(array, wcs=identity_gwcs_4d)
 
 
 def test_repr(dataset, dataset_3d):
@@ -98,15 +135,32 @@ def test_dimensions(dataset, dataset_3d):
 
 
 def test_crop_by_coords(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5, 5, 5)*u.arcsec, (5, 5, 5)*u.arcsec)
+    arr = dataset_3d.crop_by_coords((5*u.arcsec, 5*u.arcsec, 5*u.nm),
+                                    (9*u.arcsec, 9*u.arcsec, 9*u.nm))
+
+    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
+    assert arr.data.shape == da_crop.shape
+    assert np.allclose(arr.data, da_crop)
+
+
+def test_crop_by_coords_units(dataset_3d):
+    arr = dataset_3d.crop_by_coords((5, 5, 5),
+                                    (9, 9, 9),
+                                    (u.arcsec, u.arcsec, u.nm))
+
     da_crop = dataset_3d.data[5:10, 5:10, 5:10]
     assert arr.data.shape == da_crop.shape
     assert np.allclose(arr.data, da_crop)
 
 
 def test_crop_by_coords_bad_args(dataset_3d):
+    with pytest.raises(TypeError):
+        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
+
+
+def test_crop_by_coords_bad_units(dataset_3d):
     with pytest.raises(ValueError):
-        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5)*u.arcsec)
+        dataset_3d.crop_by_coords((5, 5, 5), (9, 9, 9), units=(u.pix, u.pix))
 
 
 def test_load_from_directory():
@@ -127,12 +181,19 @@ def test_from_directory_not_dir():
         Dataset.from_directory(os.path.join(rootdir, 'EIT', 'eit_2004-03-01T00:00:10.515000.asdf'))
         assert "must be a directory" in str(e)
 
+
 def test_no_wcs_slice(dataset):
     dataset._wcs = None
-    ds = dataset[3,0]
+    ds = dataset[3, 0]
     assert ds.wcs is None
+
 
 def test_random_wcs_slice(dataset):
     dataset._wcs = "aslkdjalsjdkls"
     ds = dataset[3]
-    assert ds.wcs ==  "k"
+    assert ds.wcs == "k"
+
+
+def test_crop_few_slices(dataset_4d):
+    sds = dataset_4d[0, 0]
+    assert len(sds.wcs.input_frame.axes_order)

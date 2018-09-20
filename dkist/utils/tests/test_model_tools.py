@@ -5,9 +5,10 @@ from astropy.modeling.core import Model
 from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP
 from astropy.modeling.separable import is_separable
 
-from dkist.utils.model_tools import re_model_trees, remove_input_frame, make_tree_input_map
+from dkist.utils.model_tools import re_model_trees, remove_input_frame, make_tree_input_map, make_forward_input_map
 
 ## Fixtures used in this file are defined in conftest.py
+
 
 def test_input_map(triple_input_flat):
     ti_map = make_tree_input_map(triple_input_flat._tree)
@@ -104,3 +105,41 @@ def test_re_model_nested(triple_input_nested):
     model = re_model_trees(trees)
     assert isinstance(model, Model)
     assert len(model.inputs) == 2
+
+
+def test_drop_one_half_input_tree(spatial_like):
+    """
+    This test checks that if the input we want to drop is the sole input to one
+    half of the original tree, then we drop that half and keep the other.
+    """
+    tree = spatial_like._tree
+    drop_input = "x01"
+
+    # Work out based on name which tree we are dropping.
+    ginp_map = make_tree_input_map(tree)
+    r_ginp_map = {tuple(v): k for k, v in ginp_map.items()}
+    drop_tree = r_ginp_map[(drop_input,)]
+
+    trees = remove_input_frame(tree, drop_input)
+
+    # Work out which tree we are keeping
+    keep_trees = [tree.left, tree.right]
+    keep_trees.remove(drop_tree)
+
+    # Check we have kept and dropped the correct trees
+    assert drop_tree not in trees
+    assert keep_trees[0] in trees
+
+
+def test_dont_drop_one_half(spatial_like):
+    """
+    Test the situation where we are not just dropping one half of the tree.
+    """
+    spatial_like = spatial_like & Identity(1)
+    tree = spatial_like._tree
+    ginp_map = make_tree_input_map(tree)
+    r_ginp_map = {tuple(v): k for k, v in ginp_map.items()}
+
+    trees = remove_input_frame(tree, "x01")
+    assert r_ginp_map[("x0",)] in trees
+    assert tree.left not in trees

@@ -1,0 +1,1 @@
+Add support for array wcs calls post slicing a non-separable dimension. 

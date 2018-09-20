@@ -8,6 +8,6 @@ A Python library of tools for obtaining, processing and interacting with DKIST d
   :maxdepth: 2
 
   self
-  dataset.rst
-  io.rst
-  asdfmaker.rst
+  dataset
+  io
+  asdfmaker
