@@ -124,23 +124,25 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
     # map the input names of this tree to the names of it's children
     inp_map = make_forward_input_map(tree)
 
+    ori_trees = [tree.left, tree.right]
     new_trees = []
-    for tree in (tree.left, tree.right):
+    for i, stree in enumerate(ori_trees):
         # Generate the input mapping
-        ti_map = make_tree_input_map(tree)
+        ti_map = make_tree_input_map(stree)
         # Keep a list of the left and right trees for this tree
         sub_trees = list(ti_map.keys())
         # Find if the input we are after is in one of the subtrees for this tree.
         sub_tree = get_tree_with_input(ti_map, inp_map[inp])
         if sub_tree is None:
             # If we don't have the input, then we save the original tree unmodified.
-            new_trees.append(tree)
+            new_trees.append(stree)
             continue
 
         # If this subtree only has one input, we drop it and keep all the other one.
         if len(sub_tree.inputs) == 1:
             sub_trees.remove(sub_tree)
             new_trees += sub_trees
+            break  # Once we remove a tree we are done.
 
         # If we have more than one input, but they are not separable then we
         # either drop the whole subtree or we keep the original tree
@@ -151,13 +153,14 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
                 sub_trees.remove(sub_tree)
                 new_trees += sub_trees
             else:
-                new_trees.append(tree)
+                new_trees.append(stree)
+            break  # Once we remove a tree we are done.
 
         # TODO: What if we need to recurse down the tree another many levels?!
         # We shouldn't? All the inputs have to be at the top level of the expression??
         # new_trees += remove_input_frame(sub_tree, inp, remove_coupled_trees)
 
-    return new_trees
+    return new_trees + ori_trees[i+1:]
 
 
 def re_model_trees(trees):

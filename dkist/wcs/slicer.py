@@ -44,14 +44,19 @@ class GWCSSlicer:
     copy : `bool`
         A flag to determine if the input gwcs should be copied.
 
+    pixel_order : `bool`
+        If true it assumes the slice is in numpy order and therefore reversed
+        from the ordering of the gwcs.
+
     Examples
     --------
 
     >>> myslicedgwcs = Slicer(mygwcs)[10, : , 0]  # doctest: +SKIP
     """
-    def __init__(self, gwcs, copy=False):
+    def __init__(self, gwcs, copy=False, pixel_order=True):
         if copy:
             gwcs = deepcopy(gwcs)
+        self.pixel_order = pixel_order
         self.gwcs = gwcs
         self.naxis = self.gwcs.forward_transform.n_inputs
         self.separable = self._build_separable_array()
@@ -87,6 +92,8 @@ class GWCSSlicer:
         mseparable = separable.is_separable(self.gwcs.forward_transform)
         coupled = self._get_coupled_axes()
         mseparable[tuple(coupled)] = False
+        # if self.pixel_order:
+        #     return mseparable[::-1]
         return mseparable
 
     def _get_axes_map(self, frames):
@@ -138,11 +145,11 @@ class GWCSSlicer:
         copys = ("name",)
 
         attrs = {}
-        for ax in axes:
-            for m in mods:
-                n = list(getattr(iframe, m))
+        for m in mods:
+            n = list(getattr(iframe, m))
+            for ax in axes:
                 n.pop(ax)
-                attrs[m] = tuple(n)
+            attrs[m] = tuple(n)
 
         for at in copys:
             attrs[at] = getattr(iframe, at)
@@ -190,7 +197,10 @@ class GWCSSlicer:
                 item.append(slice(None))
 
         # Reverse the slice to match the physical coordinates and not the pixel ones
-        return item
+        if self.pixel_order:
+            return item[::-1]
+        else:
+            return item
 
     def __getitem__(self, item):
         """
@@ -222,6 +232,7 @@ class GWCSSlicer:
                 prepend.append(Identity(1))
 
         model = self.gwcs.forward_transform
+        axes_to_drop.sort(reverse=True)
         for drop_ax in axes_to_drop:
             inp = model._tree.inputs[drop_ax]
             trees = remove_input_frame(model._tree, inp)

@@ -53,6 +53,22 @@ def identity_gwcs_3d():
 
 
 @pytest.fixture
+def identity_gwcs_4d():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = (m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) &
+                m.Multiply(1*u.nm/u.pixel) & m.Multiply(1*u.nm/u.pixel))
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
+    time_frame = cf.TemporalFrame(axes_order=(3, ), unit=u.s)
+
+    frame = cf.CompositeFrame([sky_frame, wave_frame, time_frame])
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame)
+
+
+@pytest.fixture
 def dataset(array, identity_gwcs):
     ds = Dataset(array, wcs=identity_gwcs)
     # Sanity checks
@@ -68,6 +84,15 @@ def dataset_3d(identity_gwcs_3d):
     array = da.from_array(x, tuple(shape))
 
     return Dataset(array, wcs=identity_gwcs_3d)
+
+
+@pytest.fixture
+def dataset_4d(identity_gwcs_4d):
+    shape = (50, 60, 70, 80)
+    x = np.random.random(shape)
+    array = da.from_array(x, tuple(shape))
+
+    return Dataset(array, wcs=identity_gwcs_4d)
 
 
 def test_repr(dataset, dataset_3d):
@@ -127,12 +152,19 @@ def test_from_directory_not_dir():
         Dataset.from_directory(os.path.join(rootdir, 'EIT', 'eit_2004-03-01T00:00:10.515000.asdf'))
         assert "must be a directory" in str(e)
 
+
 def test_no_wcs_slice(dataset):
     dataset._wcs = None
-    ds = dataset[3,0]
+    ds = dataset[3, 0]
     assert ds.wcs is None
+
 
 def test_random_wcs_slice(dataset):
     dataset._wcs = "aslkdjalsjdkls"
     ds = dataset[3]
-    assert ds.wcs ==  "k"
+    assert ds.wcs == "k"
+
+
+def test_crop_few_slices(dataset_4d):
+    sds = dataset_4d[0, 0]
+    assert len(sds.wcs.input_frame.axes_order)

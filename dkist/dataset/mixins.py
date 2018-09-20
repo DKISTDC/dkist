@@ -19,7 +19,7 @@ class DatasetSlicingMixin(NDSlicingMixin):
             return None
         if isinstance(self.wcs, gwcs.WCS):
             # Reverse the item so the pixel slice matches the cartesian WCS
-            return GWCSSlicer(self.wcs, copy=True)[item[::-1]]
+            return GWCSSlicer(self.wcs, copy=True, pixel_order=True)[item]
         return self.wcs[item]
 
 
