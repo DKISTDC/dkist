@@ -1,5 +1,7 @@
 import pytest
 
+import numpy as np
+
 import astropy.units as u
 import gwcs.coordinate_frames as cf
 from gwcs import WCS
@@ -8,21 +10,7 @@ from astropy.modeling.models import Identity
 from sunpy.coordinates.frames import Helioprojective
 
 from dkist.conftest import spatial_like
-from dkist.wcs.slicer import GWCSSlicer, FixedParameter
-
-
-def test_fixed_parameter():
-    fp = FixedParameter(1)
-    assert fp() == 1
-    assert fp.n_inputs == 0
-    assert fp.n_outputs == 1
-
-
-def test_fixed_parameter_inverse():
-    fp = FixedParameter(1)
-    inv = fp.inverse
-    assert isinstance(inv, Identity)
-    assert inv.n_inputs == 1
+from dkist.wcs.slicer import GWCSSlicer
 
 
 # Some fixtures used in this file are defined in conftest.py
@@ -148,3 +136,15 @@ def test_roundtrip(slicer_3d):
     assert isinstance(w, SkyCoord)
     p = wcs.invert(w, with_units=True)
     assert len(p) == 2
+
+
+def test_array_call(slicer_3d):
+    """
+    Test that FixedParameters works with array inputs.
+    """
+    inp = [np.linspace(0, 10)*u.pix]*3
+    # Sanity check.
+    slicer_3d.gwcs(*inp)
+
+    wcs2 = slicer_3d[10]
+    x, y, z = wcs2(*inp[1:])

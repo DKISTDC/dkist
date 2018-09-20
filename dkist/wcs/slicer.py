@@ -3,61 +3,62 @@ This module contains tools for slicing gwcs objects.
 """
 from copy import deepcopy
 
+import numpy as np
+
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, Parameter, separable
 from astropy.modeling.models import Shift, Identity
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
 
-__all__ = ['GWCSSlicer', 'FixedParameter']
+__all__ = ['GWCSSlicer', 'FixedParameters']
 
 
-class FixedParameter(Model):
-    """
-    A Model that injects a parameter as an output.
+class FixedParameters(Model):
+    _name = "FixedParameters"
+    def __init__(self, input_specification):
+        self.input_specification = input_specification
 
-    The inverse of this model does nothing (is the ``Identity`` model), as the
-    parameter is only defined in the input direction.
-    """
-    value = Parameter()
-    inputs = tuple()
-    outputs = ('x',)
+    @property
+    def inputs(self):
+        return tuple(f"n{i}" for i in range(len(self.input_specification)) if not self.input_specification[i])
 
-    @classmethod
-    def evaluate(cls, value):
-        return value[0]
+    @property
+    def outputs(self):
+        return tuple(f"p{i}" for i in range(len(self.input_specification)))
+
+    def _check_arrays_same_size(self, arrays):
+        shapes = [np.asanyarray(arr).shape for arr in arrays]
+        shape0 = shapes.pop(0)
+        return all([sha == shape0 for sha in shapes])
+
+    def evaluate(self, *inputs):
+        ginput = 0
+        outputs = []
+
+        if self._check_arrays_same_size(inputs):
+            shape = np.asanyarray(inputs[0]).shape
+        else:
+            shape = tuple()
+        shape_arr = np.zeros(shape)
+
+        for finp in self.input_specification:
+            if finp:
+                if not shape:
+                    outputs.append(finp)
+                else:
+                    outputs.append(shape_arr + finp)
+            else:
+                outputs.append(inputs[ginput])
+                ginput += 1
+        return tuple(outputs)
 
     @property
     def inverse(self):
-        return Identity(1)
-
-
-def make_parameter_fixer(constructed_inputs):
-    class FixedParameters(Model):
-        fixed_inputs = constructed_inputs
-        inputs = tuple(f"n{i}" for i in range(len(constructed_inputs)) if not constructed_inputs[i])
-        outputs = tuple(f"p{i}" for i in range(len(constructed_inputs)))
-
-        @classmethod
-        def evaluate(cls, *inputs):
-            ginput = 0
-            outputs = []
-            for finp in cls.fixed_inputs:
-                if finp:
-                    outputs.append(finp)
-                else:
-                    outputs.append(inputs[ginput])
-                    ginput += 1
-            return tuple(outputs)
-
-
-        @property
-        def inverse(self):
-            m = Identity(1)
-            for i in range(1, len(self.fixed_inputs)):
-                m &= Identity(1)
-            return m
-    return FixedParameters
+        m = Identity(1)
+        for i in range(1, len(self.input_specification)):
+            m &= Identity(1)
+        return m
 
 
 class GWCSSlicer:
@@ -120,8 +121,6 @@ class GWCSSlicer:
         mseparable = separable.is_separable(self.gwcs.forward_transform)
         coupled = self._get_coupled_axes()
         mseparable[tuple(coupled)] = False
-        # if self.pixel_order:
-        #     return mseparable[::-1]
         return mseparable
 
     def _get_axes_map(self, frames):
@@ -238,9 +237,9 @@ class GWCSSlicer:
         """
         item = self._sanitize(item)
 
+        inputs = []
         prepend = []
         axes_to_drop = []
-        inputs = []
 
         # Iterate over all the axes and keep a list of models prepend to the
         # transform, and a list of axes to remove from the wcs completely.
@@ -256,7 +255,6 @@ class GWCSSlicer:
                 else:
                     inputs.append(ax*input_units[i])
                     prepend.append(Identity(1))
-                    # prepend.append(FixedParameter(ax*input_units[i]))
             elif ax.start:
                 inputs.append(None)
                 prepend.append(Shift(ax.start*input_units[i]))
@@ -274,9 +272,8 @@ class GWCSSlicer:
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
 
-        print(inputs)
         if not all([a is None for a in inputs]):
-            model = make_parameter_fixer(inputs)() | model
+            model = FixedParameters(inputs) | model
 
         new_in_frame = self.gwcs.input_frame if self.gwcs.input_frame else "pixel frame"
         new_out_frame = self.gwcs.output_frame

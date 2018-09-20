@@ -17,8 +17,8 @@ from dkist.data.test import rootdir
 
 @pytest.fixture
 def array():
-    shape = np.random.randint(100, size=2)
-    x = np.random.random(shape)
+    shape = np.random.randint(1, 100, size=2)
+    x = np.random.random(shape) + 10  # Make sure we can actually slice the thing later
     return da.from_array(x, tuple(shape))
 
 
@@ -49,7 +49,13 @@ def identity_gwcs_3d():
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
 
     frame = cf.CompositeFrame([sky_frame, wave_frame])
-    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame)
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
+                                        axes_order=(0, 1, 2),
+                                        axes_type=("pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
 
 
 @pytest.fixture
@@ -65,7 +71,13 @@ def identity_gwcs_4d():
     time_frame = cf.TemporalFrame(axes_order=(3, ), unit=u.s)
 
     frame = cf.CompositeFrame([sky_frame, wave_frame, time_frame])
-    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame)
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=4,
+                                        axes_order=(0, 1, 2, 3),
+                                        axes_type=("pixel", "pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z", "s"), unit=(u.pix, u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
 
 
 @pytest.fixture
