@@ -56,16 +56,6 @@ def make_tree_input_map(tree):
     return tree_input_map
 
 
-def get_tree_with_input(ti_map, input):
-    """
-    Given the input name and a tree input mapping, return the tree which takes
-    the input.
-    """
-    for t, inputs in ti_map.items():
-        if input in inputs:
-            return t
-
-
 def make_forward_input_map(tree):
     """
     Given a tree, generate a mapping of inputs to the tree, to inputs of it's

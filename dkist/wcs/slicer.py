@@ -11,11 +11,11 @@ from astropy.modeling.models import Shift, Identity
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
 
-__all__ = ['GWCSSlicer', 'FixedParameters']
+__all__ = ['GWCSSlicer', 'FixedInputs']
 
 
-class FixedParameters(Model):
-    _name = "FixedParameters"
+class FixedInputs(Model):
+    _name = "FixedInputs"
     def __init__(self, input_specification):
         self.input_specification = input_specification
 
@@ -273,7 +273,7 @@ class GWCSSlicer:
             model = self._list_to_compound(prepend) | model
 
         if not all([a is None for a in inputs]):
-            model = FixedParameters(inputs) | model
+            model = FixedInputs(inputs) | model
 
         new_in_frame = self.gwcs.input_frame if self.gwcs.input_frame else "pixel frame"
         new_out_frame = self.gwcs.output_frame

@@ -91,12 +91,16 @@ def test_new_output_frame(slicer_1d, slicer_3d):
 def test_simple_slices(slicer_3d):
     sl = slicer_3d[:, :, :]
     assert sl is slicer_3d.gwcs
+    outs = sl(10*u.pix, 10*u.pix, 10*u.pix)
+    assert len(outs) == 3
 
 
 def test_simple_slices2(slicer_3d):
-    sl2 = slicer_3d[:, :, 0]
-    assert sl2.forward_transform.n_inputs == 2
-    assert isinstance(sl2.output_frame, cf.CoordinateFrame)
+    sl = slicer_3d[:, :, 0]
+    assert sl.forward_transform.n_inputs == 2
+    assert isinstance(sl.output_frame, cf.CoordinateFrame)
+    outs = sl(10*u.pix, 10*u.pix)
+    assert len(outs) == 2
 
 
 def test_simple_slices3(slicer_3d):
@@ -104,6 +108,8 @@ def test_simple_slices3(slicer_3d):
     assert sl.forward_transform.n_inputs == 2
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
+    outs = sl(10*u.pix, 10*u.pix)
+    assert len(outs) == 3
 
 
 def test_simple_slices4(slicer_3d):
@@ -111,6 +117,8 @@ def test_simple_slices4(slicer_3d):
     assert sl.forward_transform.n_inputs == 2
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
+    outs = sl(10*u.pix, 10*u.pix)
+    assert len(outs) == 3
 
 
 def test_simple_slices5(slicer_3d):
@@ -118,6 +126,8 @@ def test_simple_slices5(slicer_3d):
     assert sl.forward_transform.n_inputs == 3
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
+    outs = sl(10*u.pix, 10*u.pix, 10*u.pix)
+    assert len(outs) == 3
 
 
 def test_error_step(slicer_3d):
@@ -140,7 +150,7 @@ def test_roundtrip(slicer_3d):
 
 def test_array_call(slicer_3d):
     """
-    Test that FixedParameters works with array inputs.
+    Test that FixedInputs works with array inputs.
     """
     inp = [np.linspace(0, 10)*u.pix]*3
     # Sanity check.
