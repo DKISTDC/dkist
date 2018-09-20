@@ -155,20 +155,60 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         return u.Quantity(self.data.shape, unit=u.pix)
 
-    def crop_by_coords(self, min_coord_values, interval_widths):
-        # The docstring is defined in NDDataBase
+    def crop_by_coords(self, lower_corner, upper_corner, units=None):
+        """
+        Crops an NDCube given the lower and upper corners of a box in world coordinates.
 
-        n_dim = len(self.dimensions)
-        if (len(min_coord_values) != len(interval_widths)) or len(min_coord_values) != n_dim:
-            raise ValueError("min_coord_values and interval_widths must have "
-                             "same number of elements as number of data dimensions.")
+        Parameters
+        ----------
+        lower_corner: iterable of `astropy.units.Quantity` or `float`
+            The minimum desired values along each relevant axis after cropping
+            described in physical units consistent with the NDCube's wcs object.
+            The length of the iterable must equal the number of data dimensions
+            and must have the same order as the data.
+        upper_corner: iterable of `astropy.units.Quantity` or `float`
+            The maximum desired values along each relevant axis after cropping
+            described in physical units consistent with the NDCube's wcs object.
+            The length of the iterable must equal the number of data dimensions
+            and must have the same order as the data.
+        units: iterable of `astropy.units.quantity.Quantity`, optional
+            If the inputs are set without units, the user must set the units
+            inside this argument as `str`.
+            The length of the iterable must equal the number of data dimensions
+            and must have the same order as the data.
 
-        # Convert coords of lower left corner to pixel units.
-        lower_pixels = self.world_to_pixel(*min_coord_values)
-        upper_pixels = self.world_to_pixel(*[min_coord_values[i] + interval_widths[i]
-                                             for i in range(len(min_coord_values))])
-        # Round pixel values to nearest integer.
-        lower_pixels = [int(np.rint(l.value)) for l in lower_pixels]
-        upper_pixels = [int(np.rint(u.value)) for u in upper_pixels]
-        item = tuple([slice(lower_pixels[i], upper_pixels[i]) for i in range(n_dim)])
+        Returns
+        -------
+        result: NDCube
+        """
+        n_dim = self.data.ndim
+        if units:
+            # Raising a value error if units have not the data dimensions.
+            if len(units) != n_dim:
+                raise ValueError('units must have same number of elements as '
+                                 'number of data dimensions.')
+            # If inputs are not Quantity objects, they are modified into specified units
+            lower_corner = [u.Quantity(lower_corner[i], unit=units[i])
+                            for i in range(self.data.ndim)]
+            upper_corner = [u.Quantity(upper_corner[i], unit=units[i])
+                            for i in range(self.data.ndim)]
+        else:
+            if any([not isinstance(x, u.Quantity) for x in lower_corner] +
+                   [not isinstance(x, u.Quantity) for x in upper_corner]):
+                raise TypeError("lower_corner and interval_widths/upper_corner must be "
+                                "of type astropy.units.Quantity or the units kwarg "
+                                "must be set.")
+        # Get all corners of region of interest.
+        all_world_corners_grid = np.meshgrid(
+            *[u.Quantity([lower_corner[i], upper_corner[i]], unit=lower_corner[i].unit).value
+              for i in range(self.data.ndim)])
+        all_world_corners = [all_world_corners_grid[i].flatten()*lower_corner[i].unit
+                             for i in range(n_dim)]
+        # Convert to pixel coordinates
+        all_pix_corners = self.wcs(*all_world_corners, with_units=False)
+        # Derive slicing item with which to slice NDCube.
+        # Be sure to round down min pixel and round up + 1 the max pixel.
+        item = tuple([slice(int(np.clip(axis_pixels.value.min(), 0, None)),
+                            int(np.ceil(axis_pixels.value.max()))+1)
+                      for axis_pixels in all_pix_corners])
         return self[item]

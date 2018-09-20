@@ -123,15 +123,22 @@ def test_dimensions(dataset, dataset_3d):
 
 
 def test_crop_by_coords(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5, 5, 5)*u.arcsec, (5, 5, 5)*u.arcsec)
+    arr = dataset_3d.crop_by_coords((5*u.arcsec, 5*u.arcsec, 5*u.nm),
+                                    (9*u.arcsec, 9*u.arcsec, 9*u.nm))
+
     da_crop = dataset_3d.data[5:10, 5:10, 5:10]
     assert arr.data.shape == da_crop.shape
     assert np.allclose(arr.data, da_crop)
 
 
 def test_crop_by_coords_bad_args(dataset_3d):
+    with pytest.raises(TypeError):
+        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
+
+
+def test_crop_by_coords_bad_units(dataset_3d):
     with pytest.raises(ValueError):
-        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5)*u.arcsec)
+        dataset_3d.crop_by_coords((5, 5, 5), (9, 9, 9), units=(u.pix, u.pix))
 
 
 def test_load_from_directory():
