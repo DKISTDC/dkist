@@ -71,14 +71,14 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         if self.wcs.input_frame:
             return self.wcs.input_frame.axes_names[::-1]
         else:
-            return ('',) * self.data.ndim
+            return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
 
     @property
     def world_axes_names(self):
         if self.wcs.output_frame:
             return self.wcs.output_frame.axes_names[::-1]
         else:
-            return ('',)*self.data.ndim  # pragma: no cover  # We should never hit this
+            return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
 
     def __repr__(self):
         """
