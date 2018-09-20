@@ -39,13 +39,13 @@ class FixedInputs(Model):
         if self._check_arrays_same_size(inputs):
             shape = np.asanyarray(inputs[0]).shape
         else:
-            shape = tuple()
+            shape = tuple()  # pragma: no cover
         shape_arr = np.zeros(shape)
 
         for finp in self.input_specification:
             if finp:
                 if not shape:
-                    outputs.append(finp)
+                    outputs.append(finp)  # pragma: no cover
                 else:
                     outputs.append(shape_arr + finp)
             else:

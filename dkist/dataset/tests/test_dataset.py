@@ -143,6 +143,16 @@ def test_crop_by_coords(dataset_3d):
     assert np.allclose(arr.data, da_crop)
 
 
+def test_crop_by_coords_units(dataset_3d):
+    arr = dataset_3d.crop_by_coords((5, 5, 5),
+                                    (9, 9, 9),
+                                    (u.arcsec, u.arcsec, u.nm))
+
+    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
+    assert arr.data.shape == da_crop.shape
+    assert np.allclose(arr.data, da_crop)
+
+
 def test_crop_by_coords_bad_args(dataset_3d):
     with pytest.raises(TypeError):
         dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
