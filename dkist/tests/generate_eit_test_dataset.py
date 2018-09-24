@@ -123,9 +123,11 @@ def main():
     hcubemodel = spatial & timemodel
 
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
-                                  reference_frame=smap0.coordinate_frame)
+                                  reference_frame=smap0.coordinate_frame,
+                                  axes_names=("helioprojective longitude", "helioprojective latitude"))
     time_frame = cf.TemporalFrame(axes_order=(2, ), unit=u.s,
-                                  reference_time=Time(time_coords[0]))
+                                  reference_time=Time(time_coords[0]),
+                                  axes_names=("time",))
 
     sky_frame = cf.CompositeFrame([sky_frame, time_frame])
     detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
