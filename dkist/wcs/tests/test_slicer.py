@@ -89,45 +89,50 @@ def test_new_output_frame(slicer_1d, slicer_3d):
 
 
 def test_simple_slices(slicer_3d):
-    sl = slicer_3d[:, :, :]
+    sl, _ = slicer_3d[:, :, :]
     assert sl is slicer_3d.gwcs
     outs = sl(10*u.pix, 10*u.pix, 10*u.pix)
     assert len(outs) == 3
+    sl.invert(*outs)
 
 
 def test_simple_slices2(slicer_3d):
-    sl = slicer_3d[:, :, 0]
+    sl, _ = slicer_3d[:, :, 0]
     assert sl.forward_transform.n_inputs == 2
     assert isinstance(sl.output_frame, cf.CoordinateFrame)
     outs = sl(10*u.pix, 10*u.pix)
     assert len(outs) == 2
+    sl.invert(*outs)
 
 
 def test_simple_slices3(slicer_3d):
-    sl = slicer_3d[:, 10, :]
+    sl, _ = slicer_3d[:, 10, :]
     assert sl.forward_transform.n_inputs == 2
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
     outs = sl(10*u.pix, 10*u.pix)
     assert len(outs) == 3
+    sl.invert(*outs)
 
 
 def test_simple_slices4(slicer_3d):
-    sl = slicer_3d[10]
+    sl, _ = slicer_3d[10]
     assert sl.forward_transform.n_inputs == 2
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
     outs = sl(10*u.pix, 10*u.pix)
     assert len(outs) == 3
+    sl.invert(*outs)
 
 
 def test_simple_slices5(slicer_3d):
-    sl = slicer_3d[10:]
+    sl, _ = slicer_3d[10:]
     assert sl.forward_transform.n_inputs == 3
     assert sl.forward_transform.n_outputs == 3
     assert isinstance(sl.output_frame, cf.CompositeFrame)
     outs = sl(10*u.pix, 10*u.pix, 10*u.pix)
     assert len(outs) == 3
+    sl.invert(*outs)
 
 
 def test_error_step(slicer_3d):
@@ -141,7 +146,7 @@ def test_error_type(slicer_3d):
 
 
 def test_roundtrip(slicer_3d):
-    wcs = slicer_3d[10:, 10, 10]
+    wcs, _ = slicer_3d[10:, 10, 10]
     w = wcs(10 * u.pix, with_units=True)
     assert isinstance(w, SkyCoord)
     p = wcs.invert(w, with_units=True)
@@ -156,5 +161,5 @@ def test_array_call(slicer_3d):
     # Sanity check.
     slicer_3d.gwcs(*inp)
 
-    wcs2 = slicer_3d[10]
+    wcs2, _ = slicer_3d[10]
     x, y, z = wcs2(*inp[1:])

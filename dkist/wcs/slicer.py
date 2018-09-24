@@ -21,7 +21,7 @@ class FixedInputs(Model):
 
     @property
     def inputs(self):
-        return tuple(f"n{i}" for i in range(len(self.input_specification)) if not self.input_specification[i])
+        return tuple(f"n{i}" for i in range(len(self.input_specification)) if self.input_specification[i] is None)
 
     @property
     def outputs(self):
@@ -229,14 +229,7 @@ class GWCSSlicer:
         else:
             return item
 
-    def __getitem__(self, item):
-        """
-        Once the item is sanitized, we fix the parameter if the item is an integer,
-        shift if the start is set on the slice or
-        do nothing to the axis otherwise.
-        """
-        item = self._sanitize(item)
-
+    def _convert_item_to_models(self, item):
         inputs = []
         prepend = []
         axes_to_drop = []
@@ -262,6 +255,22 @@ class GWCSSlicer:
                 inputs.append(None)
                 prepend.append(Identity(1))
 
+        return inputs, prepend, axes_to_drop
+
+    def __getitem__(self, item):
+        """
+        Once the item is sanitized, we fix the parameter if the item is an integer,
+        shift if the start is set on the slice or
+        do nothing to the axis otherwise.
+        """
+        item = self._sanitize(item)
+
+        inputs, prepend, axes_to_drop = self._convert_item_to_models(item)
+
+        missing_axes = [i is not None for i in inputs]
+        if self.pixel_order:
+            missing_axes = missing_axes[::-1]
+
         model = self.gwcs.forward_transform
         axes_to_drop.sort(reverse=True)
         for drop_ax in axes_to_drop:
@@ -284,4 +293,4 @@ class GWCSSlicer:
         # Update the gwcs
         self.gwcs._initialize_wcs(model, new_in_frame, new_out_frame)
 
-        return self.gwcs
+        return self.gwcs, missing_axes

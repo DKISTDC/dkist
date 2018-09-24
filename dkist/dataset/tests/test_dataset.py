@@ -188,12 +188,6 @@ def test_no_wcs_slice(dataset):
     assert ds.wcs is None
 
 
-def test_random_wcs_slice(dataset):
-    dataset._wcs = "aslkdjalsjdkls"
-    ds = dataset[3]
-    assert ds.wcs == "k"
-
-
 def test_crop_few_slices(dataset_4d):
     sds = dataset_4d[0, 0]
     assert len(sds.wcs.input_frame.axes_order)
