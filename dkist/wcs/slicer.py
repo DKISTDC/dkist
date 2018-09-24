@@ -55,10 +55,7 @@ class FixedInputs(Model):
 
     @property
     def inverse(self):
-        m = Identity(1)
-        for i in range(1, len(self.input_specification)):
-            m &= Identity(1)
-        return m
+        return Identity(len(self.input_specification))
 
 
 class GWCSSlicer:
