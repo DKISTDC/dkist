@@ -43,7 +43,7 @@ class FixedInputs(Model):
         shape_arr = np.zeros(shape)
 
         for finp in self.input_specification:
-            if finp:
+            if finp is not None:
                 if not shape:
                     outputs.append(finp)  # pragma: no cover
                 else:
