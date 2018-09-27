@@ -129,7 +129,7 @@ def main():
                                   reference_time=Time(time_coords[0]),
                                   axes_names=("time",))
 
-    sky_frame = cf.CompositeFrame([sky_frame, time_frame])
+    sky_frame = cf.CompositeFrame([sky_frame, time_frame], name="world")
     detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
                                         axes_order=(0, 1, 2),
                                         axes_type=("pixel", "pixel", "pixel"),
