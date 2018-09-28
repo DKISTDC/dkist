@@ -42,7 +42,10 @@ workflows:
   test-code:
     jobs:
       - egg-info-36
-      - tests:
+      - tests36:
+          requires:
+            - egg-info-36
+      - tests37:
           requires:
             - egg-info-36
 
