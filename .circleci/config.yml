@@ -1,25 +1,3 @@
-apt-run: &apt-install
-  name: Install apt packages
-  command: |
-    sudo apt update
-    sudo apt install -y graphviz
-
-pip-run: &pip-install
-  name: Install Python dependencies
-  command: |
-    python3 -m venv venv
-    . venv/bin/activate
-    pip install -q -r requirements.txt
-    pip freeze
-
-upload-coverage: &coverage
-  name: Upload coverage report to codecov
-  command: |
-    . venv/bin/activate
-    pip install codecov
-    codecov
-
-
 version: 2
 jobs:
   egg-info-36:
@@ -29,25 +7,31 @@ jobs:
       - checkout
       - run: python setup.py egg_info
 
-  tests:
-    environment:
-      - MPLBACKEND: 'agg'
+  tests36:
     docker:
-      - image: circleci/python:3.6
+      - image: continuumio/miniconda3
     steps:
       - checkout
-      - run: *pip-install
-      - run: venv/bin/python setup.py test --coverage
-      - run: *coverage
+      - run: pip install tox git+git://github.com/drdavella/tox-conda
+      - run: tox -e py36
+      - run: codecov
+
+  tests37:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - checkout
+      - run: pip install tox git+git://github.com/drdavella/tox-conda
+      - run: tox -e py37
+      - run: codecov
 
   html-docs:
     docker:
-      - image: circleci/python:3.6
+      - image: continuumio/miniconda3
     steps:
       - checkout
-      - run: *apt-install
-      - run: *pip-install
-      - run: venv/bin/python setup.py build_docs -w
+      - run: pip install tox git+git://github.com/drdavella/tox-conda
+      - run: tox -e docbuild
 
       - store_artifacts:
           path: docs/_build/html
