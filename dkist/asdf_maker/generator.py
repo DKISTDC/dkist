@@ -25,7 +25,7 @@ def headers_from_filenames(filenames, hdu=0):
     """
     A generator to get the headers from filenames.
     """
-    return [fits.getheader(fname, hdu=hdu) for fname in filenames]
+    return [fits.getheader(fname, ext=hdu) for fname in filenames]
 
 
 def table_from_headers(headers):
@@ -334,7 +334,7 @@ def sorter_DINDEX(headers):
     return np.argsort(t, order=keys)
 
 
-def asdf_tree_from_filenames(filenames, hdu=0):
+def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     """
     Build a DKIST asdf tree from a list of (unsorted) filenames.
 
@@ -366,7 +366,8 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
     # References from filenames
-    reference_array = references_from_filenames(sorted_filenames, array_shape=shape)
+    reference_array = references_from_filenames(sorted_filenames, array_shape=shape,
+                                                hdu_index=hdu, relative_to=relative_to)
 
     tree = {'dataset': reference_array,
             'gwcs': gwcs_from_headers(headers)}
@@ -376,7 +377,7 @@ def asdf_tree_from_filenames(filenames, hdu=0):
     return tree
 
 
-def dataset_from_fits(path, asdf_filename, hdu=0):
+def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
     """
     Given a path containing FITS files write an asdf file in the same path.
 
@@ -396,8 +397,7 @@ def dataset_from_fits(path, asdf_filename, hdu=0):
 
     files = path.glob("*fits")
 
-    tree = asdf_tree_from_filenames(list(files), hdu=hdu)
-    print(tree)
+    tree = asdf_tree_from_filenames(list(files), hdu=hdu, relative_to=relative_to)
 
     with asdf.AsdfFile(tree) as afile:
         afile.write_to(str(path/asdf_filename))
