@@ -13,7 +13,6 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 
-
 common_parameters = """
 
     Parameters
@@ -110,11 +109,28 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
         """
         The `~dask.array.Array` associated with this array of references.
         """
-        chunk = tuple(self.loader_array.flat[0].shape)
-        # If the first dimension of the FITS array is 1 we are going to squash
-        # it with vstack, otherwise use stack to make a new dimension
-        stacker = da.vstack if chunk[0] == 1 else da.stack
-        aa = map(
-            partial(da.from_array, chunks=chunk), self.loader_array.flat)
 
-        return stacker(list(aa)).reshape(self.shape)
+        return stack_loader_array(self.loader_array)
+
+
+def stack_loader_array(loader_array):
+    """
+    Stack a loader array along each of its dimensions.
+
+    This results in a dask array with the correct chunks and dimensions.
+
+    Parameters
+    ----------
+    loader_array : `dkist.io.reference_collections.BaseFITSArrayContainer`
+
+    Returns
+    -------
+    array : `dask.array.Array`
+    """
+    if len(loader_array.shape) == 1:
+        return da.stack(loader_array)
+    stacks = []
+    for i in range(loader_array.shape[0]):
+        sub_load = loader_array[i]
+        stacks.append(stack_loader_array(sub_load))
+    return da.stack(stacks)
