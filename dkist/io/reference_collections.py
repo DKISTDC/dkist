@@ -109,7 +109,6 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
         """
         The `~dask.array.Array` associated with this array of references.
         """
-
         return stack_loader_array(self.loader_array)
 
 
@@ -131,6 +130,5 @@ def stack_loader_array(loader_array):
         return da.stack(loader_array)
     stacks = []
     for i in range(loader_array.shape[0]):
-        sub_load = loader_array[i]
-        stacks.append(stack_loader_array(sub_load))
+        stacks.append(stack_loader_array(loader_array[i]))
     return da.stack(stacks)
