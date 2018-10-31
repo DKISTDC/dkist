@@ -7,8 +7,7 @@ import astropy.units as u
 from astropy.io import fits
 from astropy.time import Time
 from astropy.modeling import Model
-from gwcs.lookup_table import LookupTable
-from astropy.modeling.models import Linear1D
+from astropy.modeling.models import Linear1D, Tabular1D
 
 from dkist.asdf_maker.helpers import (make_asdf, linear_time_model, linear_spectral_model,
                                       time_model_from_date_obs, references_from_filenames,
@@ -73,7 +72,7 @@ def test_time_from_dateobs_lookup(header_filenames):
     date_obs = [fits.getheader(f)['DATE-OBS'] for f in header_filenames]
     date_obs[5] = (Time(date_obs[5]) + 10*u.s).isot
     time = time_model_from_date_obs(date_obs)
-    assert isinstance(time, LookupTable)
+    assert isinstance(time, Tabular1D)
 
 
 def test_spectral_framewave(header_filenames):
@@ -90,7 +89,7 @@ def test_spectral_framewave(header_filenames):
     assert isinstance(m, Linear1D)
 
     m2 = spectral_model_from_framewave(framewave)
-    assert isinstance(m2, LookupTable)
+    assert isinstance(m2, Tabular1D)
 
 
 def test_make_asdf(header_filenames, tmpdir):
