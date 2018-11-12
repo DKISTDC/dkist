@@ -29,14 +29,7 @@ def headers_from_filenames(filenames, hdu=0):
 
 
 def table_from_headers(headers):
-    h0 = headers[0]
-
-    t = Table(list(zip(h0.values())), names=list(h0.keys()))
-
-    for h in headers[1:]:
-        t.add_row(h)
-
-    return t
+    return Table(rows=headers, names=list(headers[0].keys()))
 
 
 def validate_headers(headers):
@@ -361,16 +354,17 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
 
     # Sort the filenames into DS order.
     sorted_filenames = np.array(filenames)[sort_inds]
+    sorted_headers = np.array(headers, dtype=object)[sort_inds]
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
     # References from filenames
-    reference_array = references_from_filenames(sorted_filenames, array_shape=shape,
+    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
     tree = {'dataset': reference_array,
-            'gwcs': gwcs_from_headers(headers)}
+            'gwcs': gwcs_from_headers(sorted_headers)}
 
     # TODO: Write a schema for the tree.
 

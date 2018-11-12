@@ -127,7 +127,7 @@ class AstropyFITSLoader(BaseFITSLoader):
         """
         Make sure we cache the header while we have the file open.
         """
-        with fits.open(self.absolute_uri, memmap=True, do_not_scale_image_data=False) as hdul:
+        with fits.open(self.absolute_uri, memmap=True, do_not_scale_image_data=False, mode="denywrite") as hdul:
             hdul.verify('fix')
             hdu = hdul[self.fitsarray.target]
             if not self._fits_header:

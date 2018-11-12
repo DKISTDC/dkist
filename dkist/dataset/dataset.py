@@ -77,6 +77,8 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         else:
             self.missing_axis = missing_axis
 
+        self.array_container = None
+
     @classmethod
     def from_directory(cls, directory):
         """
@@ -117,7 +119,9 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         wcs = asdf_tree['gwcs']
 
-        return cls(data, wcs=wcs)
+        cls = cls(data, wcs=wcs)
+        cls.array_container = array_container
+        return cls
 
     @property
     def pixel_axes_names(self):
