@@ -4,7 +4,6 @@ import numpy as np
 
 import asdf
 import astropy.units as u
-from astropy.io import fits
 from astropy.time import Time
 from astropy.modeling.models import (Shift, Linear1D, Multiply, Pix2Sky_TAN,
                                      AffineTransformation2D, RotateNative2Celestial, Tabular1D)
@@ -54,7 +53,7 @@ def references_from_filenames(filenames, headers, array_shape, hdu_index=0, rela
         # Convert paths to relative paths
         relative_path = filepath
         if relative_to:
-            relative_path = os.path.relpath(filepath, relative_to)
+            relative_path = os.path.relpath(filepath, str(relative_to))
 
         reference_array.flat[i] = ExternalArrayReference(
             relative_path, hdu_index, dtype, shape)

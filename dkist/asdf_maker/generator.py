@@ -194,7 +194,7 @@ class TransformBuilder:
         naxes = self.header['DEAXES']
         ss = [0] * naxes
         ss[i] = slice(None)
-        return ss
+        return ss[::-1]
 
     @property
     def slice_headers(self):
@@ -354,7 +354,7 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
 
     # Sort the filenames into DS order.
     sorted_filenames = np.array(filenames)[sort_inds]
-    sorted_headers = np.array(headers, dtype=object)[sort_inds]
+    sorted_headers = np.array(list(map(dict, headers)), dtype=object)[sort_inds]
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
