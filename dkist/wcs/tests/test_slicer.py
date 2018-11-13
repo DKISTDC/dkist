@@ -77,7 +77,6 @@ def test_get_axes_map(slicer_3d):
 
 
 def test_new_output_frame(slicer_1d, slicer_3d):
-    assert slicer_1d._new_output_frame(tuple()) is slicer_1d.gwcs.output_frame
     assert slicer_3d._new_output_frame(tuple()) is not slicer_1d.gwcs.output_frame
 
     new_frame = slicer_3d._new_output_frame(tuple())
