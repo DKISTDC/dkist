@@ -16,6 +16,7 @@ __all__ = ['GWCSSlicer', 'FixedInputs']
 
 class FixedInputs(Model):
     _name = "FixedInputs"
+
     def __init__(self, input_specification):
         self.input_specification = input_specification
 
@@ -92,9 +93,9 @@ class GWCSSlicer:
         Return a list of frames which comprise the output frame.
         """
         if hasattr(self.gwcs.output_frame, "frames"):
-            frames = self.gwcs.output_frame.frames
+            frames = deepcopy(self.gwcs.output_frame.frames)
         else:
-            frames = (self.gwcs.output_frame,)
+            frames = (deepcopy(self.gwcs.output_frame),)
         return frames
 
     def _get_coupled_axes(self):
@@ -150,7 +151,24 @@ class GWCSSlicer:
         frames = list(frames)
         for axis in axes:
             drop_frame = axes_map[axis]
-            frames.remove(drop_frame)
+            # If we are removing coupled axes we might have already removed the frame
+            if drop_frame in frames:
+                frames.remove(drop_frame)
+
+        # We now need to reindex the axes_order of all the frames to account
+        # for any removed axes.
+        for i, frame in enumerate(frames):
+            if i == 0:
+                start = i
+            else:
+                axes_order = frames[i-1].axes_order
+                start = axes_order[-1]
+                # Start can either be an int or a list/tuple here.
+                if not isinstance(start, int):
+                    start = start[-1]
+                # Increment start for the next frame.
+                start += 1
+            frame._axes_order = tuple(range(start, start+frame.naxes))
 
         if len(frames) == 1:
             return frames[0]
@@ -226,7 +244,7 @@ class GWCSSlicer:
         else:
             return item
 
-    def _convert_item_to_models(self, item):
+    def _convert_item_to_models(self, item, drop_all_non_separable):
         inputs = []
         prepend = []
         axes_to_drop = []
@@ -241,6 +259,8 @@ class GWCSSlicer:
         for i, ax in enumerate(item):
             if isinstance(ax, int):
                 if self.separable[i]:
+                    axes_to_drop.append(i)
+                elif not self.separable[i] and drop_all_non_separable:
                     axes_to_drop.append(i)
                 else:
                     inputs.append(ax*input_units[i])
@@ -262,7 +282,9 @@ class GWCSSlicer:
         """
         item = self._sanitize(item)
 
-        inputs, prepend, axes_to_drop = self._convert_item_to_models(item)
+        drop_all_non_separable = all(isinstance(ax, int) for i, ax in enumerate(item) if not self.separable[i])
+
+        inputs, prepend, axes_to_drop = self._convert_item_to_models(item, drop_all_non_separable)
 
         missing_axes = [i is not None for i in inputs]
         if self.pixel_order:
@@ -270,10 +292,24 @@ class GWCSSlicer:
 
         model = self.gwcs.forward_transform
         axes_to_drop.sort(reverse=True)
+        skip = False
+
         for drop_ax in axes_to_drop:
+            # If we are removing non separable axes then we need to skip all
+            # but the first non-separable axis.
+
+            # TODO: This is assuming there is only one set of non-separable
+            # axes in the WCS. If there were more than two sets of
+            # non-separable axes this would break.
+            if skip:
+                continue
+            skip = not self.separable[drop_ax] if drop_all_non_separable else skip
+
             inp = model._tree.inputs[drop_ax]
-            trees = remove_input_frame(model._tree, inp)
+            trees = remove_input_frame(model._tree, inp,
+                                       remove_coupled_trees=drop_all_non_separable)
             model = re_model_trees(trees)
+
 
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
