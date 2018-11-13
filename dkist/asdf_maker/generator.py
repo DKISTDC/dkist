@@ -25,7 +25,7 @@ def headers_from_filenames(filenames, hdu=0):
     """
     A generator to get the headers from filenames.
     """
-    return [fits.getheader(fname, ext=hdu) for fname in filenames]
+    return [dict(fits.getheader(fname, ext=hdu)) for fname in filenames]
 
 
 def table_from_headers(headers):
@@ -354,7 +354,7 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
 
     # Sort the filenames into DS order.
     sorted_filenames = np.array(filenames)[sort_inds]
-    sorted_headers = np.array(list(map(dict, headers)), dtype=object)[sort_inds]
+    sorted_headers = np.array(headers, dtype=object)[sort_inds]
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
