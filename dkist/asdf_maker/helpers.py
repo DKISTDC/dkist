@@ -48,7 +48,7 @@ def references_from_filenames(filenames, headers, array_shape, hdu_index=0, rela
 
     for i, (filepath, head) in enumerate(zip(filenames.flat, headers.flat)):
         dtype = BITPIX2DTYPE[head['BITPIX']]
-        shape = tuple([head[f"NAXIS{a}"] for a in range(head["NAXIS"], 0, -1)])
+        shape = tuple([int(head[f"NAXIS{a}"]) for a in range(head["NAXIS"], 0, -1)])
 
         # Convert paths to relative paths
         relative_path = filepath
@@ -158,6 +158,7 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
         intercept = 0 * u.s
         return linear_time_model(cadence=slope, reference_val=intercept)
     else:
+        print(f"creating tabular temporal axis. ddeltas: {ddelta}")
         return Tabular1D(np.arange(deltas.size)*u.pix, deltas.to(u.s))
 
 
@@ -178,6 +179,7 @@ def spectral_model_from_framewave(framewav):
         slope = ddeltas[0]
         return linear_spectral_model(slope, wave_bgn)
     else:
+        print(f"creating tabular wavelength axis. ddeltas: {ddeltas}")
         return Tabular1D(np.arange(framewav.size)*u.pix, framewav)
 
 

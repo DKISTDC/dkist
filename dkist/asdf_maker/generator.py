@@ -32,7 +32,7 @@ def table_from_headers(headers):
     return Table(rows=headers, names=list(headers[0].keys()))
 
 
-def validate_headers(headers):
+def validate_headers(table_headers):
     """
     Given a bunch of headers, validate that they form a coherent set. This
     function also adds the headers to a list as they are read from the file.
@@ -48,7 +48,7 @@ def validate_headers(headers):
     out_headers : `list`
         A list of headers.
     """
-    t = table_from_headers(headers)
+    t = table_headers
 
     """
     Let's do roughly the minimal amount of verification here.
@@ -73,7 +73,7 @@ def validate_headers(headers):
         if not all(col == col[0]):
             raise ValueError(f"The {col.name} values did not all match:\n {col}")
 
-    return headers
+    return table_headers
 
 
 def build_pixel_frame(header):
@@ -315,16 +315,18 @@ def gwcs_from_headers(headers):
                     output_frame=world_frame)
 
 
-def sorter_DINDEX(headers):
+def make_sorted_table(headers, filenames):
     """
-    A sorting function based on the values of DINDEX in the header.
+    Return an `astropy.table.Table` instance where the rows are correctly sorted.
     """
-    t = table_from_headers(headers)
+    theaders = table_from_headers(headers)
+    theaders['filenames'] = filenames
+    theaders['headers'] = headers
     dataset_axes = headers[0]['DNAXIS']
     array_axes = headers[0]['DAAXES']
     keys = [f'DINDEX{k}' for k in range(dataset_axes, array_axes, -1)]
-    t = np.array(t[keys])
-    return np.argsort(t, order=keys)
+    t = np.array(theaders[keys])
+    return theaders[np.argsort(t, order=keys)]
 
 
 def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
@@ -343,18 +345,13 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     # headers is an iterator
     headers = headers_from_filenames(filenames, hdu=hdu)
 
-    # headers is a now list
-    headers = validate_headers(headers)
+    table_headers = make_sorted_table(headers, filenames)
 
-    sort_inds = sorter_DINDEX(headers)
-
-    sort_heads = ((head, sort_inds[i]) for i, head in enumerate(headers))
-    heads = sorted(sort_heads, key=lambda h: h[1])
-    headers = [head[0] for head in heads]
+    validate_headers(table_headers)
 
     # Sort the filenames into DS order.
-    sorted_filenames = np.array(filenames)[sort_inds]
-    sorted_headers = np.array(headers, dtype=object)[sort_inds]
+    sorted_filenames = np.array(table_headers['filenames'])
+    sorted_headers = np.array(table_headers['headers'])
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
