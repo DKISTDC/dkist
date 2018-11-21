@@ -5,8 +5,9 @@ import numpy as np
 import asdf
 import astropy.units as u
 from astropy.time import Time
+from gwcs.lookup_table import LookupTable
 from astropy.modeling.models import (Shift, Linear1D, Multiply, Pix2Sky_TAN,
-                                     AffineTransformation2D, RotateNative2Celestial, Tabular1D)
+                                     AffineTransformation2D, RotateNative2Celestial)
 from astropy.io.fits.hdu.base import BITPIX2DTYPE
 from asdf.tags.core.external_reference import ExternalArrayReference
 
@@ -159,7 +160,7 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
         return linear_time_model(cadence=slope, reference_val=intercept)
     else:
         print(f"creating tabular temporal axis. ddeltas: {ddelta}")
-        return Tabular1D(np.arange(deltas.size)*u.pix, deltas.to(u.s))
+        return LookupTable(deltas.to(u.s))
 
 
 def spectral_model_from_framewave(framewav):
@@ -180,7 +181,7 @@ def spectral_model_from_framewave(framewav):
         return linear_spectral_model(slope, wave_bgn)
     else:
         print(f"creating tabular wavelength axis. ddeltas: {ddeltas}")
-        return Tabular1D(np.arange(framewav.size)*u.pix, framewav)
+        return LookupTable(framewav)
 
 
 def make_asdf(filename, *, dataset, gwcs, **kwargs):
