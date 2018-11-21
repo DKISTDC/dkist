@@ -368,7 +368,7 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     return tree
 
 
-def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
+def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
     """
     Given a path containing FITS files write an asdf file in the same path.
 
@@ -383,6 +383,9 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
     hdu : `int`
         The HDU to read from the FITS files.
 
+    kwargs
+        Additional kwargs are passed to `asdf.AsdfFile.write_to`.
+
     """
     path = pathlib.Path(path)
 
@@ -391,4 +394,4 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
     tree = asdf_tree_from_filenames(list(files), hdu=hdu, relative_to=relative_to)
 
     with asdf.AsdfFile(tree) as afile:
-        afile.write_to(str(path/asdf_filename))
+        afile.write_to(str(path/asdf_filename), **kwargs)

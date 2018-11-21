@@ -172,7 +172,7 @@ def test_load_from_directory():
 
 def test_from_directory_no_asdf():
     with pytest.raises(ValueError) as e:
-        Dataset.from_directory(rootdir)
+        Dataset.from_directory(rootdir/"notadirectory")
         assert "No asdf file found" in str(e)
 
 

@@ -165,7 +165,7 @@ class GWCSSlicer:
                 start = axes_order[-1]
                 # Start can either be an int or a list/tuple here.
                 if not isinstance(start, int):
-                    start = start[-1]
+                    start = start[-1]  # pragma: no cover  # I can't work out how to hit this.
                 # Increment start for the next frame.
                 start += 1
             frame._axes_order = tuple(range(start, start+frame.naxes))
