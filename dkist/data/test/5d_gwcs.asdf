@@ -1,0 +1,136 @@
+#ASDF 1.0.0
+#ASDF_STANDARD 1.3.0
+%YAML 1.1
+%TAG ! tag:stsci.edu:asdf/
+--- !core/asdf-1.1.0
+asdf_library: !core/software-1.0.0 {author: Space Telescope Science Institute, homepage: 'http://github.com/spacetelescope/asdf',
+  name: asdf, version: 2.3.0.dev1648}
+history:
+  extensions:
+  - !core/extension_metadata-1.0.0
+    extension_class: gwcs.extension.GWCSExtension
+    software: {name: gwcs, version: 0.10.dev399}
+  - !core/extension_metadata-1.0.0
+    extension_class: astropy.io.misc.asdf.extension.AstropyExtension
+    software: {name: astropy, version: 3.2.dev23413}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension.BuiltinExtension
+    software: {name: asdf, version: 2.3.0.dev1648}
+  - !core/extension_metadata-1.0.0
+    extension_class: astropy.io.misc.asdf.extension.AstropyAsdfExtension
+    software: {name: astropy, version: 3.2.dev23413}
+gwcs: !<tag:stsci.edu:gwcs/wcs-1.0.0>
+  name: ''
+  steps:
+  - !<tag:stsci.edu:gwcs/step-1.0.0>
+    frame: !<tag:stsci.edu:gwcs/frame-1.0.0>
+      axes_names: [spatial x, spatial y, wavelength position, scan number, stokes]
+      axes_order: [0, 1, 2, 3, 4]
+      axes_type: [SPATIAL, SPATIAL, SPECTRAL, TEMPORAL, STOKES]
+      name: pixel
+      naxes: 5
+      unit: [!unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel,
+        !unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel]
+    transform: !transform/concatenate-1.1.0
+      forward:
+      - !transform/concatenate-1.1.0
+        forward:
+        - !transform/concatenate-1.1.0
+          forward:
+          - !transform/compose-1.1.0
+            forward:
+            - !transform/compose-1.1.0
+              forward:
+              - !transform/compose-1.1.0
+                forward:
+                - !transform/compose-1.1.0
+                  forward:
+                  - !transform/concatenate-1.1.0
+                    forward:
+                    - !transform/shift-1.2.0
+                      offset: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel,
+                        value: -490.0}
+                    - !transform/shift-1.2.0
+                      offset: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel,
+                        value: -483.0}
+                  - !transform/concatenate-1.1.0
+                    forward:
+                    - !transform/multiplyscale-1.0.0
+                      factor: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 arcsec
+                          pixel-1, value: 0.06}
+                    - !transform/multiplyscale-1.0.0
+                      factor: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 arcsec
+                          pixel-1, value: 0.06}
+                - !transform/affine-1.2.0
+                  matrix: !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0 arcsec
+                    value: !core/ndarray-1.0.0
+                      data:
+                      - [0.9804184378390942, -0.1969255868219009]
+                      - [0.1969255868219009, 0.9804184378390942]
+                      datatype: float64
+                      shape: [2, 2]
+                  translation: !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0 arcsec
+                    value: !core/ndarray-1.0.0
+                      data: [0.0, 0.0]
+                      datatype: float64
+                      shape: [2]
+              - !transform/gnomonic-1.1.0 {direction: pix2sky}
+            - !transform/rotate3d-1.2.0
+              phi: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 arcsec, value: -933.4107287336818}
+              psi: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg, value: 180.0}
+              theta: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 arcsec, value: 851.4832366363328}
+          - !transform/linear1d-1.0.0
+            intercept: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 nm, value: 854.1105}
+            slope: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 nm pixel-1, value: 0.010499999999979082}
+        - !transform/linear1d-1.0.0
+          intercept: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 s, value: 0.0}
+          slope: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel-1 s, value: 467.53299999999456}
+      - !<tag:stsci.edu:gwcs/lookuptable-1.0.0>
+        lookup_table: !unit/quantity-1.1.0
+          unit: !unit/unit-1.0.0 pixel
+          value: !core/ndarray-1.0.0
+            data: [0.0, 1.0, 2.0, 3.0]
+            datatype: float64
+            shape: [4]
+  - !<tag:stsci.edu:gwcs/step-1.0.0>
+    frame: !<tag:stsci.edu:gwcs/composite_frame-1.0.0>
+      frames:
+      - !<tag:stsci.edu:gwcs/celestial_frame-1.0.0>
+        axes_names: [longitude, latitude]
+        name: helioprojective
+        reference_frame: !<tag:sunpy.org:sunpy/coordinates/frames/helioprojective-1.0.0>
+          frame_attributes:
+            observer: !<tag:sunpy.org:sunpy/coordinates/frames/heliographic_stonyhurst-1.0.0>
+              data: !<tag:astropy.org:astropy/coordinates/representation-1.0.0>
+                components:
+                  distance: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 AU, value: 1.0025005045375186}
+                  lat: !<tag:astropy.org:astropy/coordinates/latitude-1.0.0> {unit: !unit/unit-1.0.0 deg,
+                    value: 6.898593959064842}
+                  lon: !<tag:astropy.org:astropy/coordinates/longitude-1.0.0>
+                    unit: !unit/unit-1.0.0 deg
+                    value: 0.0
+                    wrap_angle: !<tag:astropy.org:astropy/coordinates/angle-1.0.0> {
+                      unit: !unit/unit-1.0.0 deg, value: 180.0}
+                type: SphericalRepresentation
+              frame_attributes: {obstime: !time/time-1.1.0 '2022-09-27T02:16:18.414'}
+            obstime: !time/time-1.1.0 2022-09-27T02:16:18.414
+            rsun: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 km, value: 695508.0}
+        unit: [!unit/unit-1.0.0 arcsec, !unit/unit-1.0.0 arcsec]
+      - !<tag:stsci.edu:gwcs/spectral_frame-1.0.0>
+        axes_names: [wavelength]
+        axes_order: [2]
+        name: wavelength
+        unit: [!unit/unit-1.0.0 nm]
+      - !<tag:stsci.edu:gwcs/temporal_frame-1.0.0>
+        axes_names: [time]
+        axes_order: [3]
+        name: time
+        reference_time: !time/time-1.1.0 2022-09-27T02:16:18.414
+        unit: [!unit/unit-1.0.0 s]
+      - !<tag:stsci.edu:gwcs/stokes_frame-1.0.0>
+        axes_order: [4]
+        name: stokes
+      name: CompositeFrame
+...

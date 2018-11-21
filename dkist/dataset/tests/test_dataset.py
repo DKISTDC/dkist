@@ -172,7 +172,7 @@ def test_load_from_directory():
 
 def test_from_directory_no_asdf():
     with pytest.raises(ValueError) as e:
-        Dataset.from_directory(rootdir)
+        Dataset.from_directory(rootdir/"notadirectory")
         assert "No asdf file found" in str(e)
 
 
@@ -186,12 +186,6 @@ def test_no_wcs_slice(dataset):
     dataset._wcs = None
     ds = dataset[3, 0]
     assert ds.wcs is None
-
-
-def test_random_wcs_slice(dataset):
-    dataset._wcs = "aslkdjalsjdkls"
-    ds = dataset[3]
-    assert ds.wcs == "k"
 
 
 def test_crop_few_slices(dataset_4d):

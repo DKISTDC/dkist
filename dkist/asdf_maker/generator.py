@@ -25,21 +25,14 @@ def headers_from_filenames(filenames, hdu=0):
     """
     A generator to get the headers from filenames.
     """
-    return [fits.getheader(fname, ext=hdu) for fname in filenames]
+    return [dict(fits.getheader(fname, ext=hdu)) for fname in filenames]
 
 
 def table_from_headers(headers):
-    h0 = headers[0]
-
-    t = Table(list(zip(h0.values())), names=list(h0.keys()))
-
-    for h in headers[1:]:
-        t.add_row(h)
-
-    return t
+    return Table(rows=headers, names=list(headers[0].keys()))
 
 
-def validate_headers(headers):
+def validate_headers(table_headers):
     """
     Given a bunch of headers, validate that they form a coherent set. This
     function also adds the headers to a list as they are read from the file.
@@ -55,7 +48,7 @@ def validate_headers(headers):
     out_headers : `list`
         A list of headers.
     """
-    t = table_from_headers(headers)
+    t = table_headers
 
     """
     Let's do roughly the minimal amount of verification here.
@@ -80,7 +73,7 @@ def validate_headers(headers):
         if not all(col == col[0]):
             raise ValueError(f"The {col.name} values did not all match:\n {col}")
 
-    return headers
+    return table_headers
 
 
 def build_pixel_frame(header):
@@ -201,7 +194,7 @@ class TransformBuilder:
         naxes = self.header['DEAXES']
         ss = [0] * naxes
         ss[i] = slice(None)
-        return ss
+        return ss[::-1]
 
     @property
     def slice_headers(self):
@@ -322,16 +315,18 @@ def gwcs_from_headers(headers):
                     output_frame=world_frame)
 
 
-def sorter_DINDEX(headers):
+def make_sorted_table(headers, filenames):
     """
-    A sorting function based on the values of DINDEX in the header.
+    Return an `astropy.table.Table` instance where the rows are correctly sorted.
     """
-    t = table_from_headers(headers)
+    theaders = table_from_headers(headers)
+    theaders['filenames'] = filenames
+    theaders['headers'] = headers
     dataset_axes = headers[0]['DNAXIS']
     array_axes = headers[0]['DAAXES']
     keys = [f'DINDEX{k}' for k in range(dataset_axes, array_axes, -1)]
-    t = np.array(t[keys])
-    return np.argsort(t, order=keys)
+    t = np.array(theaders[keys])
+    return theaders[np.argsort(t, order=keys)]
 
 
 def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
@@ -350,34 +345,30 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     # headers is an iterator
     headers = headers_from_filenames(filenames, hdu=hdu)
 
-    # headers is a now list
-    headers = validate_headers(headers)
+    table_headers = make_sorted_table(headers, filenames)
 
-    sort_inds = sorter_DINDEX(headers)
-
-    sort_heads = ((head, sort_inds[i]) for i, head in enumerate(headers))
-    heads = sorted(sort_heads, key=lambda h: h[1])
-    headers = [head[0] for head in heads]
+    validate_headers(table_headers)
 
     # Sort the filenames into DS order.
-    sorted_filenames = np.array(filenames)[sort_inds]
+    sorted_filenames = np.array(table_headers['filenames'])
+    sorted_headers = np.array(table_headers['headers'])
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
     # References from filenames
-    reference_array = references_from_filenames(sorted_filenames, array_shape=shape,
+    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
     tree = {'dataset': reference_array,
-            'gwcs': gwcs_from_headers(headers)}
+            'gwcs': gwcs_from_headers(sorted_headers)}
 
     # TODO: Write a schema for the tree.
 
     return tree
 
 
-def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
+def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
     """
     Given a path containing FITS files write an asdf file in the same path.
 
@@ -392,6 +383,9 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
     hdu : `int`
         The HDU to read from the FITS files.
 
+    kwargs
+        Additional kwargs are passed to `asdf.AsdfFile.write_to`.
+
     """
     path = pathlib.Path(path)
 
@@ -400,4 +394,4 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None):
     tree = asdf_tree_from_filenames(list(files), hdu=hdu, relative_to=relative_to)
 
     with asdf.AsdfFile(tree) as afile:
-        afile.write_to(str(path/asdf_filename))
+        afile.write_to(str(path/asdf_filename), **kwargs)

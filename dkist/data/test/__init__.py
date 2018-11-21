@@ -1,5 +1,6 @@
 import os
+import pathlib
 
 import dkist
 
-rootdir = os.path.join(os.path.dirname(dkist.__file__), "data", "test")
+rootdir = pathlib.Path(os.path.join(os.path.dirname(dkist.__file__), "data", "test"))

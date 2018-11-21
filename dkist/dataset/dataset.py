@@ -22,7 +22,62 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
     The base class for DKIST datasets.
 
     This class is backed by `dask.array.Array` and `gwcs.wcs.WCS` objects.
+
+    Parameters
+    ----------
+    data: `numpy.ndarray`
+        The array holding the actual data in this object.
+
+    wcs: `ndcube.wcs.wcs.WCS`
+        The WCS object containing the axes' information
+
+    uncertainty : any type, optional
+        Uncertainty in the dataset. Should have an attribute uncertainty_type
+        that defines what kind of uncertainty is stored, for example "std"
+        for standard deviation or "var" for variance. A metaclass defining
+        such an interface is NDUncertainty - but isn’t mandatory. If the uncertainty
+        has no such attribute the uncertainty is stored as UnknownUncertainty.
+        Defaults to None.
+
+    mask : any type, optional
+        Mask for the dataset. Masks should follow the numpy convention
+        that valid data points are marked by False and invalid ones with True.
+        Defaults to None.
+
+    meta : dict-like object, optional
+        Additional meta information about the dataset. If no meta is provided
+        an empty collections.OrderedDict is created. Default is None.
+
+    unit : Unit-like or str, optional
+        Unit for the dataset. Strings that can be converted to a Unit are allowed.
+        Default is None.
+
+    copy : bool, optional
+        Indicates whether to save the arguments as copy. True copies every attribute
+        before saving it while False tries to save every parameter as reference.
+        Note however that it is not always possible to save the input as reference.
+        Default is False.
+
+    missing_axis : `list` of `bool`
+        Designates which axes in wcs object do not have a corresponding axis is the data.
+        True means axis is "missing", False means axis corresponds to a data axis.
+        Ordering corresponds to the axis ordering in the WCS object, i.e. reverse of data.
+        For example, say the data's y-axis corresponds to latitude and x-axis corresponds
+        to wavelength.  In order the convert the y-axis to latitude the WCS must contain
+        a "missing" longitude axis as longitude and latitude are not separable.
     """
+
+    def __init__(self, data, uncertainty=None, mask=None, wcs=None,
+                 meta=None, unit=None, copy=False, missing_axis=None):
+
+        super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
+
+        if self.wcs and missing_axis is None:
+            self.missing_axis = [False]*self.wcs.forward_transform.n_outputs
+        else:
+            self.missing_axis = missing_axis
+
+        self.array_container = None
 
     @classmethod
     def from_directory(cls, directory):
@@ -64,7 +119,9 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         wcs = asdf_tree['gwcs']
 
-        return cls(data, wcs=wcs)
+        cls = cls(data, wcs=wcs)
+        cls.array_container = array_container
+        return cls
 
     @property
     def pixel_axes_names(self):

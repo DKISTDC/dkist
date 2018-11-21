@@ -4,7 +4,6 @@ import numpy as np
 
 import asdf
 import astropy.units as u
-from astropy.io import fits
 from astropy.time import Time
 from gwcs.lookup_table import LookupTable
 from astropy.modeling.models import (Shift, Linear1D, Multiply, Pix2Sky_TAN,
@@ -16,7 +15,7 @@ __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear
            'spatial_model_from_quantity', 'spatial_model_from_header', 'references_from_filenames']
 
 
-def references_from_filenames(filenames, array_shape, hdu_index=0, relative_to=None):
+def references_from_filenames(filenames, headers, array_shape, hdu_index=0, relative_to=None):
     """
     Given an array of paths to FITS files create a set of nested lists of
     `asdf.external_reference.ExternalArrayReference` objects with the same
@@ -27,6 +26,9 @@ def references_from_filenames(filenames, array_shape, hdu_index=0, relative_to=N
 
     filenames : `numpy.ndarray`
         An array of filenames, in numpy order for the output array (i.e. ``.flat``)
+
+    headers : `list`
+        A list of headers for files
 
     array_shape : `tuple`
         The desired output shape of the reference array. (i.e the shape of the
@@ -45,20 +47,17 @@ def references_from_filenames(filenames, array_shape, hdu_index=0, relative_to=N
         raise ValueError(f"An incorrect number of filenames ({filenames.size})"
                          f" supplied for array_shape ({array_shape})")
 
-    for i, filepath in enumerate(filenames.flat):
-        with fits.open(filepath) as hdul:
-            hdu = hdul[hdu_index]
-            dtype = BITPIX2DTYPE[hdu.header['BITPIX']]
-            # hdu.shape is already in Python order
-            shape = tuple(hdu.shape)
+    for i, (filepath, head) in enumerate(zip(filenames.flat, headers.flat)):
+        dtype = BITPIX2DTYPE[head['BITPIX']]
+        shape = tuple([int(head[f"NAXIS{a}"]) for a in range(head["NAXIS"], 0, -1)])
 
-            # Convert paths to relative paths
-            relative_path = filepath
-            if relative_to:
-                relative_path = os.path.relpath(filepath, relative_to)
+        # Convert paths to relative paths
+        relative_path = filepath
+        if relative_to:
+            relative_path = os.path.relpath(filepath, str(relative_to))
 
-            reference_array.flat[i] = ExternalArrayReference(
-                relative_path, hdu_index, dtype, shape)
+        reference_array.flat[i] = ExternalArrayReference(
+            relative_path, hdu_index, dtype, shape)
 
     return reference_array.tolist()
 
@@ -160,6 +159,7 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
         intercept = 0 * u.s
         return linear_time_model(cadence=slope, reference_val=intercept)
     else:
+        print(f"creating tabular temporal axis. ddeltas: {ddelta}")
         return LookupTable(deltas.to(u.s))
 
 
@@ -180,6 +180,7 @@ def spectral_model_from_framewave(framewav):
         slope = ddeltas[0]
         return linear_spectral_model(slope, wave_bgn)
     else:
+        print(f"creating tabular wavelength axis. ddeltas: {ddeltas}")
         return LookupTable(framewav)
 
 
