@@ -29,9 +29,12 @@ class DatasetTransform(CurvedTransform):
     @property
     def coord_meta(self):
         """
-        Generate a coord_meta for the two axes to be plotted.
+        Generate a WCAxes coord_meta for the two axes to be plotted.
         """
         inds = [i for i, b in enumerate(self.dataset.missing_axis[::-1]) if not b]
+
+        if len(inds) != 2:
+            raise ValueError("Can only compute coord_meta for two axes")
 
         frames = self.dataset.wcs.output_frame.frames if isinstance(self.dataset.wcs.output_frame,
                                                                     CompositeFrame) else (self.dataset.wcs.output_frame,)
@@ -69,6 +72,9 @@ class DatasetTransform(CurvedTransform):
         return dict(coord_meta)
 
     def _as_mpl_axes(self):
+        """
+        Allow this class to be converted to a WCSAxes object by matplotlib.
+        """
         return WCSAxes, {'transform': self, 'coord_meta': self.coord_meta}
 
     @property
@@ -115,6 +121,12 @@ class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
     """
     Handle plotting operations for Dataset.
     """
+
+    def _as_mpl_axes(self):
+        """
+        Allow this class to be converted to a WCSAxes object by matplotlib.
+        """
+        return DatasetTransform(self)._as_mpl_axes()
 
     def _plot_3D_cube(self, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
