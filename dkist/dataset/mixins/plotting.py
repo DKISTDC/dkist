@@ -4,11 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import astropy.units as u
-from astropy.visualization.wcsaxes.transforms import CurvedTransform
-from gwcs.coordinate_frames import CompositeFrame, CelestialFrame
-
 from ndcube.mixins import NDCubePlotMixin
+from sunpy.visualization import wcsaxes_compat
+from gwcs.coordinate_frames import CelestialFrame, CompositeFrame
 from sunpy.visualization.animator import ImageAnimator
+from astropy.visualization.wcsaxes.transforms import CurvedTransform
+from astropy.visualization.wcsaxes import WCSAxes
 
 __all__ = ['DatasetPlotMixin']
 
@@ -24,6 +25,51 @@ class DatasetTransform(CurvedTransform):
         super().__init__()
         self.dataset = dataset
         self.invert = invert
+
+    @property
+    def coord_meta(self):
+        """
+        Generate a coord_meta for the two axes to be plotted.
+        """
+        inds = [i for i, b in enumerate(self.dataset.missing_axis[::-1]) if not b]
+
+        frames = self.dataset.wcs.output_frame.frames if isinstance(self.dataset.wcs.output_frame,
+                                                                    CompositeFrame) else (self.dataset.wcs.output_frame,)
+        order_to_frames = {}
+        for aframe in frames:
+            for order in aframe.axes_order:
+                order_to_frames[order] = aframe
+
+        type_map = defaultdict(lambda: 'scalar')
+        type_map['lat'] = 'latitude'
+        type_map['lon'] = 'longitude'
+
+        coord_meta = defaultdict(lambda: [])
+
+        orders = sorted(tuple(order_to_frames.keys()))
+        for order in orders:
+            frame = order_to_frames[order]
+            frame_ind = frame.axes_order.index(order)
+            if order not in inds:
+                continue
+            if isinstance(frame, CelestialFrame):
+                name = 'lon' if not frame_ind else 'lat'  # lon is always first
+                wrap = getattr(frame.reference_frame, "_default_wrap_angle", None) if name == "lon" else None
+                if wrap:
+                    wrap = int(wrap.to_value(u.deg))
+            else:
+                name = frame.axes_names[frame_ind]
+                wrap = None
+            coord_meta['unit'].append(frame.unit[frame_ind])
+            coord_meta['format_unit'].append(frame.unit[frame_ind])
+            coord_meta['name'].append(name)
+            coord_meta['wrap'].append(wrap)
+            coord_meta['type'].append(type_map[name])
+
+        return dict(coord_meta)
+
+    def _as_mpl_axes(self):
+        return WCSAxes, {'transform': self, 'coord_meta': self.coord_meta}
 
     @property
     def input_units(self):
@@ -70,53 +116,12 @@ class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
     Handle plotting operations for Dataset.
     """
 
-    def _make_coord_meta(self):
-        """
-        Generate a coord_meta for the two axes to be plotted.
-        """
-        inds = [i for i, b in enumerate(self.missing_axis[::-1]) if not b]
-
-        frames = self.wcs.output_frame.frames if isinstance(self.wcs.output_frame,
-                                                            CompositeFrame) else (self.wcs.output_frame,)
-        order_to_frames = {}
-        for aframe in frames:
-            for order in aframe.axes_order:
-                order_to_frames[order] = aframe
-
-        type_map = defaultdict(lambda: 'scalar')
-        type_map['lat'] = 'latitude'
-        type_map['lon'] = 'longitude'
-
-        coord_meta = defaultdict(lambda: [])
-        for order, frame in order_to_frames.items():
-            frame_ind = frame.axes_order.index(order)
-            if order not in inds:
-                continue
-            if isinstance(frame, CelestialFrame):
-                name = 'lat' if not frame_ind else 'lon' # lat is always first
-                wrap = getattr(frame.reference_frame, "_default_wrap_angle", None) if name == "lon" else None
-                if wrap:
-                    wrap = int(wrap.to_value(u.deg))
-            else:
-                name = frame.axes_names[frame_ind]
-                wrap = None
-            coord_meta['unit'].append(frame.unit[frame_ind])
-            coord_meta['format_unit'].append(frame.unit[frame_ind])
-            coord_meta['name'].append(name)
-            coord_meta['wrap'].append(wrap)
-            coord_meta['type'].append(type_map[name])
-
-        return dict(coord_meta)
-
-    def _plot_3D_cube(self,
-                      image_axes=None,
-                      unit_x_axis=None,
-                      unit_y_axis=None,
-                      axis_ranges=None,
-                      **kwargs):
+    def _plot_3D_cube(self, plot_axis_indices=None, axes_coordinates=None,
+                      axes_units=None, data_unit=None, **kwargs):
         raise NotImplementedError("Only two dimensional plots are supported")
 
-    def _plot_2D_cube(self, axes=None, image_axes=None, **kwargs):
+    def _plot_2D_cube(self, axes=None, plot_axis_indices=None, axes_coordinates=None,
+                      axes_units=None, data_unit=None, **kwargs):
         """
         Plots a 2D image onto the current
         axes. Keyword arguments are passed on to matplotlib.
@@ -131,9 +136,14 @@ class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
             second axis in WCS object will become the second axis of image_axes.
             Default: ['x', 'y']
         """
-        if not image_axes:
-            image_axes = ['x', 'y']
+        if plot_axis_indices and plot_axis_indices != [-1, -2]:
+            raise NotImplementedError("Can't do this yet")
+
         if axes is None:
-            axes = plt.gca()
-        plot = axes.imshow(self.data, **kwargs)
+            axes = wcsaxes_compat.gca_wcs(DatasetTransform(self))
+
+        mpl_kwargs = {'origin': 'lower'}
+        mpl_kwargs.update(kwargs)
+        plot = axes.imshow(self.data, **mpl_kwargs)
+
         return plot

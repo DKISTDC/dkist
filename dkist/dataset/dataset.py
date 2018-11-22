@@ -73,7 +73,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
 
         if self.wcs and missing_axis is None:
-            self.missing_axis = [False]*self.wcs.forward_transform.n_outputs
+            self.missing_axis = [False] * self.wcs.forward_transform.n_outputs
         else:
             self.missing_axis = missing_axis
 
