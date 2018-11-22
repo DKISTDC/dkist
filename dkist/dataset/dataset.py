@@ -85,9 +85,9 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         Construct a `~dkist.dataset.Dataset` from a directory containing one
         asdf file and a collection of FITS files.
         """
-        if not os.path.isdir(directory):
-            raise ValueError("directory argument must be a directory")
         base_path = Path(directory)
+        if not base_path.is_dir():
+            raise ValueError("directory argument must be a directory")
         asdf_files = glob.glob(str(base_path / "*.asdf"))
 
         if not asdf_files:

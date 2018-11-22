@@ -134,25 +134,18 @@ class DatasetPlotMixin(NDCubePlotMixin):
 
     def _plot_2D_cube(self, axes=None, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
-        """
-        Plots a 2D image onto the current
-        axes. Keyword arguments are passed on to matplotlib.
-
-        Parameters
-        ----------
-        axes: `astropy.visualization.wcsaxes.core.WCSAxes` or `None`:
-            The axes to plot onto. If None the current axes will be used.
-
-        image_axes: `list`.
-            The first axis in WCS object will become the first axis of image_axes and
-            second axis in WCS object will become the second axis of image_axes.
-            Default: ['x', 'y']
-        """
+        print(plot_axis_indices, axes_coordinates, axes_units)
         if plot_axis_indices and plot_axis_indices != [-1, -2]:
             raise NotImplementedError("Can't do this yet")
 
         if axes is None:
             axes = wcsaxes_compat.gca_wcs(DatasetTransform(self))
+
+
+        if axes_units and len(axes_units) == 2:
+            coords = axes.coords
+            for i, c in enumerate(coords):
+                c.set_format_unit(axes_units[i])
 
         mpl_kwargs = {'origin': 'lower'}
         mpl_kwargs.update(kwargs)
