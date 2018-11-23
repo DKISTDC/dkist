@@ -17,8 +17,8 @@ from dkist.data.test import rootdir
 
 @pytest.fixture
 def array():
-    shape = np.random.randint(1, 100, size=2)
-    x = np.ones(shape) + 10  # Make sure we can actually slice the thing later
+    shape = np.random.randint(10, 100, size=2)
+    x = np.ones(shape) + 10
     return da.from_array(x, tuple(shape))
 
 
