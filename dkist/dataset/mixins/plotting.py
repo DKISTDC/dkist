@@ -7,11 +7,11 @@ import astropy.units as u
 from ndcube.mixins import NDCubePlotMixin
 from sunpy.visualization import wcsaxes_compat
 from gwcs.coordinate_frames import CelestialFrame, CompositeFrame
-from sunpy.visualization.animator import ImageAnimator
+from sunpy.visualization.animator import ImageAnimatorWCS, ImageAnimator
 from astropy.visualization.wcsaxes.transforms import CurvedTransform
 from astropy.visualization.wcsaxes import WCSAxes
 
-__all__ = ['DatasetPlotMixin']
+__all__ = ['ImageAnimatorDataset', 'DatasetPlotMixin']
 
 
 class DatasetTransform(CurvedTransform):
@@ -128,6 +128,15 @@ class DatasetPlotMixin(NDCubePlotMixin):
         """
         return DatasetTransform(self)._as_mpl_axes()
 
+    @property
+    def _axis_labels(self):
+        """
+        Generate axes labels for a plot of this dataset.
+        """
+        components = [(self.world_axes_names[i],
+                       self.axis_units[i]) for i, b in enumerate(self.missing_axis) if not b]
+        return [f"{name} [{unit}]" for name, unit in components[::-1]]
+
     def _plot_3D_cube(self, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
         raise NotImplementedError("Only two dimensional plots are supported")  # pragma: no cover
@@ -140,9 +149,12 @@ class DatasetPlotMixin(NDCubePlotMixin):
         if axes is None:
             axes = wcsaxes_compat.gca_wcs(DatasetTransform(self))
 
+        coords = axes.coords
+
+        for i, c in enumerate(coords):
+            c.set_axislabel(self._axis_labels[i])
 
         if axes_units and len(axes_units) == 2:
-            coords = axes.coords
             for i, c in enumerate(coords):
                 c.set_format_unit(axes_units[i])
 
@@ -151,3 +163,69 @@ class DatasetPlotMixin(NDCubePlotMixin):
         plot = axes.imshow(self.data, **mpl_kwargs)
 
         return plot
+
+
+class ImageAnimatorDataset(ImageAnimatorWCS):
+    """
+    Animates an N-Dimesional DKIST Dataset.
+    """
+    def __init__(self, dataset, image_axes=[-1, -2],
+                 unit_x_axis=None, unit_y_axis=None, axis_ranges=None,
+                 **kwargs):
+        self.unit_x_axis = unit_x_axis
+        self.unit_y_axis = unit_y_axis
+        self.slices_wcsaxes = None
+        self._dataset = dataset
+
+        ImageAnimator.__init__(self, dataset.data, image_axes=image_axes,
+                               axis_ranges=axis_ranges, **kwargs)
+
+    @property
+    def wcs(self):
+        return self.dataset
+
+    @property
+    def dataset(self):
+        """
+        Return a sliced version of the dataset.
+        """
+        return self._dataset[self.frame_index]
+
+    @property
+    def _axis_labels(self):
+        """
+        Generate axes labels for a plot of this dataset.
+        """
+        components = [(self.dataset.world_axes_names[i],
+                       self.dataset.axis_units[i]) for i, b in enumerate(self.dataset.missing_axis) if not b]
+        if self.unit_y_axis:
+            components[0] = (components[0][0], self.unit_y_axis)
+        if self.unit_x_axis:
+            components[1] = (components[1][0], self.unit_x_axis)
+        return [f"{name} [{unit}]" for name, unit in components[::-1]]
+
+    def plot_start_image(self, ax):
+        im = super().plot_start_image(ax)
+        ax.axis("auto")
+        coords = ax.coords
+        for i, c in enumerate(coords):
+            c.set_axislabel(self._axis_labels[i])
+        return im
+
+    def update_plot(self, val, im, slider):
+        """Updates plot based on slider/array dimension being iterated."""
+        val = int(val)
+        ax_ind = self.slider_axes[slider.slider_ind]
+        ind = int(np.argmin(np.abs(self.axis_ranges[ax_ind] - val)))
+        self.frame_slice[ax_ind] = ind
+        if val != slider.cval:
+            dstf = DatasetTransform(self.wcs)
+            self.axes.reset_wcs(transform=dstf, coord_meta=dstf.coord_meta)
+            self._set_unit_in_axis(self.axes)
+
+            coords = self.axes.coords
+            for i, c in enumerate(coords):
+                c.set_axislabel(self._axis_labels[i])
+
+            im.set_array(self.data[self.frame_index])
+            slider.cval = val

@@ -137,6 +137,10 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         else:
             return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
 
+    @property
+    def axis_units(self):
+        return self.wcs.output_frame.unit[::-1]
+
     def __repr__(self):
         """
         Overload the NDData repr because it does not play nice with the dask delayed io.
