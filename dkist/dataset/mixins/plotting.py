@@ -134,7 +134,6 @@ class DatasetPlotMixin(NDCubePlotMixin):
 
     def _plot_2D_cube(self, axes=None, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
-        print(plot_axis_indices, axes_coordinates, axes_units)
         if plot_axis_indices and plot_axis_indices != [-1, -2]:
             raise NotImplementedError("Can't do this yet")
 

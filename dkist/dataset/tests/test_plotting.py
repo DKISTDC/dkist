@@ -19,33 +19,15 @@ def test_non_2d(dataset_3d):
     with pytest.raises(ValueError):
         plt.subplot(projection=dataset_3d)
 
+
+# @pytest.mark.mpl_image_compare
 @pytest.mark.parametrize("aslice", (np.s_[0], np.s_[:, 0, :], np.s_[:, :, 0]))
 def test_2d_plot(dataset_3d, aslice):
     dataset_3d[aslice].plot()
     return plt.gcf()
 
-# pytestmark = pytest.mark.skip
 
 # @pytest.mark.mpl_image_compare
-# def test_3d(dataset_3d):
-#     fig = plt.figure()
-#     dataset_3d.plot(fig=fig)
-#     return fig
-
-# @pytest.mark.mpl_image_compare
-# def test_2d(dataset):
-#     fig = plt.figure()
-#     dataset.plot()
-#     return fig
-
-# @pytest.mark.mpl_image_compare
-# def test_3d_hidden(dataset_3d):
-#     fig = plt.figure()
-#     dataset_3d._plot_3D_cube(fig=fig)
-#     return fig
-
-# @pytest.mark.mpl_image_compare
-# def test_2d_hidden(dataset):
-#     fig = plt.figure()
-#     dataset._plot_2D_cube()
-#     return fig
+def test_2d_plot(dataset_3d):
+    dataset_3d[:, :, 0].plot(axes_units=["Angstrom", "deg"])
+    return plt.gcf()

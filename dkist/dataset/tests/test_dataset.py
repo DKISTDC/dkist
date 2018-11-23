@@ -18,7 +18,7 @@ from dkist.data.test import rootdir
 @pytest.fixture
 def array():
     shape = np.random.randint(1, 100, size=2)
-    x = np.random.random(shape) + 10  # Make sure we can actually slice the thing later
+    x = np.ones(shape) + 10  # Make sure we can actually slice the thing later
     return da.from_array(x, tuple(shape))
 
 
@@ -92,7 +92,7 @@ def dataset(array, identity_gwcs):
 @pytest.fixture
 def dataset_3d(identity_gwcs_3d):
     shape = (50, 50, 50)
-    x = np.random.random(shape)
+    x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
 
     return Dataset(array, wcs=identity_gwcs_3d)
@@ -101,7 +101,7 @@ def dataset_3d(identity_gwcs_3d):
 @pytest.fixture
 def dataset_4d(identity_gwcs_4d):
     shape = (50, 60, 70, 80)
-    x = np.random.random(shape)
+    x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
 
     return Dataset(array, wcs=identity_gwcs_4d)
@@ -170,10 +170,16 @@ def test_load_from_directory():
     assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
 
 
-def test_from_directory_no_asdf():
+def test_from_directory_no_asdf(tmpdir):
+    with pytest.raises(ValueError) as e:
+        Dataset.from_directory(tmpdir)
+        assert "No asdf file found" in str(e)
+
+
+def test_from_not_directory():
     with pytest.raises(ValueError) as e:
         Dataset.from_directory(rootdir/"notadirectory")
-        assert "No asdf file found" in str(e)
+        assert "directory argument" in str(e)
 
 
 def test_from_directory_not_dir():
