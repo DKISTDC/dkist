@@ -1,66 +1,64 @@
+skip-check: &skip-check
+  name: Check for [ci skip]
+  command: bash .circleci/early_exit.sh
+
 apt-run: &apt-install
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz
+    sudo apt install -y graphviz build-essential
 
-pip-run: &pip-install
-  name: Install Python dependencies
+tox-install: &tox-install
+  name: Install Tox
   command: |
-    python3 -m venv venv
-    . venv/bin/activate
-    pip install -q -r requirements.txt
-    pip freeze
-
-upload-coverage: &coverage
-  name: Upload coverage report to codecov
-  command: |
-    . venv/bin/activate
-    pip install codecov
-    codecov
-
+    sudo pip install tox codecov
 
 version: 2
 jobs:
-  egg-info-36:
+  egg-info-37:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.7
     steps:
       - checkout
       - run: python setup.py egg_info
 
   tests:
-    environment:
-      - MPLBACKEND: 'agg'
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.7
     steps:
       - checkout
-      - run: *pip-install
-      - run: venv/bin/python setup.py test --coverage
-      - run: *coverage
+      - run: *skip-check
+      - run: *apt-install
+      - run: *tox-install
+      - run: tox -e py37
+      - run: codecov
 
   html-docs:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.7
     steps:
       - checkout
+      - run: *skip-check
       - run: *apt-install
-      - run: *pip-install
-      - run: venv/bin/python setup.py build_docs -w
-
+      - run: *tox-install
+      - run: tox -e py37-build_docs
       - store_artifacts:
           path: docs/_build/html
 
+      - run:
+          name: "Built documentation is available at:"
+          command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
 
 workflows:
   version: 2
-  test-code:
+
+  egg-info:
     jobs:
-      - egg-info-36
-      - tests:
-          requires:
-            - egg-info-36
+      - egg-info-37
+
+  figure-tests:
+    jobs:
+      - tests
 
   test-documentation:
     jobs:
