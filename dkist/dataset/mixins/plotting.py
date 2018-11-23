@@ -79,21 +79,21 @@ class DatasetTransform(CurvedTransform):
 
     @property
     def input_units(self):
-        if self.invert:
+        if self.invert:  # pragma: no cover
             return self.dataset.wcs.output_frame.unit
         else:
             return self.dataset.wcs.input_frame.unit
 
     @property
     def output_units(self):
-        if self.invert:
+        if self.invert:  # pragma: no cover
             return self.dataset.wcs.input_frame.unit
         else:
             return self.dataset.wcs.output_frame.unit
 
     @property
     def call(self):
-        if self.invert:
+        if self.invert:  # pragma: no cover
             return self.dataset.wcs.invert
         else:
             return self.dataset.wcs
@@ -114,10 +114,10 @@ class DatasetTransform(CurvedTransform):
         return np.vstack((x_out, y_out)).T
 
     def inverted(self):
-        pass
+        pass  # pragma: no cover
 
 
-class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
+class DatasetPlotMixin(NDCubePlotMixin):
     """
     Handle plotting operations for Dataset.
     """
@@ -130,7 +130,7 @@ class DatasetPlotMixin(NDCubePlotMixin):  # pragma: no cover
 
     def _plot_3D_cube(self, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
-        raise NotImplementedError("Only two dimensional plots are supported")
+        raise NotImplementedError("Only two dimensional plots are supported")  # pragma: no cover
 
     def _plot_2D_cube(self, axes=None, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
