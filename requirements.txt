@@ -1,6 +1,7 @@
 # docs
 sphinx
 sphinx-astropy
+sphinx-gallery
 git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
 
 # Stable deps
