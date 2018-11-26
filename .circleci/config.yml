@@ -30,7 +30,7 @@ jobs:
       - run: *skip-check
       - run: *apt-install
       - run: *tox-install
-      - run: tox -e py37
+      - run: tox -e py37-offline
       - run: codecov
 
   html-docs:
