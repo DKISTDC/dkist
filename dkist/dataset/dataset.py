@@ -146,15 +146,19 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
         prefix = object.__repr__(self)
+        output = f"""\
+        {prefix}
+        {self.__str__()}
+        """
+        return output
 
+    def __str__(self):
         pnames = ', '.join(self.pixel_axes_names)
         wnames = ', '.join(self.world_axes_names)
-        output = dedent(f"""\
-        {prefix}
+        return dedent(f"""\
         {self.data!r}
         WCS<pixel_axes_names=({pnames}),
             world_axes_names=({wnames})>""")
-        return output
 
     def pixel_to_world(self, *quantity_axis_list):
         """
