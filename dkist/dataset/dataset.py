@@ -107,7 +107,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         filepath = Path(filepath)
         base_path = filepath.parent
-        with asdf.AsdfFile.open(str(filepath)) as ff:
+        with asdf.open(str(filepath)) as ff:
             # TODO: without this it segfaults on access
             asdf_tree = copy.deepcopy(ff.tree)
             pointer_array = np.array(ff.tree['dataset'])
@@ -146,10 +146,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
         prefix = object.__repr__(self)
-        output = f"""\
-        {prefix}
-        {self.__str__()}
-        """
+        output = dedent(f"{prefix}\n{self.__str__()}")
         return output
 
     def __str__(self):

@@ -58,7 +58,7 @@ class DatasetTransform(CurvedTransform):
             if isinstance(frame, CelestialFrame):
                 name = 'lon' if not frame_ind else 'lat'  # lon is always first
                 wrap = getattr(frame.reference_frame, "_default_wrap_angle", None) if name == "lon" else None
-                if wrap:
+                if wrap is not None:
                     wrap = int(wrap.to_value(u.deg))
             else:
                 name = frame.axes_names[frame_ind]
@@ -139,7 +139,14 @@ class DatasetPlotMixin(NDCubePlotMixin):
 
     def _plot_3D_cube(self, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
-        raise NotImplementedError("Only two dimensional plots are supported")  # pragma: no cover
+        if axes_units is None:
+            axes_units = [None] * self.data.ndim
+
+        # Generate plot
+        return ImageAnimatorDataset(self, image_axes=plot_axis_indices,
+                                    unit_x_axis=axes_units[plot_axis_indices[0]],
+                                    unit_y_axis=axes_units[plot_axis_indices[1]],
+                                    **kwargs)
 
     def _plot_2D_cube(self, axes=None, plot_axis_indices=None, axes_coordinates=None,
                       axes_units=None, data_unit=None, **kwargs):
@@ -207,14 +214,16 @@ class ImageAnimatorDataset(ImageAnimatorWCS):
     def _set_unit_in_axis(self, axes):
         if self.unit_x_axis is not None:
             axes.coords[0].set_format_unit(self.unit_x_axis)
-            axes.coords[0].set_ticks(exclude_overlapping=True)
+            axes.coords[0].set_ticklabel(exclude_overlapping=True)
         if self.unit_y_axis is not None:
             axes.coords[1].set_format_unit(self.unit_y_axis)
-            axes.coords[1].set_ticks(exclude_overlapping=True)
+            axes.coords[1].set_ticklabel(exclude_overlapping=True)
 
     def plot_start_image(self, ax):
         im = super().plot_start_image(ax)
-        ax.axis("auto")
+        # If the axes are not very square we probably are not plotting the image
+        if abs(1 - (self.data.shape[self.image_axes[0]] / self.data.shape[self.image_axes[1]])) > 0.1:
+            ax.axis("auto")
         coords = ax.coords
         for i, c in enumerate(coords):
             c.set_axislabel(self._axis_labels[i])
