@@ -22,6 +22,14 @@ jobs:
       - checkout
       - run: python setup.py egg_info
 
+  pycodestyle:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: sudo pip install pycodestyle
+      - run: pycodestyle dkist --count
+
   tests:
     docker:
       - image: circleci/python:3.7
@@ -55,6 +63,10 @@ workflows:
   egg-info:
     jobs:
       - egg-info-37
+
+  pycodestyle:
+    jobs:
+      - pycodestyle
 
   figure-tests:
     jobs:
