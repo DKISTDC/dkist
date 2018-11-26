@@ -1,16 +1,9 @@
-name: dkist
+build:
+  image: latest
 
-channels:
-    - conda-forge
+requirements_file: requirements.txt
 
-dependencies:
-  - python=3.6
-  - sphinx
-  - dask
-  - pip:
-    - git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git
-    - git+https://github.com/spacetelescope/asdf
-    - git+https://github.com/spacetelescope/gwcs
-    - git+https://github.com/sunpy/sunpy
-    - ndcube
-    - sphinx-astropy
+python:
+  version: 3.6
+  pip_install: false
+  setup_py_install: true

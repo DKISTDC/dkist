@@ -66,6 +66,9 @@ try:
 except ImportError:
     html_theme = 'default'
 
+# Disable the links to the internal projects
+html_theme_options = {'navbar_links': []}
+
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 html_title = '{0} v{1}'.format(project, release)
