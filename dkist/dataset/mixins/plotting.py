@@ -174,7 +174,7 @@ class ImageAnimatorDataset(ImageAnimatorWCS):
                  **kwargs):
         self.unit_x_axis = unit_x_axis
         self.unit_y_axis = unit_y_axis
-        self.slices_wcsaxes = None
+        self.slices_wcsaxes = ("x", "y")
         self._dataset = dataset
 
         ImageAnimator.__init__(self, dataset.data, image_axes=image_axes,
@@ -203,6 +203,14 @@ class ImageAnimatorDataset(ImageAnimatorWCS):
         if self.unit_x_axis:
             components[1] = (components[1][0], self.unit_x_axis)
         return [f"{name} [{unit}]" for name, unit in components[::-1]]
+
+    def _set_unit_in_axis(self, axes):
+        if self.unit_x_axis is not None:
+            axes.coords[0].set_format_unit(self.unit_x_axis)
+            axes.coords[0].set_ticks(exclude_overlapping=True)
+        if self.unit_y_axis is not None:
+            axes.coords[1].set_format_unit(self.unit_y_axis)
+            axes.coords[1].set_ticks(exclude_overlapping=True)
 
     def plot_start_image(self, ax):
         im = super().plot_start_image(ax)

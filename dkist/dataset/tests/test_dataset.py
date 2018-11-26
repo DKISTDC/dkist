@@ -45,8 +45,9 @@ def identity_gwcs_3d():
     """
     identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.nm/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
-                                  reference_frame=Helioprojective(obstime="2018-01-01"))
-    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
+                                  reference_frame=Helioprojective(obstime="2018-01-01"),
+                                  axes_names=("longitude", "latitude"))
+    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm, axes_names=("wavelength",))
 
     frame = cf.CompositeFrame([sky_frame, wave_frame])
 
