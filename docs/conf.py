@@ -2,6 +2,7 @@
 
 import os
 import sys
+import pathlib
 import datetime
 
 from sphinx_astropy.conf.v1 import *
@@ -106,3 +107,28 @@ if str(setup_cfg.get('edit_on_github')).lower() == "true":
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
 
+
+# -- Sphinx Gallery -----------------------------
+extensions += ["sphinx_gallery.gen_gallery"]
+path = pathlib.Path.cwd()
+example_dir = path.parent.joinpath('examples')
+
+sphinx_gallery_conf = {
+    # path to store the module using example template
+    'backreferences_dir': path.joinpath('generated', 'modules'),
+    # execute all examples except those that start with "skip_"
+    'filename_pattern': '^((?!skip_).)*$',
+    'examples_dirs': example_dir,  # path to the examples scripts
+    'gallery_dirs': path.joinpath('generated', 'gallery'),  # path to save gallery generated examples
+    'default_thumb_file': str(path.joinpath('logo', 'icon_square.jpg')),
+    # 'reference_url': {
+    #     'sunpy': 'http://docs.sunpy.org/en/latest',
+    #     'astropy': 'http://docs.astropy.org/en/latest',
+    #     'matplotlib': 'https://matplotlib.org',
+    #     'numpy': 'http://docs.scipy.org/doc/numpy',
+    # },
+    'abort_on_example_error': True,
+    'plot_gallery': True,
+    'download_all_examples': False
+}
+print(sphinx_gallery_conf)

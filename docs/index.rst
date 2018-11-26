@@ -11,3 +11,4 @@ A Python library of tools for obtaining, processing and interacting with DKIST d
   dataset
   io
   asdfmaker
+  generated/gallery/index
