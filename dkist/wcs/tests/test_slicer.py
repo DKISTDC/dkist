@@ -10,21 +10,24 @@ from astropy.coordinates import SkyCoord
 from astropy.modeling.models import Identity
 from sunpy.coordinates.frames import Helioprojective
 
-from dkist.conftest import spatial_like
+from dkist.conftest import spatial_like_model
 from dkist.data.test import rootdir
 from dkist.wcs.slicer import GWCSSlicer
 
 # Some fixtures used in this file are defined in conftest.py
 
 
-@pytest.fixture
-def gwcs_5d():
+def gwcs_5d_object():
     with asdf.open(str(rootdir / "5d_gwcs.asdf")) as f:
         return f.tree['gwcs']
 
 
 @pytest.fixture
-def gwcs_3d():
+def gwcs_5d():
+    return gwcs_5d_object()
+
+
+def gwcs_3d_object():
     detector_frame = cf.CoordinateFrame(
         name="detector",
         naxes=3,
@@ -37,11 +40,16 @@ def gwcs_3d():
     spec_frame = cf.SpectralFrame(name="spectral", axes_order=(2, ), unit=u.nm)
     out_frame = cf.CompositeFrame(frames=(sky_frame, spec_frame))
 
-    return WCS(forward_transform=spatial_like(), input_frame=detector_frame, output_frame=out_frame)
+    return WCS(forward_transform=spatial_like_model(),
+               input_frame=detector_frame, output_frame=out_frame)
 
 
 @pytest.fixture
-def gwcs_1d():
+def gwcs_3d():
+    return gwcs_3d_object()
+
+
+def gwcs_1d_object():
     detector_frame = cf.CoordinateFrame(
         name="detector",
         naxes=1,
@@ -56,18 +64,23 @@ def gwcs_1d():
 
 
 @pytest.fixture
+def gwcs_1d():
+    return gwcs_1d_object()
+
+
+@pytest.fixture
 def slicer_1d():
-    return GWCSSlicer(gwcs_1d(), pixel_order=False)
+    return GWCSSlicer(gwcs_1d_object(), pixel_order=False)
 
 
 @pytest.fixture
 def slicer_3d():
-    return GWCSSlicer(gwcs_3d(), pixel_order=False)
+    return GWCSSlicer(gwcs_3d_object(), pixel_order=False)
 
 
 @pytest.fixture
 def slicer_5d():
-    return GWCSSlicer(gwcs_5d(), pixel_order=False)
+    return GWCSSlicer(gwcs_5d_object(), pixel_order=False)
 
 
 def test_slicer_init(gwcs_3d, gwcs_1d):
