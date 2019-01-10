@@ -43,7 +43,7 @@ def identity_gwcs_3d():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.nm/u.pixel)
+    identity = m.Multiply(1 * u.arcsec / u.pixel) & m.Multiply(1 * u.arcsec / u.pixel) & m.Multiply(1 * u.nm / u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"))
