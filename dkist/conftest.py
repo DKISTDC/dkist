@@ -7,8 +7,6 @@ import pytest
 import astropy.units as u
 from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP
 
-# gwcs / modeling related fixtures
-
 
 @pytest.fixture
 def double_input_flat():
