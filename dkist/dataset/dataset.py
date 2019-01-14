@@ -73,7 +73,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
 
         if self.wcs and missing_axis is None:
-            self.missing_axis = [False] * self.wcs.forward_transform.n_outputs
+            self.missing_axis = [False] * self.wcs.world_n_dim
         else:
             self.missing_axis = missing_axis
 
@@ -138,8 +138,21 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
 
     @property
+    def world_axis_physical_types(self):
+        """
+        Returns an iterable of strings describing the physical type for each world axis.
+
+        The strings conform to the International Virtual Observatory Alliance
+        standard, UCD1+ controlled Vocabulary.  For a description of the standard and
+        definitions of the different strings and string components,
+        see http://www.ivoa.net/documents/latest/UCDlist.html.
+
+        """
+        return self.wcs.world_axis_physical_types[::-1]
+
+    @property
     def axis_units(self):
-        return self.wcs.output_frame.unit[::-1]
+        return tuple(map(u.Unit, self.wcs.world_axis_units[::-1]))
 
     def __repr__(self):
         """
@@ -175,7 +188,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        world = self.wcs(*quantity_axis_list[::-1], with_units=True)
+        world = self.wcs.pixel_to_world(*quantity_axis_list[::-1])
 
         # Convert list to tuple as a more standard return type
         if isinstance(world, list):
@@ -205,7 +218,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         coord : `list`
             A list of arrays containing the output coordinates.
         """
-        return tuple(self.wcs.invert(*quantity_axis_list[::-1], with_units=True))[::-1]
+        return tuple(self.wcs.world_to_pixel(*quantity_axis_list[::-1]))[::-1]
 
     def world_axis_physical_types(self):
         raise NotImplementedError()  # pragma: no cover
@@ -267,7 +280,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         all_world_corners = [all_world_corners_grid[i].flatten()*lower_corner[i].unit
                              for i in range(n_dim)]
         # Convert to pixel coordinates
-        all_pix_corners = self.wcs(*all_world_corners, with_units=False)
+        all_pix_corners = self.wcs.world_to_pixel(*all_world_corners)
         # Derive slicing item with which to slice NDCube.
         # Be sure to round down min pixel and round up + 1 the max pixel.
         item = tuple([slice(int(np.clip(axis_pixels.value.min(), 0, None)),

@@ -22,7 +22,7 @@ def test_repr(dataset, dataset_3d):
 def test_wcs_roundtrip(dataset):
     p = (10*u.pixel, 10*u.pixel)
     w = dataset.pixel_to_world(*p)
-    p2 = dataset.world_to_pixel(w)
+    p2 = dataset.world_to_pixel(*w)
     assert_quantity_allclose(p, p2)
 
 
