@@ -73,7 +73,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
 
         if self.wcs and missing_axis is None:
-            self.missing_axis = [False]*self.wcs.forward_transform.n_outputs
+            self.missing_axis = [False] * self.wcs.forward_transform.n_outputs
         else:
             self.missing_axis = missing_axis
 
@@ -85,9 +85,9 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         Construct a `~dkist.dataset.Dataset` from a directory containing one
         asdf file and a collection of FITS files.
         """
-        if not os.path.isdir(directory):
-            raise ValueError("directory argument must be a directory")
         base_path = Path(directory)
+        if not base_path.is_dir():
+            raise ValueError("directory argument must be a directory")
         asdf_files = glob.glob(str(base_path / "*.asdf"))
 
         if not asdf_files:
@@ -107,7 +107,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         filepath = Path(filepath)
         base_path = filepath.parent
-        with asdf.AsdfFile.open(str(filepath)) as ff:
+        with asdf.open(str(filepath)) as ff:
             # TODO: without this it segfaults on access
             asdf_tree = copy.deepcopy(ff.tree)
             pointer_array = np.array(ff.tree['dataset'])
@@ -137,20 +137,25 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         else:
             return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
 
+    @property
+    def axis_units(self):
+        return self.wcs.output_frame.unit[::-1]
+
     def __repr__(self):
         """
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
         prefix = object.__repr__(self)
+        output = dedent(f"{prefix}\n{self.__str__()}")
+        return output
 
+    def __str__(self):
         pnames = ', '.join(self.pixel_axes_names)
         wnames = ', '.join(self.world_axes_names)
-        output = dedent(f"""\
-        {prefix}
+        return dedent(f"""\
         {self.data!r}
         WCS<pixel_axes_names=({pnames}),
             world_axes_names=({wnames})>""")
-        return output
 
     def pixel_to_world(self, *quantity_axis_list):
         """
