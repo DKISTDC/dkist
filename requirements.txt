@@ -14,7 +14,7 @@ matplotlib
 git+https://github.com/astropy/astropy
 git+https://github.com/spacetelescope/asdf
 git+https://github.com/Cadair/gwcs@dkist
-git+https://github.com/sunpy/sunpy
+git+https://github.com/Cadair/sunpy@fix_pip19_2
 git+https://github.com/sunpy/ndcube
 
 # test deps
