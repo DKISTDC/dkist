@@ -1,3 +1,6 @@
+[build-system]
+requires = ["setuptools", "wheel", "numpy"]
+
 [tool.dkistbot]
   check_towncrier_changelog = true
   check_milestone = true
