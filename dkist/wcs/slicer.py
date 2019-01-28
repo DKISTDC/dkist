@@ -6,7 +6,7 @@ from copy import deepcopy
 import numpy as np
 
 import gwcs.coordinate_frames as cf
-from astropy.modeling import Model, Parameter, separable
+from astropy.modeling import Model, separable
 from astropy.modeling.models import Shift, Identity
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
@@ -22,7 +22,8 @@ class FixedInputs(Model):
 
     @property
     def inputs(self):
-        return tuple(f"n{i}" for i in range(len(self.input_specification)) if self.input_specification[i] is None)
+        return tuple(f"n{i}" for i in range(len(self.input_specification))
+                     if self.input_specification[i] is None)
 
     @property
     def outputs(self):
@@ -168,7 +169,7 @@ class GWCSSlicer:
                     start = start[-1]  # pragma: no cover  # I can't work out how to hit this.
                 # Increment start for the next frame.
                 start += 1
-            frame._axes_order = tuple(range(start, start+frame.naxes))
+            frame._axes_order = tuple(range(start, start + frame.naxes))
 
         if len(frames) == 1:
             return frames[0]
@@ -263,11 +264,11 @@ class GWCSSlicer:
                 elif not self.separable[i] and drop_all_non_separable:
                     axes_to_drop.append(i)
                 else:
-                    inputs.append(ax*input_units[i])
+                    inputs.append(ax * input_units[i])
                     prepend.append(Identity(1))
             elif ax.start:
                 inputs.append(None)
-                prepend.append(Shift(ax.start*input_units[i]))
+                prepend.append(Shift(ax.start * input_units[i]))
             else:
                 inputs.append(None)
                 prepend.append(Identity(1))
@@ -309,7 +310,6 @@ class GWCSSlicer:
             trees = remove_input_frame(model._tree, inp,
                                        remove_coupled_trees=drop_all_non_separable)
             model = re_model_trees(trees)
-
 
         if not all([isinstance(a, Identity) for a in prepend]):
             model = self._list_to_compound(prepend) | model
