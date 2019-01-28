@@ -5,6 +5,9 @@ import glob
 import os
 import sys
 
+# Fix for https://github.com/pypa/pip/issues/6163
+sys.path.insert(0, os.path.dirname(__file__))
+
 from configparser import ConfigParser
 
 # Get some values from the setup.cfg
