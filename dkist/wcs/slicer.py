@@ -115,7 +115,7 @@ class GWCSSlicer:
     def _build_separable_array(self):
         """
         Combine the information on seprability from the forward transform with
-        copupling information from the output frames.
+        coupling information from the output frames.
         """
         mseparable = separable.is_separable(self.gwcs.forward_transform)
         coupled = self._get_coupled_axes()
@@ -138,7 +138,8 @@ class GWCSSlicer:
         Return a dict mapping input number to a "unit". If the model does not use units, return 1.
         """
         ft = self.gwcs.forward_transform
-        return {inp: ft.input_units.get(ft.inputs[inp], 1) if ft.input_units else 1 for inp in range(ft.n_inputs)}
+        return {inp: ft.input_units.get(ft.inputs[inp], 1)
+                if ft.input_units else 1 for inp in range(ft.n_inputs)}
 
     def _new_output_frame(self, axes):
         """
