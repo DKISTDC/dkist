@@ -63,6 +63,73 @@ def gwcs_1d_object():
     return WCS(forward_transform=Identity(1), input_frame=detector_frame, output_frame=spec_frame)
 
 
+def gwcs_pipeline_1d_object():
+    detector_frame = cf.CoordinateFrame(
+        name="detector",
+        naxes=1,
+        axes_order=(0, ),
+        axes_type=("pixel"),
+        axes_names=("x"),
+        unit=(u.pix))
+
+    det_2_inter = Scale(10)
+
+    inter_frame = cf.CoordinateFrame(
+        name="intermediate",
+        naxes=1,
+        axes_order=(0,),
+        axes_type=("pixel",),
+        axes_names=("x1"),
+        unit=(u.pix))
+
+    inter_2_spec = Shift(10)
+
+    spec_frame = cf.SpectralFrame(name="spectral", axes_order=(0, ), unit=u.nm)
+
+    return WCS([(detector_frame, det_2_inter),
+                (inter_frame, inter_2_spec),
+                (spec_frame, None)])
+
+
+@pytest.fixture
+def gwcs_pipeline_1d():
+    return gwcs_pipeline_1d_object()
+
+
+def gwcs_pipeline_2d_object():
+    detector_frame = cf.CoordinateFrame(
+        name="detector",
+        naxes=2,
+        axes_order=(0, 1),
+        axes_type=("pixel", "pixel"),
+        axes_names=("x", "y"),
+        unit=(u.pix, u.pix))
+
+    det_2_inter = Scale(10) & Scale(5)
+
+    inter_frame = cf.CoordinateFrame(
+        name="intermediate",
+        naxes=2,
+        axes_order=(0, 1),
+        axes_type=("pixel", "pixel"),
+        axes_names=("x1", "x2"),
+        unit=(u.pix, u.pix))
+
+    inter_2_out = Shift(10) & Shift(5)
+
+    out_frame = cf.CompositeFrame([cf.SpectralFrame(name="spectral", axes_order=(0, ), unit=u.nm),
+                                   cf.TemporalFrame(name="time", axes_order=(1,), unit=u.s)])
+
+    return WCS([(detector_frame, det_2_inter),
+                (inter_frame, inter_2_out),
+                (out_frame, None)])
+
+
+@pytest.fixture
+def gwcs_pipeline_2d():
+    return gwcs_pipeline_2d_object()
+
+
 @pytest.fixture
 def gwcs_1d():
     return gwcs_1d_object()
@@ -203,7 +270,7 @@ def test_5d_both_spatial(slicer_5d):
 # - Slice out all of the stokes axis (Table)
 
 
-def test_5d_stokes_None(slicer_5d):
+def test_5d_stokes_none(slicer_5d):
     wcs, _ = slicer_5d[0, 0, 0, 0, :]
     assert wcs.forward_transform.n_inputs == 1
     stokes = wcs(range(4) * u.pix, with_units=True)
@@ -235,3 +302,22 @@ def test_5d_spatial_split(slicer_5d):
     assert u.allclose(coords[0].Ty, 817.281 * u.arcsec)
     assert isinstance(coords[1], Time)
     np.testing.assert_allclose(coords[1].jd, 2459849.5946575697)
+
+
+def test_gwcs_pipeline(gwcs_pipeline_1d):
+    slicer = GWCSSlicer(gwcs_pipeline_1d, pixel_order=False)
+    wcs, _ = slicer[10:]
+
+    # A one transform pipeline has two steps (in_frame, transform) and (out_frame, None)
+    assert len(wcs._pipeline) == 3
+    assert_quantity_allclose(wcs(10), 210 * u.nm)
+
+
+def test_gwcs_pipeline_drop(gwcs_pipeline_2d):
+    slicer = GWCSSlicer(gwcs_pipeline_2d, pixel_order=False)
+    wcs, _ = slicer[:, 0]
+
+    # A one transform pipeline has two steps (in_frame, transform) and (out_frame, None)
+    assert len(wcs._pipeline) == 3
+    assert wcs.forward_transform.n_inputs == 1
+    assert_quantity_allclose(wcs(10), 110 * u.nm)
