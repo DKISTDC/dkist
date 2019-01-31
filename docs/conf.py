@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import os
+import sys
 import pathlib
 import datetime
 
@@ -15,6 +15,8 @@ conf = ConfigParser()
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
 
+# TODO: Work out why we need this hack with tox
+sys.path.append(os.path.abspath("../"))
 
 # -- General configuration ----------------------------------------------------
 
@@ -129,4 +131,3 @@ sphinx_gallery_conf = {
     'plot_gallery': True,
     'download_all_examples': False
 }
-print(sphinx_gallery_conf)
