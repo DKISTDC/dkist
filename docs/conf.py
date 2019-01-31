@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import pathlib
 import datetime
+
+from pkg_resources import get_distribution
 
 from sphinx_astropy.conf.v1 import *
 
@@ -41,7 +42,7 @@ automodsumm_inherited_members = True
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
-project = setup_cfg['package_name']
+project = setup_cfg['name']
 author = setup_cfg['author']
 copyright = '{0}, {1}'.format(
     datetime.datetime.now().year, setup_cfg['author'])
@@ -50,14 +51,9 @@ copyright = '{0}, {1}'.format(
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-__import__(setup_cfg['package_name'])
-package = sys.modules[setup_cfg['package_name']]
 
-# The short X.Y version.
-version = package.__version__.split('-', 1)[0]
-# The full version, including alpha/beta/rc tags.
-release = package.__version__
-
+release = get_distribution(setup_cfg['name']).version
+version = '.'.join(release.split('.')[:3])
 
 # -- Options for HTML output --------------------------------------------------
 
@@ -97,10 +93,9 @@ latex_documents = [('index', project + '.tex', project + u' Documentation',
 if str(setup_cfg.get('edit_on_github')).lower() == "true":
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
-    versionmod = __import__(setup_cfg['package_name'] + '.version')
     edit_on_github_project = setup_cfg['github_project']
-    if versionmod.version.release:
-        edit_on_github_branch = "v" + versionmod.version.version
+    if release == version:
+        edit_on_github_branch = "v" + release
     else:
         edit_on_github_branch = "master"
 
