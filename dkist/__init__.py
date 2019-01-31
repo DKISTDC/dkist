@@ -1,20 +1,45 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+import os
+from warnings import warn
 
-# Packages may add whatever they like to this file, but
-# Enforce Python version check during package import.
-# This is the same check as the one at the top of setup.py
-import sys
+from pkg_resources import get_distribution, DistributionNotFound
 
-from ._dkist_init import *
+from astropy.tests.helper import TestRunner
+from astropy.config.configuration import (
+    update_default_config,
+    ConfigurationDefaultMissingError,
+    ConfigurationDefaultMissingWarning)
 
-__minimum_python_version__ = "3.6"
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    __version__ = "unknown"
 
-class UnsupportedPythonError(Exception):
-    pass
+# add these here so we only need to cleanup the namespace at the end
+config_dir = None
 
-if sys.version_info < tuple((int(val) for val in __minimum_python_version__.split('.'))):
-    raise UnsupportedPythonError("dkist does not support Python < {}".format(__minimum_python_version__))  # pragma: no cover
+if not os.environ.get('ASTROPY_SKIP_CONFIG_UPDATE', False):
+    config_dir = os.path.dirname(__file__)
+    config_template = os.path.join(config_dir, __package__ + ".cfg")
+    if os.path.isfile(config_template):
+        try:
+            update_default_config(
+                __package__, config_dir, version=__version__)
+        except TypeError as orig_error:
+            try:
+                update_default_config(__package__, config_dir)
+            except ConfigurationDefaultMissingError as e:
+                wmsg = (e.args[0] +
+                        " Cannot install default profile. If you are "
+                        "importing from source, this is expected.")
+                warn(ConfigurationDefaultMissingWarning(wmsg))
+                del e
+            except Exception:
+                raise orig_error
 
-if not _ASTROPY_SETUP_:
-    # For egg_info test builds to pass, put package imports here.
-    from .dataset import Dataset
+
+__all__ = ['test', 'Dataset']
+
+test = TestRunner.make_test_runner_in(os.path.dirname(__file__))
+
+from .dataset import Dataset  # noqa

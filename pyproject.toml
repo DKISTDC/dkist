@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "numpy"]
+requires = ["setuptools>=30.3.0", "setuptools_scm", "wheel"]
 
 [tool.dkistbot]
   check_towncrier_changelog = true
