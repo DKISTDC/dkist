@@ -310,14 +310,14 @@ def test_gwcs_pipeline(gwcs_pipeline_1d):
 
     # A one transform pipeline has two steps (in_frame, transform) and (out_frame, None)
     assert len(wcs._pipeline) == 3
-    assert_quantity_allclose(wcs(10), 210 * u.nm)
+    assert_quantity_allclose(wcs(10, with_units=True), 210 * u.nm)
 
 
 def test_gwcs_pipeline_drop(gwcs_pipeline_2d):
-    slicer = GWCSSlicer(gwcs_pipeline_2d, pixel_order=False)
+    slicer = GWCSSlicer(gwcs_pipeline_2d, pixel_order=False, copy=True)
     wcs, _ = slicer[:, 0]
 
     # A one transform pipeline has two steps (in_frame, transform) and (out_frame, None)
     assert len(wcs._pipeline) == 3
     assert wcs.forward_transform.n_inputs == 1
-    assert_quantity_allclose(wcs(10), 110 * u.nm)
+    assert_quantity_allclose(wcs(10, with_units=True), 110 * u.nm)

@@ -6,8 +6,8 @@ from copy import deepcopy
 import numpy as np
 
 import gwcs.coordinate_frames as cf
-from astropy.modeling import Model, separable
-from astropy.modeling.models import Identity, Shift
+from astropy.modeling import Model, separable as model_separable
+from astropy.modeling.models import Shift, Identity
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
 
@@ -95,6 +95,7 @@ class GWCSSlicer:
         """
         return {inp: model.input_units.get(model.inputs[inp], 1)
                 if model.input_units else 1 for inp in range(model.n_inputs)}
+
     @staticmethod
     def _split_frames(frame):
         """
@@ -109,6 +110,18 @@ class GWCSSlicer:
         else:
             frames = (deepcopy(frame),)
         return frames
+
+    @staticmethod
+    def _get_axes_map(frames):
+        """
+        Map the number of the axes to its frame.
+        """
+        axes_map = {}
+        for frame in frames:
+            for ax in frame.axes_order:
+                axes_map[ax] = frame
+
+        return axes_map
 
     def _get_coupled_axes(self, frame):
         """
@@ -129,18 +142,22 @@ class GWCSSlicer:
     @property
     def models(self):
         """ The models in the pipeline """
-        return (a[1] for a in self.pipeline)
+        return [a[1] for a in self.pipeline]
 
     @property
     def frames(self):
         """ The frames in the pipeline """
-        return (a[0] for a in self.pipeline)
+        return [a[0] for a in self.pipeline]
 
     @property
     def separable(self):
         separable = []
         for frame, model in self.pipeline:
-            mseparable = separable.is_separable(model)
+            if model:
+                mseparable = model_separable.is_separable(model)
+            # TODO: Verify this
+            else:
+                mseparable = model_separable.is_separable(self.models[-2])
             coupled = self._get_coupled_axes(frame)
             mseparable[tuple(coupled)] = False
             separable.append(mseparable)
@@ -207,13 +224,65 @@ class GWCSSlicer:
 
         return inputs, prepend, axes_to_drop
 
+    def _remove_axes_from_frame(self, axes, frame):
+        """
+        remove the frames for all axes and return a new output frame.
+
+        This method assumes axes has already been sanitized for non-separable axes.
+        """
+        frames = self._split_frames(frame)
+        axes_map = self._get_axes_map(frames)
+
+        frames = list(frames)
+        for axis in axes:
+            drop_frame = axes_map[axis]
+            # If we are removing coupled axes we might have already removed the frame
+            if drop_frame in frames:
+                frames.remove(drop_frame)
+
+        # We now need to reindex the axes_order of all the frames to account
+        # for any removed axes.
+        for i, frame in enumerate(frames):
+            if i == 0:
+                start = i
+            else:
+                axes_order = frames[i-1].axes_order
+                start = axes_order[-1]
+                # Start can either be an int or a list/tuple here.
+                if not isinstance(start, int):
+                    start = start[-1]  # pragma: no cover  # I can't work out how to hit this.
+                # Increment start for the next frame.
+                start += 1
+            frame._axes_order = tuple(range(start, start + frame.naxes))
+
+        if len(frames) == 1:
+            return frames[0]
+        else:
+            return cf.CompositeFrame(frames, name=self.gwcs.output_frame.name)
+
+    def _list_to_compound(self, models):
+        """
+        Convert a list of models into a compound model using the ``&`` operator.
+        """
+        # Convert the list of models into a CompoundModel
+        comp_m = models[0]
+        for m in models[1:]:
+            comp_m = comp_m & m
+        return comp_m
+
     def __getitem__(self, item):
         item = self._sanitize(item)
 
-        for model in self.models:
+        models = []
+        all_axes_to_drop = []
+        # The last model is always None, skip it
+        for model in self.models[:-1]:
             drop_all_non_separable = all(isinstance(ax, int) for i, ax in enumerate(item)
                                          if not self.separable[i])
 
+            # TODO: We only need to perform non-axis drops on the first model.
+            print(item)
+            breakpoint()
             inputs, prepend, axes_to_drop = self._convert_item_to_models(model, item,
                                                                          drop_all_non_separable)
 
@@ -245,3 +314,20 @@ class GWCSSlicer:
 
             if not all([a is None for a in inputs]):
                 model = FixedInputs(inputs) | model
+
+            models.append(model)
+            all_axes_to_drop.append(axes_to_drop)
+
+        models.append(None)
+        all_axes_to_drop.append(all_axes_to_drop[-1])
+
+        frames = []
+        for frame, axes in zip(self.frames, all_axes_to_drop):
+            frames.append(self._remove_axes_from_frame(axes, frame))
+
+        new_pipeline = list(zip(frames, models))
+        assert new_pipeline
+        print(new_pipeline)
+
+        self.gwcs._initialize_wcs(new_pipeline, None, None)
+        return self.gwcs, None
