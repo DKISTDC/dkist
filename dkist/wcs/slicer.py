@@ -271,20 +271,66 @@ class GWCSSlicer:
         return comp_m
 
     def __getitem__(self, item):
+        """
+         * Sanitize item
+         * Calculate Model to prepend and append
+         * Calculate any axes to drop
+         * Drop axes from first model in the pipeline
+           * Propagate this through the model chain, being aware the inputs and outputs could swap.
+         * Prepend to first model
+         * Append to last
+         * Update frames to match models.
+         * Reinitialise
+        """
         item = self._sanitize(item)
+
+        drop_all_non_separable = all(isinstance(ax, int) for i, ax in enumerate(item)
+                                     if not self.separable[0])
+        inputs, prepend, axes_to_drop = self._convert_item_to_models(self.models[0], item,
+                                                                     drop_all_non_separable)
+
+        missing_axes = [i is not None for i in inputs]
+        if self.pixel_order:
+            missing_axes = missing_axes[::-1]
+
+        first_model = self.models[0]
+        axes_to_drop.sort(reverse=True)
+        skip = False
+
+        for drop_ax in axes_to_drop:
+            # If we are removing non separable axes then we need to skip all
+            # but the first non-separable axis.
+
+            # TODO: This is assuming there is only one set of non-separable
+            # axes in the WCS. If there were more than two sets of
+            # non-separable axes this would break.
+            if skip:
+                continue
+            skip = not self.separable[drop_ax] if drop_all_non_separable else skip
+
+            inp = first_model._tree.inputs[drop_ax]
+            trees = remove_input_frame(first_model._tree, inp,
+                                       remove_coupled_trees=drop_all_non_separable)
+            first_model = re_model_trees(trees)
+
+
+        
+
+
+
+
+
+
+
 
         models = []
         all_axes_to_drop = []
         # The last model is always None, skip it
         for model in self.models[:-1]:
-            drop_all_non_separable = all(isinstance(ax, int) for i, ax in enumerate(item)
-                                         if not self.separable[i])
 
             # TODO: We only need to perform non-axis drops on the first model.
             print(item)
             breakpoint()
-            inputs, prepend, axes_to_drop = self._convert_item_to_models(model, item,
-                                                                         drop_all_non_separable)
 
             missing_axes = [i is not None for i in inputs]
             if self.pixel_order:
@@ -292,22 +338,6 @@ class GWCSSlicer:
 
             axes_to_drop.sort(reverse=True)
             skip = False
-
-            for drop_ax in axes_to_drop:
-                # If we are removing non separable axes then we need to skip all
-                # but the first non-separable axis.
-
-                # TODO: This is assuming there is only one set of non-separable
-                # axes in the WCS. If there were more than two sets of
-                # non-separable axes this would break.
-                if skip:
-                    continue
-                skip = not self.separable[drop_ax] if drop_all_non_separable else skip
-
-                inp = model._tree.inputs[drop_ax]
-                trees = remove_input_frame(model._tree, inp,
-                                           remove_coupled_trees=drop_all_non_separable)
-                model = re_model_trees(trees)
 
             if not all([isinstance(a, Identity) for a in prepend]):
                 model = self._list_to_compound(prepend) | model
