@@ -7,7 +7,7 @@ I would imagine this will end up in gwcs or maybe even astropy at somepoint.
 from collections import defaultdict
 
 from astropy.modeling import separable
-from astropy.modeling.core import BINARY_OPERATORS, _model_oper
+from astropy.modeling.core import Model, BINARY_OPERATORS, _model_oper
 
 OPERATORS = dict((oper, _model_oper(oper)) for oper in BINARY_OPERATORS)
 
@@ -105,7 +105,7 @@ def remove_input_frame(tree, inp, remove_coupled_trees=False):
     if tree.value != "&":
         # If the input is not a "&" then we have to respect remove_coupled_trees
         sep = tree_is_separable(tree)
-        if all(~sep):
+        if all(~sep) or isinstance(tree.value, Model):
             if not remove_coupled_trees:
                 return [tree]
         # Otherwise, we know this tree has the input, so we just drop it.

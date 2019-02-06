@@ -2,7 +2,7 @@ import pytest
 
 import astropy.units as u
 from astropy.modeling.core import Model
-from astropy.modeling.models import Identity, Multiply, Pix2Sky_AZP, Shift
+from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP, Pix2Sky_CylindricalPerspective
 from astropy.modeling.separable import is_separable
 
 from dkist.utils.model_tools import (make_forward_input_map, make_tree_input_map,
@@ -144,3 +144,17 @@ def test_dont_drop_one_half(spatial_like):
     trees = remove_input_frame(tree, "x01")
     assert r_ginp_map[("x0",)] in trees
     assert tree.left not in trees
+
+
+@pytest.mark.parametrize("model", ((Pix2Sky_CylindricalPerspective() & Identity(1)),
+                                   (Pix2Sky_AZP() & Identity(1))))
+def test_model_coupled_separable(model):
+    """
+    So it turns out you can have a single model which is separable, but can't
+    be split.
+    """
+
+    trees = remove_input_frame(model._tree, "x")
+    new_model = re_model_trees(trees)
+
+    assert new_model.n_inputs == 3
