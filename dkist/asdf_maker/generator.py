@@ -353,6 +353,8 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     sorted_filenames = np.array(table_headers['filenames'])
     sorted_headers = np.array(table_headers['headers'])
 
+    table_headers.remove_columns(["headers", "filenames"])
+
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
@@ -361,7 +363,8 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
                                                 hdu_index=hdu, relative_to=relative_to)
 
     tree = {'dataset': reference_array,
-            'gwcs': gwcs_from_headers(sorted_headers)}
+            'gwcs': gwcs_from_headers(sorted_headers),
+            'headers': table_headers}
 
     # TODO: Write a schema for the tree.
 
