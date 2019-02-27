@@ -1,0 +1,45 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://stsci.edu/schemas/asdf/core/asdf-1.1.0"
+
+title: DKIST Data Center Level 1 asdf file
+description: |
+  This describes the top-level schema for asdf files used to construct a
+  dkist.dataset.Dataset object.
+
+tag: "tag:stsci.edu:asdf/core/asdf-1.1.0"
+type: object
+properties:
+  dataset:
+    description: A (nested) array of ExternalArrayReference objects.
+    type: array
+    anyOf:
+      # 3D Array of EARs
+      - type: array
+        items:
+          type: array
+          items:
+            $ref: "externalarray-1.0.0"
+      # 2D Array of EARs
+      - type: array
+        items:
+          $ref: "externalarray-1.0.0"
+      # 1D Array of EARs
+      - items:
+          $ref: "externalarray-1.0.0"
+
+  gwcs:
+    description: The coordinate system for the complete dataset.
+    $ref: "tag:stsci.edu:gwcs/wcs-1.0.0"
+
+  headers:
+    description: A table of all the headers for the constituent files.
+    $ref: "table-1.0.0"
+
+  meta:
+    description: Extra dataset metadata, describing the whole dataset.
+    type: object
+
+required: [dataset, gwcs]
+additionalProperties: true

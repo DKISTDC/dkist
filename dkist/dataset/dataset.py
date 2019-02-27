@@ -1,6 +1,3 @@
-import copy
-import glob
-import os.path
 from pathlib import Path
 from textwrap import dedent
 
@@ -13,6 +10,12 @@ from ndcube.ndcube import NDCubeABC
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+
+try:
+    from importlib import resources  # >= py 3.7
+except ImportError:
+    import importlib_resources as resources
+
 
 __all__ = ['Dataset']
 
@@ -88,7 +91,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         base_path = Path(directory)
         if not base_path.is_dir():
             raise ValueError("directory argument must be a directory")
-        asdf_files = glob.glob(str(base_path / "*.asdf"))
+        asdf_files = tuple(base_path.glob("*.asdf"))
 
         if not asdf_files:
             raise ValueError("No asdf file found in directory.")
@@ -107,17 +110,17 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         filepath = Path(filepath)
         base_path = filepath.parent
-        with asdf.open(str(filepath)) as ff:
-            # TODO: without this it segfaults on access
-            asdf_tree = copy.deepcopy(ff.tree)
-            pointer_array = np.array(ff.tree['dataset'])
+        with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
+            with asdf.open(filepath, custom_schema=schema_path.as_posix(),
+                           lazy_load=False, copy_arrays=True) as ff:
+                pointer_array = np.array(ff.tree['dataset'])
 
-        array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                                 basepath=str(base_path))
+                array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
+                                                         basepath=base_path)
 
-        data = array_container.array
+                data = array_container.array
 
-        wcs = asdf_tree['gwcs']
+                wcs = ff.tree['gwcs']
 
         cls = cls(data, wcs=wcs)
         cls.array_container = array_container
