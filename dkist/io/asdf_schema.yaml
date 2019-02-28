@@ -20,13 +20,18 @@ properties:
         items:
           type: array
           items:
-            $ref: "externalarray-1.0.0"
+            type: array
+            items:
+              $ref: "externalarray-1.0.0"
       # 2D Array of EARs
       - type: array
         items:
-          $ref: "externalarray-1.0.0"
+          type: array
+          items:
+            $ref: "externalarray-1.0.0"
       # 1D Array of EARs
-      - items:
+      - type: array
+        items:
           $ref: "externalarray-1.0.0"
 
   gwcs:

@@ -16,6 +16,11 @@ from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_dat
                                       references_from_filenames, spatial_model_from_header,
                                       spectral_model_from_framewave)
 
+try:
+    from importlib import resources  # >= py 3.7
+except ImportError:
+    import importlib_resources as resources
+
 __all__ = ['dataset_from_fits', 'asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
            'build_pixel_frame', 'validate_headers', 'table_from_headers',
            'headers_from_filenames']
@@ -366,8 +371,6 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
             'gwcs': gwcs_from_headers(sorted_headers),
             'headers': table_headers}
 
-    # TODO: Write a schema for the tree.
-
     return tree
 
 
@@ -378,7 +381,8 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
     Parameters
     ----------
     path : `pathlib.Path` or `str`
-        The path to read the FITS files (with a `.fits` file extension) from and save the asdf file.
+        The path to read the FITS files (with a `.fits` file extension) from
+        and save the asdf file.
 
     asdf_filename : `str`
         The filename to save the asdf with in the path.
@@ -396,5 +400,6 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
 
     tree = asdf_tree_from_filenames(list(files), hdu=hdu, relative_to=relative_to)
 
-    with asdf.AsdfFile(tree) as afile:
-        afile.write_to(str(path/asdf_filename), **kwargs)
+    with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
+        with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
+            afile.write_to(path/asdf_filename, **kwargs)
