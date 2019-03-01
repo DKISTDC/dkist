@@ -16,6 +16,8 @@ from gwcs.lookup_table import LookupTable
 from astropy.modeling.models import (Shift, Multiply, Pix2Sky_TAN,
                                      AffineTransformation2D, RotateNative2Celestial)
 
+from dkist.asdf_maker.generator import table_from_headers
+
 
 def map_to_transform(smap):
     # crval1u, crval2u = smap.reference_coordinate.Tx, smap.reference_coordinate.Ty
@@ -101,19 +103,22 @@ def main():
     # the dt from the first image
     seconds = []
 
+    headers = []
+
     for i, filepath in enumerate(files):
         with fits.open(filepath) as hdul:
             header = hdul[0].header
+            headers.append(dict(header))
         time = parse_time(header['DATE-OBS'])
         if i == 0:
             start_time = time
         inds.append(i)
         times.append(time)
-        seconds.append((time - start_time).total_seconds())
+        seconds.append((time - start_time).to(u.s))
 
     # Extract a list of coordinates in time and wavelength
     # this assumes all wavelength images are taken at the same time
-    time_coords = np.array([t.isoformat() for t in times])
+    time_coords = np.array([str(t.isot) for t in times])
 
     smap0 = sunpy.map.Map(files[0])
     spatial = map_to_transform(smap0)
@@ -145,13 +150,13 @@ def main():
     ea = references_from_filenames(files, relative_to=str(path))
 
     tree = {
-        'gwcs': wcs,
-        'dataset': ea,
+        'wcs': wcs,
+        'data': ea,
+        'headers': table_from_headers(headers)
     }
 
     with asdf.AsdfFile(tree) as ff:
-        # ff.write_to("test.asdf")
-        filename = str(path / "eit_{}.asdf".format(time_coords[0]))
+        filename = path / "eit_test_dataset.asdf"
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
 

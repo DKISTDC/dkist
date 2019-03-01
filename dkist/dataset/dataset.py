@@ -113,14 +113,14 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                            lazy_load=False, copy_arrays=True) as ff:
-                pointer_array = np.array(ff.tree['dataset'])
+                pointer_array = np.array(ff.tree['data'])
 
                 array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
                                                          basepath=base_path)
 
                 data = array_container.array
 
-                wcs = ff.tree['gwcs']
+                wcs = ff.tree['wcs']
 
         cls = cls(data, wcs=wcs)
         cls.array_container = array_container

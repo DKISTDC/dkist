@@ -11,7 +11,7 @@ description: |
 tag: "tag:stsci.edu:asdf/core/asdf-1.1.0"
 type: object
 properties:
-  dataset:
+  data:
     description: A (nested) array of ExternalArrayReference objects.
     type: array
     anyOf:
@@ -34,7 +34,7 @@ properties:
         items:
           $ref: "externalarray-1.0.0"
 
-  gwcs:
+  wcs:
     description: The coordinate system for the complete dataset.
     $ref: "tag:stsci.edu:gwcs/wcs-1.0.0"
 
@@ -43,8 +43,8 @@ properties:
     $ref: "table-1.0.0"
 
   meta:
-    description: Extra dataset metadata, describing the whole dataset.
+    description: Dataset metadata, describing the whole dataset.
     type: object
 
-required: [dataset, gwcs]
+required: [data, wcs, headers]
 additionalProperties: true

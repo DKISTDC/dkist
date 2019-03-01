@@ -367,8 +367,8 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
-    tree = {'dataset': reference_array,
-            'gwcs': gwcs_from_headers(sorted_headers),
+    tree = {'data': reference_array,
+            'wcs': gwcs_from_headers(sorted_headers),
             'headers': table_headers}
 
     return tree

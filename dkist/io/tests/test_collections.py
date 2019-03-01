@@ -21,8 +21,8 @@ def externalarray():
     """
     with asdf.AsdfFile.open(
             os.path.join(eitdir,
-                         "eit_2004-03-01T00:00:10.515000.asdf")) as f:
-        return f.tree['dataset']
+                         "eit_test_dataset.asdf")) as f:
+        return f.tree['data']
 
 
 def test_numpy(externalarray):

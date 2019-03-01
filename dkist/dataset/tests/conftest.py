@@ -102,3 +102,10 @@ def dataset_4d(identity_gwcs_4d):
     array = da.from_array(x, tuple(shape))
 
     return Dataset(array, wcs=identity_gwcs_4d)
+
+
+if __name__ == "__main__":
+    from dkist.asdf_maker.generator import dataset_from_fits
+    from dkist.data.test import rootdir
+
+    dataset_from_fits(rootdir / "EIT", "eit_2004-03-01T00:00:10.515000.asdf", relative_to=rootdir / "EIT")
