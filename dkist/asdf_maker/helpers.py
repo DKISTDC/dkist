@@ -85,7 +85,7 @@ def spatial_model_from_header(header):
     lonproj = header[f'CTYPE{lonind}'][5:]
 
     if latproj != lonproj:
-        raise ValueError("The projection of the two spatial axes did not match.")
+        raise ValueError("The projection of the two spatial axes did not match.")  # pragma: no cover
 
     cunit1, cunit2 = u.Unit(header[f'CUNIT{lonind}']), u.Unit(header[f'CUNIT{latind}'])
     crpix1, crpix2 = header[f'CRPIX{lonind}'] * u.pix, header[f'CRPIX{latind}'] * u.pix

@@ -432,7 +432,7 @@ def _gen_type(gen_type, max_int=1e6, max_float=1e6, len_str=30):
         return ''.join(
             random.choice(string.ascii_uppercase + string.digits) for _ in range(len_str))
     else:
-        raise ValueError("Type {} is not supported".format(gen_type))
+        raise ValueError("Type {} is not supported".format(gen_type))  # pragma: no cover
 
 
 def generate_datset_inventory_from_headers(headers, asdf_name):
@@ -441,6 +441,12 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
 
     .. note::
        This is just for test data, it should not be used on real data.
+
+    Parameters
+    ----------
+
+    headers: `astropy.table.Table`
+    asdf_name: `str`
 
     """
 
@@ -484,10 +490,7 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
 
     for key, ktype in schema:
         if key in header_mapping:
-            if not isinstance(headers[0], dict):
-                hdict = dict(zip(headers.colnames, headers[0]))
-            else:
-                hdict = headers[0]
+            hdict = dict(zip(headers.colnames, headers[0]))
             output[key] = ktype(hdict.get(header_mapping[key], _gen_type(ktype)))
         else:
             output[key] = _gen_type(ktype)
