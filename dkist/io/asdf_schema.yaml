@@ -56,8 +56,12 @@ properties:
           type: string
         contributing_experiment_ids:
           type: array
+          items:
+            type: string
         contributing_proposal_ids:
           type: array
+          items:
+            type: string
         dataset_id:
           type: string
         dataset_inventory_id:
@@ -80,6 +84,8 @@ properties:
           type: string
         observables:
           type: array
+          items:
+            type: string
         original_frame_count:
           type: integer
         primary_experiment_id:
