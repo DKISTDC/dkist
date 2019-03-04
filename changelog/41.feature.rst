@@ -1,0 +1,1 @@
+All asdf files are now validated against the level 1 dataset schema on save and load.
