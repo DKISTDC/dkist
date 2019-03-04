@@ -16,7 +16,7 @@ from gwcs.lookup_table import LookupTable
 from astropy.modeling.models import (Shift, Multiply, Pix2Sky_TAN,
                                      AffineTransformation2D, RotateNative2Celestial)
 
-from dkist.asdf_maker.generator import table_from_headers
+from dkist.asdf_maker.generator import table_from_headers, generate_datset_inventory_from_headers
 
 
 def map_to_transform(smap):
@@ -152,7 +152,8 @@ def main():
     tree = {
         'wcs': wcs,
         'data': ea,
-        'headers': table_from_headers(headers)
+        'headers': table_from_headers(headers),
+        'meta': generate_datset_inventory_from_headers(headers, "eit_test_dataset.asdf")
     }
 
     with asdf.AsdfFile(tree) as ff:

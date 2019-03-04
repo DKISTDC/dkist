@@ -2,6 +2,7 @@ from pathlib import Path
 from textwrap import dedent
 
 import numpy as np
+from jsonschema.exceptions import ValidationError
 
 import asdf
 import astropy.units as u
@@ -110,17 +111,21 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         filepath = Path(filepath)
         base_path = filepath.parent
-        with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
-            with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, copy_arrays=True) as ff:
-                pointer_array = np.array(ff.tree['data'])
+        try:
+            with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
+                with asdf.open(filepath, custom_schema=schema_path.as_posix(),
+                            lazy_load=False, copy_arrays=True) as ff:
+                    pointer_array = np.array(ff.tree['data'])
 
-                array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                                         basepath=base_path)
+                    array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
+                                                            basepath=base_path)
 
-                data = array_container.array
+                    data = array_container.array
 
-                wcs = ff.tree['wcs']
+                    wcs = ff.tree['wcs']
+
+        except ValidationError as e:
+            raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
 
         cls = cls(data, wcs=wcs)
         cls.array_container = array_container
@@ -222,9 +227,6 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             A list of arrays containing the output coordinates.
         """
         return tuple(self.wcs.world_to_pixel(*quantity_axis_list[::-1]))[::-1]
-
-    def world_axis_physical_types(self):
-        raise NotImplementedError()  # pragma: no cover
 
     @property
     def dimensions(self):

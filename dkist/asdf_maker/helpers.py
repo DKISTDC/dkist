@@ -191,12 +191,12 @@ def make_asdf(filename, *, dataset, gwcs, **kwargs):
     All keyword arguments become keys in the top level of the asdf tree.
     """
     tree = {
-        'gwcs': gwcs,
-        'dataset': dataset,
+        'wcs': gwcs,
+        'data': dataset,
         **kwargs
     }
 
     with asdf.AsdfFile(tree) as ff:
-        ff.write_to(str(filename))
+        ff.write_to(filename)
 
     return filename

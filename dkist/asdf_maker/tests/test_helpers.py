@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 import numpy as np
@@ -98,8 +99,8 @@ def test_spectral_framewave(header_filenames):
 
 
 def test_make_asdf(header_filenames, tmpdir):
-    tree = asdf_tree_from_filenames(header_filenames)
-    fname = tmpdir.join("test.asdf")
+    tree = asdf_tree_from_filenames(header_filenames, "test.asdf")
+    fname = Path(tmpdir.join("test.asdf"))
     asdf_file = make_asdf(fname, dataset=tree['data'], gwcs=tree['wcs'])
 
     with open(asdf_file, "rb") as fd:
