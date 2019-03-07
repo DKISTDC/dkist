@@ -9,7 +9,7 @@ import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, separable as model_separable
 from astropy.modeling.models import Shift, Identity
 
-from dkist.utils.model_tools import re_model_trees, remove_input_frame
+from astropy.modeling.splitting import re_model_trees, remove_input_frame
 
 __all__ = ['GWCSSlicer', 'FixedInputs']
 
