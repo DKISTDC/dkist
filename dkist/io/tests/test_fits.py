@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ from astropy.io import fits
 from dkist.data.test import rootdir
 from dkist.io.fits import AstropyFITSLoader
 
-eitdir = os.path.join(rootdir, 'EIT')
+eitdir = Path(rootdir) / 'EIT'
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def relative_ear():
 
 @pytest.fixture
 def absolute_ear():
-    return asdf.ExternalArrayReference(os.path.join(eitdir, "efz20040301.000010_s.fits"),
+    return asdf.ExternalArrayReference(eitdir / "efz20040301.000010_s.fits",
                                        0,
                                        "float64",
                                        (128, 128))
@@ -43,7 +43,7 @@ def test_construct(relative_fl, absolute_fl):
     for fl in [relative_fl, absolute_fl]:
         assert fl.shape == (128, 128)
         assert fl.dtype == "float64"
-        assert fl.absolute_uri == os.path.join(eitdir, "efz20040301.000010_s.fits")
+        assert fl.absolute_uri == eitdir /"efz20040301.000010_s.fits"
 
         for contain in ("efz20040301.000010_s.fits", str(fl.shape), fl.dtype):
             assert contain in repr(fl)
@@ -61,6 +61,16 @@ def test_array(absolute_fl):
     for contain in ("efz20040301.000010_s.fits", str(absolute_fl.shape), absolute_fl.dtype):
         assert contain not in repr(absolute_fl)
         assert contain not in str(absolute_fl)
+
+
+def test_nan():
+    ear = asdf.ExternalArrayReference("/tmp/not_a_path.fits",
+                                      0,
+                                      "float64",
+                                      (128, 128))
+    loader = AstropyFITSLoader(ear)
+
+    assert_allclose(loader[10:20, :], np.nan)
 
 
 def test_header(absolute_fl):
