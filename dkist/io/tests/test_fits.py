@@ -63,6 +63,16 @@ def test_array(absolute_fl):
         assert contain not in str(absolute_fl)
 
 
+def test_nan():
+    ear = asdf.ExternalArrayReference("/tmp/not_a_path.fits",
+                                      0,
+                                      "float64",
+                                      (128, 128))
+    loader = AstropyFITSLoader(ear)
+
+    assert_allclose(loader[10:20, :], np.nan)
+
+
 def test_header(absolute_fl):
     h = absolute_fl.fits_header
     assert isinstance(h, fits.Header)

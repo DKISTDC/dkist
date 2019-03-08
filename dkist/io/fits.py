@@ -3,13 +3,18 @@ This file contains code to lazy-load arrays from FITS files. It is designed to
 minimise (virtual) memory usage and the number of open files.
 """
 
-import os
 import abc
+from pathlib import Path
+
+import dask.array as da
+import numpy as np
+from dask import delayed
 
 from astropy.io import fits
 from sunpy.util.decorators import add_common_docstring
 
 __all__ = ['BaseFITSLoader', 'AstropyFITSLoader']
+
 
 common_parameters = """
 
@@ -33,7 +38,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
 
     def __init__(self, externalarray, basepath=None):
         self.fitsarray = externalarray
-        self.basepath = basepath
+        self.basepath = Path(basepath) if basepath else None
         # Private cache
         self._array = None
         self._fits_header = None
@@ -67,9 +72,9 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         Construct a non-relative path to the file, using ``basepath`` if provided.
         """
         if self.basepath:
-            return os.path.join(self.basepath, self.fitsarray.fileuri)
+            return self.basepath / self.fitsarray.fileuri
         else:
-            return self.fitsarray.fileuri
+            return Path(self.fitsarray.fileuri)
 
     @property
     def fits_header(self):
@@ -127,7 +132,15 @@ class AstropyFITSLoader(BaseFITSLoader):
         """
         Make sure we cache the header while we have the file open.
         """
-        with fits.open(self.absolute_uri, memmap=True, do_not_scale_image_data=False, mode="denywrite") as hdul:
+        if not self.absolute_uri.exists():
+            # Use np.broadcast_to to generate an array of the correct size, but
+            # which only uses memory for one value.
+            return da.from_delayed(delayed(np.broadcast_to)(np.nan, self.shape) * np.nan,
+                                   self.shape, self.dtype)
+
+        with fits.open(self.absolute_uri, memmap=True,
+                       do_not_scale_image_data=False, mode="denywrite") as hdul:
+
             hdul.verify('fix')
             hdu = hdul[self.fitsarray.target]
             if not self._fits_header:
