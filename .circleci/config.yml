@@ -27,8 +27,9 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: sudo pip install pycodestyle
+      - run: sudo pip install pycodestyle isort[pyproject]
       - run: pycodestyle dkist --count
+      - run: isort dkist/**/*.py -c
 
   tests-37:
     docker:

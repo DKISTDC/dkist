@@ -5,19 +5,19 @@ import pathlib
 import numpy as np
 
 import asdf
-import gwcs
 import astropy.units as u
+import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.io import fits
-from astropy.time import Time
 from astropy.table import Table
+from astropy.time import Time
 from gwcs.lookup_table import LookupTable
 from sunpy.coordinates import Helioprojective
 from sunpy.time import parse_time
 
-from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_date_obs,
-                                      references_from_filenames, spatial_model_from_header,
-                                      spectral_model_from_framewave)
+from dkist.asdf_maker.helpers import (linear_spectral_model, references_from_filenames,
+                                      spatial_model_from_header, spectral_model_from_framewave,
+                                      time_model_from_date_obs)
 
 try:
     from importlib import resources  # >= py 3.7

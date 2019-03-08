@@ -5,11 +5,11 @@ This submodule provides tools for resolving arrays of
 import abc
 from functools import partial
 
-import numpy as np
 import dask.array as da
+import numpy as np
 
-from sunpy.util.decorators import add_common_docstring
 from asdf.tags.core.external_reference import ExternalArrayReference
+from sunpy.util.decorators import add_common_docstring
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 

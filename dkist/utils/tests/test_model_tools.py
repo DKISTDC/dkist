@@ -2,10 +2,11 @@ import pytest
 
 import astropy.units as u
 from astropy.modeling.core import Model
-from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP
+from astropy.modeling.models import Identity, Multiply, Pix2Sky_AZP, Shift
 from astropy.modeling.separable import is_separable
 
-from dkist.utils.model_tools import re_model_trees, remove_input_frame, make_tree_input_map, make_forward_input_map
+from dkist.utils.model_tools import (make_forward_input_map, make_tree_input_map,
+                                     re_model_trees, remove_input_frame)
 
 ## Fixtures used in this file are defined in conftest.py
 

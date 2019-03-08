@@ -9,8 +9,8 @@ import astropy.units as u
 from astropy.utils import isiterable
 from ndcube.ndcube import NDCubeABC
 
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 try:
     from importlib import resources  # >= py 3.7

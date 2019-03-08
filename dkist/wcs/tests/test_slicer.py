@@ -4,10 +4,10 @@ import pytest
 import asdf
 import astropy.units as u
 import gwcs.coordinate_frames as cf
-from gwcs import WCS
-from astropy.time import Time
 from astropy.coordinates import SkyCoord
 from astropy.modeling.models import Identity
+from astropy.time import Time
+from gwcs import WCS
 from sunpy.coordinates.frames import Helioprojective
 
 from dkist.conftest import spatial_like_model

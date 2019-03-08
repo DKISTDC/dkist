@@ -1,13 +1,14 @@
 import os
 from warnings import warn
 
-from pkg_resources import get_distribution, DistributionNotFound
+from pkg_resources import DistributionNotFound, get_distribution
 
+from astropy.config.configuration import (ConfigurationDefaultMissingError,
+                                          ConfigurationDefaultMissingWarning,
+                                          update_default_config)
 from astropy.tests.helper import TestRunner
-from astropy.config.configuration import (
-    update_default_config,
-    ConfigurationDefaultMissingError,
-    ConfigurationDefaultMissingWarning)
+
+from .dataset import Dataset  # noqa
 
 try:
     __version__ = get_distribution(__name__).version
@@ -41,5 +42,3 @@ if not os.environ.get('ASTROPY_SKIP_CONFIG_UPDATE', False):
 __all__ = ['test', 'Dataset']
 
 test = TestRunner.make_test_runner_in(os.path.dirname(__file__))
-
-from .dataset import Dataset  # noqa
