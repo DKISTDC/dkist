@@ -1,5 +1,5 @@
-import glob
 import os
+import glob
 import shutil
 import tempfile
 from zipfile import ZipFile

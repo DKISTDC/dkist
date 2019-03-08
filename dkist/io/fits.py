@@ -3,8 +3,8 @@ This file contains code to lazy-load arrays from FITS files. It is designed to
 minimise (virtual) memory usage and the number of open files.
 """
 
-import abc
 import os
+import abc
 
 from astropy.io import fits
 from sunpy.util.decorators import add_common_docstring
