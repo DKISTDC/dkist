@@ -1,15 +1,31 @@
 import os
+from pathlib import Path
 
 import numpy as np
 import pytest
 import dask.array as da
 
+import asdf
 import gwcs
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.dataset import Dataset
 from dkist.data.test import rootdir
+
+
+@pytest.fixture
+def invalid_asdf(tmpdir):
+    filename = Path(tmpdir / "test.asdf")
+    tree = {'spam': 'eggs'}
+    with asdf.AsdfFile(tree=tree) as af:
+        af.write_to(filename)
+    return filename
+
+
+def test_load_invalid_asdf(invalid_asdf):
+    with pytest.raises(TypeError):
+        Dataset.from_asdf(invalid_asdf)
 
 
 def test_repr(dataset, dataset_3d):

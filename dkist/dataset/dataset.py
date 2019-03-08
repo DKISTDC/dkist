@@ -1,10 +1,8 @@
-import copy
-import glob
-import os.path
 from pathlib import Path
 from textwrap import dedent
 
 import numpy as np
+from jsonschema.exceptions import ValidationError
 
 import asdf
 import astropy.units as u
@@ -13,6 +11,12 @@ from ndcube.ndcube import NDCubeABC
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+
+try:
+    from importlib import resources  # >= py 3.7
+except ImportError:
+    import importlib_resources as resources
+
 
 __all__ = ['Dataset']
 
@@ -88,7 +92,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         base_path = Path(directory)
         if not base_path.is_dir():
             raise ValueError("directory argument must be a directory")
-        asdf_files = glob.glob(str(base_path / "*.asdf"))
+        asdf_files = tuple(base_path.glob("*.asdf"))
 
         if not asdf_files:
             raise ValueError("No asdf file found in directory.")
@@ -107,17 +111,21 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         """
         filepath = Path(filepath)
         base_path = filepath.parent
-        with asdf.open(str(filepath)) as ff:
-            # TODO: without this it segfaults on access
-            asdf_tree = copy.deepcopy(ff.tree)
-            pointer_array = np.array(ff.tree['dataset'])
+        try:
+            with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+                with asdf.open(filepath, custom_schema=schema_path.as_posix(),
+                               lazy_load=False, copy_arrays=True) as ff:
+                    pointer_array = np.array(ff.tree['data'])
 
-        array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                                 basepath=str(base_path))
+                    array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
+                                                            basepath=base_path)
 
-        data = array_container.array
+                    data = array_container.array
 
-        wcs = asdf_tree['gwcs']
+                    wcs = ff.tree['wcs']
+
+        except ValidationError as e:
+            raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
 
         cls = cls(data, wcs=wcs)
         cls.array_container = array_container
@@ -219,9 +227,6 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             A list of arrays containing the output coordinates.
         """
         return tuple(self.wcs.world_to_pixel(*quantity_axis_list[::-1]))[::-1]
-
-    def world_axis_physical_types(self):
-        raise NotImplementedError()  # pragma: no cover
 
     @property
     def dimensions(self):

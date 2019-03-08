@@ -30,7 +30,7 @@ jobs:
       - run: sudo pip install pycodestyle
       - run: pycodestyle dkist --count
 
-  tests:
+  tests-37:
     docker:
       - image: circleci/python:3.7
     steps:
@@ -39,6 +39,17 @@ jobs:
       - run: *apt-install
       - run: *tox-install
       - run: tox -e py37-offline
+      - run: codecov
+
+  tests-36:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *apt-install
+      - run: *tox-install
+      - run: tox -e py36-offline
       - run: codecov
 
   html-docs:
@@ -68,9 +79,10 @@ workflows:
     jobs:
       - pycodestyle
 
-  figure-tests:
+  tests:
     jobs:
-      - tests
+      - tests-37
+      - tests-36
 
   test-documentation:
     jobs:

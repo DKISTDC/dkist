@@ -66,7 +66,7 @@ def test_transform_models(wcs):
 
 
 def test_asdf_tree(header_filenames):
-    tree = asdf_tree_from_filenames(header_filenames)
+    tree = asdf_tree_from_filenames(header_filenames, "test_file.asdf")
     assert isinstance(tree, dict)
 
 

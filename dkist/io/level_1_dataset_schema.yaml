@@ -1,0 +1,147 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://stsci.edu/schemas/asdf/core/asdf-1.1.0"
+
+title: DKIST Data Center Level 1 asdf file
+description: |
+  This describes the top-level schema for asdf files used to construct a
+  dkist.dataset.Dataset object.
+
+tag: "tag:stsci.edu:asdf/core/asdf-1.1.0"
+type: object
+properties:
+  data:
+    description: A (nested) array of ExternalArrayReference objects.
+    type: array
+    anyOf:
+      # 3D Array of EARs
+      - type: array
+        items:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "externalarray-1.0.0"
+      # 2D Array of EARs
+      - type: array
+        items:
+          type: array
+          items:
+            $ref: "externalarray-1.0.0"
+      # 1D Array of EARs
+      - type: array
+        items:
+          $ref: "externalarray-1.0.0"
+
+  wcs:
+    description: The coordinate system for the complete dataset.
+    $ref: "tag:stsci.edu:gwcs/wcs-1.0.0"
+
+  headers:
+    description: A table of all the headers for the constituent files.
+    $ref: "table-1.0.0"
+
+  meta:
+    description: Dataset metadata, describing the whole dataset.
+    type: object
+    properties:
+        asdf_object_key:
+          type: string
+        browse_movie_object_key:
+          type: string
+        browse_movie_url:
+          type: string
+        bucket:
+          type: string
+        contributing_experiment_ids:
+          type: array
+          items:
+            type: string
+        contributing_proposal_ids:
+          type: array
+          items:
+            type: string
+        dataset_id:
+          type: string
+        dataset_inventory_id:
+          type: integer
+        dataset_size:
+          type: integer
+        end_time:
+          $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
+        exposure_time:
+          type: number
+        filter_wavelengths:
+          type: array
+          items:
+            type: string
+        frame_count:
+          type: integer
+        has_all_stokes:
+          type: boolean
+        instrument_name:
+          type: string
+        observables:
+          type: array
+          items:
+            type: string
+        original_frame_count:
+          type: integer
+        primary_experiment_id:
+          type: string
+        primary_proposal_id:
+          type: string
+        quality_average_fried_parameter:
+          type: number
+        quality_average_polarimetric_accuracy:
+          type: number
+        recipe_id:
+          type: integer
+        recipe_instance_id:
+          type: integer
+        recipe_run_id:
+          type: integer
+        start_time:
+          $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
+        #stokes_parameters:
+        #  type: string
+        target_type:
+          type: string
+        wavelength_max:
+          type: number
+        wavelength_min:
+          type: number
+    additionalProperties: False
+    required:
+        - asdf_object_key
+        - browse_movie_object_key
+        - browse_movie_url
+        - bucket
+        - contributing_experiment_ids
+        - contributing_proposal_ids
+        - dataset_id
+        - dataset_inventory_id
+        - dataset_size
+        - end_time
+        - exposure_time
+        - filter_wavelengths
+        - frame_count
+        - has_all_stokes
+        - instrument_name
+        - observables
+        - original_frame_count
+        - primary_experiment_id
+        - primary_proposal_id
+        - quality_average_fried_parameter
+        - quality_average_polarimetric_accuracy
+        - recipe_id
+        - recipe_instance_id
+        - recipe_run_id
+        - start_time
+        - target_type
+        - wavelength_max
+        - wavelength_min
+
+required: [data, wcs, headers, meta]
+additionalProperties: true

@@ -1,3 +1,5 @@
+import random
+import string
 import pathlib
 
 import numpy as np
@@ -11,12 +13,19 @@ from astropy.time import Time
 from astropy.table import Table
 from gwcs.lookup_table import LookupTable
 from sunpy.coordinates import Helioprojective
+from sunpy.time import parse_time
 
 from dkist.asdf_maker.helpers import (linear_spectral_model, time_model_from_date_obs,
                                       references_from_filenames, spatial_model_from_header,
                                       spectral_model_from_framewave)
 
-__all__ = ['dataset_from_fits', 'asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
+try:
+    from importlib import resources  # >= py 3.7
+except ImportError:
+    import importlib_resources as resources
+
+__all__ = ['generate_datset_inventory_from_headers', 'dataset_from_fits',
+           'asdf_tree_from_filenames', 'gwcs_from_headers', 'TransformBuilder',
            'build_pixel_frame', 'validate_headers', 'table_from_headers',
            'headers_from_filenames']
 
@@ -329,7 +338,7 @@ def make_sorted_table(headers, filenames):
     return theaders[np.argsort(t, order=keys)]
 
 
-def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
+def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0, relative_to=None):
     """
     Build a DKIST asdf tree from a list of (unsorted) filenames.
 
@@ -353,6 +362,8 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     sorted_filenames = np.array(table_headers['filenames'])
     sorted_headers = np.array(table_headers['headers'])
 
+    table_headers.remove_columns(["headers", "filenames"])
+
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
@@ -360,28 +371,35 @@ def asdf_tree_from_filenames(filenames, hdu=0, relative_to=None):
     reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
-    tree = {'dataset': reference_array,
-            'gwcs': gwcs_from_headers(sorted_headers)}
-
-    # TODO: Write a schema for the tree.
+    tree = {'data': reference_array,
+            'wcs': gwcs_from_headers(sorted_headers),
+            'headers': table_headers,
+            'meta': generate_datset_inventory_from_headers(table_headers, asdf_filename)}
 
     return tree
 
 
-def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
+def dataset_from_fits(path, asdf_filename, inventory=None, hdu=0, relative_to=None, **kwargs):
     """
     Given a path containing FITS files write an asdf file in the same path.
 
     Parameters
     ----------
     path : `pathlib.Path` or `str`
-        The path to read the FITS files (with a `.fits` file extension) from and save the asdf file.
+        The path to read the FITS files (with a `.fits` file extension) from
+        and save the asdf file.
 
     asdf_filename : `str`
         The filename to save the asdf with in the path.
 
-    hdu : `int`
+    inventory : `dict`, optional
+        The dataset inventory for this collection of FITS. If `None` a random one will be generated.
+
+    hdu : `int`, optional
         The HDU to read from the FITS files.
+
+    relative_to: `pathlib.Path` or `str`, optional
+        The base path to use in the asdf references.
 
     kwargs
         Additional kwargs are passed to `asdf.AsdfFile.write_to`.
@@ -391,7 +409,90 @@ def dataset_from_fits(path, asdf_filename, hdu=0, relative_to=None, **kwargs):
 
     files = path.glob("*fits")
 
-    tree = asdf_tree_from_filenames(list(files), hdu=hdu, relative_to=relative_to)
+    tree = asdf_tree_from_filenames(list(files), asdf_filename, inventory=inventory,
+                                    hdu=hdu, relative_to=relative_to)
 
-    with asdf.AsdfFile(tree) as afile:
-        afile.write_to(str(path/asdf_filename), **kwargs)
+    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+        with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
+            afile.write_to(path/asdf_filename, **kwargs)
+
+
+def _gen_type(gen_type, max_int=1e6, max_float=1e6, len_str=30):
+    if gen_type is bool:
+        return bool(random.randint(0, 1))
+    elif gen_type is int:
+        return random.randint(0, max_int)
+    elif gen_type is float:
+        return random.random() * max_float
+    elif gen_type is list:
+        return [_gen_type(str)]
+    elif gen_type is Time:
+        return parse_time("now")
+    elif gen_type is str:
+        return ''.join(
+            random.choice(string.ascii_uppercase + string.digits) for _ in range(len_str))
+    else:
+        raise ValueError("Type {} is not supported".format(gen_type))  # pragma: no cover
+
+
+def generate_datset_inventory_from_headers(headers, asdf_name):
+    """
+    Generate a dummy dataset inventory from headers.
+
+    .. note::
+       This is just for test data, it should not be used on real data.
+
+    Parameters
+    ----------
+
+    headers: `astropy.table.Table`
+    asdf_name: `str`
+
+    """
+
+    schema = [
+        ('asdf_object_key', str),
+              ('browse_movie_object_key', str),
+              ('browse_movie_url', str),
+              ('bucket', str),
+              ('contributing_experiment_ids', list),
+              ('contributing_proposal_ids', list),
+              ('dataset_id', str),
+              ('dataset_inventory_id', int),
+              ('dataset_size', int),
+              ('end_time', Time),
+              ('exposure_time', float),
+              ('filter_wavelengths', list),
+              ('frame_count', int),
+              ('has_all_stokes', bool),
+              ('instrument_name', str),
+              ('observables', list),
+              ('original_frame_count', int),
+              ('primary_experiment_id', str),
+              ('primary_proposal_id', str),
+              ('quality_average_fried_parameter', float),
+              ('quality_average_polarimetric_accuracy', float),
+              ('recipe_id', int),
+              ('recipe_instance_id', int),
+              ('recipe_run_id', int),
+              ('start_time', Time),
+              # ('stokes_parameters', str),
+              ('target_type', str),
+              ('wavelength_max', float),
+              ('wavelength_min', float)]
+
+    header_mapping = {
+        'start_time': 'DATE-BGN',
+        'end_time': 'DATE-END',
+        'filter_wavelengths': 'WAVELNGTH'}
+
+    output = {}
+
+    for key, ktype in schema:
+        if key in header_mapping:
+            hdict = dict(zip(headers.colnames, headers[0]))
+            output[key] = ktype(hdict.get(header_mapping[key], _gen_type(ktype)))
+        else:
+            output[key] = _gen_type(ktype)
+
+    return output
