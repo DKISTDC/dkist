@@ -1,23 +1,23 @@
-import os
 import glob
+import os
 from pathlib import Path
 
 import numpy as np
 
 import asdf
+import astropy.units as u
 import gwcs
 import sunpy.map
-import astropy.units as u
+from astropy.io import fits
+from astropy.modeling.models import (AffineTransformation2D, Multiply,
+                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
+from astropy.time import Time
 from gwcs import coordinate_frames as cf
+from gwcs.lookup_table import LookupTable
 from sunpy.net import Fido
 from sunpy.net import attrs as a
-from astropy.io import fits
-from sunpy.time import parse_time
-from astropy.time import Time
 from sunpy.net.jsoc import JSOCClient
-from gwcs.lookup_table import LookupTable
-from astropy.modeling.models import (Shift, Multiply, Pix2Sky_TAN,
-                                     AffineTransformation2D, RotateNative2Celestial)
+from sunpy.time import parse_time
 
 
 def map_to_transform(smap):

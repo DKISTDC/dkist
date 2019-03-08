@@ -1,15 +1,15 @@
 from collections import defaultdict
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 import astropy.units as u
+from astropy.visualization.wcsaxes import WCSAxes
+from astropy.visualization.wcsaxes.transforms import CurvedTransform
+from gwcs.coordinate_frames import CelestialFrame, CompositeFrame
 from ndcube.mixins import NDCubePlotMixin
 from sunpy.visualization import wcsaxes_compat
-from gwcs.coordinate_frames import CelestialFrame, CompositeFrame
-from sunpy.visualization.animator import ImageAnimatorWCS, ImageAnimator
-from astropy.visualization.wcsaxes.transforms import CurvedTransform
-from astropy.visualization.wcsaxes import WCSAxes
+from sunpy.visualization.animator import ImageAnimator, ImageAnimatorWCS
 
 __all__ = ['ImageAnimatorDataset', 'DatasetPlotMixin']
 

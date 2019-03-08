@@ -1,17 +1,17 @@
 import os
 from pathlib import Path
 
+import dask.array as da
 import numpy as np
 import pytest
-import dask.array as da
 
 import asdf
-import gwcs
 import astropy.units as u
+import gwcs
 from astropy.tests.helper import assert_quantity_allclose
 
-from dkist.dataset import Dataset
 from dkist.data.test import rootdir
+from dkist.dataset import Dataset
 
 
 @pytest.fixture

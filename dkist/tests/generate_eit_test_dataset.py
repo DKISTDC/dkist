@@ -1,22 +1,22 @@
-import os
 import glob
+import os
 from pathlib import Path
 
 import numpy as np
 
 import asdf
+import astropy.units as u
 import gwcs
 import sunpy.map
-import astropy.units as u
-from gwcs import coordinate_frames as cf
 from astropy.io import fits
-from sunpy.time import parse_time
+from astropy.modeling.models import (AffineTransformation2D, Multiply,
+                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.time import Time
+from gwcs import coordinate_frames as cf
 from gwcs.lookup_table import LookupTable
-from astropy.modeling.models import (Shift, Multiply, Pix2Sky_TAN,
-                                     AffineTransformation2D, RotateNative2Celestial)
+from sunpy.time import parse_time
 
-from dkist.asdf_maker.generator import table_from_headers, generate_datset_inventory_from_headers
+from dkist.asdf_maker.generator import generate_datset_inventory_from_headers, table_from_headers
 
 
 def map_to_transform(smap):

@@ -1,11 +1,11 @@
+import dask.array as da
 import numpy as np
 import pytest
-import dask.array as da
 
-import gwcs
-import astropy.units as u
-import gwcs.coordinate_frames as cf
 import astropy.modeling.models as m
+import astropy.units as u
+import gwcs
+import gwcs.coordinate_frames as cf
 from sunpy.coordinates.frames import Helioprojective
 
 from dkist.dataset import Dataset

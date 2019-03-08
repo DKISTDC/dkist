@@ -5,7 +5,7 @@ Shared pytest fixtures.
 import pytest
 
 import astropy.units as u
-from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP
+from astropy.modeling.models import Identity, Multiply, Pix2Sky_AZP, Shift
 
 
 @pytest.fixture

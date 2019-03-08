@@ -7,7 +7,7 @@ import numpy as np
 
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, separable
-from astropy.modeling.models import Shift, Identity
+from astropy.modeling.models import Identity, Shift
 
 from dkist.utils.model_tools import re_model_trees, remove_input_frame
 

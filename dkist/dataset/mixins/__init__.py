@@ -1,2 +1,2 @@
-from .slicing import DatasetSlicingMixin
 from .plotting import DatasetPlotMixin
+from .slicing import DatasetSlicingMixin
