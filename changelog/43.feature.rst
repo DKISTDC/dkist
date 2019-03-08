@@ -1,0 +1,1 @@
+Add support for returning an array of NaNs when the file is not present. This is needed to support partial dataset download from the DC.
