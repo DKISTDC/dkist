@@ -412,7 +412,7 @@ def dataset_from_fits(path, asdf_filename, inventory=None, hdu=0, relative_to=No
     tree = asdf_tree_from_filenames(list(files), asdf_filename, inventory=inventory,
                                     hdu=hdu, relative_to=relative_to)
 
-    with resources.path("dkist.io", "asdf_schema.yaml") as schema_path:
+    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to(path/asdf_filename, **kwargs)
 
