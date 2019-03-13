@@ -2,7 +2,8 @@ import pytest
 
 import astropy.units as u
 from astropy.modeling.core import Model
-from astropy.modeling.models import Shift, Identity, Multiply, Pix2Sky_AZP, Pix2Sky_CylindricalPerspective
+from astropy.modeling.models import (Identity, Multiply, Pix2Sky_AZP,
+                                     Pix2Sky_CylindricalPerspective, Shift)
 from astropy.modeling.separable import is_separable
 
 from dkist.utils.model_tools import (make_forward_input_map, make_tree_input_map,
