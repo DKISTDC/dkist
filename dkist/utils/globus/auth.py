@@ -24,6 +24,12 @@ SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',)
 __all__ = ['get_refresh_token_authorizer']
 
 
+class AuthenticationError(Exception):
+    """
+    An error to be raised if authentication fails.
+    """
+
+
 class RedirectHTTPServer(HTTPServer):
     def __init__(self, listen, handler_class):
         super().__init__(listen, handler_class)
@@ -134,14 +140,17 @@ def do_native_app_authentication(client_id, requested_scopes=None):
                              refresh_tokens=True)
     url = client.oauth2_get_authorize_url()
 
-    print("Opening Globus login in your webbrowser...")
     webbrowser.open(url, new=1)
 
-    # TODO: Come up with some way of interrupting this or timing it out.
-    auth_code = server.wait_for_code()
-    token_response = client.oauth2_exchange_code_for_tokens(auth_code)
+    print("Waiting for completion of Globus Authentication in your webbrowser...")
+    try:
+        auth_code = server.wait_for_code()
+    except KeyboardInterrupt:
+        raise AuthenticationError("Failed to authenticate with Globus.")
+    finally:
+        server.shutdown()
 
-    server.shutdown()
+    token_response = client.oauth2_exchange_code_for_tokens(auth_code)
 
     # return a set of tokens, organized by resource server name
     return token_response.by_resource_server
@@ -162,11 +171,9 @@ def get_refresh_token_authorizer(force_reauth=False):
     `globus_sdk.RefreshTokenAuthorizer`
 
     """
+    tokens = None
     if not force_reauth:
         tokens = get_cache_contents()
-    else:
-        tokens = None
-
     if not tokens:
         tokens = do_native_app_authentication(CLIENT_ID, SCOPES)
         save_auth_cache(tokens)
