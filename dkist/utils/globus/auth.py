@@ -137,6 +137,7 @@ def do_native_app_authentication(client_id, requested_scopes=None):
     print("Opening Globus login in your webbrowser...")
     webbrowser.open(url, new=1)
 
+    # TODO: Come up with some way of interrupting this or timing it out.
     auth_code = server.wait_for_code()
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
 
