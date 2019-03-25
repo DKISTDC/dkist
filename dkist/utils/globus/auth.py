@@ -126,7 +126,7 @@ def save_auth_cache(auth_cache):
     cache_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
 
 
-def do_native_app_authentication(client_id, requested_scopes=None):
+def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: no cover
     """
     Does a Native App authentication flow and returns a
     dict of tokens keyed by service name.
