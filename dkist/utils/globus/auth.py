@@ -5,12 +5,12 @@ Globus Auth Helpers.
 # https://github.com/globus/native-app-examples
 
 import json
-import queue
 import stat
+import queue
 import threading
 import webbrowser
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
 import appdirs
