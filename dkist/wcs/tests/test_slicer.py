@@ -17,17 +17,14 @@ from dkist.wcs.slicer import GWCSSlicer
 # Some fixtures used in this file are defined in conftest.py
 
 
-def gwcs_5d_object():
+@pytest.fixture
+def gwcs_5d():
     with asdf.open(str(rootdir / "5d_gwcs.asdf")) as f:
         return f.tree['gwcs']
 
 
 @pytest.fixture
-def gwcs_5d():
-    return gwcs_5d_object()
-
-
-def gwcs_3d_object():
+def gwcs_3d():
     detector_frame = cf.CoordinateFrame(
         name="detector",
         naxes=3,
@@ -45,11 +42,7 @@ def gwcs_3d_object():
 
 
 @pytest.fixture
-def gwcs_3d():
-    return gwcs_3d_object()
-
-
-def gwcs_1d_object():
+def gwcs_1d():
     detector_frame = cf.CoordinateFrame(
         name="detector",
         naxes=1,
@@ -64,23 +57,18 @@ def gwcs_1d_object():
 
 
 @pytest.fixture
-def gwcs_1d():
-    return gwcs_1d_object()
+def slicer_1d(gwcs_1d):
+    return GWCSSlicer(gwcs_1d, pixel_order=False)
 
 
 @pytest.fixture
-def slicer_1d():
-    return GWCSSlicer(gwcs_1d_object(), pixel_order=False)
+def slicer_3d(gwcs_3d):
+    return GWCSSlicer(gwcs_3d, pixel_order=False)
 
 
 @pytest.fixture
-def slicer_3d():
-    return GWCSSlicer(gwcs_3d_object(), pixel_order=False)
-
-
-@pytest.fixture
-def slicer_5d():
-    return GWCSSlicer(gwcs_5d_object(), pixel_order=False)
+def slicer_5d(gwcs_5d):
+    return GWCSSlicer(gwcs_5d, pixel_order=False)
 
 
 def test_slicer_init(gwcs_3d, gwcs_1d):
