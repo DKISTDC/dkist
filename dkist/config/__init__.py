@@ -1,5 +1,5 @@
-from astropy.config import ConfigNamespace, ConfigItem as _AstropyConfigItem
-
+from astropy.config import ConfigItem as _AstropyConfigItem
+from astropy.config import ConfigNamespace
 
 __all__ = ['ConfigItem', 'ConfigNamespace']
 
