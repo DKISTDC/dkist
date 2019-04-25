@@ -1,0 +1,1 @@
+Add a dkist config file using custom location from astropy
