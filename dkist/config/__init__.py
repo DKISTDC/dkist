@@ -1,9 +1,8 @@
-import astropy.config as astropyconfig
+from astropy.config import ConfigNamespace, ConfigItem as _AstropyConfigItem
 
 
-class ConfigNamespace(astropyconfig.ConfigNamespace):
-    rootname = 'dkist'
+__all__ = ['ConfigItem', 'ConfigNamespace']
 
 
-class ConfigItem(astropyconfig.ConfigItem):
+class ConfigItem(_AstropyConfigItem):
     rootname = 'dkist'
