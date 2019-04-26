@@ -85,7 +85,11 @@ def get_endpoint_id(endpoint, tfr_client):
 
     if len(responses) > 1:
         display_names = [a['display_name'] for a in responses]
+        # If we have one and only one exact display name match use that
+        if display_names.count(endpoint) == 1:
+            return responses[display_names.index(endpoint)]['id']
         raise ValueError(f"Multiple matches for endpoint '{endpoint}': {display_names}")
+
     elif len(responses) == 0:
         raise ValueError(f"No matches found for endpoint '{endpoint}'")
 
@@ -123,4 +127,3 @@ def get_directory_listing(path, endpoint=None):
         endpoint_id = get_endpoint_id(endpoint, tc)
 
     return tc.operation_ls(endpoint_id, path=path.as_posix())
-
