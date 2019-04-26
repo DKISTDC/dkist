@@ -96,7 +96,7 @@ def get_endpoint_id(endpoint, tfr_client):
     return responses[0]['id']
 
 
-def get_directory_listing(path, endpoint=None):
+def get_directory_listing(path, endpoint=None, force_reauth=False):
     """
     Retrieve a list of all files in the path.
 
@@ -108,6 +108,9 @@ def get_directory_listing(path, endpoint=None):
     endpoint : `str` or `None`
         The name or uuid of the endpoint to use or None to attempt to connect
         to a local endpoint.
+
+    force_reauth : `bool`, optional
+        Do not use cached authentication when `True`.
 
     Returns
     -------
@@ -121,9 +124,12 @@ def get_directory_listing(path, endpoint=None):
     if endpoint is None:
         endpoint_id = get_local_endpoint_id()
 
-    tc = get_transfer_client()
+    tc = get_transfer_client(force_reauth=force_reauth)
 
     if endpoint_id is None:
         endpoint_id = get_endpoint_id(endpoint, tc)
 
-    return tc.operation_ls(endpoint_id, path=path.as_posix())
+    response = tc.operation_ls(endpoint_id, path=path.as_posix())
+    names = [r['name'] for r in response]
+
+    return [path / n for n in names]
