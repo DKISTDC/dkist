@@ -9,6 +9,9 @@ import globus_sdk
 from .auth import get_refresh_token_authorizer
 
 
+__all__ = ['get_directory_listing']
+
+
 def get_transfer_client(force_reauth=False):
     """
     Get an authorized transfer client.
