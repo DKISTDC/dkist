@@ -2,6 +2,7 @@
 Functions for interacting with globus endpoints.
 """
 import pathlib
+import webbrowser
 
 import globus_sdk
 
@@ -96,6 +97,31 @@ def get_endpoint_id(endpoint, tfr_client):
     return responses[0]['id']
 
 
+def auto_activate_endpoint(tfr_client, endpoint_id):
+    """
+    Perform activation of a Globus endpoint.
+
+    Parameters
+    ----------
+    tfr_client : `globus_sdk.TransferClient`
+        The transfer client to use for the activation.
+
+    endpoint_id : `str`
+        The uuid of the endpoint to activate.
+
+    """
+    activation = tfr_client.endpoint_get_activation_requirements(endpoint_id)
+    needs_activation = bool(activation['DATA'])
+    activated = activation['activated']
+    if needs_activation and not activated:
+        r = tfr_client.endpoint_autoactivate(endpoint_id)
+        if r['code'] == "AutoActivationFailed":
+            webbrowser.open(f"https://www.globus.org/app/endpoints/{endpoint_id}/activate",
+                            new=1)
+            input("Press Return after completing activation in your webbrowser...")
+            r = tfr_client.endpoint_autoactivate(endpoint_id)
+
+
 def get_directory_listing(path, endpoint=None, force_reauth=False):
     """
     Retrieve a list of all files in the path.
@@ -128,6 +154,7 @@ def get_directory_listing(path, endpoint=None, force_reauth=False):
 
     if endpoint_id is None:
         endpoint_id = get_endpoint_id(endpoint, tc)
+        auto_activate_endpoint(tc, endpoint_id)
 
     response = tc.operation_ls(endpoint_id, path=path.as_posix())
     names = [r['name'] for r in response]
