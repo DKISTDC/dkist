@@ -153,6 +153,8 @@ def get_directory_listing(path, endpoint=None, force_reauth=False):
     if endpoint is None:
         endpoint_id = get_local_endpoint_id()
 
+    # Set this up after attempting local endpoint discovery so that we fail on
+    # local endpoint discovery before needing to login.
     tc = get_transfer_client(force_reauth=force_reauth)
 
     if endpoint_id is None:
