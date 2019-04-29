@@ -7,7 +7,7 @@ import requests
 import globus_sdk
 
 from dkist.utils.globus.auth import (get_cache_contents, get_cache_file_path, save_auth_cache,
-                                     start_local_server, get_refresh_token_authorizer)
+                                     start_local_server, get_refresh_token_authorizer, ensure_globus_authorized)
 
 
 def test_http_server():
@@ -99,3 +99,21 @@ def test_get_refresh_token_authorizer():
         auth = get_refresh_token_authorizer(force_reauth=True)
         assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
         assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
+
+
+def test_ensure_auth_decorator(mocker):
+    error = globus_sdk.AuthAPIError(mock.MagicMock())
+    mocker.patch.object(error, "http_status", 400)
+    mocker.patch.object(error, "message", "invalid_grant")
+    reauth = mocker.patch("dkist.utils.globus.auth.get_refresh_token_authorizer")
+
+    called = [False]
+    @ensure_globus_authorized
+    def test_func():
+        if not called[0]:
+            called[0] = True
+            raise error
+        return True
+
+    assert test_func()
+    assert reauth.called_once_with(force_reauth=True)
