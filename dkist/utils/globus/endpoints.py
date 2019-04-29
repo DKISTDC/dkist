@@ -100,7 +100,7 @@ def get_endpoint_id(endpoint, tfr_client):
     return responses[0]['id']
 
 
-def auto_activate_endpoint(tfr_client, endpoint_id):
+def auto_activate_endpoint(tfr_client, endpoint_id):  # pragma: no cover
     """
     Perform activation of a Globus endpoint.
 
