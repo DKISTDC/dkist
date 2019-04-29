@@ -6,7 +6,7 @@ import webbrowser
 
 import globus_sdk
 
-from .auth import get_refresh_token_authorizer
+from .auth import get_refresh_token_authorizer, ensure_globus_authorized
 
 
 __all__ = ['get_directory_listing']
@@ -53,6 +53,7 @@ def get_local_endpoint_id():
     return endpoint_id
 
 
+@ensure_globus_authorized
 def get_endpoint_id(endpoint, tfr_client):
     """
     Resolve an endpoint description to an ID.
@@ -100,6 +101,7 @@ def get_endpoint_id(endpoint, tfr_client):
     return responses[0]['id']
 
 
+@ensure_globus_authorized
 def auto_activate_endpoint(tfr_client, endpoint_id):  # pragma: no cover
     """
     Perform activation of a Globus endpoint.
@@ -125,7 +127,8 @@ def auto_activate_endpoint(tfr_client, endpoint_id):  # pragma: no cover
             r = tfr_client.endpoint_autoactivate(endpoint_id)
 
 
-def get_directory_listing(path, endpoint=None, force_reauth=False):
+@ensure_globus_authorized
+def get_directory_listing(path, endpoint=None):
     """
     Retrieve a list of all files in the path.
 
@@ -137,9 +140,6 @@ def get_directory_listing(path, endpoint=None, force_reauth=False):
     endpoint : `str` or `None`
         The name or uuid of the endpoint to use or None to attempt to connect
         to a local endpoint.
-
-    force_reauth : `bool`, optional
-        Do not use cached authentication when `True`.
 
     Returns
     -------
@@ -155,7 +155,7 @@ def get_directory_listing(path, endpoint=None, force_reauth=False):
 
     # Set this up after attempting local endpoint discovery so that we fail on
     # local endpoint discovery before needing to login.
-    tc = get_transfer_client(force_reauth=force_reauth)
+    tc = get_transfer_client()
 
     if endpoint_id is None:
         endpoint_id = get_endpoint_id(endpoint, tc)
