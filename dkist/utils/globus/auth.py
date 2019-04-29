@@ -7,6 +7,7 @@ Globus Auth Helpers.
 import json
 import stat
 import queue
+import functools
 import threading
 import webbrowser
 from pathlib import Path
@@ -21,7 +22,7 @@ CLIENT_ID = 'dd2d62af-0b44-4e2e-9454-1092c94b46b3'
 SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',)
 
 
-__all__ = ['get_refresh_token_authorizer']
+__all__ = ['ensure_globus_authorized', 'get_refresh_token_authorizer']
 
 
 class AuthenticationError(Exception):
@@ -189,3 +190,23 @@ def get_refresh_token_authorizer(force_reauth=False):
         on_refresh=save_auth_cache)
 
     return authorizer
+
+
+def ensure_globus_authorized(func):
+    """
+    A wrapper for functions that need valid globus authorization.
+
+    If the refresh token is invalid this function will prompt the user to
+    login.
+    """
+    @functools.wraps(func)
+    def do_reauth(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except globus_sdk.AuthAPIError as e:
+            if e.http_status == 400 and e.message == "invalid_grant":
+                print("Globus login has expired.")
+                get_refresh_token_authorizer(force_reauth=True)
+                return func(*args, **kwargs)
+
+    return do_reauth
