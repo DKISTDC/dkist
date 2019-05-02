@@ -19,7 +19,8 @@ import globus_sdk
 import globus_sdk.auth.token_response
 
 CLIENT_ID = 'dd2d62af-0b44-4e2e-9454-1092c94b46b3'
-SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',)
+SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',
+          'openid')
 
 
 __all__ = ['ensure_globus_authorized', 'get_refresh_token_authorizer']
@@ -179,17 +180,20 @@ def get_refresh_token_authorizer(force_reauth=False):
         tokens = do_native_app_authentication(CLIENT_ID, SCOPES)
         save_auth_cache(tokens)
 
+    auth_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
+
     transfer_tokens = tokens['transfer.api.globus.org']
 
-    auth_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
-    authorizer = globus_sdk.RefreshTokenAuthorizer(
-        transfer_tokens['refresh_token'],
-        auth_client,
-        access_token=transfer_tokens['access_token'],
-        expires_at=transfer_tokens['expires_at_seconds'],
-        on_refresh=save_auth_cache)
+    authorizers = {}
+    for scope, transfer_tokens in tokens.items():
+        authorizers[scope] = globus_sdk.RefreshTokenAuthorizer(
+            transfer_tokens['refresh_token'],
+            auth_client,
+            access_token=transfer_tokens['access_token'],
+            expires_at=transfer_tokens['expires_at_seconds'],
+            on_refresh=save_auth_cache)
 
-    return authorizer
+    return authorizers
 
 
 def ensure_globus_authorized(func):

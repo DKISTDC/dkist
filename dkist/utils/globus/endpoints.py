@@ -25,7 +25,8 @@ def get_transfer_client(force_reauth=False):
     -------
     `globus_sdk.TransferClient`
     """
-    return globus_sdk.TransferClient(get_refresh_token_authorizer(force_reauth))
+    auth = get_refresh_token_authorizer(force_reauth)['transfer.api.globus.org']
+    return globus_sdk.TransferClient(auth)
 
 
 def get_local_endpoint_id():

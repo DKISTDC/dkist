@@ -1,13 +1,15 @@
 import json
-import stat
 import pathlib
+import stat
 from unittest import mock
 
 import requests
-import globus_sdk
 
-from dkist.utils.globus.auth import (get_cache_contents, get_cache_file_path, save_auth_cache,
-                                     start_local_server, get_refresh_token_authorizer, ensure_globus_authorized)
+import globus_sdk
+from dkist.utils.globus.auth import (ensure_globus_authorized,
+                                     get_cache_contents, get_cache_file_path,
+                                     get_refresh_token_authorizer,
+                                     save_auth_cache, start_local_server)
 
 
 def test_http_server():
@@ -91,12 +93,12 @@ def test_get_refresh_token_authorizer():
     }
 
     with mock.patch("dkist.utils.globus.auth.get_cache_contents", return_value=cache):
-        auth = get_refresh_token_authorizer()
+        auth = get_refresh_token_authorizer()['transfer.api.globus.org']
         assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
         assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 
     with mock.patch("dkist.utils.globus.auth.do_native_app_authentication", return_value=cache):
-        auth = get_refresh_token_authorizer(force_reauth=True)
+        auth = get_refresh_token_authorizer(force_reauth=True)['transfer.api.globus.org']
         assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
         assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 
