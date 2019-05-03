@@ -17,5 +17,5 @@ jobs:
       os: linux
       tox: py37 --
 
-  - ${{ if and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
-    - template: azure-dkist-wheel.yml
+  # - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+  - template: azure-dkist-wheel.yml
