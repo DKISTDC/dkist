@@ -18,4 +18,4 @@ jobs:
       tox: py37 --
 
   # - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-  - template: azure-dkist-wheel.yml
+  - template: azure-dkist-wheel.yaml
