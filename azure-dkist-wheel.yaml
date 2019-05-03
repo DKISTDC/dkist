@@ -1,5 +1,5 @@
 jobs:
-- job: Upload dkist wheel
+- job: Upload_dkist_wheel
   pool:
     vmImage: Ubuntu 16.04
 
