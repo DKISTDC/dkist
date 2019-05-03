@@ -5,21 +5,17 @@ variables:
   CI_BUILD_URL: "https://dev.azure.com/sunpy/sunpy/_build/results?buildId=$(Build.BuildId)"
 
 jobs:
-- template: azure-templates.yml
-  parameters:
-    name: Linux_36
-    os: linux
-    tox: py36 --
+  - template: azure-templates.yml
+    parameters:
+      name: Linux_36
+      os: linux
+      tox: py36 --
+  
+  - template: azure-templates.yml
+    parameters:
+      name: Linux_37
+      os: linux
+      tox: py37 --
 
-- template: azure-templates.yml
-  parameters:
-    name: Linux_37
-    os: linux
-    tox: py37 --
-
-# - ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
-#   - template: azure-templates.yml
-#     parameters:
-#       name: Linux_37_numpydev
-#       os: linux
-#       tox: py37-numpydev -- -n=2
+  - ${{ if and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
+    - template: azure-dkist-wheel.yml

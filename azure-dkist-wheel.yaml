@@ -1,0 +1,20 @@
+jobs:
+- job: Upload dkist wheel
+  pool:
+    vmImage: Ubuntu 16.04
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+
+  - script: pip install --upgrade twine wheel
+    displayName: Install wheel requirements
+
+  - task: TwineAuthenticate@0
+    inputs:
+      artifactFeeds: 'dkist_pypi'
+
+  - script: 'python setup.py bdist_wheel --universal'
+
+  - script: 'twine upload -r dkist_pypi --config-file $(PYPIRC_PATH) dist/*whl'
