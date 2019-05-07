@@ -8,12 +8,15 @@ jobs:
     inputs:
       versionSpec: '3.7'
 
-  - script: pip install --upgrade twine wheel
+  - script: pip install --upgrade twine wheel setuptools_scm
     displayName: Install wheel requirements
 
   - task: TwineAuthenticate@0
     inputs:
       artifactFeeds: 'dkist_pypi'
+
+  - script: >
+      python -c "import setuptools_scm; print('##vso[task.setvariable variable=SETUPTOOLS_SCM_PRETEND_VERSION]' + setuptools_scm.get_version(local_scheme=lambda v: ''))"
 
   - script: 'python setup.py bdist_wheel --universal'
 
