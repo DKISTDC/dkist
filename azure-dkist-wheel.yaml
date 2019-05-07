@@ -17,7 +17,13 @@ jobs:
 
   - script: >
       python -c "import setuptools_scm; print('##vso[task.setvariable variable=SETUPTOOLS_SCM_PRETEND_VERSION]' + setuptools_scm.get_version(local_scheme=lambda v: ''))"
+    displayName: Remove local part from version
+
+  - script: 'python setup.py sdist'
+    displayName: Build sdist
 
   - script: 'python setup.py bdist_wheel --universal'
+    displayName: Build Wheel
 
   - script: 'twine upload -r dkist_pypi --config-file $(PYPIRC_PATH) dist/*whl'
+    displayName: Upload wheel
