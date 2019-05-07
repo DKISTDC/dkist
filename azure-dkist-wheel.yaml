@@ -1,5 +1,6 @@
 jobs:
 - job: Upload_dkist_wheel
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   pool:
     vmImage: Ubuntu 16.04
 
