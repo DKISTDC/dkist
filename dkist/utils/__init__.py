@@ -4,7 +4,7 @@
 # functions.
 
 
-def in_notebook():
+def in_notebook():  # pragma: no cover
     """
     Attempts to detect if this python process is connected to a Jupyter Notebook.
     """

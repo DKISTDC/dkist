@@ -14,6 +14,9 @@ from .. import in_notebook
 from .endpoints import auto_activate_endpoint, get_endpoint_id, get_transfer_client
 
 
+__all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
+
+
 def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, file_list,
                                   src_base_path=None):
     """
