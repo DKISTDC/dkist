@@ -8,8 +8,9 @@ import pathlib
 import datetime
 
 import globus_sdk
-from tqdm import tqdm
+from tqdm import tqdm, tqdm_notebook
 
+from .. import in_notebook
 from .endpoints import auto_activate_endpoint, get_endpoint_id, get_transfer_client
 
 
@@ -81,6 +82,7 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 
+
 def _process_task_events(task_id, prev_events, tfr_client):
     """
     Process a globus task event list.
@@ -115,17 +117,21 @@ def _process_task_events(task_id, prev_events, tfr_client):
     # Drop all events we have seen before
     new_events = events.difference(prev_events)
 
+    # Filter out the events which are json (start with {)
     json_events = set(filter(lambda x: dict(x).get("details", "").startswith("{"), new_events))
+    # All the other events are message events
     message_events = tuple(map(dict, (new_events.difference(json_events))))
 
     def json_loader(x):
+        """Modify the event so the json is a dict."""
         x['details'] = json.loads(x['details'])
         return x
 
+    # If some of the events are json events, load the json.
     if json_events:
         json_events = tuple(map(dict, map(json_loader, map(dict, json_events))))
     else:
-        json_events = ({},)
+        json_events = tuple()
 
     return events, json_events, message_events
 
@@ -138,17 +144,53 @@ def _get_speed(event):
         return event['details'].get("mbps")
 
 
-def watch_transfer_progress(task_id, tfr_client, total=None, poll_interval=5, verbose=False):
+def get_progress_bar(*args, **kwargs):
     """
+    Return the correct tqdm instance.
     """
+    notebook = in_notebook()
+    if not notebook:
+        kwargs['bar_format'] = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]'
+    else:
+        # TODO: Both having this and not having it breaks things.
+        kwargs['total'] = kwargs.get("total", 1e9)
+    the_tqdm = tqdm if not in_notebook() else tqdm_notebook
+    return the_tqdm(*args, **kwargs)
+
+
+def watch_transfer_progress(task_id, tfr_client, poll_interval=5, verbose=False):
+    """
+    Wait for a Globus transfer task to finish and display a progress bar.
+
+    Parameters
+    ----------
+    task_id : `str`
+        The task to monitor.
+
+    tfr_client : `globus_sdk.TransferClient`
+        The transfer client to use to monitor the task.
+
+    poll_interval : `int`, optional
+        The number of seconds to wait between API calls.
+
+    verbose : `bool`
+        If `True` print all events received from Globus, defaults to `False`
+        which just prints Error events.
+    """
+    started = False
     prev_events = set()
-    progress = tqdm(total=total, unit="file",
-                    dynamic_ncols=True,
-                    bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]')
+    progress = None
+    progress = get_progress_bar(unit="file",
+                                dynamic_ncols=True)
     while True:
         (prev_events,
          json_events,
          message_events) = _process_task_events(task_id, prev_events, tfr_client)
+
+        if ('code', 'STARTED') not in prev_events and not started:
+            started = True
+            progress.write("PENDING: Starting Transfer")
+
         # Print status messages if verbose or if they are errors
         for event in message_events:
             if event['is_error'] or verbose:
@@ -163,6 +205,7 @@ def watch_transfer_progress(task_id, tfr_client, total=None, poll_interval=5, ve
         # Get the status of the task to see how many files we have processed.
         task = tfr_client.get_task(task_id)
         status = task['status']
+        progress.total = task['files']
         progress.update((task['files_skipped'] + task['files_transferred']) - progress.n)
 
         # If the status of the task is not active we are finished.
