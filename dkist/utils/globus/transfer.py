@@ -147,7 +147,7 @@ def _get_speed(event):
         return event['details'].get("mbps")
 
 
-def get_progress_bar(*args, **kwargs):
+def get_progress_bar(*args, **kwargs):  # pragma: no cover
     """
     Return the correct tqdm instance.
     """
@@ -161,7 +161,7 @@ def get_progress_bar(*args, **kwargs):
     return the_tqdm(*args, **kwargs)
 
 
-def watch_transfer_progress(task_id, tfr_client, poll_interval=5, verbose=False):
+def watch_transfer_progress(task_id, tfr_client, poll_interval=5, verbose=False):  # pragma: no cover
     """
     Wait for a Globus transfer task to finish and display a progress bar.
 
