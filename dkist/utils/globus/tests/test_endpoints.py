@@ -32,16 +32,6 @@ def ls_response(mocker):
 
 
 @pytest.fixture
-def transfer_client(mocker):
-    tc = get_transfer_client()
-    mocker.patch("dkist.utils.globus.endpoints.get_transfer_client",
-                 return_value=tc)
-    mocker.patch("dkist.utils.globus.auth.get_refresh_token_authorizer",
-                 return_value=None)
-    return tc
-
-
-@pytest.fixture
 def mock_search(mocker):
     mocker.patch("globus_sdk.TransferClient.endpoint_search",
                  return_value=globus_sdk.transfer.paging.PaginatedResource)

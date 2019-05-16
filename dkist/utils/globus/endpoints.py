@@ -103,17 +103,17 @@ def get_endpoint_id(endpoint, tfr_client):
 
 
 @ensure_globus_authorized
-def auto_activate_endpoint(tfr_client, endpoint_id):  # pragma: no cover
+def auto_activate_endpoint(endpoint_id, tfr_client):  # pragma: no cover
     """
     Perform activation of a Globus endpoint.
 
     Parameters
     ----------
-    tfr_client : `globus_sdk.TransferClient`
-        The transfer client to use for the activation.
-
     endpoint_id : `str`
         The uuid of the endpoint to activate.
+
+    tfr_client : `globus_sdk.TransferClient`
+        The transfer client to use for the activation.
 
     """
     activation = tfr_client.endpoint_get_activation_requirements(endpoint_id)
@@ -160,7 +160,7 @@ def get_directory_listing(path, endpoint=None):
 
     if endpoint_id is None:
         endpoint_id = get_endpoint_id(endpoint, tc)
-        auto_activate_endpoint(tc, endpoint_id)
+        auto_activate_endpoint(endpoint_id, tc)
 
     response = tc.operation_ls(endpoint_id, path=path.as_posix())
     names = [r['name'] for r in response]
