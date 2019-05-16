@@ -1,0 +1,2 @@
+Allow easy access to the filenames contained in an
+`dkist.io.BaseFITSArrayContainer` object via a `~dkist.io.BaseFITSArrayContainer.filenames` property.

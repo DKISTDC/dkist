@@ -118,3 +118,12 @@ def test_no_wcs_slice(dataset):
 def test_crop_few_slices(dataset_4d):
     sds = dataset_4d[0, 0]
     assert len(sds.wcs.input_frame.axes_order)
+
+
+def test_array_container():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    assert dataset.array_container is dataset._array_container
+    with pytest.raises(AttributeError):
+        dataset.array_container = 10
+
+    assert len(dataset.array_container.filenames) == 11

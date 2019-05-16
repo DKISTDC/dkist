@@ -81,7 +81,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         else:
             self.missing_axis = missing_axis
 
-        self.array_container = None
+        self._array_container = None
 
     @classmethod
     def from_directory(cls, directory):
@@ -128,8 +128,15 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
 
         cls = cls(data, wcs=wcs)
-        cls.array_container = array_container
+        cls._array_container = array_container
         return cls
+
+    @property
+    def array_container(self):
+        """
+        A reference to the files containing the data.
+        """
+        return self._array_container
 
     @property
     def pixel_axes_names(self):
