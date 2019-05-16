@@ -59,8 +59,8 @@ def test_array(absolute_fl):
     assert isinstance(absolute_fl.fits_header, fits.Header)
 
     for contain in ("efz20040301.000010_s.fits", str(absolute_fl.shape), absolute_fl.dtype):
-        assert contain not in repr(absolute_fl)
-        assert contain not in str(absolute_fl)
+        assert contain in repr(absolute_fl)
+        assert contain in str(absolute_fl)
 
 
 def test_nan():

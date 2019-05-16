@@ -51,14 +51,16 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         if self._array is None:
             return "<FITS array (unloaded) in {0} shape: {1} dtype: {2}>".format(
                 self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype)
-        return repr(self._array)
+        return "<FITS array (loaded) in {0} shape: {1} dtype: {2}>\n{3!r}".format(
+            self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype, self._array)
 
     def __str__(self):
         # str alone should not force loading of the data
         if self._array is None:
             return "<FITS array (unloaded) in {0} shape: {1} dtype: {2}>".format(
                 self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype)
-        return str(self._array)
+        return "<FITS array (loaded) in {0} shape: {1} dtype: {2}>\n{3!r}".format(
+            self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype, self._array)
 
     def __array__(self):
         return self.fits_array

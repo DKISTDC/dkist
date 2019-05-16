@@ -37,9 +37,7 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, reference_array, *, loader, **kwargs):
-
         reference_array = np.asarray(reference_array, dtype=object)
-
         self._check_contents(reference_array)
 
         # If the first dimension is one we are going to squash it.
@@ -52,7 +50,10 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
             loader_array.flat[i] = loader(ele, **kwargs)
+
         self.loader_array = loader_array
+        self._loader = partial(loader, **kwargs)
+        self.reference_array = reference_array
 
     def _check_contents(self, reference_array):
         """
@@ -66,6 +67,19 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
             assert isinstance(ele, ExternalArrayReference)
             assert ele.dtype == dtype
             assert ele.shape == shape
+
+    def __getitem__(self, item):
+        return type(self)(self.reference_array[item], loader=self._loader)
+
+    @property
+    def filenames(self):
+        """
+        Return a list of file names referenced by this Array Container.
+        """
+        names = []
+        for ear in self.reference_array.flat:
+            names.append(ear.fileuri)
+        return names
 
     @abc.abstractproperty
     def array(self):
