@@ -11,6 +11,9 @@ from ndcube.ndcube import NDCubeABC
 
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.utils.globus import (DKIST_DATA_CENTRE_ENDPOINT_ID, DKIST_DATA_CENTRE_DATASET_PATH,
+                                start_transfer_from_file_list, watch_transfer_progress)
+from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 try:
     from importlib import resources  # >= py 3.7
@@ -299,3 +302,44 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
                             int(np.ceil(axis_pixels.value.max()))+1)
                       for axis_pixels in all_pix_corners])
         return self[item]
+
+    def download(self, path="/~/", destination_endpoint=None, progress=True):
+        """
+        Start a Globus file transfer for all files in this Dataset.
+
+        Parameters
+        ----------
+        path : `pathlib.Path` or `str`, optional
+            The path to save the data in, must be accessible by the Globus
+            endpoint.
+
+        destination_endpoint : `str`, optional
+            A unique specifier for a Globus endpoint. If `None` a local
+            endpoint will be used if it can be found, otherwise an error will
+            be raised. See `~dkist.utils.globus.get_endpoint_id` for valid
+            endpoint specifiers.
+
+        progress : `bool`, optional
+           If `True` status information and a progress bar will be displayed
+           while waiting for the transfer to complete.
+        """
+
+        base_path = DKIST_DATA_CENTRE_DATASET_PATH.format(self.meta)
+        # TODO: Default path to the config file
+        destination_path = Path(path) / self.meta['dataset_id']
+
+        file_list = self.filenames
+        file_list.append(Path(self.meta['asdf_object_key']))
+
+        if not destination_endpoint:
+            destination_endpoint = get_local_endpoint_id()
+
+        task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
+                                                destination_endpoint, base_path,
+                                                self.filenames, destination_path)
+
+        if progress:
+            watch_transfer_progress()
+        else:
+            tc = get_transfer_client()
+            tc.task_wait(task_id, timeout=1e6)
