@@ -303,6 +303,19 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
                       for axis_pixels in all_pix_corners])
         return self[item]
 
+    @property
+    def filenames(self):
+        """
+        The filenames referenced by this dataset.
+
+        .. note::
+            This is not their full file paths.
+        """
+        if self._array_container is None:
+            return []
+        else:
+            return self._array_container.filenames
+
     def download(self, path="/~/", destination_endpoint=None, progress=True):
         """
         Start a Globus file transfer for all files in this Dataset.
@@ -324,7 +337,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
            while waiting for the transfer to complete.
         """
 
-        base_path = DKIST_DATA_CENTRE_DATASET_PATH.format(self.meta)
+        base_path = DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta)
         # TODO: Default path to the config file
         destination_path = Path(path) / self.meta['dataset_id']
 
@@ -336,10 +349,10 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                                 destination_endpoint, base_path,
-                                                self.filenames, destination_path)
+                                                file_list, destination_path)
 
+        tc = get_transfer_client()
         if progress:
-            watch_transfer_progress()
+            watch_transfer_progress(task_id, tc)
         else:
-            tc = get_transfer_client()
             tc.task_wait(task_id, timeout=1e6)
