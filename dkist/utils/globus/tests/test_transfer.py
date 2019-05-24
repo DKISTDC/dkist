@@ -56,6 +56,8 @@ def mock_task_event_list(mocker):
 def test_start_transfer(mocker, transfer_client, mock_endpoints):
     submit_mock = mocker.patch("globus_sdk.TransferClient.submit_transfer",
                                return_value={"task_id": "task_id"})
+    mocker.patch("globus_sdk.TransferClient.get_submission_id",
+                 return_value={'value': "wibble"})
     file_list = list(map(pathlib.Path, ["/a/name.fits", "/a/name2.fits"]))
     start_transfer_from_file_list("a", "b", "/", file_list)
     calls = mock_endpoints.call_args_list

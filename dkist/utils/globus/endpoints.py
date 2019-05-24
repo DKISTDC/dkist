@@ -59,11 +59,11 @@ def get_endpoint_id(endpoint, tfr_client):
     """
     Resolve an endpoint description to an ID.
 
-    This uses the `endpoint search
+    If the endpoint description is not a endpoint ID The `endpoint search
     <https://docs.globus.org/api/transfer/endpoint_search/#endpoint_search>`__
-    functionality of the Globus API, so any endpoint search can be specified.
-    One and only one result must be returned from the search or a `ValueError`
-    will be raised.
+    functionality of the Globus API will be used, so any endpoint search can be
+    specified. One and only one result must be returned from the search or a
+    `ValueError` will be raised.
 
     Parameters
     ----------
