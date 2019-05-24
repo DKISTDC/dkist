@@ -11,7 +11,7 @@ from ndcube.ndcube import NDCubeABC
 
 from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.utils.globus import (DKIST_DATA_CENTRE_ENDPOINT_ID, DKIST_DATA_CENTRE_DATASET_PATH,
+from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
