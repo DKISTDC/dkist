@@ -128,6 +128,11 @@ def test_array_container():
         dataset.array_container = 10
 
     assert len(dataset.array_container.filenames) == 11
+    assert len(dataset.filenames) == 11
+
+
+def test_no_filenames(dataset_3d):
+    assert dataset_3d.filenames == []
 
 
 def test_download(mocker, dataset):
