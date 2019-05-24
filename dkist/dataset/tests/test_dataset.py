@@ -12,6 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
+from dkist.utils.globus import DKIST_DATA_CENTRE_ENDPOINT_ID
 
 
 @pytest.fixture
@@ -127,3 +128,48 @@ def test_array_container():
         dataset.array_container = 10
 
     assert len(dataset.array_container.filenames) == 11
+
+
+def test_download(mocker, dataset):
+    mocker.patch("dkist.dataset.dataset.watch_transfer_progress",
+                 autospec=True)
+    mocker.patch("dkist.dataset.dataset.get_local_endpoint_id",
+                 autospec=True, return_value="mysecretendpoint")
+    mocker.patch("dkist.dataset.dataset.get_transfer_client",
+                 autospec=True)
+    start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
+                              autospec=True, return_value="1234")
+
+    file_list = dataset.filenames + [Path("test_dataset.asdf")]
+
+    dataset.download()
+
+    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
+                                       "mysecretendpoint",
+                                       "/data/test_dataset",
+                                       file_list,
+                                       Path("/~/test_dataset"))
+
+
+def test_download_no_progress(mocker, dataset):
+    progress_mock = mocker.patch("dkist.dataset.dataset.watch_transfer_progress",
+                                 autospec=True)
+    mocker.patch("dkist.dataset.dataset.get_local_endpoint_id",
+                 autospec=True, return_value="mysecretendpoint")
+    tc_mock = mocker.patch("dkist.dataset.dataset.get_transfer_client",
+                           autospec=True)
+    start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
+                              autospec=True, return_value="1234")
+
+    file_list = dataset.filenames + [Path("test_dataset.asdf")]
+
+    dataset.download(progress=False)
+
+    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
+                                       "mysecretendpoint",
+                                       "/data/test_dataset",
+                                       file_list,
+                                       Path("/~/test_dataset"))
+
+    progress_mock.assert_not_called()
+    tc_mock.return_value.task_wait.assert_called_once_with("1234", timeout=1e6)

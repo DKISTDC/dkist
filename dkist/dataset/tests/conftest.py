@@ -7,8 +7,10 @@ import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
 from sunpy.coordinates.frames import Helioprojective
+from asdf import ExternalArrayReference
 
 from dkist.dataset import Dataset
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 
 @pytest.fixture
@@ -79,10 +81,18 @@ def identity_gwcs_4d():
 
 @pytest.fixture
 def dataset(array, identity_gwcs):
-    ds = Dataset(array, wcs=identity_gwcs)
+    meta = {'bucket': 'data',
+            'dataset_id': 'test_dataset',
+            'asdf_object_key': 'test_dataset.asdf'}
+    ds = Dataset(array, wcs=identity_gwcs, meta=meta)
     # Sanity checks
     assert ds.data is array
     assert ds.wcs is identity_gwcs
+
+    ds._array_container = DaskFITSArrayContainer([ExternalArrayReference('test1.fits', 0, float, (10, 10)),
+                                                  ExternalArrayReference('test2.fits', 0, float, (10, 10))],
+                                                 loader=AstropyFITSLoader)
+
     return ds
 
 
