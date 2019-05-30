@@ -213,7 +213,9 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
             world = tuple(world)
 
         # If our return is an iterable then reverse it to match pixel dims.
-        if isiterable(world):
+        # TODO: There was a discussion about this in the astropy repo.
+        # We should be consistent with what was there rather than doing this.
+        if isinstance(world, tuple):
             return world[::-1]
 
         return world

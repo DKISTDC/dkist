@@ -1,3 +1,5 @@
+import numpy as np
+
 import gwcs
 from astropy.nddata.mixins.ndslicing import NDSlicingMixin
 
@@ -10,6 +12,21 @@ class DatasetSlicingMixin(NDSlicingMixin):
     """
     A class to override the wcs slicing behavior of `astropy.nddata.mixins.NDSlicingMixin`.
     """
+    def __getitem__(self, item):
+        # Abort slicing if the data is a single scalar.
+        if self.data.shape == ():
+            raise TypeError('scalars cannot be sliced.')
+
+        # Let the other methods handle slicing.
+        kwargs = self._slice(item)
+        new = self.__class__(**kwargs)
+        try:
+            new._array_container = self._array_container[item]
+        except Exception:
+            pass
+
+        return new
+
     def _slice(self, item):
         """
         Construct a set of keyword arguments to initialise a new (sliced)

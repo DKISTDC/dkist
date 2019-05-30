@@ -71,6 +71,20 @@ def slicer_5d(gwcs_5d):
     return GWCSSlicer(gwcs_5d, pixel_order=False)
 
 
+@pytest.mark.xfail
+def test_double_slice(gwcs_5d):
+    """
+    This is a major bug in the slicing.
+
+    The solution to this is to abandon all hope.
+    """
+    slicer_5d = GWCSSlicer(gwcs_5d, pixel_order=True)
+    s1, _ = slicer_5d[0, 10:20]
+    s1 = GWCSSlicer(s1, pixel_order=True)
+    s2, _ = s1[:, 0]
+    assert isinstance(s2, WCS)
+
+
 def test_slicer_init(gwcs_3d, gwcs_1d):
     for gwcs in (gwcs_1d, gwcs_3d):
         slc = GWCSSlicer(gwcs)

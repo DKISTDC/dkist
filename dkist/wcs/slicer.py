@@ -20,6 +20,9 @@ class FixedInputs(Model):
     def __init__(self, input_specification):
         self.input_specification = input_specification
 
+    def __repr__(self):
+        return f"<FixedInputs(input_specification={self.input_specification})>"
+
     @property
     def inputs(self):
         return tuple(f"n{i}" for i in range(len(self.input_specification))
@@ -245,6 +248,11 @@ class GWCSSlicer:
         else:
             return item
 
+    def _identity_with_units(self, unit):
+        i = Identity(1)
+        i._input_units = {inp: unit for inp in i.inputs}
+        return i
+
     def _convert_item_to_models(self, item, drop_all_non_separable):
         inputs = []
         prepend = []
@@ -265,13 +273,13 @@ class GWCSSlicer:
                     axes_to_drop.append(i)
                 else:
                     inputs.append(ax * input_units[i])
-                    prepend.append(Identity(1))
+                    prepend.append(self._identity_with_units(input_units[i]))
             elif ax.start:
                 inputs.append(None)
                 prepend.append(Shift(ax.start * input_units[i]))
             else:
                 inputs.append(None)
-                prepend.append(Identity(1))
+                prepend.append(self._identity_with_units(input_units[i]))
 
         return inputs, prepend, axes_to_drop
 
