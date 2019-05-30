@@ -74,7 +74,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         a "missing" longitude axis as longitude and latitude are not separable.
     """
 
-    def __init__(self, data, uncertainty=None, mask=None, wcs=None,
+    def __init__(self, data, header_table=None, uncertainty=None, mask=None, wcs=None,
                  meta=None, unit=None, copy=False, missing_axis=None):
 
         super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
@@ -84,7 +84,12 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         else:
             self.missing_axis = missing_axis
 
+        self._header_table = header_table
         self._array_container = None
+
+    @property
+    def headers(self):
+        return self._header_table
 
     @classmethod
     def from_directory(cls, directory):
@@ -127,11 +132,12 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
                     wcs = ff.tree['wcs']
                     meta = ff.tree['meta']
+                    headers = ff.tree['headers']
 
         except ValidationError as e:
             raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
 
-        cls = cls(data, wcs=wcs, meta=meta)
+        cls = cls(data, header_table=headers, wcs=wcs, meta=meta)
         cls._array_container = array_container
         return cls
 
