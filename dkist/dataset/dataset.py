@@ -126,11 +126,12 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
                     data = array_container.array
 
                     wcs = ff.tree['wcs']
+                    meta = ff.tree['meta']
 
         except ValidationError as e:
             raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
 
-        cls = cls(data, wcs=wcs)
+        cls = cls(data, wcs=wcs, meta=meta)
         cls._array_container = array_container
         return cls
 
