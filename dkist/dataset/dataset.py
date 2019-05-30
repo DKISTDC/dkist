@@ -121,7 +121,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
                     pointer_array = np.array(ff.tree['data'])
 
                     array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                                            basepath=base_path)
+                                                             basepath=base_path)
 
                     data = array_container.array
 
@@ -344,18 +344,26 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         # TODO: Default path to the config file
         destination_path = Path(path) / self.meta['dataset_id']
 
-        file_list = self.filenames
+        file_list = [Path(base_path) / fn for fn in self.filenames]
         file_list.append(Path(self.meta['asdf_object_key']))
 
         if not destination_endpoint:
             destination_endpoint = get_local_endpoint_id()
 
         task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                                destination_endpoint, base_path,
-                                                file_list, destination_path)
+                                                destination_endpoint, destination_path,
+                                                file_list)
 
         tc = get_transfer_client()
         if progress:
             watch_transfer_progress(task_id, tc)
         else:
             tc.task_wait(task_id, timeout=1e6)
+
+        # TODO: This is a hack to change the base dir of the dataset.
+        # The real solution to this is to use the database.
+        old_ac = self._array_container
+        self._array_container = DaskFITSArrayContainer(old_ac.reference_array,
+                                                       loader=old_ac._loader,
+                                                       basepath=destination_path)
+        self._data = self._array_container.array
