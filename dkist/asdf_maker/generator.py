@@ -358,6 +358,9 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0, re
 
     validate_headers(table_headers)
 
+    if not inventory:
+        inventory = generate_datset_inventory_from_headers(table_headers, asdf_filename)
+
     # Sort the filenames into DS order.
     sorted_filenames = np.array(table_headers['filenames'])
     sorted_headers = np.array(table_headers['headers'])
@@ -374,7 +377,7 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0, re
     tree = {'data': reference_array,
             'wcs': gwcs_from_headers(sorted_headers),
             'headers': table_headers,
-            'meta': generate_datset_inventory_from_headers(table_headers, asdf_filename)}
+            'meta': inventory}
 
     return tree
 
@@ -414,7 +417,7 @@ def dataset_from_fits(path, asdf_filename, inventory=None, hdu=0, relative_to=No
 
     with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
-            afile.write_to(path/asdf_filename, **kwargs)
+            afile.write_to(path / asdf_filename, **kwargs)
 
 
 def _gen_type(gen_type, max_int=1e6, max_float=1e6, len_str=30):
@@ -487,6 +490,11 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
         'end_time': 'DATE-END',
         'filter_wavelengths': 'WAVELNGTH'}
 
+    constants = {
+        'frame_count': len(headers),
+        'bucket': 'data',
+        }
+
     output = {}
 
     for key, ktype in schema:
@@ -496,4 +504,5 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
         else:
             output[key] = _gen_type(ktype)
 
+    output.update(constants)
     return output
