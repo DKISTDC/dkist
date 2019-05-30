@@ -338,7 +338,8 @@ def make_sorted_table(headers, filenames):
     return theaders[np.argsort(t, order=keys)]
 
 
-def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0, relative_to=None):
+def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
+                             relative_to=None, extra_inventory=None):
     """
     Build a DKIST asdf tree from a list of (unsorted) filenames.
 
@@ -360,6 +361,8 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0, re
 
     if not inventory:
         inventory = generate_datset_inventory_from_headers(table_headers, asdf_filename)
+    if extra_inventory:
+        inventory.update(extra_inventory)
 
     # Sort the filenames into DS order.
     sorted_filenames = np.array(table_headers['filenames'])
@@ -493,6 +496,7 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
     constants = {
         'frame_count': len(headers),
         'bucket': 'data',
+        'asdf_object_key': asdf_name
         }
 
     output = {}
