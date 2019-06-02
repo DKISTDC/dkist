@@ -351,7 +351,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
         destination_path = Path(path) / self.meta['dataset_id']
 
         file_list = [Path(base_path) / fn for fn in self.filenames]
-        file_list.append(Path(self.meta['asdf_object_key']))
+        file_list.append(Path(base_path) / self.meta['asdf_object_key'])
 
         if not destination_endpoint:
             destination_endpoint = get_local_endpoint_id()
@@ -362,7 +362,7 @@ class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
 
         tc = get_transfer_client()
         if progress:
-            watch_transfer_progress(task_id, tc)
+            watch_transfer_progress(task_id, tc, initial_n=len(file_list))
         else:
             tc.task_wait(task_id, timeout=1e6)
 
