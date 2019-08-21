@@ -7,9 +7,9 @@ from jsonschema.exceptions import ValidationError
 import asdf
 import astropy.units as u
 from astropy.utils import isiterable
-from ndcube.ndcube import NDCubeABC
+from ndcube.ndcube import NDCubeBase
 
-from dkist.dataset.mixins import DatasetPlotMixin, DatasetSlicingMixin
+from dkist.dataset.mixins import DatasetPlotMixin
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
@@ -24,7 +24,7 @@ except ImportError:
 __all__ = ['Dataset']
 
 
-class Dataset(DatasetSlicingMixin, DatasetPlotMixin, NDCubeABC):
+class Dataset(DatasetPlotMixin, NDCubeBase):
     """
     The base class for DKIST datasets.
 
