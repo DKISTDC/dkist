@@ -59,7 +59,7 @@ def test_output_frames(wcs):
 def test_transform_models(wcs):
     # Test that there is one lookup table and two linear models for both the
     # wcses
-    sms = wcs.forward_transform._submodels
+    sms = wcs.forward_transform._leaflist
     smtypes = [type(m) for m in sms]
     assert sum(mt is models.Linear1D for mt in smtypes) == 2
     assert sum(mt is LookupTable for mt in smtypes) == 1

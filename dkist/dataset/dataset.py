@@ -7,9 +7,9 @@ from jsonschema.exceptions import ValidationError
 import asdf
 import astropy.units as u
 from astropy.utils import isiterable
-from ndcube.ndcube import NDCubeBase
+from astropy.visualization.wcsaxes import WCSAxes
+from ndcube.ndcube import NDCube
 
-from dkist.dataset.mixins import DatasetPlotMixin
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
@@ -24,7 +24,7 @@ except ImportError:
 __all__ = ['Dataset']
 
 
-class Dataset(DatasetPlotMixin, NDCubeBase):
+class Dataset(NDCube):
     """
     The base class for DKIST datasets.
 
@@ -74,15 +74,11 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         a "missing" longitude axis as longitude and latitude are not separable.
     """
 
-    def __init__(self, data, header_table=None, uncertainty=None, mask=None, wcs=None,
-                 meta=None, unit=None, copy=False, missing_axis=None):
+    def __init__(self, data, wcs, uncertainty=None, mask=None,
+                 meta=None, unit=None, extra_coords=None, copy=False, header_table=None):
 
-        super().__init__(data, uncertainty, mask, wcs, meta, unit, copy)
-
-        if self.wcs and missing_axis is None:
-            self.missing_axis = [False] * self.wcs.world_n_dim
-        else:
-            self.missing_axis = missing_axis
+        super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
+                         unit=unit, extra_coords=extra_coords, copy=copy)
 
         self._header_table = header_table
         self._array_container = None
@@ -175,9 +171,11 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         """
         return self.wcs.world_axis_physical_types[::-1]
 
-    @property
-    def axis_units(self):
-        return tuple(map(u.Unit, self.wcs.world_axis_units[::-1]))
+
+    # Overload this to only expose the new API in this package, this can be
+    # removed once NDCube 2 is finalised.
+    def crop_by_coords(self, lower_corner, upper_corner, units=None):
+        return super().crop_by_coords(lower_corner, upper_corner=upper_corner, units=units)
 
     def __repr__(self):
         """
@@ -188,64 +186,10 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         return output
 
     def __str__(self):
-        pnames = ', '.join(self.pixel_axes_names)
-        wnames = ', '.join(self.world_axes_names)
-        return dedent(f"""\
-        {self.data!r}
-        WCS<pixel_axes_names=({pnames}),
-            world_axes_names=({wnames})>""")
+        return f"{self.data!r}\n{self.wcs!r}"
 
-    def pixel_to_world(self, *quantity_axis_list):
-        """
-        Convert a pixel coordinate to a data (world) coordinate by using
-        `~gwcs.wcs.WCS`.
-
-        This method expects input and returns output in the same order as the
-        array dimensions. (Which is the reverse of the underlying WCS object.)
-
-        Parameters
-        ----------
-        quantity_axis_list : iterable
-            An iterable of `~astropy.units.Quantity` with unit as pixel `pix`.
-
-        Returns
-        -------
-        coord : `list`
-            A list of arrays containing the output coordinates.
-        """
-        world = self.wcs.pixel_to_world(*quantity_axis_list[::-1])
-
-        # Convert list to tuple as a more standard return type
-        if isinstance(world, list):
-            world = tuple(world)
-
-        # If our return is an iterable then reverse it to match pixel dims.
-        # TODO: There was a discussion about this in the astropy repo.
-        # We should be consistent with what was there rather than doing this.
-        if isinstance(world, tuple):
-            return world[::-1]
-
-        return world
-
-    def world_to_pixel(self, *quantity_axis_list):
-        """
-        Convert a world coordinate to a data (pixel) coordinate by using
-        `~gwcs.wcs.WCS.invert`.
-
-        This method expects input and returns output in the same order as the
-        array dimensions. (Which is the reverse of the underlying WCS object.)
-
-        Parameters
-        ----------
-        quantity_axis_list : iterable
-            A iterable of `~astropy.units.Quantity`.
-
-        Returns
-        -------
-        coord : `list`
-            A list of arrays containing the output coordinates.
-        """
-        return tuple(self.wcs.world_to_pixel(*quantity_axis_list[::-1]))[::-1]
+    def _as_mpl_axes(self):
+        return WCSAxes, {'transform': self.wcs}
 
     @property
     def dimensions(self):
@@ -253,64 +197,6 @@ class Dataset(DatasetPlotMixin, NDCubeBase):
         The dimensions of the data as a `~astropy.units.Quantity`.
         """
         return u.Quantity(self.data.shape, unit=u.pix)
-
-    def crop_by_coords(self, lower_corner, upper_corner, units=None):
-        """
-        Crops an NDCube given the lower and upper corners of a box in world coordinates.
-
-        Parameters
-        ----------
-        lower_corner: iterable of `astropy.units.Quantity` or `float`
-            The minimum desired values along each relevant axis after cropping
-            described in physical units consistent with the NDCube's wcs object.
-            The length of the iterable must equal the number of data dimensions
-            and must have the same order as the data.
-        upper_corner: iterable of `astropy.units.Quantity` or `float`
-            The maximum desired values along each relevant axis after cropping
-            described in physical units consistent with the NDCube's wcs object.
-            The length of the iterable must equal the number of data dimensions
-            and must have the same order as the data.
-        units: iterable of `astropy.units.quantity.Quantity`, optional
-            If the inputs are set without units, the user must set the units
-            inside this argument as `str`.
-            The length of the iterable must equal the number of data dimensions
-            and must have the same order as the data.
-
-        Returns
-        -------
-        result: NDCube
-        """
-        n_dim = self.data.ndim
-        if units:
-            # Raising a value error if units have not the data dimensions.
-            if len(units) != n_dim:
-                raise ValueError('units must have same number of elements as '
-                                 'number of data dimensions.')
-            # If inputs are not Quantity objects, they are modified into specified units
-            lower_corner = [u.Quantity(lower_corner[i], unit=units[i])
-                            for i in range(self.data.ndim)]
-            upper_corner = [u.Quantity(upper_corner[i], unit=units[i])
-                            for i in range(self.data.ndim)]
-        else:
-            if any([not isinstance(x, u.Quantity) for x in lower_corner] +
-                   [not isinstance(x, u.Quantity) for x in upper_corner]):
-                raise TypeError("lower_corner and interval_widths/upper_corner must be "
-                                "of type astropy.units.Quantity or the units kwarg "
-                                "must be set.")
-        # Get all corners of region of interest.
-        all_world_corners_grid = np.meshgrid(
-            *[u.Quantity([lower_corner[i], upper_corner[i]], unit=lower_corner[i].unit).value
-              for i in range(self.data.ndim)])
-        all_world_corners = [all_world_corners_grid[i].flatten()*lower_corner[i].unit
-                             for i in range(n_dim)]
-        # Convert to pixel coordinates
-        all_pix_corners = self.wcs.world_to_pixel(*all_world_corners)
-        # Derive slicing item with which to slice NDCube.
-        # Be sure to round down min pixel and round up + 1 the max pixel.
-        item = tuple([slice(int(np.clip(axis_pixels.value.min(), 0, None)),
-                            int(np.ceil(axis_pixels.value.max()))+1)
-                      for axis_pixels in all_pix_corners])
-        return self[item]
 
     @property
     def filenames(self):

@@ -237,7 +237,7 @@ class TransformBuilder:
                                              name=name,
                                              axes_names=(name,),
                                              unit=self.get_units(self._i),
-                                             reference_time=Time(self.header['DATE-BGN'])))
+                                             reference_frame=Time(self.header['DATE-BGN'])))
         self._transforms.append(time_model_from_date_obs([e['DATE-OBS'] for e in self.slice_headers],
                                                          self.header['DATE-BGN']))
 

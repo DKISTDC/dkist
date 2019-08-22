@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
-from dkist.utils.globus import DKIST_DATA_CENTRE_ENDPOINT_ID
+from dkist.utils.globus import DKIST_DATA_CENTRE_ENDPOINT_ID, DKIST_DATA_CENTRE_DATASET_PATH
 
 
 @pytest.fixture
@@ -39,7 +39,7 @@ def test_repr(dataset, dataset_3d):
 def test_wcs_roundtrip(dataset):
     p = (10*u.pixel, 10*u.pixel)
     w = dataset.pixel_to_world(*p)
-    p2 = dataset.world_to_pixel(*w)
+    p2 = dataset.world_to_pixel(w)
     assert_quantity_allclose(p, p2)
 
 
@@ -54,35 +54,6 @@ def test_wcs_roundtrip_3d(dataset_3d):
 def test_dimensions(dataset, dataset_3d):
     for ds in [dataset, dataset_3d]:
         assert_quantity_allclose(ds.dimensions, ds.data.shape*u.pix)
-
-
-def test_crop_by_coords(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5*u.arcsec, 5*u.arcsec, 5*u.nm),
-                                    (9*u.arcsec, 9*u.arcsec, 9*u.nm))
-
-    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
-    assert arr.data.shape == da_crop.shape
-    assert np.allclose(arr.data, da_crop)
-
-
-def test_crop_by_coords_units(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5, 5, 5),
-                                    (9, 9, 9),
-                                    (u.arcsec, u.arcsec, u.nm))
-
-    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
-    assert arr.data.shape == da_crop.shape
-    assert np.allclose(arr.data, da_crop)
-
-
-def test_crop_by_coords_bad_args(dataset_3d):
-    with pytest.raises(TypeError):
-        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
-
-
-def test_crop_by_coords_bad_units(dataset_3d):
-    with pytest.raises(ValueError):
-        dataset_3d.crop_by_coords((5, 5, 5), (9, 9, 9), units=(u.pix, u.pix))
 
 
 def test_load_from_directory():
@@ -110,15 +81,9 @@ def test_from_directory_not_dir():
         assert "must be a directory" in str(e)
 
 
-def test_no_wcs_slice(dataset):
-    dataset._wcs = None
-    ds = dataset[3, 0]
-    assert ds.wcs is None
-
-
 def test_crop_few_slices(dataset_4d):
     sds = dataset_4d[0, 0]
-    assert len(sds.wcs.input_frame.axes_order)
+    assert sds.wcs.world_n_dim == 2
 
 
 def test_array_container():
@@ -135,6 +100,35 @@ def test_no_filenames(dataset_3d):
     assert dataset_3d.filenames == []
 
 
+def test_crop_by_coords(dataset_3d):
+    arr = dataset_3d.crop_by_coords((5*u.nm, 5*u.arcsec, 5*u.arcsec),
+                                    (9*u.nm, 9*u.arcsec, 9*u.arcsec))
+
+    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
+    assert arr.data.shape == da_crop.shape
+    assert np.allclose(arr.data, da_crop)
+
+
+def test_crop_by_coords_units(dataset_3d):
+    arr = dataset_3d.crop_by_coords((5, 5, 5),
+                                    (9, 9, 9),
+                                    (u.nm, u.arcsec, u.arcsec))
+
+    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
+    assert arr.data.shape == da_crop.shape
+    assert np.allclose(arr.data, da_crop)
+
+
+def test_crop_by_coords_bad_args(dataset_3d):
+    with pytest.raises(ValueError):
+        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
+
+
+def test_crop_by_coords_bad_units(dataset_3d):
+    with pytest.raises(ValueError):
+        dataset_3d.crop_by_coords((5, 5, 5), (9, 9, 9), units=(u.pix, u.pix))
+
+
 def test_download(mocker, dataset):
     mocker.patch("dkist.dataset.dataset.watch_transfer_progress",
                  autospec=True)
@@ -145,15 +139,16 @@ def test_download(mocker, dataset):
     start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
     file_list = dataset.filenames + [Path("test_dataset.asdf")]
+    file_list = [base_path / fn for fn in file_list]
 
-    dataset.download()
+    dataset.download(progress=False)
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
-                                       "/data/test_dataset",
-                                       file_list,
-                                       Path("/~/test_dataset"))
+                                       Path("/~/test_dataset"),
+                                       file_list)
 
 
 def test_download_no_progress(mocker, dataset):
@@ -166,15 +161,16 @@ def test_download_no_progress(mocker, dataset):
     start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
     file_list = dataset.filenames + [Path("test_dataset.asdf")]
+    file_list = [base_path / fn for fn in file_list]
 
     dataset.download(progress=False)
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
-                                       "/data/test_dataset",
-                                       file_list,
-                                       Path("/~/test_dataset"))
+                                       Path("/~/test_dataset"),
+                                       file_list)
 
     progress_mock.assert_not_called()
     tc_mock.return_value.task_wait.assert_called_once_with("1234", timeout=1e6)
