@@ -44,6 +44,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         self._fits_header = None
         # These are needed for this object to be array-like
         self.shape = self.fitsarray.shape
+        self.ndim = len(self.shape)
         self.dtype = self.fitsarray.dtype
 
     def __repr__(self):
