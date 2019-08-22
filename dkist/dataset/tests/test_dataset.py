@@ -143,7 +143,7 @@ def test_download(mocker, dataset):
     file_list = dataset.filenames + [Path("test_dataset.asdf")]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.download(progress=False)
+    dataset.download()
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",

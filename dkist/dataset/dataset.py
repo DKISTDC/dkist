@@ -145,20 +145,6 @@ class Dataset(NDCube):
         return self._array_container
 
     @property
-    def pixel_axes_names(self):
-        if self.wcs.input_frame:
-            return self.wcs.input_frame.axes_names[::-1]
-        else:
-            return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
-
-    @property
-    def world_axes_names(self):
-        if self.wcs.output_frame:
-            return self.wcs.output_frame.axes_names[::-1]
-        else:
-            return ('',) * self.data.ndim  # pragma: no cover  # We should never hit this
-
-    @property
     def world_axis_physical_types(self):
         """
         Returns an iterable of strings describing the physical type for each world axis.
