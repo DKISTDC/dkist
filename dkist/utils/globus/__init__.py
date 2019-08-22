@@ -5,7 +5,7 @@ from .auth import *
 from .endpoints import *
 from .transfer import *
 
-DKIST_DATA_CENTRE_ENDPOINT_ID = '5c510e9e-56fa-11e9-9e6e-0266b1fe9f9e'
+DKIST_DATA_CENTRE_ENDPOINT_ID = '5e534393-e5bc-4042-9fb9-14f1649b120c'
 """The Globus endpoint ID of the main DKIST globus endpoint."""
 
 DKIST_DATA_CENTRE_DATASET_PATH = "/{bucket}/{dataset_id}"

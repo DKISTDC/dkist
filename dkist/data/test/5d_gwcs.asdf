@@ -127,7 +127,7 @@ gwcs: !<tag:stsci.edu:gwcs/wcs-1.0.0>
         axes_names: [time]
         axes_order: [3]
         name: time
-        reference_time: !time/time-1.1.0 2022-09-27T02:16:18.414
+        reference_frame: !time/time-1.1.0 2022-09-27T02:16:18.414
         unit: [!unit/unit-1.0.0 s]
       - !<tag:stsci.edu:gwcs/stokes_frame-1.0.0>
         axes_order: [4]

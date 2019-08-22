@@ -519,7 +519,7 @@ wcs: !<tag:stsci.edu:gwcs/wcs-1.0.0>
         axes_names: [time]
         axes_order: [2]
         name: TemporalFrame
-        reference_time: !time/time-1.1.0 2004-03-01T00:00:10.515
+        reference_frame: !time/time-1.1.0 2004-03-01T00:00:10.515
         unit: [!unit/unit-1.0.0 s]
       name: world
 ...

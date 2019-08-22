@@ -80,6 +80,7 @@ def get_endpoint_id(endpoint, tfr_client):
     if ' ' not in endpoint:
         try:
             tr = tfr_client.get_endpoint(endpoint)
+            return endpoint
         except globus_sdk.TransferAPIError as e:
             if e.code != "EndpointNotFound":
                 raise

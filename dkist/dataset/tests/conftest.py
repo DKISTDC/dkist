@@ -6,8 +6,9 @@ import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
-from sunpy.coordinates.frames import Helioprojective
 from asdf import ExternalArrayReference
+from astropy.time import Time
+from sunpy.coordinates.frames import Helioprojective
 
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
@@ -41,7 +42,10 @@ def identity_gwcs_3d():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = m.Multiply(1 * u.arcsec / u.pixel) & m.Multiply(1 * u.arcsec / u.pixel) & m.Multiply(1 * u.nm / u.pixel)
+    identity = (m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.nm / u.pixel))
+
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"))
@@ -67,7 +71,7 @@ def identity_gwcs_4d():
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
-    time_frame = cf.TemporalFrame(axes_order=(3, ), unit=u.s)
+    time_frame = cf.TemporalFrame(Time([], format="isot", scale="utc"), axes_order=(3, ), unit=u.s)
 
     frame = cf.CompositeFrame([sky_frame, wave_frame, time_frame])
 
@@ -91,14 +95,14 @@ def dataset(array, identity_gwcs):
 
     ds._array_container = DaskFITSArrayContainer([ExternalArrayReference('test1.fits', 0, float, (10, 10)),
                                                   ExternalArrayReference('test2.fits', 0, float, (10, 10))],
-                                                 loader=AstropyFITSLoader)
+                                                loader=AstropyFITSLoader)
 
     return ds
 
 
 @pytest.fixture
 def dataset_3d(identity_gwcs_3d):
-    shape = (50, 50, 50)
+    shape = (25, 50, 50)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
 

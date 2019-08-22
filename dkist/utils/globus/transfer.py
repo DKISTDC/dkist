@@ -156,12 +156,13 @@ def get_progress_bar(*args, **kwargs):  # pragma: no cover
         kwargs['bar_format'] = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]'
     else:
         # TODO: Both having this and not having it breaks things.
-        kwargs['total'] = kwargs.get("total", 1e9)
+        kwargs['total'] = kwargs.get("total", 1e9) or 1e9
     the_tqdm = tqdm if not in_notebook() else tqdm_notebook
     return the_tqdm(*args, **kwargs)
 
 
-def watch_transfer_progress(task_id, tfr_client, poll_interval=5, verbose=False):  # pragma: no cover
+def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
+                            verbose=False, initial_n=None):  # pragma: no cover
     """
     Wait for a Globus transfer task to finish and display a progress bar.
 
@@ -184,7 +185,8 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5, verbose=False)
     prev_events = set()
     progress = None
     progress = get_progress_bar(unit="file",
-                                dynamic_ncols=True)
+                                dynamic_ncols=True,
+                                total=initial_n)
     while True:
         (prev_events,
          json_events,
