@@ -1,4 +1,4 @@
-DKIST User Tools
+DKIST User Tools!
 ----------------
 
 .. image:: http://img.shields.io/badge/powered%20by-SunPy-orange.svg?style=flat 
