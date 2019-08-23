@@ -14,7 +14,7 @@ include_trailing_comma = false
 length_sort = false
 length_sort_stdlib = true
 
-[tool.giles]
+[tool.gilesbot]
   [ tool.gilesbot.pull_requests ]
     enabled = true
   
