@@ -91,4 +91,4 @@ workflows:
 
 notify:
   webhooks:
-    - url: https://dkistbot.dev.cadair.com/circleci
+    - url: https://giles.cadair.dev/circleci

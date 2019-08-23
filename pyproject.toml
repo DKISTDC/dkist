@@ -14,18 +14,17 @@ include_trailing_comma = false
 length_sort = false
 length_sort_stdlib = true
 
-[tool.dkistbot]
-  check_towncrier_changelog = true
-  check_milestone = true
-  post_pr_comment = false
+[tool.giles]
+  [ tool.gilesbot.pull_requests ]
+    enabled = true
+  
+  [ tool.gilesbot.towncrier_changelog ]
+    enabled = true
+    changelog_skip_label = "no changelog"
+    help_url = "https://github.com/DKISTDC/dkist/changelog/README.rst"
 
-  # Disable other astropy skills
-  changelog_check = false
-  autoclose_stale_pull_request = false
-
-  [tool.dkistbot.towncrier_changelog]
-   changelog_skip_label = "no changelog"
-   help_url = "https://github.com/DKISTDC/dkist/changelog/README.rst"
+  [ tool.gilesbot.milestones ]
+    enabled = true
 
 [tool.towncrier]
     package = "dkist"
