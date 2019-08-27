@@ -3,13 +3,11 @@ import os
 import sys
 import pathlib
 import datetime
+from configparser import ConfigParser
 
 from pkg_resources import get_distribution
-
 from sphinx_astropy.conf.v1 import *
 
-# Get configuration information from setup.cfg
-from configparser import ConfigParser
 conf = ConfigParser()
 
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
@@ -53,6 +51,7 @@ copyright = '{0}, {1}'.format(
 
 release = get_distribution(setup_cfg['name']).version
 version = '.'.join(release.split('.')[:3])
+is_development = '.dev' in release
 
 # -- Options for HTML output --------------------------------------------------
 
@@ -128,3 +127,17 @@ sphinx_gallery_conf = {
     'plot_gallery': True,
     'download_all_examples': False
 }
+
+"""
+Write the latest changelog into the documentation.
+"""
+target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
+try:
+    from sunpy.util.towncrier import generate_changelog_for_docs
+    if is_development:
+        generate_changelog_for_docs("../", target_file)
+except Exception as e:
+    print(f"Failed to add changelog to docs with error {e}.")
+
+# Make sure the file exists or else sphinx will complain.
+open(target_file, 'a').close()

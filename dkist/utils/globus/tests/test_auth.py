@@ -1,14 +1,13 @@
 import json
-import pathlib
 import stat
+import pathlib
 from unittest import mock
 
+import globus_sdk
 import requests
 
-import globus_sdk
-from dkist.utils.globus.auth import (ensure_globus_authorized,
-                                     get_cache_contents, get_cache_file_path,
-                                     get_refresh_token_authorizer,
+from dkist.utils.globus.auth import (ensure_globus_authorized, get_cache_contents,
+                                     get_cache_file_path, get_refresh_token_authorizer,
                                      save_auth_cache, start_local_server)
 
 

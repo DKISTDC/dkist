@@ -13,7 +13,6 @@ from tqdm import tqdm, tqdm_notebook
 from .. import in_notebook
 from .endpoints import auto_activate_endpoint, get_endpoint_id, get_transfer_client
 
-
 __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
 
 

@@ -2,7 +2,23 @@ skip-check: &skip-check
   name: Check for [ci skip]
   command: bash .circleci/early_exit.sh
 
-apt-run: &apt-install
+merge-check: &merge-check
+  name: Check if we need to merge upstream master
+  command: |
+    if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+      git fetch origin --tags
+      git fetch origin +refs/pull/$CIRCLE_PR_NUMBER/merge:pr/$CIRCLE_PR_NUMBER/merge
+      git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
+    fi
+
+permission-run: &permission-run
+  name: Fix permssions for installing
+  command: |
+    sudo chown -R circleci:circleci /usr/local/bin
+    sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+    sudo chown -R circleci:circleci /usr/local/share/
+
+sudo-apt-run: &sudo-apt-install
   name: Install apt packages
   command: |
     sudo apt update
@@ -31,27 +47,32 @@ jobs:
       - run: pycodestyle dkist --count
       - run: isort dkist/**/*.py -c
 
-  tests-37:
+  twine-check:
     docker:
       - image: circleci/python:3.7
     steps:
       - checkout
       - run: *skip-check
-      - run: *apt-install
-      - run: *tox-install
-      - run: tox -e py37
-      - run: codecov
+      - run: *merge-check
+      - run: *permission-run
+      - run: python setup.py sdist
+      - run: python -m pip install -U --user --force-reinstall twine
+      - run: python -m twine check dist/*
 
-  tests-36:
+  pip-install:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.7
     steps:
       - checkout
       - run: *skip-check
-      - run: *apt-install
-      - run: *tox-install
-      - run: tox -e py36
-      - run: codecov
+      - run: *merge-check
+      - run: *permission-run
+      - run: *sudo-apt-install
+      - run: pip install -U pip
+      - run: pip install --progress-bar off .[all,dev]
+      - run: pip install -e .[all,dev]
+      # We can't run this with all the git deps
+      # - run: python setup.py develop
 
   html-docs:
     docker:
@@ -59,12 +80,13 @@ jobs:
     steps:
       - checkout
       - run: *skip-check
-      - run: *apt-install
-      - run: *tox-install
-      - run: tox -e py37-build_docs
+      - run: *merge-check
+      - run: *permission-run
+      - run: *sudo-apt-install
+      - run: pip install -U tox
+      - run: tox -e build_docs
       - store_artifacts:
           path: docs/_build/html
-
       - run:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
@@ -72,18 +94,15 @@ jobs:
 workflows:
   version: 2
 
-  egg-info:
+  pip-check:
     jobs:
       - egg-info-37
+      - pip-install
+      - twine-check
 
   pycodestyle:
     jobs:
       - pycodestyle
-
-  tests:
-    jobs:
-      - tests-37
-      - tests-36
 
   test-documentation:
     jobs:
@@ -91,4 +110,4 @@ workflows:
 
 notify:
   webhooks:
-    - url: https://giles.cadair.dev/circleci
+    - url: https://giles.cadair.com/circleci
