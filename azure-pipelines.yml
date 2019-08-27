@@ -1,20 +1,49 @@
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
 variables:
   CI_NAME: Azure Pipelines
   CI_BUILD_ID: $(Build.BuildId)
-  CI_BUILD_URL: "https://dev.azure.com/dkistdc/dkist/_build/results?buildId=$(Build.BuildId)"
+  # These will need to be changed  for your project.
+  CI_BUILD_URL: "https://dev.azure.com/sunpy/dkist/_build/results?buildId=$(Build.BuildId)"
+
+# These resources need to be setup on the Azure Pipeline website
+# as a service connection (if it has not been already).
+resources:
+  repositories:
+  - repository: sunpy
+    type: github
+    endpoint: DKISTDC
+    name: sunpy/azure-pipelines-template
+    ref: master
+
+trigger:
+  tags:
+    include:
+    - 'v*'
+    # exclude:
+    # - '*dev*'
+    # - '*pre*'
+    # - '*post*'
 
 jobs:
-  # We are still running tests on Circle for now
-  # - template: azure-templates.yml
-  #   parameters:
-  #     name: Linux_36
-  #     os: linux
-  #     tox: py36 --
-  
-  # - template: azure-templates.yml
-  #   parameters:
-  #     name: Linux_37
-  #     os: linux
-  #     tox: py37 --
+- template: run-tox-env.yml@sunpy
+  parameters:
+    name: Linux_37
+    os: linux
+    tox: py37 --
 
-  - template: azure-dkist-wheel.yaml
+- template: run-tox-env.yml@sunpy
+  parameters:
+    name: Windows_37
+    os: windows
+    tox: py37 --
+
+- template: run-tox-env.yml@sunpy
+  parameters:
+    name: macOS_36
+    os: macos
+    tox: py36 --
+
+- ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+  - template: publish-pypi.yml@sunpy
+    parameters:
+      dependsOn: [Linux_37,Windows_37,macOS_36]
