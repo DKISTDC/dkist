@@ -71,7 +71,8 @@ jobs:
       - run: pip install -U pip
       - run: pip install --progress-bar off .[all,dev]
       - run: pip install -e .[all,dev]
-      - run: python setup.py develop
+      # We can't run this with all the git deps
+      # - run: python setup.py develop
 
   html-docs:
     docker:
