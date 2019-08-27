@@ -137,7 +137,7 @@ try:
     if is_development:
         generate_changelog_for_docs("../", target_file)
 except Exception as e:
-    print(f"Failed to add changelog to docs with error {e}")
-    # If we can't generate it, we need to make sure it exists or else sphinx
-    # will complain.
-    open(target_file, 'a').close()
+    print(f"Failed to add changelog to docs with error {e}.")
+
+# Make sure the file exists or else sphinx will complain.
+open(target_file, 'a').close()
