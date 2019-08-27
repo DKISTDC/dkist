@@ -6,8 +6,7 @@ import webbrowser
 
 import globus_sdk
 
-from .auth import get_refresh_token_authorizer, ensure_globus_authorized
-
+from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
 __all__ = ['get_directory_listing']
 

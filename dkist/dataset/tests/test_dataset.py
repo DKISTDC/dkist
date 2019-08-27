@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
-from dkist.utils.globus import DKIST_DATA_CENTRE_ENDPOINT_ID, DKIST_DATA_CENTRE_DATASET_PATH
+from dkist.utils.globus import DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID
 
 
 @pytest.fixture

@@ -3,13 +3,11 @@ import os
 import sys
 import pathlib
 import datetime
+from configparser import ConfigParser
 
 from pkg_resources import get_distribution
-
 from sphinx_astropy.conf.v1 import *
 
-# Get configuration information from setup.cfg
-from configparser import ConfigParser
 conf = ConfigParser()
 
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
