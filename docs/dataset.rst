@@ -49,6 +49,3 @@ API Documenation
 
 .. automodapi:: dkist.dataset
    :headings: ^#
-
-.. automodapi:: dkist.dataset.mixins
-   :headings: ^#

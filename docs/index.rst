@@ -12,3 +12,4 @@ A Python library of tools for obtaining, processing and interacting with DKIST d
   io
   asdfmaker
   generated/gallery/index
+  whatsnew/index
