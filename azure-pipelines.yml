@@ -31,11 +31,11 @@ jobs:
     os: linux
     tox: py37 --
 
-- template: run-tox-env.yml@sunpy
-  parameters:
-    name: Windows_37
-    os: windows
-    tox: py37 --
+# - template: run-tox-env.yml@sunpy
+#   parameters:
+#     name: Windows_37
+#     os: windows
+#     tox: py37 --
 
 - template: run-tox-env.yml@sunpy
   parameters:
