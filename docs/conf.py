@@ -51,6 +51,7 @@ copyright = '{0}, {1}'.format(
 
 release = get_distribution(setup_cfg['name']).version
 version = '.'.join(release.split('.')[:3])
+is_development = '.dev' in release
 
 # -- Options for HTML output --------------------------------------------------
 
@@ -126,3 +127,17 @@ sphinx_gallery_conf = {
     'plot_gallery': True,
     'download_all_examples': False
 }
+
+"""
+Write the latest changelog into the documentation.
+"""
+target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
+try:
+    from sunpy.util.towncrier import generate_changelog_for_docs
+    if is_development:
+        generate_changelog_for_docs("../", target_file)
+except Exception as e:
+    print(f"Failed to add changelog to docs with error {e}")
+    # If we can't generate it, we need to make sure it exists or else sphinx
+    # will complain.
+    open(target_file, 'a').close()
