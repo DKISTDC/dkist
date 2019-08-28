@@ -1,0 +1,61 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://dkist.nso.edu/schemas/dkist/dataset-0.1.0"
+tag: "tag:dkist.nso.edu:dkist/dataset-0.1.0"
+
+title: |
+  A DKIST Level 1 Dataset object.
+description:
+  The container for a distributed dataset object.
+
+type: object
+properties:
+  data:
+    description: A (nested) array of ExternalArrayReference objects.
+    type: array
+    anyOf:
+      # 3D Array of EARs
+      - type: array
+        items:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
+      # 2D Array of EARs
+      - type: array
+        items:
+          type: array
+          items:
+            $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
+      # 1D Array of EARs
+      - type: array
+        items:
+          $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
+
+  wcs:
+    description: The coordinate system for the complete dataset.
+    $ref: "tag:stsci.edu:gwcs/wcs-1.0.0"
+
+  headers:
+    description: A table of all the headers for the constituent files.
+    anyOf:
+      - $ref: "tag:stsci.edu:asdf/core/table-1.0.0"
+      - $ref: "tag:astropy.org:astropy/table/table-1.0.0"
+  meta:
+    type: object
+
+  # mask:
+  #   $ref: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
+
+  # unit:
+  #   $ref: "tag:stsci.edu:asdf/unit/unit-1.0.0"
+
+  # uncertainty:
+  #   type: object
+
+
+required: [meta, data, headers, wcs]
+allowAdditionalProperties: true
+...

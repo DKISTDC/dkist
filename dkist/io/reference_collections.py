@@ -71,6 +71,16 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
     def __getitem__(self, item):
         return type(self)(self.reference_array[item], loader=self._loader)
 
+    def as_external_array_references(self):
+        """
+        Convert the loader array back to a nested list of
+        `asdf.ExternalArrayReference` objects.
+        """
+        ears = np.empty_like(self.loader_array)
+        for i, lelem in enumerate(self.loader_array.flat):
+            ears.flat[i] = lelem.fitsarray
+        return ears.tolist()
+
     @property
     def filenames(self):
         """
