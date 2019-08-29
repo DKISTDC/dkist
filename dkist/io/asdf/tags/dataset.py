@@ -20,25 +20,16 @@ class DatasetType(DKISTType):
 
     @classmethod
     def from_tree(cls, node, ctx):
-        breakpoint()
-
-        filepath = Path(ctx.uri)
-        base_path = filepath.parent
-
-        pointer_array = np.array(node['data'])
-
-        array_container = DaskFITSArrayContainer(pointer_array,
-                                                 loader=AstropyFITSLoader,
-                                                 basepath=base_path)
-
-        data = array_container.array
-
+        data = node['data'].array
         wcs = node['wcs']
         meta = node['meta']
         headers = node['headers']
+        unit = node.get('unit')
+        mask = node.get('mask')
 
-        dataset = Dataset(data, header_table=headers, wcs=wcs, meta=meta)
-        dataset._array_container = array_container
+        dataset = Dataset(data, header_table=headers, wcs=wcs, meta=meta,
+                          unit=unit, mask=mask)
+        dataset._array_container = node['data']
         return dataset
 
     @classmethod
@@ -50,7 +41,9 @@ class DatasetType(DKISTType):
         node['meta'] = dataset.meta
         node['wcs'] = dataset.wcs
         node['headers'] = dataset.headers
-        node['data'] = dataset._array_container.as_external_array_references()
+        node['data'] = dataset._array_container
+        node['unit'] = dataset.unit
+        node['mask'] = dataset.mask
 
         return custom_tree_to_tagged_tree(node, ctx)
 
