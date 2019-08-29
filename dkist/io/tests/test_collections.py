@@ -9,7 +9,7 @@ import asdf
 
 from dkist.data.test import rootdir
 from dkist.io.fits import AstropyFITSLoader
-from dkist.io.reference_collections import DaskFITSArrayContainer, NumpyFITSArrayContainer
+from dkist.io.array_containers import DaskFITSArrayContainer, NumpyFITSArrayContainer
 
 eitdir = os.path.join(rootdir, "EIT")
 
