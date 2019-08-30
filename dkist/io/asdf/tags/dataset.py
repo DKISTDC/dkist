@@ -53,3 +53,9 @@ class DatasetType(DKISTType):
         This method is used by asdf to test that to_tree > from_tree gives an
         equivalent object.
         """
+        assert old.meta == new.meta
+        assert old.wcs == new.wcs
+        assert old.headers == new.headers
+        assert old._array_container == new._array_container
+        assert old.unit == new.unit
+        assert old.mask == new.mask
