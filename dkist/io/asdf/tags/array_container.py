@@ -43,3 +43,6 @@ class ArrayContainerType(DKISTType):
         This method is used by asdf to test that to_tree > from_tree gives an
         equivalent object.
         """
+        new = new.as_external_array_references()
+        old = old.as_external_array_references()
+        assert new == old
