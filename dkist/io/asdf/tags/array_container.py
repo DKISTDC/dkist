@@ -20,7 +20,7 @@ class ArrayContainerType(DKISTType):
 
     @classmethod
     def from_tree(cls, node, ctx):
-        filepath = Path(ctx.uri)
+        filepath = Path(ctx.uri or ".")
         base_path = filepath.parent
 
         pointer_array = np.array(node['array_container'])
