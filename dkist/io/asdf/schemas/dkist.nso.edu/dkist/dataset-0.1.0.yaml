@@ -95,35 +95,35 @@ properties:
         wavelength_min:
           type: number
     additionalProperties: false
-    required:
-        - asdf_object_key
-        - browse_movie_object_key
-        - browse_movie_url
-        - bucket
-        - contributing_experiment_ids
-        - contributing_proposal_ids
-        - dataset_id
-        - dataset_inventory_id
-        - dataset_size
-        - end_time
-        - exposure_time
-        - filter_wavelengths
-        - frame_count
-        - has_all_stokes
-        - instrument_name
-        - observables
-        - original_frame_count
-        - primary_experiment_id
-        - primary_proposal_id
-        - quality_average_fried_parameter
-        - quality_average_polarimetric_accuracy
-        - recipe_id
-        - recipe_instance_id
-        - recipe_run_id
-        - start_time
-        - target_type
-        - wavelength_max
-        - wavelength_min
+    # required:
+    #     - asdf_object_key
+    #     - browse_movie_object_key
+    #     - browse_movie_url
+    #     - bucket
+    #     - contributing_experiment_ids
+    #     - contributing_proposal_ids
+    #     - dataset_id
+    #     - dataset_inventory_id
+    #     - dataset_size
+    #     - end_time
+    #     - exposure_time
+    #     - filter_wavelengths
+    #     - frame_count
+    #     - has_all_stokes
+    #     - instrument_name
+    #     - observables
+    #     - original_frame_count
+    #     - primary_experiment_id
+    #     - primary_proposal_id
+    #     - quality_average_fried_parameter
+    #     - quality_average_polarimetric_accuracy
+    #     - recipe_id
+    #     - recipe_instance_id
+    #     - recipe_run_id
+    #     - start_time
+    #     - target_type
+    #     - wavelength_max
+    #     - wavelength_min
 
   mask:
     $ref: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
@@ -135,6 +135,6 @@ properties:
   #   type: object
 
 
-required: [meta, data, headers, wcs]
+required: [data, headers, wcs]
 allowAdditionalProperties: true
 ...

@@ -22,8 +22,8 @@ class DatasetType(DKISTType):
     def from_tree(cls, node, ctx):
         data = node['data'].array
         wcs = node['wcs']
-        meta = node['meta']
         headers = node['headers']
+        meta = node.get('meta')
         unit = node.get('unit')
         mask = node.get('mask')
 
@@ -38,7 +38,7 @@ class DatasetType(DKISTType):
             raise ValueError("This Dataset object can not be saved to asdf as "
                              "it was not constructed from a set of FITS files.")
         node = {}
-        node['meta'] = dataset.meta
+        node['meta'] = dataset.meta or None
         node['wcs'] = dataset.wcs
         node['headers'] = dataset.headers
         node['data'] = dataset._array_container

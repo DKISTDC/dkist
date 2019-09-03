@@ -119,23 +119,11 @@ class Dataset(NDCube):
             with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
                 with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                                lazy_load=False, copy_arrays=True) as ff:
-                    pointer_array = np.array(ff.tree['data'])
-
-                    array_container = DaskFITSArrayContainer(pointer_array, loader=AstropyFITSLoader,
-                                                             basepath=base_path)
-
-                    data = array_container.array
-
-                    wcs = ff.tree['wcs']
-                    meta = ff.tree['meta']
-                    headers = ff.tree['headers']
+                    return ff.tree['dataset']
 
         except ValidationError as e:
-            raise TypeError(f"This file is not a valid DKIST asdf file, it fails validation with: {e.message}.")
-
-        cls = cls(data, header_table=headers, wcs=wcs, meta=meta)
-        cls._array_container = array_container
-        return cls
+            err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."
+            raise TypeError(err) from e
 
     @property
     def array_container(self):

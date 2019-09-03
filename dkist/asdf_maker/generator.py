@@ -18,6 +18,9 @@ from sunpy.time import parse_time
 from dkist.asdf_maker.helpers import (linear_spectral_model, references_from_filenames,
                                       spatial_model_from_header, spectral_model_from_framewave,
                                       time_model_from_date_obs)
+from dkist.dataset import Dataset
+from dkist.io.array_containers import DaskFITSArrayContainer
+from dkist.io.fits import AstropyFITSLoader
 
 try:
     from importlib import resources  # >= py 3.7
@@ -377,10 +380,12 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
     reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
-    tree = {'data': reference_array,
-            'wcs': gwcs_from_headers(sorted_headers),
-            'headers': table_headers,
-            'meta': inventory}
+    array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
+    ds = Dataset(array_container.array, gwcs_from_headers(sorted_headers), meta=inventory, header_table=table_headers)
+
+    ds._array_container = array_container
+
+    tree = {'dataset': ds}
 
     return tree
 

@@ -21,7 +21,7 @@ def externalarray():
     """
     with asdf.AsdfFile.open(
             os.path.join(eitdir, "eit_test_dataset.asdf")) as f:
-        return f.tree['data']
+        return f.tree['dataset']._array_container.as_external_array_references()
 
 
 def test_slicing(externalarray):
