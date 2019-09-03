@@ -9,7 +9,7 @@ import asdf
 
 from dkist.data.test import rootdir
 from dkist.io.fits import AstropyFITSLoader
-from dkist.io.reference_collections import DaskFITSArrayContainer, NumpyFITSArrayContainer
+from dkist.io.array_containers import DaskFITSArrayContainer, NumpyFITSArrayContainer
 
 eitdir = os.path.join(rootdir, "EIT")
 
@@ -21,7 +21,7 @@ def externalarray():
     """
     with asdf.AsdfFile.open(
             os.path.join(eitdir, "eit_test_dataset.asdf")) as f:
-        return f.tree['data']
+        return f.tree['dataset']._array_container.as_external_array_references()
 
 
 def test_slicing(externalarray):

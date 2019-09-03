@@ -1,48 +1,119 @@
-"""
-Shared pytest fixtures.
-"""
-
+import dask.array as da
+import numpy as np
 import pytest
 
+import astropy.modeling.models as m
 import astropy.units as u
-from astropy.modeling.models import Identity, Multiply, Pix2Sky_AZP, Shift
+import gwcs
+import gwcs.coordinate_frames as cf
+from asdf import ExternalArrayReference
+from astropy.table import Table
+from astropy.time import Time
+from sunpy.coordinates.frames import Helioprojective
+
+from dkist.dataset import Dataset
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 
 @pytest.fixture
-def double_input_flat():
-    return (Identity(1) | Identity(1)) & Identity(1)
+def array():
+    shape = np.random.randint(10, 100, size=2)
+    x = np.ones(shape) + 10
+    return da.from_array(x, tuple(shape))
 
 
 @pytest.fixture
-def triple_input_flat():
-    return Identity(1) & Identity(1) & Identity(1)
+def identity_gwcs():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=2,
+                                        axes_order=(0, 1),
+                                        axes_type=("pixel", "pixel"),
+                                        axes_names=("x", "y"),
+                                        unit=(u.pix, u.pix))
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=sky_frame, input_frame=detector_frame)
 
 
 @pytest.fixture
-def triple_input_nested():
-    return (Identity(1) | Identity(1) | Identity(1)) & (Identity(1) | Identity(1)) & Identity(1)
+def identity_gwcs_3d():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = (m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.nm / u.pixel))
+
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"),
+                                  axes_names=("longitude", "latitude"))
+    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm, axes_names=("wavelength",))
+
+    frame = cf.CompositeFrame([sky_frame, wave_frame])
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
+                                        axes_order=(0, 1, 2),
+                                        axes_type=("pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
 
 
 @pytest.fixture
-def single_non_separable():
-    return Pix2Sky_AZP() | Identity(2)
+def identity_gwcs_4d():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = (m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel) &
+                m.Multiply(1*u.nm/u.pixel) & m.Multiply(1*u.nm/u.pixel))
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+    wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
+    time_frame = cf.TemporalFrame(Time([], format="isot", scale="utc"), axes_order=(3, ), unit=u.s)
+
+    frame = cf.CompositeFrame([sky_frame, wave_frame, time_frame])
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=4,
+                                        axes_order=(0, 1, 2, 3),
+                                        axes_type=("pixel", "pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z", "s"), unit=(u.pix, u.pix, u.pix, u.pix))
+
+    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
 
 
 @pytest.fixture
-def double_non_separable():
-    return (Pix2Sky_AZP() | Identity(2)) & Identity(1)
+def dataset(array, identity_gwcs):
+    meta = {'bucket': 'data',
+            'dataset_id': 'test_dataset',
+            'asdf_object_key': 'test_dataset.asdf'}
+    ds = Dataset(array, wcs=identity_gwcs, meta=meta, header_table=Table())
+    # Sanity checks
+    assert ds.data is array
+    assert ds.wcs is identity_gwcs
 
+    ds._array_container = DaskFITSArrayContainer([ExternalArrayReference('test1.fits', 0, 'float', (10, 10)),
+                                                  ExternalArrayReference('test2.fits', 0, 'float', (10, 10))],
+                                                loader=AstropyFITSLoader)
 
-def spatial_like_model():
-    crpix1, crpix2 = (100, 100) * u.pix
-    cdelt1, cdelt2 = (10, 10) * (u.arcsec / u.pix)
-
-    shiftu = Shift(-crpix1) & Shift(-crpix2)
-    scale = Multiply(cdelt1) & Multiply(cdelt2)
-
-    return (shiftu | scale | Pix2Sky_AZP()) & Identity(1)
+    return ds
 
 
 @pytest.fixture
-def spatial_like():
-    return spatial_like_model()
+def dataset_3d(identity_gwcs_3d):
+    shape = (25, 50, 50)
+    x = np.ones(shape)
+    array = da.from_array(x, tuple(shape))
+
+    return Dataset(array, wcs=identity_gwcs_3d)
+
+
+@pytest.fixture
+def dataset_4d(identity_gwcs_4d):
+    shape = (50, 60, 70, 80)
+    x = np.ones(shape)
+    array = da.from_array(x, tuple(shape))
+
+    return Dataset(array, wcs=identity_gwcs_4d)

@@ -184,15 +184,14 @@ def spectral_model_from_framewave(framewav):
         return LookupTable(framewav)
 
 
-def make_asdf(filename, *, dataset, gwcs, **kwargs):
+def make_asdf(filename, *, dataset, **kwargs):
     """
     Save an asdf file.
 
     All keyword arguments become keys in the top level of the asdf tree.
     """
     tree = {
-        'wcs': gwcs,
-        'data': dataset,
+        'dataset': dataset,
         **kwargs
     }
 

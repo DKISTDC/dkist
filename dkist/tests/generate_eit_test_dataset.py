@@ -131,7 +131,7 @@ def main():
                                   reference_frame=smap0.coordinate_frame,
                                   axes_names=("helioprojective longitude", "helioprojective latitude"))
     time_frame = cf.TemporalFrame(axes_order=(2, ), unit=u.s,
-                                  reference_time=Time(time_coords[0]),
+                                  reference_frame=Time(time_coords[0]),
                                   axes_names=("time",))
 
     sky_frame = cf.CompositeFrame([sky_frame, time_frame], name="world")
@@ -149,11 +149,16 @@ def main():
 
     ea = references_from_filenames(files, relative_to=str(path))
 
+    from dkist.dataset import Dataset
+    from dkist.io.array_containers import DaskFITSArrayContainer
+    from dkist.io.fits import AstropyFITSLoader
+
+    ac = DaskFITSArrayContainer(ea, loader=AstropyFITSLoader)
+    ds = Dataset(ac.array, wcs, meta=None, header_table=table_from_headers(headers))
+    ds._array_container = ac
+
     tree = {
-        'wcs': wcs,
-        'data': ea,
-        'headers': table_from_headers(headers),
-        'meta': generate_datset_inventory_from_headers(headers, "eit_test_dataset.asdf")
+        'dataset': ds
     }
 
     with asdf.AsdfFile(tree) as ff:

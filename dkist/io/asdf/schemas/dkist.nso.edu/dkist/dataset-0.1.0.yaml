@@ -1,0 +1,140 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://dkist.nso.edu/schemas/dkist/dataset-0.1.0"
+tag: "tag:dkist.nso.edu:dkist/dataset-0.1.0"
+
+title: |
+  A DKIST Level 1 Dataset object.
+description:
+  The container for a distributed dataset object.
+
+type: object
+properties:
+  data:
+    $ref: "tag:dkist.nso.edu:dkist/array_container-0.1.0"
+
+  wcs:
+    description: The coordinate system for the complete dataset.
+    $ref: "tag:stsci.edu:gwcs/wcs-1.0.0"
+
+  headers:
+    description: A table of all the headers for the constituent files.
+    anyOf:
+      - $ref: "tag:stsci.edu:asdf/core/table-1.0.0"
+      - $ref: "tag:astropy.org:astropy/table/table-1.0.0"
+
+  meta:
+    description: Dataset metadata, describing the whole dataset.
+    type: object
+    properties:
+        asdf_object_key:
+          type: string
+        browse_movie_object_key:
+          type: string
+        browse_movie_url:
+          type: string
+        bucket:
+          type: string
+        contributing_experiment_ids:
+          type: array
+          items:
+            type: string
+        contributing_proposal_ids:
+          type: array
+          items:
+            type: string
+        dataset_id:
+          type: string
+        dataset_inventory_id:
+          type: integer
+        dataset_size:
+          type: integer
+        end_time:
+          $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
+        exposure_time:
+          type: number
+        filter_wavelengths:
+          type: array
+          items:
+            type: string
+        frame_count:
+          type: integer
+        has_all_stokes:
+          type: boolean
+        instrument_name:
+          type: string
+        observables:
+          type: array
+          items:
+            type: string
+        original_frame_count:
+          type: integer
+        primary_experiment_id:
+          type: string
+        primary_proposal_id:
+          type: string
+        quality_average_fried_parameter:
+          type: number
+        quality_average_polarimetric_accuracy:
+          type: number
+        recipe_id:
+          type: integer
+        recipe_instance_id:
+          type: integer
+        recipe_run_id:
+          type: integer
+        start_time:
+          $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
+        #stokes_parameters:
+        #  type: string
+        target_type:
+          type: string
+        wavelength_max:
+          type: number
+        wavelength_min:
+          type: number
+    additionalProperties: false
+    # required:
+    #     - asdf_object_key
+    #     - browse_movie_object_key
+    #     - browse_movie_url
+    #     - bucket
+    #     - contributing_experiment_ids
+    #     - contributing_proposal_ids
+    #     - dataset_id
+    #     - dataset_inventory_id
+    #     - dataset_size
+    #     - end_time
+    #     - exposure_time
+    #     - filter_wavelengths
+    #     - frame_count
+    #     - has_all_stokes
+    #     - instrument_name
+    #     - observables
+    #     - original_frame_count
+    #     - primary_experiment_id
+    #     - primary_proposal_id
+    #     - quality_average_fried_parameter
+    #     - quality_average_polarimetric_accuracy
+    #     - recipe_id
+    #     - recipe_instance_id
+    #     - recipe_run_id
+    #     - start_time
+    #     - target_type
+    #     - wavelength_max
+    #     - wavelength_min
+
+  mask:
+    $ref: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
+
+  unit:
+    $ref: "tag:stsci.edu:asdf/unit/unit-1.0.0"
+
+  # uncertainty:
+  #   type: object
+
+
+required: [data, headers, wcs]
+allowAdditionalProperties: true
+...
