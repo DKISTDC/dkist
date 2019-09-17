@@ -27,7 +27,7 @@ class DatasetType(DKISTType):
         unit = node.get('unit')
         mask = node.get('mask')
 
-        dataset = Dataset(data, header_table=headers, wcs=wcs, meta=meta,
+        dataset = Dataset(data, headers=headers, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
         dataset._array_container = node['data']
         return dataset

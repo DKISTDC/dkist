@@ -154,7 +154,7 @@ def main():
     from dkist.io.fits import AstropyFITSLoader
 
     ac = DaskFITSArrayContainer(ea, loader=AstropyFITSLoader)
-    ds = Dataset(ac.array, wcs, meta=None, header_table=table_from_headers(headers))
+    ds = Dataset(ac.array, wcs, meta=None, headers=table_from_headers(headers))
     ds._array_container = ac
 
     tree = {

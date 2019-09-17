@@ -89,7 +89,7 @@ def dataset(array, identity_gwcs):
     meta = {'bucket': 'data',
             'dataset_id': 'test_dataset',
             'asdf_object_key': 'test_dataset.asdf'}
-    ds = Dataset(array, wcs=identity_gwcs, meta=meta, header_table=Table())
+    ds = Dataset(array, wcs=identity_gwcs, meta=meta, headers=Table())
     # Sanity checks
     assert ds.data is array
     assert ds.wcs is identity_gwcs

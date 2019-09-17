@@ -74,13 +74,13 @@ class Dataset(NDCube):
         a "missing" longitude axis as longitude and latitude are not separable.
     """
 
-    def __init__(self, data, wcs, uncertainty=None, mask=None,
-                 meta=None, unit=None, extra_coords=None, copy=False, header_table=None):
+    def __init__(self, data, wcs, uncertainty=None, mask=None, meta=None,
+                 unit=None, extra_coords=None, copy=False, headers=None):
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, extra_coords=extra_coords, copy=copy)
 
-        self._header_table = header_table
+        self._header_table = headers
         self._array_container = None
 
     @property

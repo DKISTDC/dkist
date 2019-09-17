@@ -391,7 +391,7 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
                                                 hdu_index=hdu, relative_to=relative_to)
 
     array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
-    ds = Dataset(array_container.array, gwcs_from_headers(sorted_headers), meta=inventory, header_table=table_headers)
+    ds = Dataset(array_container.array, gwcs_from_headers(sorted_headers), meta=inventory, headers=table_headers)
 
     ds._array_container = array_container
 
