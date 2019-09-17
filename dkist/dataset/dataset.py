@@ -59,23 +59,17 @@ class Dataset(NDCube):
         Unit for the dataset. Strings that can be converted to a Unit are allowed.
         Default is None.
 
-    copy : bool, optional
-        Indicates whether to save the arguments as copy. True copies every attribute
-        before saving it while False tries to save every parameter as reference.
-        Note however that it is not always possible to save the input as reference.
-        Default is False.
+    extra_coords : iterable of `tuple`, each with three entries
+        (`str`, `int`, `astropy.units.quantity` or array-like)
+        Gives the name, axis of data, and values of coordinates of a data axis not
+        included in the WCS object.
 
-    missing_axis : `list` of `bool`
-        Designates which axes in wcs object do not have a corresponding axis is the data.
-        True means axis is "missing", False means axis corresponds to a data axis.
-        Ordering corresponds to the axis ordering in the WCS object, i.e. reverse of data.
-        For example, say the data's y-axis corresponds to latitude and x-axis corresponds
-        to wavelength.  In order the convert the y-axis to latitude the WCS must contain
-        a "missing" longitude axis as longitude and latitude are not separable.
+    headers : `astropy.table.Table`
+        A Table of all FITS headers for all files comprising this dataset.
     """
 
     def __init__(self, data, wcs, uncertainty=None, mask=None, meta=None,
-                 unit=None, extra_coords=None, copy=False, headers=None):
+                 unit=None, extra_coords=None, headers=None):
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, extra_coords=extra_coords, copy=copy)
