@@ -511,7 +511,7 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
     constants = {
         'frame_count': len(headers),
         'bucket': 'data',
-        'asdf_object_key': asdf_name
+        'asdf_object_key': str(asdf_name)
         }
 
     output = {}
