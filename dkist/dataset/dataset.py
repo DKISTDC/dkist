@@ -5,15 +5,20 @@ import numpy as np
 from jsonschema.exceptions import ValidationError
 
 import asdf
+import astropy.table
 import astropy.units as u
+import gwcs
 from astropy.utils import isiterable
 from astropy.visualization.wcsaxes import WCSAxes
+from astropy.wcs.wcsapi.utils import wcs_info_str
 from ndcube.ndcube import NDCube
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
+
+from .utils import dataset_info_str
 
 try:
     from importlib import resources  # >= py 3.7
@@ -71,15 +76,76 @@ class Dataset(NDCube):
     def __init__(self, data, wcs, uncertainty=None, mask=None, meta=None,
                  unit=None, extra_coords=None, headers=None):
 
+        # Do some validation
+        if not isinstance(wcs, gwcs.WCS):
+            raise ValueError("DKIST Dataset objects expect gWCS objects as the wcs argument.")
+
+        # Set the array shape to be that of the data.
+        wcs.array_shape = data.shape
+        wcs.pixel_shape = data.shape[::-1]
+
+        if headers is not None and not isinstance(headers, astropy.table.Table):
+            raise ValueError("The headers keyword argument must be an Astropy Table instance.")
+
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
-                         unit=unit, extra_coords=extra_coords, copy=copy)
+                         unit=unit, extra_coords=extra_coords, copy=False)
 
         self._header_table = headers
         self._array_container = None
 
+    """
+    Changes to the NDCube APIs.
+    """
+
+    # Overload this to only expose the new API in this package, this can be
+    # removed once NDCube 2 is finalised.
+    def crop_by_coords(self, lower_corner, upper_corner, units=None):
+        return super().crop_by_coords(lower_corner, upper_corner=upper_corner, units=units)
+
+    @property
+    def world_axis_physical_types(self):
+        """
+        Returns an iterable of strings describing the physical type for each world axis.
+
+        The strings conform to the International Virtual Observatory Alliance
+        standard, UCD1+ controlled Vocabulary.  For a description of the standard and
+        definitions of the different strings and string components,
+        see http://www.ivoa.net/documents/latest/UCDlist.html.
+
+        """
+        return self.wcs.world_axis_physical_types[::-1]
+
+    """
+    Properties.
+    """
+
     @property
     def headers(self):
         return self._header_table
+
+    @property
+    def array_container(self):
+        """
+        A reference to the files containing the data.
+        """
+        return self._array_container
+
+    @property
+    def filenames(self):
+        """
+        The filenames referenced by this dataset.
+
+        .. note::
+            This is not their full file paths.
+        """
+        if self._array_container is None:
+            return []
+        else:
+            return self._array_container.filenames
+
+    """
+    Dataset loading and saving routines.
+    """
 
     @classmethod
     def from_directory(cls, directory):
@@ -119,31 +185,9 @@ class Dataset(NDCube):
             err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."
             raise TypeError(err) from e
 
-    @property
-    def array_container(self):
-        """
-        A reference to the files containing the data.
-        """
-        return self._array_container
-
-    @property
-    def world_axis_physical_types(self):
-        """
-        Returns an iterable of strings describing the physical type for each world axis.
-
-        The strings conform to the International Virtual Observatory Alliance
-        standard, UCD1+ controlled Vocabulary.  For a description of the standard and
-        definitions of the different strings and string components,
-        see http://www.ivoa.net/documents/latest/UCDlist.html.
-
-        """
-        return self.wcs.world_axis_physical_types[::-1]
-
-
-    # Overload this to only expose the new API in this package, this can be
-    # removed once NDCube 2 is finalised.
-    def crop_by_coords(self, lower_corner, upper_corner, units=None):
-        return super().crop_by_coords(lower_corner, upper_corner=upper_corner, units=units)
+    """
+    Private methods.
+    """
 
     def __repr__(self):
         """
@@ -154,30 +198,17 @@ class Dataset(NDCube):
         return output
 
     def __str__(self):
-        return f"{self.data!r}\n{self.wcs!r}"
+        return dataset_info_str(self)
 
     def _as_mpl_axes(self):
+        """
+        Allow this object to be passed to matplotlib as a projection.
+        """
         return WCSAxes, {'transform': self.wcs}
 
-    @property
-    def dimensions(self):
-        """
-        The dimensions of the data as a `~astropy.units.Quantity`.
-        """
-        return u.Quantity(self.data.shape, unit=u.pix)
-
-    @property
-    def filenames(self):
-        """
-        The filenames referenced by this dataset.
-
-        .. note::
-            This is not their full file paths.
-        """
-        if self._array_container is None:
-            return []
-        else:
-            return self._array_container.filenames
+    """
+    DKIST specific methods.
+    """
 
     def download(self, path="/~/", destination_endpoint=None, progress=True):
         """
