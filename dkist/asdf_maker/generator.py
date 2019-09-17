@@ -226,7 +226,7 @@ class TransformBuilder:
         """
         name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.StokesFrame(axes_order=(self._i,), name=name))
-        self._transforms.append(LookupTable([0, 1, 2, 3] * u.pixel))
+        self._transforms.append(LookupTable([0, 1, 2, 3] * u.one))
 
         self._i += 1
 
@@ -260,10 +260,13 @@ class TransformBuilder:
         axes_names = [(self.header[f'DWNAME{nn}'].rsplit(' ')[1]) for nn in (self.n, self._n(i+1))]
 
         obstime = Time(self.header['DATE-BGN'])
+        axes_types = ["lat" if "LT" in self.axes_types[i] else "lon", "lon" if "LN" in self.axes_types[i] else "lat"]
         self._frames.append(cf.CelestialFrame(axes_order=(i, i+1), name=name,
                                               reference_frame=Helioprojective(obstime=obstime),
                                               axes_names=axes_names,
-                                              unit=self.get_units(self._i, self._i+1)))
+                                              unit=self.get_units(self._i, self._i+1),
+                                              axis_physical_types=(f"custom:pos.helioprojective.{axes_types[0]}",
+                                                                   f"custom:pos.helioprojective.{axes_types[1]}")))
 
         self._transforms.append(spatial_model_from_header(self.header))
 
