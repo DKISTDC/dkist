@@ -10,6 +10,7 @@ import astropy.units as u
 import gwcs
 from astropy.utils import isiterable
 from astropy.visualization.wcsaxes import WCSAxes
+from astropy.wcs.wcsapi import SlicedLowLevelWCS
 from astropy.wcs.wcsapi.utils import wcs_info_str
 from ndcube.ndcube import NDCube
 
@@ -77,12 +78,14 @@ class Dataset(NDCube):
                  unit=None, extra_coords=None, headers=None):
 
         # Do some validation
-        if not isinstance(wcs, gwcs.WCS):
+        if (not isinstance(wcs, gwcs.WCS) and
+            (isinstance(wcs, SlicedLowLevelWCS) and not isinstance(wcs._wcs, gwcs.WCS))):
             raise ValueError("DKIST Dataset objects expect gWCS objects as the wcs argument.")
 
-        # Set the array shape to be that of the data.
-        wcs.array_shape = data.shape
-        wcs.pixel_shape = data.shape[::-1]
+        if isinstance(wcs, gwcs.WCS):
+            # Set the array shape to be that of the data.
+            wcs.array_shape = data.shape
+            wcs.pixel_shape = data.shape[::-1]
 
         if headers is not None and not isinstance(headers, astropy.table.Table):
             raise ValueError("The headers keyword argument must be an Astropy Table instance.")
@@ -161,8 +164,9 @@ class Dataset(NDCube):
         if not asdf_files:
             raise ValueError("No asdf file found in directory.")
         elif len(asdf_files) > 1:
-            raise NotImplementedError("Multiple asdf files found in this"
-                                      " directory. Can't handle this yet.")  # pragma: no cover
+            raise NotImplementedError("Multiple asdf files found in this "
+                                      "directory. Use from_asdf to specify which "
+                                      "one to use.") # pragma: no cover
 
         asdf_file = asdf_files[0]
 

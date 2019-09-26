@@ -4,6 +4,8 @@ Helper functions for the Dataset class.
 
 import numpy as np
 
+from astropy.wcs.wcsapi import SlicedLowLevelWCS
+
 
 __all__ = ['dataset_info_str']
 
@@ -22,7 +24,10 @@ def dataset_info_str(ds):
     pixel_shape = ds.wcs.pixel_shape or (None,) * ds.wcs.pixel_n_dim
 
     # Find largest between header size and value length
-    pixel_axis_names = ds.wcs.input_frame.axes_names
+    if isinstance(ds.wcs, SlicedLowLevelWCS):
+        pixel_axis_names = np.array(ds.wcs._wcs.input_frame.axes_names)[ds.wcs._pixel_keep]
+    else:
+        pixel_axis_names = ds.wcs.input_frame.axes_names
     pixel_dim_width = max(9, len(str(ds.wcs.pixel_n_dim)))
     pixel_nam_width = max(9, max(len(x) for x in pixel_axis_names))
     pixel_siz_width = max(9, len(str(max(array_shape))))
