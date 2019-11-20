@@ -45,7 +45,10 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         if reference_shape[0] == 1:
             reference_shape = reference_shape[1:]
 
-        self.shape = tuple(list(reference_array.shape) + list(reference_shape))
+        if len(reference_array) == 1:
+            self.shape = reference_shape
+        else:
+            self.shape = tuple(list(reference_array.shape) + list(reference_shape))
 
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
