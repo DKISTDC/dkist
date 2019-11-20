@@ -13,11 +13,12 @@ from astropy.modeling.models import (AffineTransformation2D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
-from gwcs.lookup_table import LookupTable
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 from sunpy.net.jsoc import JSOCClient
 from sunpy.time import parse_time
+
+from dkist.asdf_maker.helpers import generate_lookup_table
 
 
 def map_to_transform(smap):
@@ -162,8 +163,8 @@ def main():
     smap0 = sunpy.map.Map(files[0])
     spatial = map_to_transform(smap0)
 
-    timemodel = LookupTable(lookup_table=seconds[:shape[1]]*u.s)
-    wavemodel = LookupTable(lookup_table=waves[:shape[0]]*u.AA)
+    timemodel = generate_lookup_table(lookup_table=seconds[:shape[1]]*u.s)
+    wavemodel = generate_lookup_table(lookup_table=waves[:shape[0]]*u.AA)
 
     hcubemodel = spatial & timemodel & wavemodel
 
