@@ -145,7 +145,7 @@ def main():
 
     print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, with_units=True))
+    print(wcs(*[1*u.pix]*3, with_units=True))
 
     ea = references_from_filenames(files, relative_to=str(path))
 
@@ -166,6 +166,10 @@ def main():
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
 
+
+    ds.plot()
+    import matplotlib.pyplot as plt
+    plt.show()
 
 if __name__ == "__main__":
     main()
