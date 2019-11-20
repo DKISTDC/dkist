@@ -4,11 +4,10 @@ import numpy as np
 
 import asdf
 import astropy.units as u
-from astropy.modeling.models import Tabular1D
 from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.io.fits.hdu.base import BITPIX2DTYPE
 from astropy.modeling.models import (AffineTransformation2D, Linear1D, Multiply,
-                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
+                                     Pix2Sky_TAN, RotateNative2Celestial, Shift, Tabular1D)
 from astropy.time import Time
 
 __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear_spectral_model',

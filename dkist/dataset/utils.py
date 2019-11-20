@@ -6,7 +6,6 @@ import numpy as np
 
 from astropy.wcs.wcsapi import SlicedLowLevelWCS
 
-
 __all__ = ['dataset_info_str']
 
 

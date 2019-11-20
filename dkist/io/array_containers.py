@@ -180,4 +180,3 @@ def loader_to_dask(loader_array):
     to_array = partial(da.from_array, meta=meta)
 
     return map(to_array, loader_array)
-
