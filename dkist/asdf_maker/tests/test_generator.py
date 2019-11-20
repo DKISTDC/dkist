@@ -5,7 +5,6 @@ import pytest
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, models
-from gwcs.lookup_table import LookupTable
 
 from dkist.asdf_maker.generator import (asdf_tree_from_filenames, dataset_from_fits,
                                         gwcs_from_headers, headers_from_filenames,
@@ -62,7 +61,7 @@ def test_transform_models(wcs):
     sms = wcs.forward_transform._leaflist
     smtypes = [type(m) for m in sms]
     assert sum(mt is models.Linear1D for mt in smtypes) == 2
-    assert sum(mt is LookupTable for mt in smtypes) == 1
+    assert sum(mt is models.Tabular1D for mt in smtypes) == 1
 
 
 def test_array_container_shape(header_filenames):

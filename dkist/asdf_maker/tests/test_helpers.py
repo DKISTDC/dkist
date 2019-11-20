@@ -7,10 +7,8 @@ import pytest
 import asdf
 import astropy.units as u
 from astropy.io import fits
-from astropy.modeling import Model
-from astropy.modeling.models import Linear1D
+from astropy.modeling import Model, models
 from astropy.time import Time
-from gwcs.lookup_table import LookupTable
 
 from dkist.asdf_maker.generator import asdf_tree_from_filenames, headers_from_filenames
 from dkist.asdf_maker.helpers import (linear_spectral_model, linear_time_model, make_asdf,
@@ -56,14 +54,14 @@ def test_spatial_model_fail(header_filenames):
 
 def test_linear_spectral():
     lin = linear_spectral_model(10*u.nm, 0*u.nm)
-    assert isinstance(lin, Linear1D)
+    assert isinstance(lin, models.Linear1D)
     assert u.allclose(lin.slope, 10*u.nm/u.pix)
     assert u.allclose(lin.intercept, 0*u.nm)
 
 
 def test_linear_time():
     lin = linear_time_model(10*u.s)
-    assert isinstance(lin, Linear1D)
+    assert isinstance(lin, models.Linear1D)
     assert u.allclose(lin.slope, 10*u.s/u.pix)
     assert u.allclose(lin.intercept, 0*u.s)
 
@@ -71,14 +69,14 @@ def test_linear_time():
 def test_time_from_dateobs(header_filenames):
     date_obs = [fits.getheader(f)['DATE-OBS'] for f in header_filenames]
     time = time_model_from_date_obs(date_obs)
-    assert isinstance(time, Linear1D)
+    assert isinstance(time, models.Linear1D)
 
 
 def test_time_from_dateobs_lookup(header_filenames):
     date_obs = [fits.getheader(f)['DATE-OBS'] for f in header_filenames]
     date_obs[5] = (Time(date_obs[5]) + 10*u.s).isot
     time = time_model_from_date_obs(date_obs)
-    assert isinstance(time, LookupTable)
+    assert isinstance(time, models.Tabular1D)
 
 
 def test_spectral_framewave(header_filenames):
@@ -92,10 +90,10 @@ def test_spectral_framewave(header_filenames):
     framewave = [fits.getheader(h)['FRAMEWAV'] for h in header_filenames]
 
     m = spectral_model_from_framewave(framewave[:nwave])
-    assert isinstance(m, Linear1D)
+    assert isinstance(m, models.Linear1D)
 
     m2 = spectral_model_from_framewave(framewave)
-    assert isinstance(m2, LookupTable)
+    assert isinstance(m2, models.Tabular1D)
 
 
 def test_make_asdf(header_filenames, tmpdir):

@@ -8,16 +8,16 @@ import asdf
 import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
+from astropy.modeling.models import Tabular1D
 from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
-from gwcs.lookup_table import LookupTable
 from sunpy.coordinates import Helioprojective
 from sunpy.time import parse_time
 
 from dkist.asdf_maker.helpers import (linear_spectral_model, references_from_filenames,
                                       spatial_model_from_header, spectral_model_from_framewave,
-                                      time_model_from_date_obs)
+                                      time_model_from_date_obs, generate_lookup_table)
 from dkist.dataset import Dataset
 from dkist.io.array_containers import DaskFITSArrayContainer
 from dkist.io.fits import AstropyFITSLoader
@@ -226,8 +226,7 @@ class TransformBuilder:
         """
         name = self.header[f'DWNAME{self.n}']
         self._frames.append(cf.StokesFrame(axes_order=(self._i,), name=name))
-        self._transforms.append(LookupTable([0, 1, 2, 3] * u.one))
-
+        self._transforms.append(generate_lookup_table([0, 1, 2, 3] * u.one, interpolation='nearest'))
         self._i += 1
 
     def make_temporal(self):
