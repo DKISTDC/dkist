@@ -341,6 +341,21 @@ def make_sorted_table(headers, filenames):
     return theaders[np.argsort(t, order=keys)]
 
 
+def _preprocess_headers(headers, filenames):
+    table_headers = make_sorted_table(headers, filenames)
+
+    validate_headers(table_headers)
+
+    # Sort the filenames into DS order.
+    sorted_filenames = np.array(table_headers['filenames'])
+    sorted_headers = np.array(table_headers['headers'])
+
+    table_headers.remove_columns(["headers", "filenames"])
+
+    return table_headers, sorted_filenames, sorted_headers
+
+
+
 def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
                              relative_to=None, extra_inventory=None):
     """
@@ -355,23 +370,18 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
     hdu : `int`
         The HDU to read from the FITS files.
     """
+    # In case filenames is a generator we cast to list.
+    filenames = list(filenames)
+
     # headers is an iterator
     headers = headers_from_filenames(filenames, hdu=hdu)
 
-    table_headers = make_sorted_table(headers, filenames)
-
-    validate_headers(table_headers)
+    table_headers, sorted_filenames, sorted_headers = _preprocess_headers(headers, filenames)
 
     if not inventory:
         inventory = generate_datset_inventory_from_headers(table_headers, asdf_filename)
     if extra_inventory:
         inventory.update(extra_inventory)
-
-    # Sort the filenames into DS order.
-    sorted_filenames = np.array(table_headers['filenames'])
-    sorted_headers = np.array(table_headers['headers'])
-
-    table_headers.remove_columns(["headers", "filenames"])
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],

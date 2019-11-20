@@ -65,6 +65,24 @@ def test_transform_models(wcs):
     assert sum(mt is LookupTable for mt in smtypes) == 1
 
 
+def test_array_container_shape(header_filenames):
+    from dkist.asdf_maker.generator import _preprocess_headers, references_from_filenames
+    from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
+
+    headers = headers_from_filenames(header_filenames, hdu=0)
+    table_headers, sorted_filenames, sorted_headers = _preprocess_headers(headers, header_filenames)
+    # Get the array shape
+    shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
+                                                           headers[0]['DAAXES'], -1)))
+    # References from filenames
+    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
+                                                hdu_index=0, relative_to=".")
+    array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
+
+    assert len(array_container.shape) == 5
+    assert array_container.shape == array_container.array.shape
+
+
 def test_asdf_tree(header_filenames):
     tree = asdf_tree_from_filenames(header_filenames, "test_file.asdf")
     assert isinstance(tree, dict)
