@@ -48,22 +48,25 @@ def dataset_info_str(ds):
 
     # Find largest between header size and value length
     world_dim_width = max(9, len(str(ds.wcs.world_n_dim)))
+    world_nam_width = max(9, max(len(x) if x is not None else 0 for x in ds.wcs.world_axis_names))
     world_typ_width = max(13, max(len(x) if x is not None else 0 for x in ds.wcs.world_axis_physical_types))
 
     s += (('{0:' + str(world_dim_width) + 's}').format('World Dim') + '  ' +
+            ('{0:' + str(world_nam_width) + 's}').format('Axis Name') + '  ' +
             ('{0:' + str(world_typ_width) + 's}').format('Physical Type') + '  ' +
             'Units\n')
 
     for iwrl in range(ds.wcs.world_n_dim):
 
-        if ds.wcs.world_axis_physical_types[iwrl] is not None:
-            s += (('{0:' + str(world_dim_width) + 'd}').format(iwrl) + '  ' +
-                    ('{0:' + str(world_typ_width) + 's}').format(ds.wcs.world_axis_physical_types[::-1][iwrl]) + '  ' +
-                    '{:s}'.format(ds.wcs.world_axis_units[::-1][iwrl] + '\n'))
-        else:
-            s += (('{0:' + str(world_dim_width) + 'd}').format(iwrl) + '  ' +
-                    ('{0:' + str(world_typ_width) + 's}').format('None') + '  ' +
-                    '{:s}'.format('unknown' + '\n'))
+        name = ds.wcs.world_axis_names[::-1][iwrl] or 'None'
+        typ = ds.wcs.world_axis_physical_types[::-1][iwrl] or 'None'
+        unit = ds.wcs.world_axis_units[::-1][iwrl] or 'unknown'
+
+        s += (('{0:' + str(world_dim_width) + 'd}').format(iwrl) + '  ' +
+                ('{0:' + str(world_nam_width) + 's}').format(name) + '  ' +
+                ('{0:' + str(world_typ_width) + 's}').format(typ) + '  ' +
+                '{:s}'.format(unit + '\n'))
+
     s += '\n'
 
     # Axis correlation matrix
