@@ -13,10 +13,10 @@ from astropy.modeling.models import (AffineTransformation2D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
-from gwcs.lookup_table import LookupTable
 from sunpy.time import parse_time
 
 from dkist.asdf_maker.generator import generate_datset_inventory_from_headers, table_from_headers
+from dkist.asdf_maker.helpers import generate_lookup_table
 
 
 def map_to_transform(smap):
@@ -123,7 +123,7 @@ def main():
     smap0 = sunpy.map.Map(files[0])
     spatial = map_to_transform(smap0)
 
-    timemodel = LookupTable(lookup_table=seconds*u.s)
+    timemodel = generate_lookup_table(lookup_table=seconds*u.s)
 
     hcubemodel = spatial & timemodel
 
@@ -145,7 +145,7 @@ def main():
 
     print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, with_units=True))
+    print(wcs(*[1*u.pix]*3, with_units=True))
 
     ea = references_from_filenames(files, relative_to=str(path))
 
@@ -154,7 +154,7 @@ def main():
     from dkist.io.fits import AstropyFITSLoader
 
     ac = DaskFITSArrayContainer(ea, loader=AstropyFITSLoader)
-    ds = Dataset(ac.array, wcs, meta=None, header_table=table_from_headers(headers))
+    ds = Dataset(ac.array, wcs, meta=None, headers=table_from_headers(headers))
     ds._array_container = ac
 
     tree = {
@@ -166,6 +166,10 @@ def main():
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
 
+
+    ds.plot()
+    import matplotlib.pyplot as plt
+    plt.show()
 
 if __name__ == "__main__":
     main()

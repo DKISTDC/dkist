@@ -45,7 +45,10 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         if reference_shape[0] == 1:
             reference_shape = reference_shape[1:]
 
-        self.shape = tuple(list(reference_array.shape) + list(reference_shape))
+        if len(reference_array) == 1:
+            self.shape = reference_shape
+        else:
+            self.shape = tuple(list(reference_array.shape) + list(reference_shape))
 
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
@@ -133,7 +136,7 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
         """
         The `~dask.array.Array` associated with this array of references.
         """
-        return stack_loader_array(self.loader_array)
+        return stack_loader_array(self.loader_array).reshape(self.shape)
 
 
 def stack_loader_array(loader_array):
@@ -151,8 +154,29 @@ def stack_loader_array(loader_array):
     array : `dask.array.Array`
     """
     if len(loader_array.shape) == 1:
-        return da.stack(loader_array)
+        return da.stack(loader_to_dask(loader_array))
     stacks = []
     for i in range(loader_array.shape[0]):
         stacks.append(stack_loader_array(loader_array[i]))
     return da.stack(stacks)
+
+
+def loader_to_dask(loader_array):
+    """
+    Map a call to `dask.array.from_array` onto all the elements in ``loader_array``.
+
+    This is done so that an explicit ``meta=`` argument can be provided to
+    prevent loading data from disk.
+    """
+
+    if len(loader_array.shape) != 1:
+        raise ValueError("Can only be used on one dimensional arrays")
+
+    # The meta argument to from array is used to determine properties of the
+    # array, such as dtype. We explicitly specify it here to prevent dask
+    # trying to auto calculate it by reading from the actual array on disk.
+    meta = np.zeros((0,), dtype=loader_array[0].dtype)
+
+    to_array = partial(da.from_array, meta=meta)
+
+    return map(to_array, loader_array)

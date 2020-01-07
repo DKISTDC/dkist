@@ -7,9 +7,8 @@ import astropy.units as u
 from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.io.fits.hdu.base import BITPIX2DTYPE
 from astropy.modeling.models import (AffineTransformation2D, Linear1D, Multiply,
-                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
+                                     Pix2Sky_TAN, RotateNative2Celestial, Shift, Tabular1D)
 from astropy.time import Time
-from gwcs.lookup_table import LookupTable
 
 __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear_spectral_model',
            'spatial_model_from_quantity', 'spatial_model_from_header', 'references_from_filenames']
@@ -134,7 +133,23 @@ def linear_time_model(cadence: u.s, reference_val: u.s = 0*u.s):
     """
     if not reference_val:
         reference_val = 0 * cadence.unit
-    return Linear1D(slope=cadence/(1*u.pix), intercept=reference_val)
+    return Linear1D(slope=cadence / (1 * u.pix), intercept=reference_val)
+
+
+def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pix, **kwargs):
+    if not isinstance(lookup_table, u.Quantity):
+        raise TypeError("lookup_table must be a Quantity.")
+
+    points = np.arange(lookup_table.size) * points_unit
+
+    kwargs = {
+        'bounds_error': False,
+        'fill_value': np.nan,
+        'method': interpolation,
+        **kwargs
+        }
+
+    return Tabular1D(points, lookup_table, **kwargs)
 
 
 def time_model_from_date_obs(date_obs, date_bgn=None):
@@ -160,7 +175,7 @@ def time_model_from_date_obs(date_obs, date_bgn=None):
         return linear_time_model(cadence=slope, reference_val=intercept)
     else:
         print(f"creating tabular temporal axis. ddeltas: {ddelta}")
-        return LookupTable(deltas.to(u.s))
+        return generate_lookup_table(deltas.to(u.s))
 
 
 def spectral_model_from_framewave(framewav):
@@ -181,7 +196,7 @@ def spectral_model_from_framewave(framewav):
         return linear_spectral_model(slope, wave_bgn)
     else:
         print(f"creating tabular wavelength axis. ddeltas: {ddeltas}")
-        return LookupTable(framewav)
+        return generate_lookup_table(framewav)
 
 
 def make_asdf(filename, *, dataset, **kwargs):

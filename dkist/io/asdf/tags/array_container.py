@@ -20,7 +20,8 @@ class ArrayContainerType(DKISTType):
 
     @classmethod
     def from_tree(cls, node, ctx):
-        filepath = Path(ctx.uri or ".")
+        # TODO: Work out a way over overriding this at dataset load.
+        filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
         pointer_array = np.array(node['array_container'])

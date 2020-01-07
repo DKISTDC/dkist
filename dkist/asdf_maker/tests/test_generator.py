@@ -5,7 +5,6 @@ import pytest
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, models
-from gwcs.lookup_table import LookupTable
 
 from dkist.asdf_maker.generator import (asdf_tree_from_filenames, dataset_from_fits,
                                         gwcs_from_headers, headers_from_filenames,
@@ -62,7 +61,25 @@ def test_transform_models(wcs):
     sms = wcs.forward_transform._leaflist
     smtypes = [type(m) for m in sms]
     assert sum(mt is models.Linear1D for mt in smtypes) == 2
-    assert sum(mt is LookupTable for mt in smtypes) == 1
+    assert sum(mt is models.Tabular1D for mt in smtypes) == 1
+
+
+def test_array_container_shape(header_filenames):
+    from dkist.asdf_maker.generator import _preprocess_headers, references_from_filenames
+    from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
+
+    headers = headers_from_filenames(header_filenames, hdu=0)
+    table_headers, sorted_filenames, sorted_headers = _preprocess_headers(headers, header_filenames)
+    # Get the array shape
+    shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
+                                                           headers[0]['DAAXES'], -1)))
+    # References from filenames
+    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
+                                                hdu_index=0, relative_to=".")
+    array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
+
+    assert len(array_container.shape) == 5
+    assert array_container.shape == array_container.array.shape
 
 
 def test_asdf_tree(header_filenames):
