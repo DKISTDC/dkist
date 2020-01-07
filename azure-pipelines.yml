@@ -9,10 +9,10 @@ variables:
 # as a service connection (if it has not been already).
 resources:
   repositories:
-  - repository: sunpy
+  - repository: OpenAstronomy
     type: github
     endpoint: DKISTDC
-    name: sunpy/azure-pipelines-template
+    name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
 trigger:
@@ -25,25 +25,21 @@ trigger:
     # - '*post*'
 
 jobs:
-- template: run-tox-env.yml@sunpy
+- template: run-tox-env.yml@OpenAstronomy
   parameters:
-    name: Linux_37
-    os: linux
-    tox: py37 --
+    coverage: codecov
+    envs:
+      - macos: py36
+        name: macos_36
 
-# - template: run-tox-env.yml@sunpy
-#   parameters:
-#     name: Windows_37
-#     os: windows
-#     tox: py37 --
+      - linux: py37
+        name: linux_37
 
-- template: run-tox-env.yml@sunpy
-  parameters:
-    name: macOS_36
-    os: macos
-    tox: py36 --
+      - linus: py38
+        name: linux_38
+
 
 - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
-  - template: publish-pypi.yml@sunpy
+  - template: publish.yml@OpenAstronomy
     parameters:
-      dependsOn: [Linux_37,Windows_37,macOS_36]
+      dependsOn: [linux_37, linux_38, macos_36]
