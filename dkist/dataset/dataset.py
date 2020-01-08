@@ -11,7 +11,6 @@ import gwcs
 from astropy.utils import isiterable
 from astropy.visualization.wcsaxes import WCSAxes
 from astropy.wcs.wcsapi import SlicedLowLevelWCS
-from astropy.wcs.wcsapi.utils import wcs_info_str
 from ndcube.ndcube import NDCube
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
