@@ -9,7 +9,6 @@ import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.io import fits
-from astropy.modeling.models import Tabular1D
 from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates import Helioprojective

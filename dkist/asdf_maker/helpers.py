@@ -140,7 +140,8 @@ def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pi
     if not isinstance(lookup_table, u.Quantity):
         raise TypeError("lookup_table must be a Quantity.")
 
-    points = np.arange(lookup_table.size) * points_unit
+    # The integer location is at the centre of the pixel.
+    points = (np.arange(lookup_table.size) - 0) * points_unit
 
     kwargs = {
         'bounds_error': False,
