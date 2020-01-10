@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
+from asdf import ExternalArrayReferenceCollection
 from asdf.yamlutil import custom_tree_to_tagged_tree
 
 from dkist.dataset import Dataset
@@ -24,19 +25,18 @@ class ArrayContainerType(DKISTType):
         filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
-        pointer_array = np.array(node['array_container'])
-
         # TODO: The choice of Dask and Astropy here should be in a config somewhere.
-        array_container = DaskFITSArrayContainer(pointer_array,
+        array_container = DaskFITSArrayContainer(node['fileuris'],
+                                                 node['target'],
+                                                 node['dtype'],
+                                                 node['shape'],
                                                  loader=AstropyFITSLoader,
                                                  basepath=base_path)
         return array_container
 
     @classmethod
     def to_tree(cls, array_container, ctx):
-        node = {}
-        node['array_container'] = array_container.as_external_array_references()
-        return custom_tree_to_tagged_tree(node, ctx)
+        return ExternalArrayReferenceCollection.to_tree(array_container, ctx)
 
     @classmethod
     def assert_equal(cls, old, new):
@@ -44,6 +44,4 @@ class ArrayContainerType(DKISTType):
         This method is used by asdf to test that to_tree > from_tree gives an
         equivalent object.
         """
-        new = new.as_external_array_references()
-        old = old.as_external_array_references()
         assert new == old

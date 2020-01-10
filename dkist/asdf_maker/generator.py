@@ -20,7 +20,7 @@ from dkist.asdf_maker.helpers import (generate_lookup_table, linear_spectral_mod
                                       spectral_model_from_framewave, time_model_from_date_obs)
 from dkist.dataset import Dataset
 from dkist.io.array_containers import DaskFITSArrayContainer
-from dkist.io.fits import AstropyFITSLoader
+from dkist.io import AstropyFITSLoader
 
 try:
     from importlib import resources  # >= py 3.7

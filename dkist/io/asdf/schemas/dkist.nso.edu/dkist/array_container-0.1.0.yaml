@@ -1,37 +1,13 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "http://dkist.nso.edu/schemas/dkist/array_container-0.1.0"
-tag: "tag:dkist.nso.edu:dkist/array_container-0.1.0"
+id: "http://dkist.nso.edu/schemas/dkist/array_container-0.2.0"
+tag: "tag:dkist.nso.edu:dkist/array_container-0.2.0"
 
 title: |
-  A multi-dimensional (up to 3D) collection of ExternalArrayReference objects.
+  A multi-dimensional collection of ExternalArrayReference objects to be loaded as FITS files.
 
 type: object
-properties:
-  array_container:
-    description: A (nested) array of ExternalArrayReference objects.
-    type: array
-    anyOf:
-      # 3D Array of EARs
-      - type: array
-        items:
-          type: array
-          items:
-            type: array
-            items:
-              $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
-      # 2D Array of EARs
-      - type: array
-        items:
-          type: array
-          items:
-            $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
-      # 1D Array of EARs
-      - type: array
-        items:
-          $ref: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
-
-required: [array_container]
+$ref: "tag:stsci.edu:asdf/core/externalarraycollection-1.0.0"
 allowAdditionalProperties: false
 ...

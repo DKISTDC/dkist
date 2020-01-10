@@ -151,7 +151,7 @@ def main():
 
     from dkist.dataset import Dataset
     from dkist.io.array_containers import DaskFITSArrayContainer
-    from dkist.io.fits import AstropyFITSLoader
+    from dkist.io.loaders import AstropyFITSLoader
 
     ac = DaskFITSArrayContainer(ea, loader=AstropyFITSLoader)
     ds = Dataset(ac.array, wcs, meta=None, headers=table_from_headers(headers))

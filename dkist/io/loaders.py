@@ -37,31 +37,31 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, externalarray, basepath=None):
-        self.fitsarray = externalarray
+        self.externalarray = externalarray
         self.basepath = Path(basepath) if basepath else None
         # Private cache
         self._array = None
         self._fits_header = None
         # These are needed for this object to be array-like
-        self.shape = self.fitsarray.shape
+        self.shape = self.externalarray.shape
         self.ndim = len(self.shape)
-        self.dtype = self.fitsarray.dtype
+        self.dtype = self.externalarray.dtype
 
     def __repr__(self):
         # repr alone should not force loading of the data
         if self._array is None:
             return "<FITS array (unloaded) in {0} shape: {1} dtype: {2}>".format(
-                self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype)
+                self.externalarray.fileuri, self.externalarray.shape, self.externalarray.dtype)
         return "<FITS array (loaded) in {0} shape: {1} dtype: {2}>\n{3!r}".format(
-            self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype, self._array)
+            self.externalarray.fileuri, self.externalarray.shape, self.externalarray.dtype, self._array)
 
     def __str__(self):
         # str alone should not force loading of the data
         if self._array is None:
             return "<FITS array (unloaded) in {0} shape: {1} dtype: {2}>".format(
-                self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype)
+                self.externalarray.fileuri, self.externalarray.shape, self.externalarray.dtype)
         return "<FITS array (loaded) in {0} shape: {1} dtype: {2}>\n{3!r}".format(
-            self.fitsarray.fileuri, self.fitsarray.shape, self.fitsarray.dtype, self._array)
+            self.externalarray.fileuri, self.externalarray.shape, self.externalarray.dtype, self._array)
 
     def __array__(self):
         return self.fits_array
@@ -75,9 +75,9 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         Construct a non-relative path to the file, using ``basepath`` if provided.
         """
         if self.basepath:
-            return self.basepath / self.fitsarray.fileuri
+            return self.basepath / self.externalarray.fileuri
         else:
-            return Path(self.fitsarray.fileuri)
+            return Path(self.externalarray.fileuri)
 
     @property
     def fits_header(self):
@@ -145,7 +145,7 @@ class AstropyFITSLoader(BaseFITSLoader):
                        do_not_scale_image_data=False, mode="denywrite") as hdul:
 
             hdul.verify('fix')
-            hdu = hdul[self.fitsarray.target]
+            hdu = hdul[self.externalarray.target]
             if not self._fits_header:
                 self._fits_header = hdu.header
             return hdu.data
@@ -156,5 +156,5 @@ class AstropyFITSLoader(BaseFITSLoader):
         """
         with fits.open(self.absolute_uri) as hdul:
             hdul.verify('fix')
-            hdu = hdul[self.fitsarray.target]
+            hdu = hdul[self.externalarray.target]
             return hdu.header
