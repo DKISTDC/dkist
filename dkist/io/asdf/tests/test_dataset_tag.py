@@ -5,7 +5,6 @@ from asdf.tests import helpers
 
 from dkist import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.io.array_containers import DaskFITSArrayContainer
 
 
 @pytest.fixture

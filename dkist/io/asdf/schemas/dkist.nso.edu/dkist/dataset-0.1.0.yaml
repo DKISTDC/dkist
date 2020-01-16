@@ -12,7 +12,7 @@ description:
 type: object
 properties:
   data:
-    $ref: "tag:dkist.nso.edu:dkist/array_container-0.1.0"
+    $ref: "tag:dkist.nso.edu:dkist/array_container-0.2.0"
 
   wcs:
     description: The coordinate system for the complete dataset.
