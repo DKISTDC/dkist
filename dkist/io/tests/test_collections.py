@@ -82,10 +82,10 @@ def test_collection_to_references(tmpdir, earcollection):
     assert len(earcollection) == len(ears) == 2
 
     for ear in ears:
-      assert isinstance(ear, asdf.ExternalArrayReference)
-      assert ear.target == earcollection.target
-      assert ear.dtype == earcollection.dtype
-      assert ear.shape == earcollection.shape
+        assert isinstance(ear, asdf.ExternalArrayReference)
+        assert ear.target == earcollection.target
+        assert ear.dtype == earcollection.dtype
+        assert ear.shape == earcollection.shape
 
 
 def test_collection_getitem(tmpdir, earcollection):
