@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.array_containers import DaskFITSArrayContainer, NumpyFITSArrayContainer
+from dkist.io.array_containers import DaskFITSArrayContainer, NumpyFITSArrayContainer, ExternalArrayReferenceCollection
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = os.path.join(rootdir, "EIT")
@@ -66,3 +66,30 @@ def test_dask(externalarray):
 
     assert isinstance(ac.array, da.Array)
     assert_allclose(ac.array, np.array(ac.array))
+
+
+@pytest.fixture
+def earcollection():
+    return ExternalArrayReferenceCollection(["./nonexistant.fits",
+                                             "./nonexistant-1.fits"],
+                                             1,
+                                             "np.float64",
+                                             (100, 100))
+
+
+def test_collection_to_references(tmpdir, earcollection):
+    ears = earcollection.external_array_references
+    assert len(earcollection) == len(ears) == 2
+
+    for ear in ears:
+      assert isinstance(ear, asdf.ExternalArrayReference)
+      assert ear.target == earcollection.target
+      assert ear.dtype == earcollection.dtype
+      assert ear.shape == earcollection.shape
+
+
+def test_collection_getitem(tmpdir, earcollection):
+    assert isinstance(earcollection[0], ExternalArrayReferenceCollection)
+    assert isinstance(earcollection[1], ExternalArrayReferenceCollection)
+    assert len(earcollection[0]) == len(earcollection[1]) == 1
+    assert earcollection[0:2] == earcollection
