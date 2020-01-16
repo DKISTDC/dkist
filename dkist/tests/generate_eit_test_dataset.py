@@ -16,7 +16,7 @@ from gwcs import coordinate_frames as cf
 from sunpy.time import parse_time
 
 from dkist.asdf_maker.generator import generate_datset_inventory_from_headers, table_from_headers
-from dkist.asdf_maker.helpers import generate_lookup_table
+from dkist.asdf_maker.helpers import generate_lookup_table, references_from_filenames
 
 
 def map_to_transform(smap):
@@ -57,35 +57,6 @@ def map_to_transform(smap):
     transu.rename("spatial")
 
     return transu
-
-
-def references_from_filenames(filename_array, relative_to=None):
-    """
-    Given an array of paths to FITS files create a set of nested lists of
-    `asdf.external_reference.ExternalArrayReference` objects with the same
-    shape.
-    """
-
-    from astropy.io.fits.hdu.base import BITPIX2DTYPE
-    from asdf.tags.core.external_reference import ExternalArrayReference
-
-    reference_array = np.empty_like(filename_array, dtype=object)
-    for i, filepath in enumerate(filename_array.flat):
-        with fits.open(filepath) as hdul:
-            hdu_index = 0
-            hdu = hdul[hdu_index]
-            dtype = BITPIX2DTYPE[hdu.header['BITPIX']]
-            shape = tuple(reversed(hdu.shape))
-
-            # Convert paths to relative paths
-            relative_path = filepath
-            if relative_to:
-                relative_path = os.path.relpath(filepath, relative_to)
-
-            reference_array.flat[i] = ExternalArrayReference(
-                relative_path, hdu_index, dtype, shape)
-
-    return reference_array.tolist()
 
 
 def main():
@@ -147,13 +118,10 @@ def main():
 
     print(wcs(*[1*u.pix]*3, with_units=True))
 
-    ea = references_from_filenames(files, relative_to=str(path))
+    ac = references_from_filenames(files, np.asanyarray(headers), (len(files),), relative_to=str(path))
 
     from dkist.dataset import Dataset
-    from dkist.io.array_containers import DaskFITSArrayContainer
-    from dkist.io.loaders import AstropyFITSLoader
 
-    ac = DaskFITSArrayContainer(ea, loader=AstropyFITSLoader)
     ds = Dataset(ac.array, wcs, meta=None, headers=table_from_headers(headers))
     ds._array_container = ac
 

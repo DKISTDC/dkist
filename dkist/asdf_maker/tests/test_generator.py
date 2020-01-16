@@ -74,12 +74,11 @@ def test_array_container_shape(header_filenames):
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
     # References from filenames
-    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
+    array_container = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=0, relative_to=".")
-    array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
 
-    assert len(array_container.shape) == 5
-    assert array_container.shape == array_container.array.shape
+    assert len(array_container.output_shape) == 5
+    assert array_container.output_shape == array_container.array.shape
 
 
 def test_asdf_tree(header_filenames):

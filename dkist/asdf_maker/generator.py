@@ -389,10 +389,9 @@ def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
                                                            headers[0]['DAAXES'], -1)))
     # References from filenames
-    reference_array = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
+    array_container = references_from_filenames(sorted_filenames, sorted_headers, array_shape=shape,
                                                 hdu_index=hdu, relative_to=relative_to)
 
-    array_container = DaskFITSArrayContainer(reference_array, loader=AstropyFITSLoader)
     ds = Dataset(array_container.array, gwcs_from_headers(sorted_headers), meta=inventory, headers=table_headers)
 
     ds._array_container = array_container

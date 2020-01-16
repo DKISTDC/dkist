@@ -68,7 +68,7 @@ class ExternalArrayReferenceCollection:
         return ear.fileuri
 
     @classmethod
-    def from_external_array_references(cls, ears):
+    def from_external_array_references(cls, ears, **kwargs):
         """
         Construct a collection from a (nested) iterable of
         `asdf.ExternalArrayReference` objects.
@@ -80,7 +80,7 @@ class ExternalArrayReferenceCollection:
         for i, ele in enumerate(ears):
             uris = cls._validate_homogenaity(shape, target, dtype, ears)
 
-        return cls(uris, target, dtype, shape)
+        return cls(uris, target, dtype, shape, **kwargs)
 
     def __init__(self, fileuris, target, dtype, shape):
         self.shape = tuple(shape)
@@ -157,7 +157,7 @@ common_parameters = """
 """
 
 @add_common_docstring(append=common_parameters)
-class BaseFITSArrayContainer(ExternalArrayReferenceCollection):
+class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABCMeta):
     """
     A collection of references to homogenous FITS arrays.
     """
@@ -199,7 +199,10 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection):
         self._loader = partial(loader, **kwargs)
 
     def __getitem__(self, item):
-        return type(self)(self.reference_array[item], loader=self._loader)
+        uris = self.fileuris[item]
+        if isinstance(uris, str):
+            uris = [uris]
+        return type(self)(uris, self.target, self.dtype, self.shape, loader=self._loader)
 
     @property
     def filenames(self):
