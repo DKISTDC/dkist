@@ -1,0 +1,1 @@
+Implement a new more efficient asdf schema and tag for `dkist.io.array_containers.BaseFITSArrayContainer` to massively improve asdf load times.
