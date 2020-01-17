@@ -4,11 +4,12 @@ import numpy as np
 
 import asdf
 import astropy.units as u
-from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.io.fits.hdu.base import BITPIX2DTYPE
 from astropy.modeling.models import (AffineTransformation2D, Linear1D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift, Tabular1D)
 from astropy.time import Time
+
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear_spectral_model',
            'spatial_model_from_quantity', 'spatial_model_from_header', 'references_from_filenames']
@@ -16,13 +17,10 @@ __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear
 
 def references_from_filenames(filenames, headers, array_shape, hdu_index=0, relative_to=None):
     """
-    Given an array of paths to FITS files create a set of nested lists of
-    `asdf.external_reference.ExternalArrayReference` objects with the same
-    shape.
+    Given an array of paths to FITS files create a `dkist.io.DaskFITSArrayContainer`.
 
     Parameters
     ----------
-
     filenames : `numpy.ndarray`
         An array of filenames, in numpy order for the output array (i.e. ``.flat``)
 
@@ -41,24 +39,36 @@ def references_from_filenames(filenames, headers, array_shape, hdu_index=0, rela
     """
 
     filenames = np.asanyarray(filenames)
-    reference_array = np.empty(array_shape, dtype=object)
-    if filenames.size != reference_array.size:
+    filepaths = np.empty(array_shape, dtype=object)
+    if filenames.size != filepaths.size:
         raise ValueError(f"An incorrect number of filenames ({filenames.size})"
                          f" supplied for array_shape ({array_shape})")
 
+    dtypes = []
+    shapes = []
     for i, (filepath, head) in enumerate(zip(filenames.flat, headers.flat)):
-        dtype = BITPIX2DTYPE[head['BITPIX']]
-        shape = tuple([int(head[f"NAXIS{a}"]) for a in range(head["NAXIS"], 0, -1)])
+        dtypes.append(BITPIX2DTYPE[head['BITPIX']])
+        shapes.append(tuple([int(head[f"NAXIS{a}"]) for a in range(head["NAXIS"], 0, -1)]))
 
         # Convert paths to relative paths
         relative_path = filepath
         if relative_to:
             relative_path = os.path.relpath(filepath, str(relative_to))
 
-        reference_array.flat[i] = ExternalArrayReference(
-            relative_path, hdu_index, dtype, shape)
+        filepaths.flat[i] = str(relative_path)
 
-    return reference_array.tolist()
+    # Validate all shapes and dtypes are consistent.
+    dtype = set(dtypes)
+    if len(dtype) != 1:
+        raise ValueError("Not all the dtypes of these files are the same.")
+    dtype = list(dtype)[0]
+
+    shape = set(shapes)
+    if len(shape) != 1:
+        raise ValueError("Not all the shapes of these files are the same")
+    shape = list(shape)[0]
+
+    return DaskFITSArrayContainer(filepaths.tolist(), hdu_index, dtype, shape, loader=AstropyFITSLoader)
 
 
 def spatial_model_from_header(header):

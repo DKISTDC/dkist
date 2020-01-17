@@ -32,8 +32,8 @@ def test_references_from_filenames(header_filenames):
     refs = references_from_filenames(header_filenames, np.array(headers, dtype=object),
                                      (len(header_filenames),), relative_to=base)
 
-    for ref in refs:
-        assert base not in ref.fileuri
+    for ref in refs.fileuris:
+        assert base not in ref
 
 
 def first_header(header_filenames):

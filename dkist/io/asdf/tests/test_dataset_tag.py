@@ -5,7 +5,6 @@ from asdf.tests import helpers
 
 from dkist import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.io.array_containers import DaskFITSArrayContainer
 
 
 @pytest.fixture
@@ -18,8 +17,7 @@ def tagobj(request):
 
 @pytest.fixture
 def array_container():
-    return DaskFITSArrayContainer([ExternalArrayReference('test1.fits', 0, 'float', (10, 10)),
-                                   ExternalArrayReference('test2.fits', 0, 'float', (10, 10))],
+    return DaskFITSArrayContainer(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
                                   loader=AstropyFITSLoader)
 
 

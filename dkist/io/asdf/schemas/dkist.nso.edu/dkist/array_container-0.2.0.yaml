@@ -1,0 +1,29 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://dkist.nso.edu/schemas/dkist/array_container-0.2.0"
+tag: "tag:dkist.nso.edu:dkist/array_container-0.2.0"
+
+title: |
+  A multi-dimensional collection of ExternalArrayReference objects to be loaded as FITS files.
+
+type: object
+properties:
+  fileuris:
+    type: array
+  target:
+    anyOf:
+      - type: integer
+      - type: string
+  datatype:
+    type: string
+  shape:
+    type: array
+    items:
+      anyOf:
+      - type: integer
+        minimum: 0
+
+required: [fileuris, target, datatype, shape]
+additionalProperties: false
+...

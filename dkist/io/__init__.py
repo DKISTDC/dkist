@@ -2,7 +2,7 @@ import dkist.config as _config
 
 from .array_containers import (BaseFITSArrayContainer, DaskFITSArrayContainer,
                                NumpyFITSArrayContainer)
-from .fits import AstropyFITSLoader, BaseFITSLoader
+from .loaders import AstropyFITSLoader, BaseFITSLoader
 
 __all__ = ['BaseFITSLoader', 'AstropyFITSLoader', 'BaseFITSArrayContainer',
            'NumpyFITSArrayContainer', 'DaskFITSArrayContainer', 'conf']

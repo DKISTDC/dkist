@@ -3,6 +3,8 @@ This submodule provides tools for resolving arrays of
 `asdf.ExternalArrayReference` objects to Python array-like objects.
 """
 import abc
+import collections
+from pathlib import Path
 from functools import partial
 
 import dask.array as da
@@ -11,44 +13,182 @@ import numpy as np
 from asdf.tags.core.external_reference import ExternalArrayReference
 from sunpy.util.decorators import add_common_docstring
 
+from dkist.io.asdf.types import DKISTType
+from dkist.io.loaders import AstropyFITSLoader
+
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
+
+
+# This class should probably live in asdf, and there are PRs open to add it.
+# However, there are issues with schemas if it's in asdf, and also I don't want
+# to depend on asdf master right now, so I am copying it in here.
+class ExternalArrayReferenceCollection:
+    """
+    A homogeneous collection of `asdf.ExternalArrayReference` like objects.
+
+    This class differs from a list of `asdf.ExternalArrayReference` objects
+    because all of the references have the same shape, dtype and target. This
+    allows for much more yaml and schema efficient storage in the asdf tree.
+
+    Parameters
+    ----------
+
+    fileuris: `list` or `tuple`
+        An interable of paths to be referenced. Can be nested arbitarily deep.
+
+    target: `object`
+        Some internal target to the data in the files. Examples may include a HDU
+        index, a HDF path or an asdf fragment.
+
+    dtype: `str`
+        The (numpy) dtype of the contained arrays.
+
+    shape: `tuple`
+        The shape of the arrays to be loaded.
+    """
+
+    @classmethod
+    def _validate_homogenaity(cls, shape, target, dtype, ear):
+        """
+        Ensure that if constructing from `asdf.ExternalArrayReference` objects
+        all of them have the same shape, dtype and target.
+        """
+        if isinstance(ear, (list, tuple)):
+            return list(map(partial(cls._validate_homogenaity, shape, target, dtype), ear))
+
+        if not isinstance(ear, ExternalArrayReference):
+            raise TypeError("Every element of must be an instance of ExternalArrayReference.")
+        if ear.dtype != dtype:
+            raise ValueError(f"The Reference {ear} does not have the same dtype as the first reference.")
+        if ear.shape != shape:
+            raise ValueError(f"The Reference {ear} does not have the same shape as the first reference.")
+        if ear.target != target:
+            raise ValueError(f"The Reference {ear} does not have the same target as the first reference.")
+        return ear.fileuri
+
+    @classmethod
+    def from_external_array_references(cls, ears, **kwargs):
+        """
+        Construct a collection from a (nested) iterable of
+        `asdf.ExternalArrayReference` objects.
+        """
+        shape = ears[0].shape
+        dtype = ears[0].dtype
+        target = ears[0].target
+
+        for i, ele in enumerate(ears):
+            uris = cls._validate_homogenaity(shape, target, dtype, ears)
+
+        return cls(uris, target, dtype, shape, **kwargs)
+
+    def __init__(self, fileuris, target, dtype, shape):
+        self.shape = tuple(shape)
+        self.dtype = dtype
+        self.target = target
+        self.fileuris = fileuris
+
+    def _to_ears(self, urilist):
+        if isinstance(urilist, (list, tuple)):
+            return list(map(self._to_ears, urilist))
+        return ExternalArrayReference(urilist, self.target, self.dtype, self.shape)
+
+    @property
+    def external_array_references(self):
+        """
+        Represent this collection as a list of `asdf.ExternalArrayReference` objects.
+        """
+        return self._to_ears(self.fileuris)
+
+    def __getitem__(self, item):
+        uris = self.fileuris[item]
+        if isinstance(uris, str):
+            uris = [uris]
+        return type(self)(uris, self.target, self.dtype, self.shape)
+
+    def __len__(self):
+        return len(self.fileuris)
+
+    def __eq__(self, other):
+        uri = self.fileuris == other.fileuris
+        target = self.target == other.target
+        dtype = self.dtype == other.dtype
+        shape = self.shape == other.shape
+
+        return all((uri, target, dtype, shape))
+
+    @classmethod
+    def to_tree(cls, data, ctx):
+        node = {}
+        node['fileuris'] = data.fileuris
+        node['target'] = data.target
+        node['datatype'] = data.dtype
+        node['shape'] = data.shape
+        return node
+
+    @classmethod
+    def from_tree(cls, tree, ctx):
+        return cls(tree['fileuris'], tree['target'], tree['datatype'], tree['shape'])
+
 
 common_parameters = """
 
     Parameters
     ----------
 
-    reference_array : `~numpy.ndarray` or `list`
-        A (multi-dimensional) array of `asdf.ExternalArrayReference` objects.
+    fileuris: `list` or `tuple`
+        An interable of paths to be referenced. Can be nested arbitarily deep.
 
-    loader : `dkist.io.fits.BaseFITSLoader`
+    target: `object`
+        Some internal target to the data in the files. Examples may include a HDU
+        index, a HDF path or an asdf fragment.
+
+    dtype: `str`
+        The (numpy) dtype of the contained arrays.
+
+    shape: `tuple`
+        The shape of the arrays to be loaded.
+
+    loader : `dkist.io.BaseFITSLoader`
         The loader subclass to use to resolve each `~asdf.ExternalArrayReference`.
 
     kwargs : `dict`
         Extra keyword arguments are passed to the loader class.
 """
 
-
 @add_common_docstring(append=common_parameters)
-class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
+class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABCMeta):
     """
-    This class provides an array-like interface to an array of
-    `asdf.ExternalArrayReference` objects.
+    A collection of references to homogenous FITS arrays.
     """
 
-    def __init__(self, reference_array, *, loader, **kwargs):
-        reference_array = np.asarray(reference_array, dtype=object)
-        self._check_contents(reference_array)
+    @classmethod
+    def from_tree(cls, node, ctx):
+        # TODO: Work out a way over overriding this at dataset load.
+        filepath = Path((ctx.uri or ".").replace("file:", ""))
+        base_path = filepath.parent
+
+        # TODO: The choice of Dask and Astropy here should be in a config somewhere.
+        array_container = DaskFITSArrayContainer(node['fileuris'],
+                                                 node['target'],
+                                                 node['datatype'],
+                                                 node['shape'],
+                                                 loader=AstropyFITSLoader,
+                                                 basepath=base_path)
+        return array_container
+
+
+    def __init__(self, fileuris, target, dtype, shape, *, loader, **kwargs):
+        super().__init__(fileuris, target, dtype, shape)
+        reference_array = np.asarray(self.external_array_references, dtype=object)
 
         # If the first dimension is one we are going to squash it.
-        reference_shape = reference_array.flat[0].shape
+        reference_shape = self.shape
         if reference_shape[0] == 1:
             reference_shape = reference_shape[1:]
-
         if len(reference_array) == 1:
-            self.shape = reference_shape
+            self.output_shape = reference_shape
         else:
-            self.shape = tuple(list(reference_array.shape) + list(reference_shape))
+            self.output_shape = tuple(list(reference_array.shape) + list(reference_shape))
 
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
@@ -56,33 +196,12 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
 
         self.loader_array = loader_array
         self._loader = partial(loader, **kwargs)
-        self.reference_array = reference_array
-
-    def _check_contents(self, reference_array):
-        """
-        Validate that the array reference objects are compatible with each other,
-        i.e. same dimensions and same dtype.
-        """
-        shape = reference_array.flat[0].shape
-        dtype = reference_array.flat[0].dtype
-        for i, ele in enumerate(reference_array.flat):
-            # TODO: Make these not asserts
-            assert isinstance(ele, ExternalArrayReference)
-            assert ele.dtype == dtype
-            assert ele.shape == shape
 
     def __getitem__(self, item):
-        return type(self)(self.reference_array[item], loader=self._loader)
-
-    def as_external_array_references(self):
-        """
-        Convert the loader array back to a nested list of
-        `asdf.ExternalArrayReference` objects.
-        """
-        ears = np.empty_like(self.loader_array)
-        for i, lelem in enumerate(self.loader_array.flat):
-            ears.flat[i] = lelem.fitsarray
-        return ears.tolist()
+        uris = self.fileuris[item]
+        if isinstance(uris, str):
+            uris = [uris]
+        return type(self)(uris, self.target, self.dtype, self.shape, loader=self._loader)
 
     @property
     def filenames(self):
@@ -90,8 +209,8 @@ class BaseFITSArrayContainer(metaclass=abc.ABCMeta):
         Return a list of file names referenced by this Array Container.
         """
         names = []
-        for ear in self.reference_array.flat:
-            names.append(ear.fileuri)
+        for furi in np.asarray(self.fileuris).flat:
+            names.append(furi)
         return names
 
     @abc.abstractproperty
@@ -121,7 +240,7 @@ class NumpyFITSArrayContainer(BaseFITSArrayContainer):
         The `~numpy.ndarray` associated with this array of references.
         """
         aa = map(np.asarray, self.loader_array.flat)
-        return np.stack(aa, axis=0).reshape(self.shape)
+        return np.stack(aa, axis=0).reshape(self.output_shape)
 
 
 @add_common_docstring(append=common_parameters)
@@ -136,7 +255,7 @@ class DaskFITSArrayContainer(BaseFITSArrayContainer):
         """
         The `~dask.array.Array` associated with this array of references.
         """
-        return stack_loader_array(self.loader_array).reshape(self.shape)
+        return stack_loader_array(self.loader_array).reshape(self.output_shape)
 
 
 def stack_loader_array(loader_array):

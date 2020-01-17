@@ -8,7 +8,7 @@ import asdf
 from astropy.io import fits
 
 from dkist.data.test import rootdir
-from dkist.io.fits import AstropyFITSLoader
+from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = Path(rootdir) / 'EIT'
 

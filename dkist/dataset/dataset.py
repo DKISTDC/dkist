@@ -257,7 +257,8 @@ class Dataset(NDCube):
         # TODO: This is a hack to change the base dir of the dataset.
         # The real solution to this is to use the database.
         old_ac = self._array_container
-        self._array_container = DaskFITSArrayContainer(old_ac.reference_array,
-                                                       loader=old_ac._loader,
-                                                       basepath=destination_path)
+        self._array_container = DaskFITSArrayContainer.from_external_array_references(
+            old_ac.external_array_references,
+            loader=old_ac._loader,
+            basepath=destination_path)
         self._data = self._array_container.array

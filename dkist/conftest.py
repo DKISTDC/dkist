@@ -94,7 +94,7 @@ def dataset(array, identity_gwcs):
     assert ds.data is array
     assert ds.wcs is identity_gwcs
 
-    ds._array_container = DaskFITSArrayContainer([ExternalArrayReference('test1.fits', 0, 'float', array.shape)],
+    ds._array_container = DaskFITSArrayContainer(['test1.fits'], 0, 'float', array.shape,
                                                 loader=AstropyFITSLoader)
 
     return ds

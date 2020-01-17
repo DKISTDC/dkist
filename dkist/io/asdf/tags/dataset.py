@@ -79,8 +79,8 @@ class DatasetType(DKISTType):
         assert old.meta == new.meta
         cls._assert_wcs_equal(old.wcs, new.wcs)
         cls._assert_table_equal(old.headers, new.headers)
-        ac_new = new._array_container.as_external_array_references()
-        ac_old = old._array_container.as_external_array_references()
+        ac_new = new._array_container.external_array_references
+        ac_old = old._array_container.external_array_references
         assert ac_new == ac_old
         assert old.unit == new.unit
         assert old.mask == new.mask
