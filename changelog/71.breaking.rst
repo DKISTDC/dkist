@@ -1,0 +1,1 @@
+Move the `dkist.asdf_maker` package to `dkist.io.asdf.generator` while also refactoring its internal structure to hopefully make it a little easier to follow.

@@ -6,36 +6,32 @@ from zipfile import ZipFile
 
 import pytest
 
-from dkist.asdf_maker.generator import TransformBuilder, headers_from_filenames
+from dkist.io.asdf.generator.generator import headers_from_filenames
+from dkist.io.asdf.generator.transforms import TransformBuilder
 from dkist.data.test import rootdir
 
 DATA_DIR = os.path.join(rootdir, 'datasettestfiles')
 
 
-def extract(name):
+@pytest.fixture(scope="session", params=["vtf.zip", "visp.zip"])
+def header_directory(request):
     atmpdir = tempfile.mkdtemp()
-    with ZipFile(os.path.join(DATA_DIR, name)) as myzip:
+    with ZipFile(os.path.join(DATA_DIR, request.param)) as myzip:
         myzip.extractall(atmpdir)
     return atmpdir
 
 
-@pytest.fixture(scope="session", params=["vtf.zip", "visp.zip"])
-def header_filenames(request):
-    tdir = extract(request.param)
-    files = glob.glob(os.path.join(tdir, '*'))
+@pytest.fixture
+def header_filenames(header_directory):
+    files = glob.glob(os.path.join(header_directory, '*'))
     files.sort()
-    yield files
-    shutil.rmtree(tdir)
+    return files
 
 
-@pytest.fixture(params=["vtf.zip", "visp.zip"])
-def transform_builder(request):
-    tdir = extract(request.param)
-    files = glob.glob(os.path.join(tdir, '*'))
-    files.sort()
-    headers = headers_from_filenames(files)
-    yield TransformBuilder(headers)
-    shutil.rmtree(tdir)
+@pytest.fixture
+def transform_builder(header_filenames):
+    headers = headers_from_filenames(header_filenames)
+    return TransformBuilder(headers)
 
 
 def make_header_files():
