@@ -9,7 +9,7 @@ from astropy.modeling.models import (AffineTransformation2D, Linear1D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift, Tabular1D)
 from astropy.time import Time
 
-from dkist.io import DaskFITSArrayContainer, AstropyFITSLoader
+from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 __all__ = ['make_asdf', 'time_model_from_date_obs', 'linear_time_model', 'linear_spectral_model',
            'spatial_model_from_quantity', 'spatial_model_from_header', 'references_from_filenames']

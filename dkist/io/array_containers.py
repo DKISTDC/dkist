@@ -4,8 +4,8 @@ This submodule provides tools for resolving arrays of
 """
 import abc
 import collections
-from functools import partial
 from pathlib import Path
+from functools import partial
 
 import dask.array as da
 import numpy as np
@@ -15,7 +15,6 @@ from sunpy.util.decorators import add_common_docstring
 
 from dkist.io.asdf.types import DKISTType
 from dkist.io.loaders import AstropyFITSLoader
-
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
 

@@ -8,7 +8,8 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.array_containers import DaskFITSArrayContainer, NumpyFITSArrayContainer, ExternalArrayReferenceCollection
+from dkist.io.array_containers import (DaskFITSArrayContainer, ExternalArrayReferenceCollection,
+                                       NumpyFITSArrayContainer)
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = os.path.join(rootdir, "EIT")
