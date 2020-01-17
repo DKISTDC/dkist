@@ -6,9 +6,9 @@ import numpy as np
 import asdf
 from astropy.io.fits.hdu.base import BITPIX2DTYPE
 
-from dkist.asdf_maker.helpers import headers_from_filenames, preprocess_headers
-from dkist.asdf_maker.simulated_data import generate_datset_inventory_from_headers
-from dkist.asdf_maker.transforms import TransformBuilder
+from dkist.io.asdf.generator.helpers import headers_from_filenames, preprocess_headers
+from dkist.io.asdf.generator.simulated_data import generate_datset_inventory_from_headers
+from dkist.io.asdf.generator.transforms import TransformBuilder
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 

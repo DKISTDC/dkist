@@ -8,9 +8,9 @@ import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, models
 
 from dkist import Dataset
-from dkist.asdf_maker.generator import (asdf_tree_from_filenames, dataset_from_fits,
+from dkist.io.asdf.generator.generator import (asdf_tree_from_filenames, dataset_from_fits,
                                         references_from_filenames)
-from dkist.asdf_maker.helpers import (headers_from_filenames, preprocess_headers,
+from dkist.io.asdf.generator.helpers import (headers_from_filenames, preprocess_headers,
                                       table_from_headers, validate_headers)
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer

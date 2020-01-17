@@ -6,8 +6,8 @@ from zipfile import ZipFile
 
 import pytest
 
-from dkist.asdf_maker.generator import headers_from_filenames
-from dkist.asdf_maker.transforms import TransformBuilder
+from dkist.io.asdf.generator.generator import headers_from_filenames
+from dkist.io.asdf.generator.transforms import TransformBuilder
 from dkist.data.test import rootdir
 
 DATA_DIR = os.path.join(rootdir, 'datasettestfiles')
