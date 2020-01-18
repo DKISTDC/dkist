@@ -2,10 +2,10 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
+      - id: check-yaml
       - id: check-ast
-      - id: flake8
-        additional_dependencies: [flake8-docstrings]
-        args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
+      - id: debug-statements
+      - id: check-added-large-files
       - id: check-case-conflict
       - id: trailing-whitespace
         exclude: ".*fits"
@@ -13,8 +13,9 @@ repos:
         files: ".*.py"
       - id: end-of-file-fixer
         exclude: ".*fits"
-      - id: check-yaml
-      - id: debug-statements
+      - id: flake8
+        additional_dependencies: [flake8-docstrings]
+        args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
   - repo: https://github.com/timothycrosley/isort
     rev: 4.3.21-2
     hooks:
