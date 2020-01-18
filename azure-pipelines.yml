@@ -35,8 +35,10 @@ jobs:
       - linux: py37
         name: linux_37
 
-      - linus: py38
+      - linux: py38
         name: linux_38
+
+      - linux: codestyle
 
 
 - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:

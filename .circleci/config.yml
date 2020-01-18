@@ -31,22 +31,6 @@ tox-install: &tox-install
 
 version: 2
 jobs:
-  egg-info-37:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - run: python setup.py egg_info
-
-  pycodestyle:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - run: sudo pip install pycodestyle isort[pyproject]
-      - run: pycodestyle dkist --count
-      - run: isort dkist/**/*.py -c
-
   twine-check:
     docker:
       - image: circleci/python:3.7
@@ -67,12 +51,9 @@ jobs:
       - run: *skip-check
       - run: *merge-check
       - run: *permission-run
-      - run: *sudo-apt-install
       - run: pip install -U pip
       - run: pip install --progress-bar off .[all,dev]
       - run: pip install -e .[all,dev]
-      # We can't run this with all the git deps
-      # - run: python setup.py develop
 
   html-docs:
     docker:
@@ -96,13 +77,8 @@ workflows:
 
   pip-check:
     jobs:
-      - egg-info-37
       - pip-install
       - twine-check
-
-  pycodestyle:
-    jobs:
-      - pycodestyle
 
   test-documentation:
     jobs:
@@ -110,4 +86,4 @@ workflows:
 
 notify:
   webhooks:
-    - url: https://giles.cadair.com/circleci
+    - url: https://giles.cadair.dev/circleci

@@ -1,5 +1,4 @@
 import pathlib
-from unittest import mock
 
 import pytest
 from globus_sdk import GlobusResponse

@@ -1,14 +1,13 @@
 import os
 import glob
-import shutil
 import tempfile
 from zipfile import ZipFile
 
 import pytest
 
+from dkist.data.test import rootdir
 from dkist.io.asdf.generator.generator import headers_from_filenames
 from dkist.io.asdf.generator.transforms import TransformBuilder
-from dkist.data.test import rootdir
 
 DATA_DIR = os.path.join(rootdir, 'datasettestfiles')
 

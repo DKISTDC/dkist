@@ -34,7 +34,7 @@ arrays are read from the FITS file.::
   >>> from dkist.dataset import Dataset
   >>> ds = Dataset.from_directory("/my/directory") # doctest: +SKIP
 
-  
+
 Slicing a Dataset
 -----------------
 

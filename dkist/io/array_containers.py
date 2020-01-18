@@ -3,7 +3,6 @@ This submodule provides tools for resolving arrays of
 `asdf.ExternalArrayReference` objects to Python array-like objects.
 """
 import abc
-import collections
 from pathlib import Path
 from functools import partial
 
@@ -13,7 +12,6 @@ import numpy as np
 from asdf.tags.core.external_reference import ExternalArrayReference
 from sunpy.util.decorators import add_common_docstring
 
-from dkist.io.asdf.types import DKISTType
 from dkist.io.loaders import AstropyFITSLoader
 
 __all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
