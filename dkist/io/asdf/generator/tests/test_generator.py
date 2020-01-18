@@ -3,13 +3,9 @@ import pathlib
 import pytest
 
 import asdf
-import gwcs
-import gwcs.coordinate_frames as cf
-from astropy.modeling import Model, models
 
 from dkist import Dataset
 from dkist.dataset import Dataset
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 from dkist.io.asdf.generator.generator import (asdf_tree_from_filenames, dataset_from_fits,
                                                references_from_filenames)
 from dkist.io.asdf.generator.helpers import (headers_from_filenames, preprocess_headers,

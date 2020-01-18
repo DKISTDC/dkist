@@ -3,8 +3,8 @@ from pathlib import Path
 from asdf import AsdfExtension
 from asdf.util import filepath_to_url
 
-from .tags.array_container import ArrayContainerType
-from .tags.dataset import DatasetType
+from .tags.array_container import ArrayContainerType  # noqa
+from .tags.dataset import DatasetType  # noqa
 from .types import DKISTType
 
 __all__ = ['DKISTExtension']

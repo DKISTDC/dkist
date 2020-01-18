@@ -6,7 +6,6 @@ import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
-from asdf import ExternalArrayReference
 from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective

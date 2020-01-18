@@ -1,19 +1,16 @@
 from pathlib import Path
 from textwrap import dedent
 
-import numpy as np
 from jsonschema.exceptions import ValidationError
 
 import asdf
 import astropy.table
-import astropy.units as u
 import gwcs
-from astropy.utils import isiterable
 from astropy.visualization.wcsaxes import WCSAxes
 from astropy.wcs.wcsapi import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube
 
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.io import DaskFITSArrayContainer
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client

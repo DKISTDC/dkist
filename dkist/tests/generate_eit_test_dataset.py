@@ -1,4 +1,3 @@
-import os
 import glob
 from pathlib import Path
 
@@ -15,7 +14,7 @@ from astropy.time import Time
 from gwcs import coordinate_frames as cf
 from sunpy.time import parse_time
 
-from dkist.asdf_maker.generator import generate_datset_inventory_from_headers, table_from_headers
+from dkist.asdf_maker.generator import table_from_headers
 from dkist.asdf_maker.helpers import generate_lookup_table, references_from_filenames
 
 

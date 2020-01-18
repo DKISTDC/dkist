@@ -4,7 +4,6 @@ Helper functions for parsing files and processing headers.
 
 import numpy as np
 
-import asdf
 from astropy.io import fits
 from astropy.table import Table
 

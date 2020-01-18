@@ -1,9 +1,7 @@
 import pytest
 
-from asdf import ExternalArrayReference
 from asdf.tests import helpers
 
-from dkist import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
 
 

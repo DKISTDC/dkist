@@ -1,16 +1,9 @@
 import os
-from pathlib import Path
 
 import numpy as np
 import pytest
 
-import asdf
-import astropy.units as u
-from astropy.io import fits
-from astropy.modeling import Model, models
-from astropy.time import Time
-
-from dkist.io.asdf.generator.generator import asdf_tree_from_filenames, references_from_filenames
+from dkist.io.asdf.generator.generator import references_from_filenames
 from dkist.io.asdf.generator.helpers import headers_from_filenames
 
 
