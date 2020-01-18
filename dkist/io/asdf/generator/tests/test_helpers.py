@@ -10,8 +10,8 @@ from astropy.io import fits
 from astropy.modeling import Model, models
 from astropy.time import Time
 
-from dkist.io.asdf.generator.helpers import headers_from_filenames
 from dkist.io.asdf.generator.generator import asdf_tree_from_filenames, references_from_filenames
+from dkist.io.asdf.generator.helpers import headers_from_filenames
 
 
 def test_references_from_filesnames_shape_error(header_filenames):
