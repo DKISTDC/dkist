@@ -84,7 +84,7 @@ class DKISTDatasetClient(BaseClient):
             # DKIST Specific attrs
 
             # exposureTimeMin, exposureTimeMax
-            dattrs.ExposureTime: [],  # Range subclass of Time
+            dattrs.ExposureTime: [],  # Range subclass
             # createDateMin, createDateMax
             dattrs.CreationTime: [],  # Range subclass of Time
             # embargoEndDateMin, embargoEndDateMax
