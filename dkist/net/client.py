@@ -60,11 +60,14 @@ class DKISTDatasetClient(BaseClient):
         # Should you be able to hit this client if you don't specify instrument??
 
     @classmethod
+    def _attrs_module(cls):
+        return 'dkist', 'dkist.net.attrs'
+
+    @classmethod
     def register_values(cls):
         """
         Known search values for DKIST data, currently manually specified.
         """
-        # Things with the vso postfix here need moving in SunPy?!
         return {
             sattrs.vso.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
             # instrumentNames
@@ -73,47 +76,12 @@ class DKISTDatasetClient(BaseClient):
                                 ("VTF", "Visible Tunable Filter"),
                                 ("Cryo-NIRSP", "Cryogenic Near Infrared SpectroPolarimiter"),
                                 ("DL-NIRSP", "")],
-            # startTime, endTime
-            sattrs.Time: [],
-            # wavelengthMin, wavelengthMax
-            sattrs.Wavelength: [],  # Range
             # hasAllStokes
             sattrs.vso.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
                                  ("intensity", "Only Stokes I is provided in the dataset.")],
-
-            # DKIST Specific attrs
-
-            # exposureTimeMin, exposureTimeMax
-            dattrs.ExposureTime: [],  # Range subclass
-            # createDateMin, createDateMax
-            dattrs.CreationTime: [],  # Range subclass of Time
-            # embargoEndDateMin, embargoEndDateMax
-            dattrs.EmbargoEndTime: [],  # Range subclass of Time
-            # browseMovieUrl & browseMovieObjectKey
-            dattrs.BrowseMovie: [], # Two kwargs as they are specifying the same record
-            # datasetIds
-            dattrs.Dataset: [],
-            # filterWavelengths
-            dattrs.WavelengthBand: [],  # NAME?! attrs.vso.Filter does exist?!
             # isEmbargoed
             dattrs.Embargoed: [(True, "Data is subject to access restrictions."),
                                (False, "Data is not subject to access restrictions.")],
-            # observables
-            dattrs.Observable: [],
-            # primaryExperimentIds
-            dattrs.Experiment: [],
-            # primaryProposalIds
-            dattrs.Proposal: [],
-            # qualityAverageFriedParameterMin, qualityAverageFriedParameterMax
-            dattrs.FriedParameter: [],  # Range
-            # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
-            dattrs.PolarimetricAccuracy: [],  # Range
-            # recipeId
-            dattrs.Recipe: [],
-            # recipeInstanceId
-            dattrs.RecipeInstance: [],
-            # rectangleContainedByBoundingBox, rectangleContainingBoundingBox, rectangleIntersectingBoundingBox
-            dattrs.BoundingBox: [],  # Takes a specification of a rectangle and a matching criteria.
             # targetTypes
             dattrs.TargetType: [],  # This should be a controlled list.
 
