@@ -14,19 +14,9 @@ __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox', 'Provider', 'Physobs']
 
 
-_supported_core_attrs = [
-    # startTime, endTime
-    _sunpy_attrs.Time,
-    # instrumentNames [array]
-    _sunpy_attrs.Instrument,
-    # wavelengthMin, wavelengthMax
-    _sunpy_attrs.Wavelength,
-    # Nothing
-    _sunpy_attrs.Level]
-
-
 # The attrs we are using from VSO should appear like they are defined in this
-# module for documentation purposes. These should really be moved in sunpy core?
+# module for documentation purposes. These should really be moved in sunpy from
+# a.vso. to a.?
 for attr in [Provider, Physobs]:
     attr.__module__ = __name__
 
@@ -63,7 +53,7 @@ class Experiment(_SimpleAttr):
     """
     """
     def __init__(self, experiment_id):
-        super().__init__(self, experiment_id)
+        super().__init__(experiment_id)
 
 
 # primaryProposalIds [array]
@@ -71,7 +61,7 @@ class Proposal(_SimpleAttr):
     """
     """
     def __init__(self, proposal_id):
-        super().__init__(self, proposal_id)
+        super().__init__(proposal_id)
 
 
 # targetTypes [array]
@@ -79,7 +69,7 @@ class TargetType(_SimpleAttr):
     """
     """
     def __init__(self, target_type):
-        super().__init__(self, target_type)
+        super().__init__(target_type)
 
 
 # recipeId [array]
@@ -87,7 +77,7 @@ class Recipe(_SimpleAttr):
     """
     """
     def __init__(self, recipe_id):
-        super().__init__(self, recipe_id)
+        super().__init__(recipe_id)
 
 
 # recipeInstanceId [array]
@@ -95,7 +85,7 @@ class RecipeInstance(_SimpleAttr):
     """
     """
     def __init__(self, recipe_instance_id):
-        super().__init__(self, recipe_instance_id)
+        super().__init__(recipe_instance_id)
 
 
 # isEmbargoed

@@ -25,7 +25,14 @@ def create_from_or(wlk, tree):
     """
     params = []
     for sub in tree.attrs:
-        params.append(wlk.create(sub))
+        sub_params = wlk.create(sub)
+
+        # Strip out one layer of nesting of lists
+        # This means that create always returns a list of dicts.
+        if isinstance(sub_params, list) and len(sub_params) == 1:
+            sub_params = sub_params[0]
+
+        params.append(sub_params)
 
     return params
 
@@ -53,6 +60,7 @@ def add_value_to_params(wlk, attr, params):
     params.update(attr.attrs)
 
 
+# Converters from Attrs to ValueAttrs
 # SunPy Attrs
 
 @walker.add_converter(Time)
