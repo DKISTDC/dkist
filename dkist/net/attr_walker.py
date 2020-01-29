@@ -1,3 +1,4 @@
+import astropy.units as u
 from sunpy.net.attr import AttrAnd, AttrOr, AttrWalker, ValueAttr
 from sunpy.net.attrs import Instrument, Time, Wavelength
 
@@ -56,22 +57,30 @@ def add_value_to_params(wlk, attr, params):
 
 @walker.add_converter(Time)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'startTimeMin': attr.start.isot,
+                      'endTimeMax': attr.end.isot})
 
 
 @walker.add_converter(Instrument)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'instrumentNames': [attr.value]})
 
 
 @walker.add_converter(Wavelength)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'wavelengthMinMin': attr.min.to_value(u.nm),
+                      'wavelengthMaxMax': attr.max.to_value(u.nm)})
 
 
 @walker.add_converter(Physobs)
 def _(attr):
-    return ValueAttr({'': ''})
+    if attr.value == "stokes_parameters":
+        return ValueAttr({'hasAllStokes': True})
+    if attr.value == "intensity":
+        return ValueAttr({'hasAllStokes': False})
+
+    # The client should not have accepted the query if we make it this far.
+    raise ValueError(f"Physobs({attr.value}) is not supported by the DKIST client.")
 
 
 # DKIST Attrs
@@ -79,79 +88,91 @@ def _(attr):
 
 @walker.add_converter(Dataset)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'datasetIds': [attr.value]})
 
 
 @walker.add_converter(WavelengthBand)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'filterWavelengths': [attr.value]})
 
 
 @walker.add_converter(Observable)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'observables': [attr.value]})
 
 
 @walker.add_converter(Experiment)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'primaryExperimentIds': [attr.value]})
 
 
 @walker.add_converter(Proposal)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'primaryProposalIds': [attr.value]})
 
 
 @walker.add_converter(TargetType)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'targetTypes': [attr.value]})
 
 
 @walker.add_converter(Recipe)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'recipeId': int(attr.value)})
 
 
 @walker.add_converter(RecipeInstance)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'recipeInstanceId': int(attr.value)})
 
 
 @walker.add_converter(Embargoed)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'isEmbargoed': bool(attr.value)})
 
 
 @walker.add_converter(FriedParameter)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'qualityAverageFriedParameterMin': attr.min,
+                      'qualityAverageFriedParameterMax': attr.max})
 
 
 @walker.add_converter(PolarimetricAccuracy)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'qualityAveragePolarimetricAccuracyMin': attr.min,
+                      'qualityAveragePolarimetricAccuracyMax': attr.max})
 
 
 @walker.add_converter(ExposureTime)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'exposureTimeMin': attr.min.to_value(u.s),
+                      'exposureTimeMax': attr.max.to_value(u.s)})
 
 
 @walker.add_converter(CreationTime)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'createDateMin': attr.start.isot,
+                      'createDateMax': attr.end.isot})
 
 
 @walker.add_converter(EmbargoEndTime)
 def _(attr):
-    return ValueAttr({'': ''})
+    return ValueAttr({'embargoEndDateMin': attr.start.isot,
+                      'embargoEndDateMax': attr.end.isot})
 
 
 @walker.add_converter(BrowseMovie)
 def _(attr):
-    return ValueAttr({'': ''})
+    values = {}
+    if attr.movieurl:
+        values['browseMovieUrl'] = attr.movieurl
+    if attr.movieobjectkey:
+        values['browseMovieObjectKey'] = attr.movieobjectkey
+
+    return ValueAttr(values)
 
 
 @walker.add_converter(BoundingBox)
 def _(attr):
+    raise NotImplementedError("Support for bounding box isn't implemented")
     return ValueAttr({'': ''})
