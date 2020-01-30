@@ -26,7 +26,12 @@ for attr in [Provider, Physobs]:
 # datasetIds [array]
 class Dataset(_SimpleAttr):
     """
-    Search for a dataset id.
+    Unique identifier for a dataset.
+
+    Parameters
+    ----------
+    dataset_id : `str`
+        A random unique identifier for a dataset.
     """
     def __init__(self, dataset_id):
         super().__init__(dataset_id)
@@ -35,6 +40,11 @@ class Dataset(_SimpleAttr):
 # filterWavelengths [array]
 class WavelengthBand(_SimpleAttr):
     """
+    Known wavelength feature present in dataset.
+
+    Parameters
+    ----------
+    wavelength_band : `str`?
     """
     def __init__(self, wavelength_band):
         super().__init__(wavelength_band)
@@ -43,6 +53,7 @@ class WavelengthBand(_SimpleAttr):
 # observables [array]
 class Observable(_SimpleAttr):
     """
+    Unused at this time.
     """
     def __init__(self, observable):
         super().__init__(observable)
@@ -51,6 +62,17 @@ class Observable(_SimpleAttr):
 # primaryExperimentIds [array]
 class Experiment(_SimpleAttr):
     """
+    Unique identifier for a grouping of observations that meet the same scientific goal.
+
+    ..note ::
+
+        One `~dkist.net.attrs.Proposal` can consist of many
+        `~dkist.net.attrs.Experiment` which can consist of many datasets.
+
+    Parameters
+    ----------
+    experiment_id : `str`
+        A unique identifier for an experiment.
     """
     def __init__(self, experiment_id):
         super().__init__(experiment_id)
@@ -59,6 +81,17 @@ class Experiment(_SimpleAttr):
 # primaryProposalIds [array]
 class Proposal(_SimpleAttr):
     """
+    Unique identifier for a proposal.
+
+    ..note ::
+
+        One `~dkist.net.attrs.Proposal` can consist of many
+        `~dkist.net.attrs.Experiment` which can consist of many datasets.
+
+    Parameters
+    ----------
+    proposal_id : `str`
+        A unique identifier for a proposal.
     """
     def __init__(self, proposal_id):
         super().__init__(proposal_id)
@@ -67,6 +100,12 @@ class Proposal(_SimpleAttr):
 # targetTypes [array]
 class TargetType(_SimpleAttr):
     """
+    Name for the object observed by a dataset.
+
+    Parameters
+    ----------
+    target_type: `str`
+        A controlled string describing the target object.
     """
     def __init__(self, target_type):
         super().__init__(target_type)
@@ -75,23 +114,26 @@ class TargetType(_SimpleAttr):
 # recipeId [array]
 class Recipe(_SimpleAttr):
     """
+    Unique identifier for a calibration pipeline.
+
+    Parameters
+    ----------
+    recipe_id: `str`
+        A unique identifier for the calibration pipeline.
     """
     def __init__(self, recipe_id):
         super().__init__(recipe_id)
 
 
-# recipeInstanceId [array]
-class RecipeInstance(_SimpleAttr):
-    """
-    """
-    def __init__(self, recipe_instance_id):
-        super().__init__(recipe_instance_id)
-
-
 # isEmbargoed
 class Embargoed(_SimpleAttr):
     """
-    Search only for datasets with either are or are not under embargo.
+    Current embargo status of a dataset.
+
+    Parameters
+    ----------
+    is_embargoed: `str`
+        A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed):
         super().__init__(is_embargoed)
@@ -103,32 +145,49 @@ class Embargoed(_SimpleAttr):
 # qualityAverageFriedParameterMin, qualityAverageFriedParameterMax
 class FriedParameter(_Range):
     """
+    The average Fried parameter of a dataset.
+
+    Parameters
+    ----------
+    friedmin : `u.Quantity`
+        The minimum value of the average fried parameter to search between.
+
+    friedmax : `u.Quantity`
+        The maximum value of the average fried parameter to search between.
     """
+    def __init__(self, friedmin: u.cm, friedmax: u.cm):
+        super().__init__(friedmin, friedmax)
 
 
 # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
 class PolarimetricAccuracy(_Range):
     """
+    The average polarimetric accuracy of a dataset.
+
+    Parameters
+    ----------
+    friedmin : `u.Quantity`
+        The minimum value of the average fried parameter to search between.
+
+    friedmax : `u.Quantity`
+        The maximum value of the average fried parameter to search between.
     """
 
 
 # exposureTimeMin, exposureTimeMax
 class ExposureTime(_Range):
     """
+    Most common exposure time of the calibrated data frames within the dataset.
     """
     @u.quantity_input
     def __init__(self, expmin: u.s, expmax: u.s):
         super().__init__(expmin, expmax)
 
 
-# createDateMin, createDateMax
-class CreationTime(_sunpy_attrs.Time):
-    """
-    """
-
 # embargoEndDateMin, embargoEndDateMax
 class EmbargoEndTime(_sunpy_attrs.Time):
     """
+    The time at which an embargo on the dataset lapses.
     """
 
 
@@ -138,6 +197,7 @@ class EmbargoEndTime(_sunpy_attrs.Time):
 # browseMovieUrl & browseMovieObjectKey
 class BrowseMovie(_Attr):
     """
+    The identifier for a browse move associated with a dataset.
     """
     def __init__(self, *, movieurl=None, movieobjectkey=None):
         if movieurl is None and movieobjectkey is None:
@@ -149,6 +209,7 @@ class BrowseMovie(_Attr):
 # rectangleContainedByBoundingBox, rectangleContainingBoundingBox, rectangleIntersectingBoundingBox
 class BoundingBox(_Attr):
     """
+    The dataset bounding box in spatial coordinates.
     """
     def __init__(self, bottom_left, *, top_right=None, width=None, height=None, search="containing"):
         pass
