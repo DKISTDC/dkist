@@ -126,12 +126,7 @@ def _(attr):
 
 @walker.add_converter(Recipe)
 def _(attr):
-    return ValueAttr({'recipeId': int(attr.value)})
-
-
-@walker.add_converter(RecipeInstance)
-def _(attr):
-    return ValueAttr({'recipeInstanceId': int(attr.value)})
+    return ValueAttr({'recipeId': attr.value})
 
 
 @walker.add_converter(Embargoed)
@@ -157,12 +152,6 @@ def _(attr):
                       'exposureTimeMax': attr.max.to_value(u.s)})
 
 
-@walker.add_converter(CreationTime)
-def _(attr):
-    return ValueAttr({'createDateMin': attr.start.isot,
-                      'createDateMax': attr.end.isot})
-
-
 @walker.add_converter(EmbargoEndTime)
 def _(attr):
     return ValueAttr({'embargoEndDateMin': attr.start.isot,
@@ -184,3 +173,11 @@ def _(attr):
 def _(attr):
     raise NotImplementedError("Support for bounding box isn't implemented")
     return ValueAttr({'': ''})
+
+
+@walker.add_converter(Provider)
+def _(attr):
+    """
+    Provider is used by client _can_handle_query and not the API.
+    """
+    return ValueAttr(dict())

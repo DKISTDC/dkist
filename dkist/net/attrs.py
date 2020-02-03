@@ -9,8 +9,8 @@ from sunpy.net.attr import SimpleAttr as _SimpleAttr
 from sunpy.net.vso.attrs import Physobs, Provider
 
 __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
-           'Experiment', 'Proposal', 'TargetType', 'Recipe', 'RecipeInstance',
-           'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime', 'CreationTime',
+           'Experiment', 'Proposal', 'TargetType', 'Recipe',
+           'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox', 'Provider', 'Physobs']
 
 
@@ -132,10 +132,10 @@ class Embargoed(_SimpleAttr):
 
     Parameters
     ----------
-    is_embargoed: `str`
+    is_embargoed: `bool`
         A boolean determining if a dataset currently under embargo.
     """
-    def __init__(self, is_embargoed):
+    def __init__(self, is_embargoed: bool):
         super().__init__(is_embargoed)
 
 
