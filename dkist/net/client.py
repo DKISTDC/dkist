@@ -1,9 +1,20 @@
+import json
+import urllib.parse
+import urllib.request
+
+from sunpy.net import attr
 from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import BaseClient
 
 from . import attrs as dattrs
+from .attr_walker import walker
 
 __all__ = ['DKISTDatasetClient']
+
+
+class DKISTQueryReponse:
+    """
+    """
 
 
 class DKISTDatasetClient(BaseClient):
@@ -11,11 +22,21 @@ class DKISTDatasetClient(BaseClient):
     A client for search DKIST datasets and retrieving metadata files describing
     the datasets.
     """
+    _BASE_URL = "http://10.10.10.10/datasets/v1/"
 
     def search(self, *args):
         """
         Search for datasets provided by the DKIST data centre.
         """
+        query = attr.and_(*args)
+        queries = walker.create(query)
+        for url_parameters in queries:
+            query_string = urllib.parse.urlencode(url_parameters)
+
+            full_url = f"{self._BASE_URL}?{query_string}"
+            data = urllib.request.urlopen(full_url)
+            data = json.loads(data)
+
 
     def fetch(self, *query_results, path=None, overwrite=False, progress=True,
               max_conn=5, downloader=None, wait=True, **kwargs):
