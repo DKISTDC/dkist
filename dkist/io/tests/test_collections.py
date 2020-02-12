@@ -94,3 +94,22 @@ def test_collection_getitem(tmpdir, earcollection):
     assert isinstance(earcollection[1], ExternalArrayReferenceCollection)
     assert len(earcollection[0]) == len(earcollection[1]) == 1
     assert earcollection[0:2] == earcollection
+
+
+@pytest.fixture
+def large_EARCollection():
+    ear = asdf.ExternalArrayReference("efz20040301.000010_s.fits",
+                                      0,
+                                      "float64",
+                                      (128, 128))
+
+    ears = [[[ear] * 128 ] * 32] * 4
+
+    return DaskFITSArrayContainer.from_external_array_references(ears, loader=AstropyFITSLoader)
+
+
+def test_construct_large_array(benchmark, large_EARCollection):
+    arr = benchmark(lambda: large_EARCollection.array)
+
+    assert arr.shape == (4, 32, 128, 128, 128)
+    assert arr.chunksize == (1, 1, 1, 128, 128)

@@ -70,9 +70,10 @@ class ExternalArrayReferenceCollection:
         Construct a collection from a (nested) iterable of
         `asdf.ExternalArrayReference` objects.
         """
-        shape = ears[0].shape
-        dtype = ears[0].dtype
-        target = ears[0].target
+        array_ears = np.asarray(ears, dtype=object)
+        shape = array_ears.flat[0].shape
+        dtype = array_ears.flat[0].dtype
+        target = array_ears.flat[0].target
 
         for i, ele in enumerate(ears):
             uris = cls._validate_homogenaity(shape, target, dtype, ears)
