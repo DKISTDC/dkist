@@ -27,6 +27,10 @@ class DKISTQueryReponse(Sequence):
     def client(self):
         return DKISTDatasetClient()
 
+    @client.setter
+    def client(self, value):
+        return
+
     def __len__(self):
         return len(self.table)
 
@@ -47,7 +51,14 @@ class DKISTQueryReponse(Sequence):
 
     def __str__(self):
         """Print out human-readable summary of records retrieved"""
+        if len(self) == 0:
+            return str(self.table)
         return "\n".join(self.build_table()[self._core_keys].pformat(max_width=200, show_dtype=False))
+
+    def _repr_html_(self):
+        if len(self) == 0:
+            return self.table._repr_html_()
+        return self.table[self._core_keys]._repr_html_()
 
     def __repr__(self):
         """Print out human-readable summary of records retrieved"""
@@ -182,6 +193,11 @@ class DKISTDatasetClient(BaseClient):
         This enables the client to register what kind of searches it can
         handle, to prevent Fido using the incorrect client.
         """
+        for x in query:
+            if isinstance(x, sattrs.Instrument):
+                if x.value.lower() not in ("inst", "vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
+                    return False
+        return True
         # If any specific DKIST attrs
         # If Instrument is any of the known DKIST instruments
         # Should you be able to hit this client if you don't specify instrument??

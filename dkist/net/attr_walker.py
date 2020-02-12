@@ -71,7 +71,7 @@ def _(attr):
 
 @walker.add_converter(Instrument)
 def _(attr):
-    return ValueAttr({'instrumentNames': [attr.value]})
+    return ValueAttr({'instrumentNames': attr.value})
 
 
 @walker.add_converter(Wavelength)
@@ -96,32 +96,32 @@ def _(attr):
 
 @walker.add_converter(Dataset)
 def _(attr):
-    return ValueAttr({'datasetIds': [attr.value]})
+    return ValueAttr({'datasetIds': attr.value})
 
 
 @walker.add_converter(WavelengthBand)
 def _(attr):
-    return ValueAttr({'filterWavelengths': [attr.value]})
+    return ValueAttr({'filterWavelengths': attr.value})
 
 
 @walker.add_converter(Observable)
 def _(attr):
-    return ValueAttr({'observables': [attr.value]})
+    return ValueAttr({'observables': attr.value})
 
 
 @walker.add_converter(Experiment)
 def _(attr):
-    return ValueAttr({'primaryExperimentIds': [attr.value]})
+    return ValueAttr({'primaryExperimentIds': attr.value})
 
 
 @walker.add_converter(Proposal)
 def _(attr):
-    return ValueAttr({'primaryProposalIds': [attr.value]})
+    return ValueAttr({'primaryProposalIds': attr.value})
 
 
 @walker.add_converter(TargetType)
 def _(attr):
-    return ValueAttr({'targetTypes': [attr.value]})
+    return ValueAttr({'targetTypes': attr.value})
 
 
 @walker.add_converter(Recipe)
