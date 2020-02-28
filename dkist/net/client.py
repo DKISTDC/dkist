@@ -2,12 +2,11 @@ import json
 import urllib.parse
 import urllib.request
 from collections import defaultdict
-from collections.abc import Sequence
 
 import astropy.table
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
-from sunpy.net.base_client import BaseClient
+from sunpy.net.base_client import BaseClient, BaseQueryResponse
 
 from . import attrs as dattrs
 from .attr_walker import walker
@@ -15,21 +14,28 @@ from .attr_walker import walker
 __all__ = ['DKISTQueryReponse', 'DKISTDatasetClient']
 
 
-class DKISTQueryReponse(Sequence):
+class DKISTQueryReponse(BaseQueryResponse):
     """
     """
     _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength Min", "Wavelength Max")
 
     def __init__(self, table=None):
         self.table = table or astropy.table.Table()
+        self._client = None
 
     @property
     def client(self):
-        return DKISTDatasetClient()
+        if self._client is None:
+            self.client = DKISTDatasetClient()
+        return self._client
 
     @client.setter
     def client(self, value):
-        return
+        self._client = value
+
+    @property
+    def blocks(self):
+        return list(self.table.iterrows())
 
     def __len__(self):
         return len(self.table)
@@ -39,6 +45,9 @@ class DKISTQueryReponse(Sequence):
 
     def __iter__(self):
         return (t for t in [self])
+
+    def __eq__(self, o):
+        return self.table.__eq__(o)
 
     def build_table(self):
         return self.table
@@ -60,15 +69,49 @@ class DKISTQueryReponse(Sequence):
             return self.table._repr_html_()
         return self.table[self._core_keys]._repr_html_()
 
-    def __repr__(self):
-        """Print out human-readable summary of records retrieved"""
-        return object.__repr__(self) + "\n" + str(self)
-
     @classmethod
     def from_results(cls, results):
         res = cls()
         res._append_results(results)
         return res
+
+    key_map = {
+        "asdfObjectKey": "asdf Filename",
+        "boundingBox": "Bounding Box",
+        "browseMovieObjectKey": "Movie Filename",
+        "browseMovieUrl": "Preview URL",
+        "bucket": "Storage Bucket",
+        "contributingExperimentIds": "Experiment IDs",
+        "contributingProposalIds": "Proposal IDs",
+        "createDate": "Creation Date",
+        "datasetId": "Dataset ID",
+        "datasetSize": "Dataset Size",
+        "embargoEndDate": "Embargo End Date",
+        "endTime": "End Time",
+        "experimentDescription": "Experiment Description",
+        "exposureTime": "Exposure Time",
+        "filterWavelengths": "Filter Wavelengths",
+        "frameCount": "Number of Frames",
+        "hasAllStokes": "Full Stokes",
+        "instrumentName": "Instrument",
+        "isDownloadable": "Downloadable",
+        "isEmbargoed": "Embargoed",
+        "observables": "Observables",
+        "originalFrameCount": "Level 0 Frame count",
+        "primaryExperimentId": "Primary Experiment ID",
+        "primaryProposalId": "Primary Proposal ID",
+        "qualityAverageFriedParameter": "Average Fried Parameter",
+        "qualityAveragePolarimetricAccuracy": "Average Polarimetric Accuracy",
+        "recipeId": "Recipe ID",
+        "recipeInstanceId": "Recipie Instance ID",
+        "recipeRunId": "Recipie Run ID",
+        "startTime": "Start Time",
+        "stokesParameters": "Stokes Parameters",
+        "targetType": "Target Type",
+        "updateDate": "Last Updated",
+        "wavelengthMax": "Wavelength Max",
+        "wavelengthMin": "Wavelength Min"
+    }
 
     def _append_results(self, results):
         """
@@ -81,48 +124,11 @@ class DKISTQueryReponse(Sequence):
         results : `list`
             A list of dicts as returned by the dataset search API.
         """
-        key_map = {
-            "asdfObjectKey": "asdf Filename",
-            "boundingBox": "Bounding Box",
-            "browseMovieObjectKey": "Movie Filename",
-            "browseMovieUrl": "Preview URL",
-            "bucket": "bucket",
-            "contributingExperimentIds": "Experiment IDs",
-            "contributingProposalIds": "Proposal IDs",
-            "createDate": "Creation Date",
-            "datasetId": "Dataset ID",
-            "datasetSize": "Dataset Size",
-            "embargoEndDate": "Embargo End Date",
-            "endTime": "End Time",
-            "experimentDescription": "Experiment Description",
-            "exposureTime": "Exposure Time",
-            "filterWavelengths": "Filter Wavelengths",
-            "frameCount": "Number of Frames",
-            "hasAllStokes": "Full Stokes",
-            "instrumentName": "Instrument",
-            "isDownloadable": "Downloadable",
-            "isEmbargoed": "Embargoed",
-            "observables": "Observables",
-            "originalFrameCount": "Level 0 Frame count",
-            "primaryExperimentId": "Primary Experiment ID",
-            "primaryProposalId": "Primary Proposal ID",
-            "qualityAverageFriedParameter": "Average Fried Parameter",
-            "qualityAveragePolarimetricAccuracy": "Average Polarimetric Accuracy",
-            "recipeId": "Recipe ID",
-            "recipeInstanceId": "Recipie Instance ID",
-            "recipeRunId": "Recipie Run ID",
-            "startTime": "Start Time",
-            "stokesParameters": "Stokes Parameters",
-            "targetType": "Target Type",
-            "updateDate": "Last Updated",
-            "wavelengthMax": "Wavelength Max",
-            "wavelengthMin": "Wavelength Min"
-        }
 
         new_results = defaultdict(list)
         for result in results:
             for key, value in result.items():
-                new_results[key_map[key]].append(value)
+                new_results[self.key_map[key]].append(value)
 
         full_table = astropy.table.Table(data=new_results)
 
@@ -134,7 +140,7 @@ class DKISTDatasetClient(BaseClient):
     A client for search DKIST datasets and retrieving metadata files describing
     the datasets.
     """
-    _BASE_URL = "http://10.224.182.25:31675/datasets/"
+    _BASE_URL = "http://10.224.182.24:22163/datasets/"
 
     def search(self, *args):
         """
@@ -193,6 +199,17 @@ class DKISTDatasetClient(BaseClient):
         This enables the client to register what kind of searches it can
         handle, to prevent Fido using the incorrect client.
         """
+        from sunpy.net import attrs as a
+
+        required = {a.Time, a.Instrument, a.Level}
+        optional = {}  # Level should really be in here
+        all_attrs = required.union(optional)
+
+        query_attrs = set(type(x) for x in query)
+
+        if not required.issubset(query_attrs) or not all_attrs.issubset(query_attrs):
+            return False
+
         for x in query:
             if isinstance(x, sattrs.Instrument):
                 if x.value.lower() not in ("inst", "vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
@@ -220,8 +237,8 @@ class DKISTDatasetClient(BaseClient):
                                 ("Cryo-NIRSP", "Cryogenic Near Infrared SpectroPolarimiter"),
                                 ("DL-NIRSP", "")],
             # hasAllStokes
-            sattrs.vso.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
-                                 ("intensity", "Only Stokes I is provided in the dataset.")],
+            sattrs.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
+                             ("intensity", "Only Stokes I is provided in the dataset.")],
             # isEmbargoed
             dattrs.Embargoed: [(True, "Data is subject to access restrictions."),
                                (False, "Data is not subject to access restrictions.")],
