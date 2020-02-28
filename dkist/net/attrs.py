@@ -3,21 +3,21 @@ Search attrs for DKIST data.
 """
 import astropy.units as u
 import sunpy.net._attrs as _sunpy_attrs
-from sunpy.net.attr import Attr as _Attr
+from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
-from sunpy.net.vso.attrs import Physobs, Provider
+from sunpy.net.vso.attrs import Provider
 
 __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
-           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox', 'Provider', 'Physobs']
+           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox', 'Provider']
 
 
 # The attrs we are using from VSO should appear like they are defined in this
 # module for documentation purposes. These should really be moved in sunpy from
 # a.vso. to a.?
-for attr in [Provider, Physobs]:
+for attr in [Provider]:
     attr.__module__ = __name__
 
 
@@ -136,7 +136,7 @@ class Embargoed(_SimpleAttr):
         A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed: bool):
-        super().__init__(is_embargoed)
+        super().__init__(bool(is_embargoed))
 
 
 # Range Attrs
@@ -195,7 +195,7 @@ class EmbargoEndTime(_sunpy_attrs.Time):
 
 
 # browseMovieUrl & browseMovieObjectKey
-class BrowseMovie(_Attr):
+class BrowseMovie(_DataAttr):
     """
     The identifier for a browse move associated with a dataset.
     """
@@ -207,7 +207,7 @@ class BrowseMovie(_Attr):
 
 
 # rectangleContainedByBoundingBox, rectangleContainingBoundingBox, rectangleIntersectingBoundingBox
-class BoundingBox(_Attr):
+class BoundingBox(_DataAttr):
     """
     The dataset bounding box in spatial coordinates.
     """

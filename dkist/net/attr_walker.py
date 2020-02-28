@@ -1,6 +1,6 @@
 import astropy.units as u
-from sunpy.net.attr import AttrAnd, AttrOr, AttrWalker, ValueAttr
-from sunpy.net.attrs import Instrument, Time, Wavelength
+from sunpy.net.attr import AttrAnd, AttrOr, AttrWalker, DataAttr
+from sunpy.net.attrs import Instrument, Physobs, Time, Wavelength
 
 from .attrs import *
 
@@ -37,7 +37,7 @@ def create_from_or(wlk, tree):
     return params
 
 
-@walker.add_creator(AttrAnd, ValueAttr)
+@walker.add_creator(AttrAnd, DataAttr)
 def create_new_param(wlk, tree):
     params = dict()
 
@@ -53,131 +53,121 @@ def iterate_over_and(wlk, tree, params):
         wlk.apply(sub, params)
 
 
-@walker.add_applier(ValueAttr)
-def add_value_to_params(wlk, attr, params):
-    # Modify params in place by combining it with the dict contained in the
-    # ValueAttr
-    params.update(attr.attrs)
-
-
 # Converters from Attrs to ValueAttrs
 # SunPy Attrs
-
-@walker.add_converter(Time)
-def _(attr):
-    return ValueAttr({'startTimeMin': attr.start.isot,
-                      'endTimeMax': attr.end.isot})
-
-
-@walker.add_converter(Instrument)
-def _(attr):
-    return ValueAttr({'instrumentNames': attr.value})
+@walker.add_applier(Time)
+def _(wlk, attr, params):
+    return params.update({'startTimeMin': attr.start.isot,
+                          'endTimeMax': attr.end.isot})
 
 
-@walker.add_converter(Wavelength)
-def _(attr):
-    return ValueAttr({'wavelengthMinMin': attr.min.to_value(u.nm),
-                      'wavelengthMaxMax': attr.max.to_value(u.nm)})
+@walker.add_applier(Instrument)
+def _(wlk, attr, params):
+    return params.update({'instrumentNames': attr.value})
 
 
-@walker.add_converter(Physobs)
-def _(attr):
+@walker.add_applier(Wavelength)
+def _(wlk, attr, params):
+    return params.update({'wavelengthMinMin': attr.min.to_value(u.nm),
+                          'wavelengthMaxMax': attr.max.to_value(u.nm)})
+
+
+@walker.add_applier(Physobs)
+def _(wlk, attr, params):
     if attr.value == "stokes_parameters":
-        return ValueAttr({'hasAllStokes': True})
+        return params.update({'hasAllStokes': True})
     if attr.value == "intensity":
-        return ValueAttr({'hasAllStokes': False})
+        return params.update({'hasAllStokes': False})
 
     # The client should not have accepted the query if we make it this far.
-    raise ValueError(f"Physobs({attr.value}) is not supported by the DKIST client.")
+    raise ValueError(f"Physobs({attr.value}) is not supported by the DKIST client.")  # pragma: no cover
 
 
 # DKIST Attrs
+@walker.add_applier(Dataset)
+def _(wlk, attr, params):
+    return params.update({'datasetIds': attr.value})
 
 
-@walker.add_converter(Dataset)
-def _(attr):
-    return ValueAttr({'datasetIds': attr.value})
+@walker.add_applier(WavelengthBand)
+def _(wlk, attr, params):
+    return params.update({'filterWavelengths': attr.value})
 
 
-@walker.add_converter(WavelengthBand)
-def _(attr):
-    return ValueAttr({'filterWavelengths': attr.value})
+@walker.add_applier(Observable)
+def _(wlk, attr, params):
+    return params.update({'observables': attr.value})
 
 
-@walker.add_converter(Observable)
-def _(attr):
-    return ValueAttr({'observables': attr.value})
+@walker.add_applier(Experiment)
+def _(wlk, attr, params):
+    return params.update({'primaryExperimentIds': attr.value})
 
 
-@walker.add_converter(Experiment)
-def _(attr):
-    return ValueAttr({'primaryExperimentIds': attr.value})
+@walker.add_applier(Proposal)
+def _(wlk, attr, params):
+    return params.update({'primaryProposalIds': attr.value})
 
 
-@walker.add_converter(Proposal)
-def _(attr):
-    return ValueAttr({'primaryProposalIds': attr.value})
+@walker.add_applier(TargetType)
+def _(wlk, attr, params):
+    return params.update({'targetTypes': attr.value})
 
 
-@walker.add_converter(TargetType)
-def _(attr):
-    return ValueAttr({'targetTypes': attr.value})
+@walker.add_applier(Recipe)
+def _(wlk, attr, params):
+    return params.update({'recipeId': attr.value})
 
 
-@walker.add_converter(Recipe)
-def _(attr):
-    return ValueAttr({'recipeId': attr.value})
+@walker.add_applier(Embargoed)
+def _(wlk, attr, params):
+    return params.update({'isEmbargoed': bool(attr.value)})
 
 
-@walker.add_converter(Embargoed)
-def _(attr):
-    return ValueAttr({'isEmbargoed': bool(attr.value)})
+@walker.add_applier(FriedParameter)
+def _(wlk, attr, params):
+    return params.update({'qualityAverageFriedParameterMin': attr.min,
+                          'qualityAverageFriedParameterMax': attr.max})
 
 
-@walker.add_converter(FriedParameter)
-def _(attr):
-    return ValueAttr({'qualityAverageFriedParameterMin': attr.min,
-                      'qualityAverageFriedParameterMax': attr.max})
+@walker.add_applier(PolarimetricAccuracy)
+def _(wlk, attr, params):
+    return params.update({'qualityAveragePolarimetricAccuracyMin': attr.min,
+                          'qualityAveragePolarimetricAccuracyMax': attr.max})
 
 
-@walker.add_converter(PolarimetricAccuracy)
-def _(attr):
-    return ValueAttr({'qualityAveragePolarimetricAccuracyMin': attr.min,
-                      'qualityAveragePolarimetricAccuracyMax': attr.max})
+@walker.add_applier(ExposureTime)
+def _(wlk, attr, params):
+    return params.update({'exposureTimeMin': attr.min.to_value(u.s),
+                          'exposureTimeMax': attr.max.to_value(u.s)})
 
 
-@walker.add_converter(ExposureTime)
-def _(attr):
-    return ValueAttr({'exposureTimeMin': attr.min.to_value(u.s),
-                      'exposureTimeMax': attr.max.to_value(u.s)})
+@walker.add_applier(EmbargoEndTime)
+def _(wlk, attr, params):
+    return params.update({'embargoEndDateMin': attr.start.isot,
+                          'embargoEndDateMax': attr.end.isot})
 
 
-@walker.add_converter(EmbargoEndTime)
-def _(attr):
-    return ValueAttr({'embargoEndDateMin': attr.start.isot,
-                      'embargoEndDateMax': attr.end.isot})
-
-
-@walker.add_converter(BrowseMovie)
-def _(attr):
+@walker.add_applier(BrowseMovie)
+def _(wlk, attr, params):
     values = {}
     if attr.movieurl:
         values['browseMovieUrl'] = attr.movieurl
     if attr.movieobjectkey:
         values['browseMovieObjectKey'] = attr.movieobjectkey
 
-    return ValueAttr(values)
+    return params.update(values)
 
 
-@walker.add_converter(BoundingBox)
-def _(attr):
+@walker.add_applier(BoundingBox)
+def _(wlk, attr, params):
     raise NotImplementedError("Support for bounding box isn't implemented")
-    return ValueAttr({'': ''})
+    return params.update({'': ''})
 
 
-@walker.add_converter(Provider)
-def _(attr):
+@walker.add_applier(Provider)
+def _(wlk, attr, params):
     """
     Provider is used by client _can_handle_query and not the API.
     """
-    return ValueAttr(dict())
+    return params.update(dict())
