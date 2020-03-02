@@ -9,34 +9,6 @@ from dkist.net.attr_walker import walker
 
 
 @pytest.fixture
-def api_param_names():
-    """
-    A mapping of attrs to param names in the query string.
-
-    Excludes ones with input dependant query params
-    """
-    return {
-        a.Time: ('startTimeMin', 'endTimeMax'),
-        a.Instrument: ('instrumentNames',),
-        a.Wavelength: ('wavelengthMinMin', 'wavelengthMaxMax'),
-        a.Physobs: ('hasAllStokes',),
-        da.Dataset: ('datasetIds',),
-        da.WavelengthBand: ('filterWavelengths',),
-        da.Observable: ('observables',),
-        da.Experiment: ('primaryExperimentIds',),
-        da.Proposal: ('primaryProposalIds',),
-        da.TargetType: ('targetTypes',),
-        da.Recipe: ('recipeId',),
-        da.Embargoed: ('isEmbargoed',),
-        da.FriedParameter: ('qualityAverageFriedParameterMin', 'qualityAverageFriedParameterMax'),
-        da.PolarimetricAccuracy: ('qualityAveragePolarimetricAccuracyMin', 'qualityAveragePolarimetricAccuracyMax'),
-        da.ExposureTime: ('exposureTimeMin', 'exposureTimeMax'),
-        da.EmbargoEndTime: ('embargoEndDateMin', 'embargoEndDateMax'),
-        da.Provider: tuple(),
-        }
-
-
-@pytest.fixture
 def query_and_simple():
     return a.Instrument("VBI") & a.Time("2020/06/01", "2020/06/02")
 
@@ -47,17 +19,6 @@ def query_or_instrument():
     A query which applies or to array types.
     """
     return (a.Instrument("VBI") | a.Instrument("VISP")) & a.Time("2020/06/01", "2020/06/02")
-
-
-@pytest.fixture(params=da.__all__)
-def all_dkist_attrs_classes(request):
-    return getattr(da, request.param)
-
-
-@pytest.fixture(params=da.__all__ + ['Time', 'Instrument', 'Wavelength', 'Physobs'])
-def all_attrs_classes(request):
-    at = getattr(da, request.param, None)
-    return at or getattr(a, request.param)
 
 
 def test_walker_single(all_attrs_classes, api_param_names):

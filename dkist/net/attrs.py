@@ -33,7 +33,7 @@ class Dataset(_SimpleAttr):
     dataset_id : `str`
         A random unique identifier for a dataset.
     """
-    def __init__(self, dataset_id):
+    def __init__(self, dataset_id: str):
         super().__init__(dataset_id)
 
 
@@ -46,7 +46,7 @@ class WavelengthBand(_SimpleAttr):
     ----------
     wavelength_band : `str`?
     """
-    def __init__(self, wavelength_band):
+    def __init__(self, wavelength_band: str):
         super().__init__(wavelength_band)
 
 
@@ -55,7 +55,7 @@ class Observable(_SimpleAttr):
     """
     Unused at this time.
     """
-    def __init__(self, observable):
+    def __init__(self, observable: str):
         super().__init__(observable)
 
 
@@ -74,7 +74,7 @@ class Experiment(_SimpleAttr):
     experiment_id : `str`
         A unique identifier for an experiment.
     """
-    def __init__(self, experiment_id):
+    def __init__(self, experiment_id: str):
         super().__init__(experiment_id)
 
 
@@ -93,7 +93,7 @@ class Proposal(_SimpleAttr):
     proposal_id : `str`
         A unique identifier for a proposal.
     """
-    def __init__(self, proposal_id):
+    def __init__(self, proposal_id: str):
         super().__init__(proposal_id)
 
 
@@ -107,7 +107,7 @@ class TargetType(_SimpleAttr):
     target_type: `str`
         A controlled string describing the target object.
     """
-    def __init__(self, target_type):
+    def __init__(self, target_type: str):
         super().__init__(target_type)
 
 
@@ -121,7 +121,7 @@ class Recipe(_SimpleAttr):
     recipe_id: `str`
         A unique identifier for the calibration pipeline.
     """
-    def __init__(self, recipe_id):
+    def __init__(self, recipe_id: str):
         super().__init__(recipe_id)
 
 
@@ -199,7 +199,7 @@ class BrowseMovie(_DataAttr):
     """
     The identifier for a browse move associated with a dataset.
     """
-    def __init__(self, *, movieurl=None, movieobjectkey=None):
+    def __init__(self, *, movieurl: str = None, movieobjectkey: str = None):
         if movieurl is None and movieobjectkey is None:
             raise ValueError("Either movieurl or movieobjectkey must be specified")
         self.movieurl = movieurl

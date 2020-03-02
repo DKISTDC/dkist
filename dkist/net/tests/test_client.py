@@ -1,9 +1,12 @@
+import hypothesis.strategies as st  # noqa
 import pytest
+from hypothesis import given, infer
 
 from sunpy.net import attrs as a
 
 import dkist.net.attrs as da  # noqa
 from dkist.net.client import DKISTDatasetClient, DKISTQueryReponse
+from dkist.net.tests import strategies  # noqa
 
 
 @pytest.fixture
@@ -97,3 +100,8 @@ def test_length_0_qr(empty_query_response):
     assert str(empty_query_response)
     assert repr(empty_query_response)
     assert empty_query_response._repr_html_()
+
+
+@given(s=infer)
+def test_range(s: a.Wavelength):
+    print(s)

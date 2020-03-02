@@ -212,6 +212,7 @@ class DKISTDatasetClient(BaseClient):
 
         for x in query:
             if isinstance(x, sattrs.Instrument):
+                # TODO: Obviously "inst" shouldn't be here, but it's in the test data.
                 if x.value.lower() not in ("inst", "vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
                     return False
         return True
@@ -228,14 +229,14 @@ class DKISTDatasetClient(BaseClient):
         """
         Known search values for DKIST data, currently manually specified.
         """
-        return {
+        return {cls: {
             sattrs.vso.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
             # instrumentNames
             sattrs.Instrument: [("VBI", "Visible Broadband Imager"),
-                                ("VISP", ""),
+                                ("VISP", "Visible Spectro-Polarimeter"),
                                 ("VTF", "Visible Tunable Filter"),
                                 ("Cryo-NIRSP", "Cryogenic Near Infrared SpectroPolarimiter"),
-                                ("DL-NIRSP", "")],
+                                ("DL-NIRSP", "Diffraction-Limited Near-InfraRed Spectro-Polarimeter")],
             # hasAllStokes
             sattrs.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
                              ("intensity", "Only Stokes I is provided in the dataset.")],
@@ -243,8 +244,8 @@ class DKISTDatasetClient(BaseClient):
             dattrs.Embargoed: [(True, "Data is subject to access restrictions."),
                                (False, "Data is not subject to access restrictions.")],
             # targetTypes
-            dattrs.TargetType: [],  # This should be a controlled list.
+            #dattrs.TargetType: [],  # This should be a controlled list.
 
             # Completeness
-            sattrs.Level: [("1", "DKIST data calibrated to level 1.")],
-        }
+            sattrs.Level: [(1, "DKIST data calibrated to level 1.")],
+        }}
