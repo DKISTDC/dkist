@@ -1,0 +1,1 @@
+Add a `sunpy.net.Fido` client for searching DKIST Dataset inventory. Currently only supports search.
