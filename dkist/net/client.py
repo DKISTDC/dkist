@@ -1,4 +1,4 @@
-import sys
+import os
 import json
 import urllib.parse
 import urllib.request
@@ -21,6 +21,7 @@ class DKISTQueryReponse(BaseQueryResponse):
     """
 
     # Define some class properties to better format the results table.
+
     # These keys are shown in the repr and str representations of this class.
     _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength Min", "Wavelength Max")
 
@@ -146,7 +147,7 @@ class DKISTDatasetClient(BaseClient):
     Search DKIST datasets and retrie metadata files describing them.
     """
 
-    _BASE_URL = sys.environ.get("DKIST_DATASET_ENDPOINT", "")
+    _BASE_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "")
 
     def search(self, *args):
         """
@@ -204,24 +205,30 @@ class DKISTDatasetClient(BaseClient):
         # handle, to prevent Fido using the incorrect client.
         from sunpy.net import attrs as a
 
-        required = {a.Time, a.Instrument, a.Level}
-        optional = {}  # Level should really be in here
-        all_attrs = required.union(optional)
-
+        supported = set(walker.applymm.registry)
+        # This function is only called with arguments of the query where they are assumed to be ANDed.
+        supported.remove(attr.AttrAnd)
         query_attrs = set(type(x) for x in query)
 
-        if not required.issubset(query_attrs) or not all_attrs.issubset(query_attrs):
+        # The DKIST client only requires that one or more of the support attrs be present.
+        if not query_attrs.issubset(supported) or len(query_attrs.intersection(supported)) < 1:
             return False
 
         for x in query:
-            if isinstance(x, sattrs.Instrument):
+            if isinstance(x, a.Instrument):
                 # TODO: Obviously "inst" shouldn't be here, but it's in the test data.
                 if x.value.lower() not in ("inst", "vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
                     return False
+
+            if isinstance(x, a.Physobs):
+                if x.value.lower() not in ("stokes_parameters", "intensity"):
+                    return False
+
+            if isinstance(x, a.Level):
+                if x.value not in (1, "1", "one"):
+                    return False
+
         return True
-        # If any specific DKIST attrs
-        # If Instrument is any of the known DKIST instruments
-        # Should you be able to hit this client if you don't specify instrument??
 
     @classmethod
     def _attrs_module(cls):

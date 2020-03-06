@@ -1,6 +1,6 @@
 import astropy.units as u
 from sunpy.net.attr import AttrAnd, AttrOr, AttrWalker, DataAttr
-from sunpy.net.attrs import Instrument, Physobs, Time, Wavelength
+from sunpy.net.attrs import Instrument, Level, Physobs, Time, Wavelength
 
 from .attrs import *
 
@@ -166,4 +166,9 @@ def _(wlk, attr, params):
     """
     Provider is used by client _can_handle_query and not the API.
     """
-    return params.update(dict())
+
+@walker.add_applier(Level)
+def _(wlk, attr, params):
+    """
+    Level is used by client _can_handle_query and not the API.
+    """

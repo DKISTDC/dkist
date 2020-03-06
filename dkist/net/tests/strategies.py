@@ -28,7 +28,7 @@ def _supported_attr_types():
     attr_types = list(walker.applymm.registry)
     attr_types.remove(object)
     attr_types.remove(AttrAnd)
-    attr_types.remove(a.dkist.BoundingBox)
+    attr_types.remove(a.dkist.BoundingBox)  # TODO: Support BoundingBox
     return attr_types
 
 

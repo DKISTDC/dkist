@@ -4,8 +4,9 @@ import hypothesis.strategies as st  # noqa
 import pytest
 from hypothesis import given
 
-from sunpy.net import attr
+from sunpy.net import Fido, attr
 from sunpy.net import attrs as a
+from sunpy.tests.helpers import no_vso
 
 from dkist.net.client import DKISTDatasetClient, DKISTQueryReponse
 from dkist.net.tests import strategies as dst  # noqa
@@ -143,3 +144,43 @@ def test_search_query_or(mocked_client, query):
     res = mocked_client.search(query)
     assert isinstance(res, DKISTQueryReponse)
     assert len(res) == 1
+
+
+@given(dst.query_and())
+def test_can_handle_query(client, query):
+    # Can handle query never gets passed an AttrOr
+    # It also never passes an AttrAnd, just the components of it
+    if isinstance(query, attr.AttrAnd):
+        assert client._can_handle_query(*query.attrs)
+    else:
+        assert client._can_handle_query(query)
+
+
+@pytest.mark.parametrize("query", (
+    a.Instrument("bob"),
+    a.Physobs("who's got the button"),
+    a.Level(2),
+    (a.Instrument("VBI"), a.Level(0)),
+    (a.Instrument("VBI"), a.Detector("test")),
+    tuple(),
+))
+def test_cant_handle_query(client, query):
+    """Some examples of invalid queries."""
+    assert not client._can_handle_query(query)
+
+
+@no_vso
+@given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
+def test_fido_valid(mocker, mocked_client, query):
+    # Test that Fido is passing through our queries to our client
+    mocked_search = mocker.patch('dkist.net.client.DKISTDatasetClient.search')
+    mocked_search.return_value = DKISTQueryReponse()
+
+    Fido.search(query)
+    assert mocked_search.called
+
+    if isinstance(query, (attr.DataAttr, attr.AttrAnd)):
+        assert mocked_search.call_count == 1
+
+    if isinstance(query, attr.AttrOr):
+        assert mocked_search.call_count == len(query.attrs)
