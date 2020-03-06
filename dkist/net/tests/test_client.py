@@ -129,7 +129,7 @@ def test_apply_or(s):
 
 @given(dst.query_or_composite())
 def test_apply_or_and(s):
-    assert isinstance(s, (attr.AttrOr, attr.DataAttr))
+    assert isinstance(s, (attr.AttrOr, attr.DataAttr, attr.AttrAnd))
 
 
 @given(dst.query_and())
