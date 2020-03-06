@@ -8,17 +8,13 @@ from hypothesis import assume
 
 import astropy.units as u
 from astropy.time import Time
+from sunpy.net import attr
 from sunpy.net import attrs as a
 from sunpy.net.attr import AttrAnd
 from sunpy.net.tests.strategies import TimeDelta, Times, time_attr
 
 from dkist.net import DKISTDatasetClient
 from dkist.net.attr_walker import walker
-
-
-@st.composite
-def _wavelength(draw):
-    return draw(st.floats(min_value=1, max_value=1e9)) * u.pm
 
 
 def _generate_from_register_values(attr_type):
@@ -32,6 +28,7 @@ def _supported_attr_types():
     attr_types = list(walker.applymm.registry)
     attr_types.remove(object)
     attr_types.remove(AttrAnd)
+    attr_types.remove(a.dkist.BoundingBox)
     return attr_types
 
 
@@ -48,10 +45,11 @@ def _unit_range(attr_type):
         unit = u.nm
 
     @st.composite
-    def aunit(draw, number=st.floats(allow_nan=False, allow_infinity=False, min_value=1)):
+    def aunit(draw, number=st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=1e10)):
         return draw(number) * unit
 
     return st.builds(attr_type, aunit(), aunit())
+
 
 @st.composite
 def _embargo_end(draw, time=Times(
@@ -76,3 +74,33 @@ st.register_type_strategy(a.dkist.FriedParameter, _unit_range)
 st.register_type_strategy(a.dkist.PolarimetricAccuracy, _unit_range)
 st.register_type_strategy(a.dkist.ExposureTime, _unit_range)
 st.register_type_strategy(a.dkist.EmbargoEndTime, _embargo_end())
+
+
+@st.composite
+def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
+                                     min_size=1, unique=True)):
+    """
+    Generate a AttrAnd query.
+    """
+    attr_types = draw(stattrs)
+    query_attrs = list(map(draw, map(st.from_type, attr_types)))
+    return attr.and_(*query_attrs)
+
+
+@st.composite
+def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
+                                    min_size=1, unique=True)):
+    """
+    Just OR a lot of attrs together.
+    """
+    attr_types = draw(stattrs)
+    query_attrs = list(map(draw, map(st.from_type, attr_types)))
+    return attr.or_(*query_attrs)
+
+
+@st.composite
+def query_or_composite(draw, qands=st.lists(query_and(), min_size=2, max_size=5)):
+    """
+    Make a more realistic OR of ANDs.
+    """
+    return attr.or_(*draw(qands))

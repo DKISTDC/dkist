@@ -1,12 +1,14 @@
+import json
+
 import hypothesis.strategies as st  # noqa
 import pytest
-from hypothesis import given, infer
+from hypothesis import given
 
+from sunpy.net import attr
 from sunpy.net import attrs as a
 
-import dkist.net.attrs as da  # noqa
 from dkist.net.client import DKISTDatasetClient, DKISTQueryReponse
-from dkist.net.tests import strategies  # noqa
+from dkist.net.tests import strategies as dst  # noqa
 
 
 @pytest.fixture
@@ -73,6 +75,18 @@ def example_api_response():
     }
 
 
+@pytest.fixture
+def mocked_client(mocker, client, example_api_response):
+    """
+    Return a client instance with any external service calls mocked.
+    """
+    urlopen = mocker.patch("urllib.request.urlopen")
+    open_mock = mocker.Mock()
+    open_mock.read.return_value = json.dumps(example_api_response)
+    urlopen.return_value = open_mock
+    return client
+
+
 def test_append_query_response(empty_query_response, example_api_response):
     qr = empty_query_response
     qr._append_results(example_api_response["searchResults"])
@@ -102,6 +116,30 @@ def test_length_0_qr(empty_query_response):
     assert empty_query_response._repr_html_()
 
 
-@given(s=infer)
-def test_range(s: a.Wavelength):
-    print(s)
+@given(dst.query_and())
+def test_apply_and(s):
+    assert isinstance(s, (attr.AttrAnd, attr.DataAttr))
+
+
+@given(dst.query_or())
+def test_apply_or(s):
+    assert isinstance(s, (attr.AttrOr, attr.DataAttr))
+
+
+@given(dst.query_or_composite())
+def test_apply_or_and(s):
+    assert isinstance(s, (attr.AttrOr, attr.DataAttr))
+
+
+@given(dst.query_and())
+def test_search_query_and(mocked_client, query):
+    res = mocked_client.search(query)
+    assert isinstance(res, DKISTQueryReponse)
+    assert len(res) == 1
+
+
+@given(dst.query_or_composite())
+def test_search_query_or(mocked_client, query):
+    res = mocked_client.search(query)
+    assert isinstance(res, DKISTQueryReponse)
+    assert len(res) == 1

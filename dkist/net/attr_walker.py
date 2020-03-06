@@ -10,11 +10,7 @@ The DKIST Client walker works by the creator creating a list of dicts, which
 become the query parameters to the call to the dataset searcher.
 
 The creator path of the walker creates the list of dicts and then the applier
-path updates the dict that the creator generates in place.
-
-The converters of the walker describe how to convert each of the supported
-Attrs into a ValueAttr containing the query params corresponding to that part
-of the query.
+path updates the dict by converting the attrs to their query parameters.
 """
 
 

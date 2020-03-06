@@ -158,6 +158,9 @@ class FriedParameter(_Range):
     def __init__(self, friedmin: u.cm, friedmax: u.cm):
         super().__init__(friedmin, friedmax)
 
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
 
 # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
 class PolarimetricAccuracy(_Range):
@@ -173,6 +176,9 @@ class PolarimetricAccuracy(_Range):
         The maximum value of the average fried parameter to search between.
     """
 
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
 
 # exposureTimeMin, exposureTimeMax
 class ExposureTime(_Range):
@@ -182,6 +188,9 @@ class ExposureTime(_Range):
     @u.quantity_input
     def __init__(self, expmin: u.s, expmax: u.s):
         super().__init__(expmin, expmax)
+
+    def collides(self, other):
+        return isinstance(other, self.__class__)
 
 
 # embargoEndDateMin, embargoEndDateMax
@@ -205,6 +214,9 @@ class BrowseMovie(_DataAttr):
         self.movieurl = movieurl
         self.movieobjectkey = movieobjectkey
 
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
 
 # rectangleContainedByBoundingBox, rectangleContainingBoundingBox, rectangleIntersectingBoundingBox
 class BoundingBox(_DataAttr):
@@ -213,3 +225,6 @@ class BoundingBox(_DataAttr):
     """
     def __init__(self, bottom_left, *, top_right=None, width=None, height=None, search="containing"):
         pass
+
+    def collides(self, other):
+        return isinstance(other, self.__class__)

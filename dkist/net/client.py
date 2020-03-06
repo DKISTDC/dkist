@@ -1,3 +1,4 @@
+import sys
 import json
 import urllib.parse
 import urllib.request
@@ -16,65 +17,14 @@ __all__ = ['DKISTQueryReponse', 'DKISTDatasetClient']
 
 class DKISTQueryReponse(BaseQueryResponse):
     """
+    Results of a DKIST Dataset search.
     """
+
+    # Define some class properties to better format the results table.
+    # These keys are shown in the repr and str representations of this class.
     _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength Min", "Wavelength Max")
 
-    def __init__(self, table=None):
-        self.table = table or astropy.table.Table()
-        self._client = None
-
-    @property
-    def client(self):
-        if self._client is None:
-            self.client = DKISTDatasetClient()
-        return self._client
-
-    @client.setter
-    def client(self, value):
-        self._client = value
-
-    @property
-    def blocks(self):
-        return list(self.table.iterrows())
-
-    def __len__(self):
-        return len(self.table)
-
-    def __getitem__(self, item):
-        return type(self)(self.table[item])
-
-    def __iter__(self):
-        return (t for t in [self])
-
-    def __eq__(self, o):
-        return self.table.__eq__(o)
-
-    def build_table(self):
-        return self.table
-
-    def response_block_properties(self):
-        """
-        Returns a set of class attributes on all the response blocks.
-        """
-        raise NotImplementedError()
-
-    def __str__(self):
-        """Print out human-readable summary of records retrieved"""
-        if len(self) == 0:
-            return str(self.table)
-        return "\n".join(self.build_table()[self._core_keys].pformat(max_width=200, show_dtype=False))
-
-    def _repr_html_(self):
-        if len(self) == 0:
-            return self.table._repr_html_()
-        return self.table[self._core_keys]._repr_html_()
-
-    @classmethod
-    def from_results(cls, results):
-        res = cls()
-        res._append_results(results)
-        return res
-
+    # Map the keys in the response to human friendly ones.
     key_map = {
         "asdfObjectKey": "asdf Filename",
         "boundingBox": "Bounding Box",
@@ -113,6 +63,16 @@ class DKISTQueryReponse(BaseQueryResponse):
         "wavelengthMin": "Wavelength Min"
     }
 
+    def __init__(self, table=None):
+        self.table = table or astropy.table.Table()
+        self._client = None
+
+    @classmethod
+    def from_results(cls, results):
+        res = cls()
+        res._append_results(results)
+        return res
+
     def _append_results(self, results):
         """
         Append a list of results from the API.
@@ -124,7 +84,6 @@ class DKISTQueryReponse(BaseQueryResponse):
         results : `list`
             A list of dicts as returned by the dataset search API.
         """
-
         new_results = defaultdict(list)
         for result in results:
             for key, value in result.items():
@@ -134,13 +93,60 @@ class DKISTQueryReponse(BaseQueryResponse):
 
         self.table = astropy.table.vstack(full_table, self.table)
 
+    @property
+    def client(self):
+        if self._client is None:
+            self.client = DKISTDatasetClient()
+        return self._client
+
+    @client.setter
+    def client(self, value):
+        self._client = value
+
+    @property
+    def blocks(self):
+        return list(self.table.iterrows())
+
+    def __len__(self):
+        return len(self.table)
+
+    def __getitem__(self, item):
+        return type(self)(self.table[item])
+
+    def __iter__(self):
+        return (t for t in [self])
+
+    def __eq__(self, o):
+        return self.table.__eq__(o)
+
+    def build_table(self):
+        return self.table
+
+    def response_block_properties(self):
+        """
+        Set of class attributes on all the response blocks.
+        """
+        raise NotImplementedError()
+
+    def __str__(self):
+        """Print out human-readable summary of records retrieved."""
+        if len(self) == 0:
+            return str(self.table)
+        return "\n".join(self.build_table()[self._core_keys].pformat(max_width=200,
+                                                                     show_dtype=False))
+
+    def _repr_html_(self):
+        if len(self) == 0:
+            return self.table._repr_html_()
+        return self.table[self._core_keys]._repr_html_()
+
 
 class DKISTDatasetClient(BaseClient):
     """
-    A client for search DKIST datasets and retrieving metadata files describing
-    the datasets.
+    Search DKIST datasets and retrie metadata files describing them.
     """
-    _BASE_URL = "http://10.224.182.24:22163/datasets/"
+
+    _BASE_URL = sys.environ.get("DKIST_DATASET_ENDPOINT", "")
 
     def search(self, *args):
         """
@@ -160,11 +166,10 @@ class DKISTDatasetClient(BaseClient):
 
         return results
 
-
     def fetch(self, *query_results, path=None, overwrite=False, progress=True,
               max_conn=5, downloader=None, wait=True, **kwargs):
         """
-        This enables the user to fetch the data using the client, after a search.
+        Fetch asdf files describing the datasets.
 
         Parameters
         ----------
@@ -195,10 +200,8 @@ class DKISTDatasetClient(BaseClient):
 
     @classmethod
     def _can_handle_query(cls, *query):
-        """
-        This enables the client to register what kind of searches it can
-        handle, to prevent Fido using the incorrect client.
-        """
+        # This enables the client to register what kind of searches it can
+        # handle, to prevent Fido using the incorrect client.
         from sunpy.net import attrs as a
 
         required = {a.Time, a.Instrument, a.Level}
