@@ -13,7 +13,7 @@ __all__ = ['preprocess_headers', 'make_sorted_table', 'validate_headers',
 
 def headers_from_filenames(filenames, hdu=0):
     """
-    A generator to get the headers from filenames.
+    Generator to get the headers from filenames.
     """
     return [dict(fits.getheader(fname, ext=hdu)) for fname in filenames]
 

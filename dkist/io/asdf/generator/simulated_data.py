@@ -28,7 +28,7 @@ def _gen_type(gen_type, max_int=1e6, max_float=1e6, len_str=30):
         raise ValueError("Type {} is not supported".format(gen_type))  # pragma: no cover
 
 
-def generate_datset_inventory_from_headers(headers, asdf_name):
+def generate_datset_inventory_from_headers(headers):
     """
     Generate a dummy dataset inventory from headers.
 
@@ -42,7 +42,6 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
     asdf_name: `str`
 
     """
-
     schema = [
         ('asdf_object_key', str),
         ('browse_movie_object_key', str),
@@ -83,8 +82,7 @@ def generate_datset_inventory_from_headers(headers, asdf_name):
     constants = {
         'frame_count': len(headers),
         'bucket': 'data',
-        'asdf_object_key': str(asdf_name)
-        }
+    }
 
     output = {}
 
