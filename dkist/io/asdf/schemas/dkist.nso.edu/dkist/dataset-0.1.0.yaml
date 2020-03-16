@@ -30,10 +30,10 @@ properties:
     properties:
         asdf_object_key:
           type: string
-        browse_movie_object_key:
-          type: string
-        browse_movie_url:
-          type: string
+        bounding_box:
+          type: array
+          items:
+            type: number
         bucket:
           type: string
         contributing_experiment_ids:
@@ -44,6 +44,8 @@ properties:
           type: array
           items:
             type: string
+        create_date:
+          $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
         dataset_id:
           type: string
         dataset_inventory_id:
@@ -57,9 +59,7 @@ properties:
         filter_wavelengths:
           type: array
           items:
-            type: string
-        frame_count:
-          type: integer
+            type: number
         has_all_stokes:
           type: boolean
         instrument_name:
@@ -86,8 +86,8 @@ properties:
           type: integer
         start_time:
           $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
-        #stokes_parameters:
-        #  type: string
+        stokes_parameters:
+         type: string
         target_type:
           type: string
         wavelength_max:
@@ -95,45 +95,41 @@ properties:
         wavelength_min:
           type: number
     additionalProperties: false
-    # required:
-    #     - asdf_object_key
-    #     - browse_movie_object_key
-    #     - browse_movie_url
-    #     - bucket
-    #     - contributing_experiment_ids
-    #     - contributing_proposal_ids
-    #     - dataset_id
-    #     - dataset_inventory_id
-    #     - dataset_size
-    #     - end_time
-    #     - exposure_time
-    #     - filter_wavelengths
-    #     - frame_count
-    #     - has_all_stokes
-    #     - instrument_name
-    #     - observables
-    #     - original_frame_count
-    #     - primary_experiment_id
-    #     - primary_proposal_id
-    #     - quality_average_fried_parameter
-    #     - quality_average_polarimetric_accuracy
-    #     - recipe_id
-    #     - recipe_instance_id
-    #     - recipe_run_id
-    #     - start_time
-    #     - target_type
-    #     - wavelength_max
-    #     - wavelength_min
+    required:
+        - asdf_object_key
+        - bounding_box
+        - bucket
+        - contributing_experiment_ids
+        - contributing_proposal_ids
+        - create_date
+        - dataset_id
+        - dataset_inventory_id
+        - dataset_size
+        - end_time
+        - exposure_time
+        - filter_wavelengths
+        - has_all_stokes
+        - instrument_name
+        - observables
+        - original_frame_count
+        - primary_experiment_id
+        - primary_proposal_id
+        - quality_average_fried_parameter
+        - quality_average_polarimetric_accuracy
+        - recipe_id
+        - recipe_instance_id
+        - recipe_run_id
+        - start_time
+        - stokes_parameters
+        - target_type
+        - wavelength_max
+        - wavelength_min
 
   mask:
     $ref: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
 
   unit:
     $ref: "tag:stsci.edu:asdf/unit/unit-1.0.0"
-
-  # uncertainty:
-  #   type: object
-
 
 required: [data, headers, wcs]
 allowAdditionalProperties: true

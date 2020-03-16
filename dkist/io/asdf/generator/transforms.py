@@ -198,7 +198,6 @@ class TransformBuilder:
                         input_frame=self.pixel_frame,
                         output_frame=world_frame)
 
-
     @property
     def frames(self):
         """
