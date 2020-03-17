@@ -173,17 +173,17 @@ def _inventory_from_headers(headers):
     inventory = {}
 
     inventory["wavelength_min"] = inventory["wavelength_max"] = _get_unique(headers['LINEWAV'])[0]
-    # inventory["exposure_time"] = _get_number_apply(headers[''], np.median)
+    inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], np.median)
     inventory["filter_wavelengths"] = _get_unique(headers['LINEWAV'])
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
     # inventory["observables"] = _get_unique(headers[''])
-    # inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
+    inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
     # inventory["quality_average_polarimetric_accuracy"] = _get_number_apply(headers[''], np.mean)
     # inventory["recipe_id"] = _get_unique(headers[''], singular=True)
     # inventory["recipe_instance_id"] = _get_unique(headers[''], singular=True)
     # inventory["recipe_run_id"] = _get_unique(headers[''], singular=True)
     # inventory["target_type"] = _get_unique(headers[''], singular=True)
-    # inventory["primary_experiment_id"] = _get_unique(headers[''], singular=True)
+    inventory["primary_experiment_id"] = _get_unique(headers['EXPER_ID'], singular=True)
     # inventory["dataset_size"] = _get_number_apply(headers[''], np.sum)
     # inventory["contributing_experiment_ids"] = _get_unique(headers[''])
     # inventory["contributing_proposal_ids"] =_get_unique(headers[''])
@@ -191,7 +191,7 @@ def _inventory_from_headers(headers):
     return inventory
 
 
-def inventory_metadata_from_tree(tree, **inventory):
+def extract_inventory(headers, wcs, **inventory):
     """
     Generate the inventory record for an asdf file from an asdf tree.
 
@@ -211,8 +211,6 @@ def inventory_metadata_from_tree(tree, **inventory):
         The updated tree with the inventory.
 
     """
-    wcs = tree['dataset'].wcs
-    headers = tree['dataset'].headers
     # The headers will populate passband info for VBI and then wcs will
     # override it if there is a wavelength axis in the dataset,
     # any supplied kwargs override things extracted from dataset.

@@ -8,8 +8,8 @@ from astropy.io.fits.hdu.base import BITPIX2DTYPE
 
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.io.asdf.generator.helpers import headers_from_filenames, preprocess_headers
-from dkist.io.asdf.generator.simulated_data import generate_datset_inventory_from_headers
+from dkist.io.asdf.generator.helpers import (extract_inventory, headers_from_filenames,
+                                             preprocess_headers)
 from dkist.io.asdf.generator.transforms import TransformBuilder
 
 try:
@@ -120,12 +120,9 @@ def asdf_tree_from_filenames(filenames, headers=None, inventory=None, hdu=0,
 
     table_headers, sorted_filenames, sorted_headers = preprocess_headers(headers, filenames)
 
-    if not inventory:
-        inventory = generate_datset_inventory_from_headers(table_headers)
-    if extra_inventory:
-        inventory.update(extra_inventory)
-
     ds_wcs = TransformBuilder(sorted_headers).gwcs
+
+    inventory = extract_inventory(table_headers, ds_wcs, **extra_inventory)
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],

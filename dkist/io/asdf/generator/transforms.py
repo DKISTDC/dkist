@@ -17,8 +17,8 @@ __all__ = ['TransformBuilder', 'spectral_model_from_framewave',
            'spatial_model_from_quantity', 'spatial_model_from_header']
 
 
-def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
-                                projection='TAN'):
+def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1,
+                                crval2, lon_pole, projection='TAN'):
     """
     Given quantity representations of a HPLx FITS WCS return a model for the
     spatial transform.
@@ -33,7 +33,7 @@ def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crva
     scale = Multiply(cdelt1) & Multiply(cdelt2)
     rotu = AffineTransformation2D(pc, translation=(0, 0)*u.arcsec)
     tanu = projections[projection]
-    skyrotu = RotateNative2Celestial(crval1, crval2, 180*u.deg)
+    skyrotu = RotateNative2Celestial(crval1, crval2, lon_pole)
     return shiftu | scale | rotu | tanu | skyrotu
 
 
@@ -70,7 +70,7 @@ def spatial_model_from_header(header):
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
                     [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * cunit1
 
-    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
+    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2, header['LONPOLE']*u.deg,
                                        projection=latproj)
 
 
