@@ -2,7 +2,10 @@
 Helper functions for parsing files and processing headers.
 """
 
+from functools import partial
+
 import numpy as np
+import scipy.stats
 
 import astropy.units as u
 import gwcs.coordinate_frames as cf
@@ -172,21 +175,23 @@ def _get_number_apply(column, func):
 def _inventory_from_headers(headers):
     inventory = {}
 
+    mode = partial(scipy.stats.mode, axis=None, nan_policy="raise")
+
     inventory["wavelength_min"] = inventory["wavelength_max"] = _get_unique(headers['LINEWAV'])[0]
-    inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], np.median)
+    inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], mode)
     inventory["filter_wavelengths"] = _get_unique(headers['LINEWAV'])
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
-    # inventory["observables"] = _get_unique(headers[''])
+    inventory["observables"] = [] # _get_unique(headers[''])
     inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
-    # inventory["quality_average_polarimetric_accuracy"] = _get_number_apply(headers[''], np.mean)
-    # inventory["recipe_id"] = _get_unique(headers[''], singular=True)
-    # inventory["recipe_instance_id"] = _get_unique(headers[''], singular=True)
-    # inventory["recipe_run_id"] = _get_unique(headers[''], singular=True)
-    # inventory["target_type"] = _get_unique(headers[''], singular=True)
+    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers[''], singular=True)
+    inventory["recipe_id"] = _get_unique(headers['RECIPEID'], singular=True)
+    inventory["recipe_instance_id"] = _get_unique(headers['RINSTID'], singular=True)
+    inventory["recipe_run_id"] = _get_unique(headers['RRUNID'], singular=True)
+    inventory["target_type"] = _get_unique(headers['OBJECT'])
     inventory["primary_experiment_id"] = _get_unique(headers['EXPER_ID'], singular=True)
-    # inventory["dataset_size"] = _get_number_apply(headers[''], np.sum)
-    # inventory["contributing_experiment_ids"] = _get_unique(headers[''])
-    # inventory["contributing_proposal_ids"] =_get_unique(headers[''])
+    inventory["dataset_size"] = _get_number_apply(headers['FRAMEVOL'], np.sum)
+    # inventory["contributing_experiment_ids"] = _get_keys_matching(headers, "EXPRID??")
+    # inventory["contributing_proposal_ids"] =_get_keys_matching(headers, "PROPID??")
 
     return inventory
 

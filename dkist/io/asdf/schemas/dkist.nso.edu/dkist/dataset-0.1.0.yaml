@@ -89,7 +89,9 @@ properties:
         stokes_parameters:
          type: string
         target_type:
-          type: string
+          type: array
+          items:
+            type: string
         wavelength_max:
           type: number
         wavelength_min:
