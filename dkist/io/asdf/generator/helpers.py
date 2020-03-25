@@ -31,12 +31,13 @@ def table_from_headers(headers):
 
 def validate_headers(table_headers):
     """
-    Given a bunch of headers, validate that they form a coherent set. This
-    function also adds the headers to a list as they are read from the file.
+    Given a bunch of headers, validate that they form a coherent set.
+
+    This function also adds the headers to a list as they are read from the
+    file.
 
     Parameters
     ----------
-
     headers :  iterator
         An iterator of headers.
 
@@ -47,9 +48,8 @@ def validate_headers(table_headers):
     """
     t = table_headers
 
-    """
-    Let's do roughly the minimal amount of verification here.
-    """
+    # Let's do roughly the minimal amount of verification here for construction
+    # of the WCS. Validation for inventory records is done independently.
 
     # For some keys all the values must be the same
     same_keys = ['NAXIS', 'DNAXIS']
@@ -110,7 +110,6 @@ def _inventory_from_wcs(wcs):
     Keys for wavelength will not be added if there is no spectral component,
     stokes keys are always added (defaulting to just I if not in the WCS).
     """
-
     bottom_left_array = [0] * wcs.pixel_n_dim
     top_right_array = np.array(wcs.pixel_shape) - 1
 
@@ -193,6 +192,8 @@ def _get_keys_matching(headers, pattern, singular_columns=True):
     for key in headers.colnames:
         if prog.match(key):
             results.append(_get_unique(headers[key], singular=singular_columns))
+    if singular_columns:
+        return list(set(results))
     return results
 
 
@@ -207,15 +208,18 @@ def _inventory_from_headers(headers):
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
     inventory["observables"] = []  # _get_unique(headers[''])
     inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
-    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers[''], singular=True)
+    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers['POL_ACC'], singular=True)
     inventory["recipe_id"] = _get_unique(headers['RECIPEID'], singular=True)
     inventory["recipe_instance_id"] = _get_unique(headers['RINSTID'], singular=True)
     inventory["recipe_run_id"] = _get_unique(headers['RRUNID'], singular=True)
     inventory["target_type"] = _get_unique(headers['OBJECT'])
-    inventory["primary_experiment_id"] = _get_unique(headers['EXPER_ID'], singular=True)
+    inventory["primary_proposal_id"] = _get_unique(headers['PROPID'], singular=True)
+    inventory["primary_experiment_id"] = _get_unique(headers['EXPERID'], singular=True)
     inventory["dataset_size"] = _get_number_apply(headers['FRAMEVOL'], np.sum)
-    inventory["contributing_experiment_ids"] = _get_keys_matching(headers, r"EXPRID\d\d")
-    inventory["contributing_proposal_ids"] = _get_keys_matching(headers, r"PROPID\d\d")
+    inventory["contributing_experiment_ids"] = (_get_keys_matching(headers, r"EXPERID\d\d$") +
+                                                [_get_unique(headers["EXPERID"], singular=True)])
+    inventory["contributing_proposal_ids"] = (_get_keys_matching(headers, r"PROPID\d\d$") +
+                                              [_get_unique(headers["PROPID"], singular=True)])
 
     return inventory
 
