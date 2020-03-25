@@ -70,7 +70,8 @@ def spatial_model_from_header(header):
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
                     [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * cunit1
 
-    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2, header['LONPOLE']*u.deg,
+    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc,
+                                       crval1, crval2, header['LONPOLE'] * u.deg,
                                        projection=latproj)
 
 

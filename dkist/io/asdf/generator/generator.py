@@ -122,6 +122,8 @@ def asdf_tree_from_filenames(filenames, headers=None, inventory=None, hdu=0,
 
     ds_wcs = TransformBuilder(sorted_headers).gwcs
 
+    if extra_inventory is None:
+        extra_inventory = {}
     inventory = extract_inventory(table_headers, ds_wcs, **extra_inventory)
 
     # Get the array shape
@@ -170,7 +172,7 @@ def dataset_from_fits(path, asdf_filename, inventory=None, hdu=0, relative_to=No
 
     files = path.glob("*fits")
 
-    tree = asdf_tree_from_filenames(list(files), asdf_filename, inventory=inventory,
+    tree = asdf_tree_from_filenames(list(files), inventory=inventory,
                                     hdu=hdu, relative_to=relative_to)
 
     with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
