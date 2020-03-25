@@ -78,15 +78,15 @@ def spatial_model_from_header(header):
 @u.quantity_input
 def linear_spectral_model(spectral_width: u.nm, reference_val: u.nm):
     """
-    A linear model in a spectral dimension. The reference pixel is always 0.
+    Linear model in a spectral dimension. The reference pixel is always 0.
     """
-    return Linear1D(slope=spectral_width/(1*u.pix), intercept=reference_val)
+    return Linear1D(slope=spectral_width / (1 * u.pix), intercept=reference_val)
 
 
 @u.quantity_input
 def linear_time_model(cadence: u.s, reference_val: u.s = 0*u.s):
     """
-    A linear model in a temporal dimension. The reference pixel is always 0.
+    Linear model in a temporal dimension. The reference pixel is always 0.
     """
     if not reference_val:
         reference_val = 0 * cadence.unit
