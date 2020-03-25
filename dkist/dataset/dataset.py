@@ -80,8 +80,14 @@ class Dataset(NDCube):
 
         if isinstance(wcs, gwcs.WCS):
             # Set the array shape to be that of the data.
-            wcs.array_shape = data.shape
-            wcs.pixel_shape = data.shape[::-1]
+            if wcs.array_shape is None:
+                wcs.array_shape = data.shape
+            if wcs.pixel_shape is None:
+                wcs.pixel_shape = data.shape[::-1]
+
+            if (wcs.pixel_shape != data.shape[::-1] or wcs.array_shape != data.shape):
+                raise ValueError("The pixel and array shape on the WCS object "
+                                 "do not match the given array.")
 
         if headers is not None and not isinstance(headers, astropy.table.Table):
             raise ValueError("The headers keyword argument must be an Astropy Table instance.")

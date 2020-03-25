@@ -172,6 +172,7 @@ class TransformBuilder:
         for i in range(arr_headers.size):
             arr_headers.flat[i] = headers[i]
 
+        self.pixel_shape = shape
         self.headers = arr_headers
         self.reset()
         self._build()
@@ -191,13 +192,17 @@ class TransformBuilder:
     @property
     def gwcs(self):
         """
-        A `gwcs.WCS` object representing these headers.
+        `gwcs.WCS` object representing these headers.
         """
         world_frame = cf.CompositeFrame(self.frames)
 
-        return gwcs.WCS(forward_transform=self.transform,
-                        input_frame=self.pixel_frame,
-                        output_frame=world_frame)
+        out_wcs = gwcs.WCS(forward_transform=self.transform,
+                           input_frame=self.pixel_frame,
+                           output_frame=world_frame)
+        out_wcs.pixel_shape = self.pixel_shape
+        out_wcs.array_shape = self.pixel_shape[::-1]
+
+        return out_wcs
 
     @property
     def frames(self):

@@ -202,7 +202,9 @@ def _inventory_from_headers(headers):
 
     mode = partial(scipy.stats.mode, axis=None, nan_policy="raise")
 
+    # These keys might get updated by parsing the gwcs object.
     inventory["wavelength_min"] = inventory["wavelength_max"] = _get_unique(headers['LINEWAV'])[0]
+
     inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], mode)
     inventory["filter_wavelengths"] = _get_unique(headers['LINEWAV'])
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)

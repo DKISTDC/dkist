@@ -6,7 +6,8 @@ import pytest
 from astropy.table import Table
 
 from dkist.io.asdf.generator.generator import references_from_filenames
-from dkist.io.asdf.generator.helpers import _inventory_from_headers, headers_from_filenames
+from dkist.io.asdf.generator.helpers import (_inventory_from_headers,
+                                             _inventory_from_wcs, headers_from_filenames)
 
 
 def test_references_from_filesnames_shape_error(header_filenames):
@@ -69,3 +70,11 @@ def test_valid_inventory(headers_inventory_214):
     assert inv["primary_experiment_id"] == "00"
     assert set(inv["contributing_experiment_ids"]) == {"10", "20", "00"}
     assert set(inv["contributing_proposal_ids"]) == {"30", "001"}
+
+
+def test_inventory_from_wcs(identity_gwcs_4d):
+    inv = _inventory_from_wcs(identity_gwcs_4d)
+
+
+def test_inventory_from_wcs_stokes(identity_gwcs_5d_stokes):
+    inv = _inventory_from_wcs(identity_gwcs_5d_stokes)
