@@ -1,7 +1,7 @@
 """
 Helper functions for parsing files and processing headers.
 """
-
+import re
 from functools import partial
 
 import numpy as np
@@ -172,6 +172,30 @@ def _get_number_apply(column, func):
     return func(column)
 
 
+def _get_keys_matching(headers, pattern, singular_columns=True):
+    """
+    Get all the values from all the keys matching the given re pattern.
+
+    Parameters
+    ----------
+    headers : `astropy.table.Table`
+        All the headers
+
+    pattern : `str`
+        A regex pattern
+
+    singular_columns : `bool`
+        Validate that all the values in a matching column are the same.
+    """
+    results = []
+
+    prog = re.compile(pattern)
+    for key in headers.colnames:
+        if prog.match(key):
+            results.append(_get_unique(headers[key], singular=singular_columns))
+    return results
+
+
 def _inventory_from_headers(headers):
     inventory = {}
 
@@ -181,7 +205,7 @@ def _inventory_from_headers(headers):
     inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], mode)
     inventory["filter_wavelengths"] = _get_unique(headers['LINEWAV'])
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
-    inventory["observables"] = [] # _get_unique(headers[''])
+    inventory["observables"] = []  # _get_unique(headers[''])
     inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
     inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers[''], singular=True)
     inventory["recipe_id"] = _get_unique(headers['RECIPEID'], singular=True)
@@ -190,8 +214,8 @@ def _inventory_from_headers(headers):
     inventory["target_type"] = _get_unique(headers['OBJECT'])
     inventory["primary_experiment_id"] = _get_unique(headers['EXPER_ID'], singular=True)
     inventory["dataset_size"] = _get_number_apply(headers['FRAMEVOL'], np.sum)
-    # inventory["contributing_experiment_ids"] = _get_keys_matching(headers, "EXPRID??")
-    # inventory["contributing_proposal_ids"] =_get_keys_matching(headers, "PROPID??")
+    inventory["contributing_experiment_ids"] = _get_keys_matching(headers, r"EXPRID\d\d")
+    inventory["contributing_proposal_ids"] = _get_keys_matching(headers, r"PROPID\d\d")
 
     return inventory
 
@@ -211,7 +235,6 @@ def extract_inventory(headers, wcs, **inventory):
 
     Returns
     -------
-
     tree: `dict`
         The updated tree with the inventory.
 
