@@ -42,7 +42,7 @@ def test_input_name_ordering(wcs):
 
 
 def test_output_name_ordering(wcs):
-    allowed_world_names = (('latitude', 'longitude', 'wavelength', 'time', 'stokes'),
+    allowed_world_names = (('longitude', 'latitude', 'wavelength', 'time', 'stokes'),
                            ('wavelength', 'latitude', 'longitude', 'time', 'stokes'))
     assert wcs.output_frame.axes_names in allowed_world_names
 

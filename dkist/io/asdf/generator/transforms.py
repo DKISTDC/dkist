@@ -70,8 +70,15 @@ def spatial_model_from_header(header):
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
                     [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * cunit1
 
+    lonpole = header.get("LONPOLE")
+    if not lonpole and latproj == "TAN":
+        lonpole = 180
+
+    if not lonpole:
+        raise ValueError("LONPOLE not specified and not known for projection {latproj}")
+
     return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc,
-                                       crval1, crval2, header['LONPOLE'] * u.deg,
+                                       crval1, crval2, lonpole * u.deg,
                                        projection=latproj)
 
 
@@ -166,13 +173,13 @@ class TransformBuilder:
         self.header = headers[0]
 
         # Reshape the headers to match the Dataset shape, so we can extract headers along various axes.
-        shape = tuple((self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
-                                                                self.header['DAAXES'], -1)))
+        shape = tuple(self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
+                                                               self.header['DAAXES'], -1))
         arr_headers = np.empty(shape, dtype=object)
         for i in range(arr_headers.size):
             arr_headers.flat[i] = headers[i]
 
-        self.pixel_shape = shape
+        self.pixel_shape = tuple(self.header[f'DNAXIS{n}'] for n in range(1, self.header['DNAXIS'] + 1))
         self.headers = arr_headers
         self.reset()
         self._build()

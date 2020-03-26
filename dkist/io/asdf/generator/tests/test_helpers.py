@@ -85,8 +85,8 @@ def test_inventory_from_wcs(identity_gwcs_4d):
     assert inv["wavelength_min"] == 0
     assert inv["wavelength_max"] == shape[2] - 1
     assert inv["bounding_box"] == ((0, 0), (shape[0] - 1, shape[1] - 1))
-    assert inv["start_time"] == time_frame.reference_frame.isot
-    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s).isot
+    assert inv["start_time"] == time_frame.reference_frame
+    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s)
     assert inv["stokes_parameters"] == ["I"]
     assert inv["has_all_stokes"] is False
 
@@ -101,8 +101,8 @@ def test_inventory_from_wcs_stokes(identity_gwcs_5d_stokes):
     assert inv["wavelength_min"] == 0
     assert inv["wavelength_max"] == shape[2] - 1
     assert inv["bounding_box"] == ((0, 0), (shape[0] - 1, shape[1] - 1))
-    assert inv["start_time"] == time_frame.reference_frame.isot
-    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s).isot
+    assert inv["start_time"] == time_frame.reference_frame
+    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s)
     assert inv["stokes_parameters"] == ["I", "Q", "U", "V"]
     assert inv["has_all_stokes"] is True
 
@@ -117,8 +117,8 @@ def test_inventory_from_wcs_2d(identity_gwcs_3d_temporal):
     assert "wavelength_min" not in inv
     assert "wavelength_max" not in inv
     assert inv["bounding_box"] == ((0, 0), (shape[0] - 1, shape[1] - 1))
-    assert inv["start_time"] == time_frame.reference_frame.isot
-    assert inv["end_time"] == (time_frame.reference_frame + (shape[2] - 1) * u.s).isot
+    assert inv["start_time"] == time_frame.reference_frame
+    assert inv["end_time"] == (time_frame.reference_frame + (shape[2] - 1) * u.s)
     assert inv["stokes_parameters"] == ["I"]
     assert inv["has_all_stokes"] is False
 
@@ -141,8 +141,8 @@ def test_extract_inventory(headers_inventory_214, identity_gwcs_4d):
     assert inv["wavelength_min"] == 0
     assert inv["wavelength_max"] == shape[2] - 1
     assert inv["bounding_box"] == ((0, 0), (shape[0] - 1, shape[1] - 1))
-    assert inv["start_time"] == time_frame.reference_frame.isot
-    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s).isot
+    assert inv["start_time"] == time_frame.reference_frame
+    assert inv["end_time"] == (time_frame.reference_frame + (shape[3] - 1) * u.s)
     assert inv["stokes_parameters"] == ["I"]
     assert inv["has_all_stokes"] is False
     assert inv["filter_wavelengths"] == [550]
@@ -170,8 +170,8 @@ def test_extract_inventory_no_wave(headers_inventory_214, identity_gwcs_3d_tempo
     # This test transform is just 0 - n_pixel in all dimensions
     assert inv["bounding_box"] == ((0, 0), (shape[0] - 1, shape[1] - 1))
     assert inv["wavelength_min"] == inv["wavelength_max"] == 550
-    assert inv["start_time"] == time_frame.reference_frame.isot
-    assert inv["end_time"] == (time_frame.reference_frame + (shape[2] - 1) * u.s).isot
+    assert inv["start_time"] == time_frame.reference_frame
+    assert inv["end_time"] == (time_frame.reference_frame + (shape[2] - 1) * u.s)
     assert inv["stokes_parameters"] == ["I"]
     assert inv["has_all_stokes"] is False
     assert inv["filter_wavelengths"] == [550]

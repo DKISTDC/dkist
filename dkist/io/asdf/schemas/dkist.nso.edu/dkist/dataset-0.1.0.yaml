@@ -33,7 +33,9 @@ properties:
         bounding_box:
           type: array
           items:
-            type: number
+            type: array
+            items:
+              type: number
         bucket:
           type: string
         contributing_experiment_ids:
@@ -51,7 +53,7 @@ properties:
         dataset_inventory_id:
           type: integer
         dataset_size:
-          type: integer
+          type: number
         end_time:
           $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
         exposure_time:
@@ -59,7 +61,7 @@ properties:
         filter_wavelengths:
           type: array
           items:
-            type: string  #number
+            type: number
         has_all_stokes:
           type: boolean
         instrument_name:
@@ -87,7 +89,9 @@ properties:
         start_time:
           $ref: "tag:stsci.edu:asdf/time/time-1.1.0"
         stokes_parameters:
-         type: string
+          type: array
+          items:
+            type: string
         target_type:
           type: array
           items:
@@ -96,7 +100,7 @@ properties:
           type: number
         wavelength_min:
           type: number
-    additionalProperties: true
+    additionalProperties: false
     # required:
     #     - asdf_object_key
     #     - bounding_box

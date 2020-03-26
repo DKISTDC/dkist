@@ -29,7 +29,8 @@ def identity_gwcs():
     """
     identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
-                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+                                  reference_frame=Helioprojective(obstime="2018-01-01"),
+                                  unit=(u.arcsec, u.arcsec))
     detector_frame = cf.CoordinateFrame(name="detector", naxes=2,
                                         axes_order=(0, 1),
                                         axes_type=("pixel", "pixel"),
@@ -52,7 +53,8 @@ def identity_gwcs_3d():
 
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
-                                  axes_names=("longitude", "latitude"))
+                                  axes_names=("longitude", "latitude"),
+                                  unit=(u.arcsec, u.arcsec))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm, axes_names=("wavelength",))
 
     frame = cf.CompositeFrame([sky_frame, wave_frame])
@@ -80,7 +82,8 @@ def identity_gwcs_3d_temporal():
 
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
-                                  axes_names=("longitude", "latitude"))
+                                  axes_names=("longitude", "latitude"),
+                                  unit=(u.arcsec, u.arcsec))
     time_frame = cf.TemporalFrame(Time("2020-01-01T00:00", format="isot", scale="utc"),
                                   axes_order=(2,), unit=u.s)
 
@@ -104,7 +107,8 @@ def identity_gwcs_4d():
     identity = (m.Multiply(1 * u.arcsec/u.pixel) & m.Multiply(1 * u.arcsec/u.pixel) &
                 m.Multiply(1 * u.nm/u.pixel) & m.Multiply(1 * u.s/u.pixel))
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
-                                  reference_frame=Helioprojective(obstime="2018-01-01"))
+                                  reference_frame=Helioprojective(obstime="2018-01-01"),
+                                  unit=(u.arcsec, u.arcsec))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
     time_frame = cf.TemporalFrame(Time("2020-01-01T00:00", format="isot", scale="utc"), axes_order=(3, ), unit=u.s)
 
@@ -149,6 +153,9 @@ def dataset(array, identity_gwcs):
     meta = {'bucket': 'data',
             'dataset_id': 'test_dataset',
             'asdf_object_key': 'test_dataset.asdf'}
+
+    identity_gwcs.array_shape = array.shape
+    identity_gwcs.pixel_shape = array.shape[::-1]
     ds = Dataset(array, wcs=identity_gwcs, meta=meta, headers=Table())
     # Sanity checks
     assert ds.data is array
@@ -166,6 +173,9 @@ def dataset_3d(identity_gwcs_3d):
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
 
+    identity_gwcs_3d.pixel_shape = array.shape[::-1]
+    identity_gwcs_3d.array_shape = array.shape
+
     return Dataset(array, wcs=identity_gwcs_3d)
 
 
@@ -174,5 +184,8 @@ def dataset_4d(identity_gwcs_4d):
     shape = (50, 60, 70, 80)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
+
+    identity_gwcs_4d.pixel_shape = array.shape[::-1]
+    identity_gwcs_4d.array_shape = array.shape
 
     return Dataset(array, wcs=identity_gwcs_4d)

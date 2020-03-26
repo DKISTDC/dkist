@@ -7,12 +7,9 @@ from functools import partial
 import numpy as np
 import scipy.stats
 
-import astropy.units as u
 import gwcs.coordinate_frames as cf
-from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.table import Table
-from astropy.time import Time
 
 __all__ = ['preprocess_headers', 'make_sorted_table', 'validate_headers',
            'table_from_headers', 'headers_from_filenames']
@@ -110,33 +107,36 @@ def _inventory_from_wcs(wcs):
     Keys for wavelength will not be added if there is no spectral component,
     stokes keys are always added (defaulting to just I if not in the WCS).
     """
+    if not isinstance(wcs.output_frame, cf.CompositeFrame):
+        raise TypeError("Can't parse this WCS as expected.")  # pragma: no cover
+
     bottom_left_array = [0] * wcs.pixel_n_dim
     top_right_array = np.array(wcs.pixel_shape) - 1
 
-    bottom_left_world = wcs.array_index_to_world(*bottom_left_array)
-    top_right_world = wcs.array_index_to_world(*top_right_array)
+    bottom_left_world = wcs.array_index_to_world_values(*bottom_left_array)
+    top_right_world = wcs.array_index_to_world_values(*top_right_array)
 
-    start_time = list(filter(lambda x: isinstance(x, Time), bottom_left_world))[0]
-    end_time = list(filter(lambda x: isinstance(x, Time), top_right_world))[0]
+    time_frame = list(filter(lambda f: isinstance(f, cf.TemporalFrame), wcs.output_frame.frames))[0]
+    temporal_axes = time_frame.axes_order[0] - wcs.pixel_n_dim
+    temporal_unit = time_frame.unit[0]
+    start_time = time_frame.reference_frame + bottom_left_world[temporal_axes] * temporal_unit
+    end_time = time_frame.reference_frame + top_right_world[temporal_axes] * temporal_unit
+    celestial_frame = list(filter(lambda f: isinstance(f, cf.CelestialFrame), wcs.output_frame.frames))[0]
+    lon_axes = celestial_frame.axes_order[0] - wcs.pixel_n_dim
+    lat_axes = celestial_frame.axes_order[1] - wcs.pixel_n_dim
 
-    bottom_left_celestial = list(filter(lambda x: isinstance(x, SkyCoord), bottom_left_world))[0]
-    top_right_celestial = list(filter(lambda x: isinstance(x, SkyCoord), top_right_world))[0]
-
-    bounding_box = ((bottom_left_celestial.Tx.to_value(u.arcsec), bottom_left_celestial.Ty.to_value(u.arcsec)),
-                    (top_right_celestial.Tx.to_value(u.arcsec), top_right_celestial.Ty.to_value(u.arcsec)))
+    bounding_box = ((bottom_left_world[lon_axes], bottom_left_world[lat_axes]),
+                    (top_right_world[lon_axes], top_right_world[lat_axes]))
 
     inventory = {'bounding_box': bounding_box,
-                 'start_time': start_time.isot,
-                 'end_time': end_time.isot}
-
-    if not isinstance(wcs.output_frame, cf.CompositeFrame):
-        raise TypeError("Can't parse this WCS as expected.")  # pragma: no cover
+                 'start_time': start_time,
+                 'end_time': end_time}
 
     spec_frame = list(filter(lambda f: isinstance(f, cf.SpectralFrame), wcs.output_frame.frames))
     if spec_frame:
         spectral_axes = spec_frame[0].axes_order[0] - wcs.pixel_n_dim
-        inventory["wavelength_min"] = bottom_left_world[spectral_axes].to_value(u.nm)
-        inventory["wavelength_max"] = top_right_world[spectral_axes].to_value(u.nm)
+        inventory["wavelength_min"] = bottom_left_world[spectral_axes]
+        inventory["wavelength_max"] = top_right_world[spectral_axes]
 
     stokes_frame = list(filter(lambda f: isinstance(f, cf.StokesFrame), wcs.output_frame.frames))
     if stokes_frame:
@@ -160,6 +160,8 @@ def _get_unique(column, singular=False):
     uniq = list(set(column))
     if singular:
         if len(uniq) == 1:
+            if isinstance(uniq[0], np.str_):
+                return str(uniq[0])
             return uniq[0]
         else:
             raise ValueError("Column does not result in a singular unique value")
@@ -202,24 +204,32 @@ def _inventory_from_headers(headers):
     # These keys might get updated by parsing the gwcs object.
     inventory["wavelength_min"] = inventory["wavelength_max"] = _get_unique(headers['LINEWAV'])[0]
 
-    inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], mode)
+    inventory["exposure_time"] = _get_number_apply(headers['FPA_EXPO'], mode).mode[0]
     inventory["filter_wavelengths"] = _get_unique(headers['LINEWAV'])
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
     inventory["observables"] = []  # _get_unique(headers[''])
-    inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
-    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers['POL_ACC'],
-                                                                     singular=True)
-    inventory["recipe_id"] = _get_unique(headers['RECIPEID'], singular=True)
-    inventory["recipe_instance_id"] = _get_unique(headers['RINSTID'], singular=True)
-    inventory["recipe_run_id"] = _get_unique(headers['RRUNID'], singular=True)
-    inventory["target_type"] = _get_unique(headers['OBJECT'])
+    inventory["recipe_id"] = int(_get_unique(headers['RECIPEID'], singular=True))
+    inventory["recipe_instance_id"] = int(_get_unique(headers['RINSTID'], singular=True))
+    inventory["recipe_run_id"] = int(_get_unique(headers['RRUNID'], singular=True))
+    inventory["target_type"] = list(map(str, _get_unique(headers['OBJECT'])))
     inventory["primary_proposal_id"] = _get_unique(headers['PROPID'], singular=True)
     inventory["primary_experiment_id"] = _get_unique(headers['EXPERID'], singular=True)
     inventory["dataset_size"] = _get_number_apply(headers['FRAMEVOL'], np.sum)
-    inventory["contributing_experiment_ids"] = (_get_keys_matching(headers, r"EXPERID\d\d$") +
-                                                [_get_unique(headers["EXPERID"], singular=True)])
-    inventory["contributing_proposal_ids"] = (_get_keys_matching(headers, r"PROPID\d\d$") +
-                                              [_get_unique(headers["PROPID"], singular=True)])
+    inventory["contributing_experiment_ids"] = list(map(str, (_get_keys_matching(headers, r"EXPERID\d\d$") +
+                                                              [_get_unique(headers["EXPERID"], singular=True)])))
+    inventory["contributing_proposal_ids"] = list(map(str, (_get_keys_matching(headers, r"PROPID\d\d$") +
+                                                            [_get_unique(headers["PROPID"], singular=True)])))
+
+    friedval = np.nan
+    if 'FRIEDVAL' in headers.colnames:
+        friedval = _get_number_apply(headers['FRIEDVAL'], np.mean)
+
+    inventory["quality_average_fried_parameter"] = friedval
+
+    polacc = np.nan
+    if 'POL_ACC' in headers.colnames:
+        polacc = _get_number_apply(headers['POL_ACC'], np.mean)
+    inventory["quality_average_polarimetric_accuracy"] = polacc
 
     return inventory
 
