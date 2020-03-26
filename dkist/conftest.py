@@ -35,7 +35,10 @@ def identity_gwcs():
                                         axes_type=("pixel", "pixel"),
                                         axes_names=("x", "y"),
                                         unit=(u.pix, u.pix))
-    return gwcs.wcs.WCS(forward_transform=identity, output_frame=sky_frame, input_frame=detector_frame)
+    wcs = gwcs.wcs.WCS(forward_transform=identity, output_frame=sky_frame, input_frame=detector_frame)
+    wcs.pixel_shape = (10, 20)
+    wcs.array_shape = wcs.pixel_shape[::-1]
+    return wcs
 
 
 @pytest.fixture
@@ -59,7 +62,38 @@ def identity_gwcs_3d():
                                         axes_type=("pixel", "pixel", "pixel"),
                                         axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
 
-    return gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
+    wcs = gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
+    wcs.pixel_shape = (10, 20, 30)
+    wcs.array_shape = wcs.pixel_shape[::-1]
+
+    return wcs
+
+
+@pytest.fixture
+def identity_gwcs_3d_temporal():
+    """
+    A simple 1-1 gwcs that converts from pixels to arcseconds
+    """
+    identity = (m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.arcsec / u.pixel) &
+                m.Multiply(1 * u.s / u.pixel))
+
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+                                  reference_frame=Helioprojective(obstime="2018-01-01"),
+                                  axes_names=("longitude", "latitude"))
+    time_frame = cf.TemporalFrame(Time("2020-01-01T00:00", format="isot", scale="utc"),
+                                  axes_order=(2,), unit=u.s)
+
+    frame = cf.CompositeFrame([sky_frame, time_frame])
+
+    detector_frame = cf.CoordinateFrame(name="detector", naxes=3,
+                                        axes_order=(0, 1, 2),
+                                        axes_type=("pixel", "pixel", "pixel"),
+                                        axes_names=("x", "y", "z"), unit=(u.pix, u.pix, u.pix))
+    wcs = gwcs.wcs.WCS(forward_transform=identity, output_frame=frame, input_frame=detector_frame)
+    wcs.pixel_shape = (10, 20, 30)
+    wcs.array_shape = wcs.pixel_shape[::-1]
+    return wcs
 
 
 @pytest.fixture
@@ -121,7 +155,7 @@ def dataset(array, identity_gwcs):
     assert ds.wcs is identity_gwcs
 
     ds._array_container = DaskFITSArrayContainer(['test1.fits'], 0, 'float', array.shape,
-                                                loader=AstropyFITSLoader)
+                                                 loader=AstropyFITSLoader)
 
     return ds
 

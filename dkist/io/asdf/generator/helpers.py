@@ -123,14 +123,14 @@ def _inventory_from_wcs(wcs):
     top_right_celestial = list(filter(lambda x: isinstance(x, SkyCoord), top_right_world))[0]
 
     bounding_box = ((bottom_left_celestial.Tx.to_value(u.arcsec), bottom_left_celestial.Ty.to_value(u.arcsec)),
-                    (top_right_celestial.Tx.to_value(u.arcsec), top_right_celestial.Tx.to_value(u.arcsec)))
+                    (top_right_celestial.Tx.to_value(u.arcsec), top_right_celestial.Ty.to_value(u.arcsec)))
 
     inventory = {'bounding_box': bounding_box,
                  'start_time': start_time.isot,
                  'end_time': end_time.isot}
 
     if not isinstance(wcs.output_frame, cf.CompositeFrame):
-        raise TypeError("Can't parse this WCS as expected.")
+        raise TypeError("Can't parse this WCS as expected.")  # pragma: no cover
 
     spec_frame = list(filter(lambda f: isinstance(f, cf.SpectralFrame), wcs.output_frame.frames))
     if spec_frame:
@@ -171,9 +171,11 @@ def _get_number_apply(column, func):
     return func(column)
 
 
-def _get_keys_matching(headers, pattern, singular_columns=True):
+def _get_keys_matching(headers, pattern):
     """
     Get all the values from all the keys matching the given re pattern.
+
+    Assumes that each matching column is singular (all values are the same)
 
     Parameters
     ----------
@@ -182,19 +184,14 @@ def _get_keys_matching(headers, pattern, singular_columns=True):
 
     pattern : `str`
         A regex pattern
-
-    singular_columns : `bool`
-        Validate that all the values in a matching column are the same.
     """
     results = []
 
     prog = re.compile(pattern)
     for key in headers.colnames:
         if prog.match(key):
-            results.append(_get_unique(headers[key], singular=singular_columns))
-    if singular_columns:
-        return list(set(results))
-    return results
+            results.append(_get_unique(headers[key], singular=True))
+    return list(set(results))
 
 
 def _inventory_from_headers(headers):
@@ -210,7 +207,8 @@ def _inventory_from_headers(headers):
     inventory["instrument_name"] = _get_unique(headers['INSTRUME'], singular=True)
     inventory["observables"] = []  # _get_unique(headers[''])
     inventory["quality_average_fried_parameter"] = _get_number_apply(headers['FRIEDVAL'], np.mean)
-    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers['POL_ACC'], singular=True)
+    inventory["quality_average_polarimetric_accuracy"] = _get_unique(headers['POL_ACC'],
+                                                                     singular=True)
     inventory["recipe_id"] = _get_unique(headers['RECIPEID'], singular=True)
     inventory["recipe_instance_id"] = _get_unique(headers['RINSTID'], singular=True)
     inventory["recipe_run_id"] = _get_unique(headers['RRUNID'], singular=True)
