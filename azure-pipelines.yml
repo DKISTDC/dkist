@@ -48,8 +48,9 @@ jobs:
       # Only Upload to PyPI on tags
       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
         pypi_connection_name : 'PyPI'
-      test_command: 'pytest -p no:warnings --pyargs dkist'
-      test_extras: "tests"
+      # We can't run sdist tests here until we have pypi deps to rely on
+      #test_command: 'pytest -p no:warnings --pyargs dkist'
+      #test_extras: "tests"
       targets:
         - sdist
       dependsOn:
