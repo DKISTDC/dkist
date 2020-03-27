@@ -16,13 +16,18 @@ resources:
     ref: master
 
 trigger:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - '*backport*'
   tags:
     include:
     - 'v*'
-    # exclude:
-    # - '*dev*'
-    # - '*pre*'
-    # - '*post*'
+    #exclude:
+    #- '*dev*'
+    #- '*pre*'
+    #- '*post*'
 
 jobs:
 - template: run-tox-env.yml@OpenAstronomy
@@ -41,7 +46,16 @@ jobs:
       - linux: codestyle
 
 
-- ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+- ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
   - template: publish.yml@OpenAstronomy
     parameters:
-      dependsOn: [linux_37, linux_38, macos_36]
+      # Only Upload to PyPI on tags
+      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+        pypi_connection_name : 'PyPI'
+      test_command: 'pytest -p no:warnings --pyargs dkist'
+      targets:
+        - sdist
+      dependsOn:
+        - linux_37
+        - linux_38
+        - macos_36
