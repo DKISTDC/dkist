@@ -1,2 +1,0 @@
-Change Level 1 asdf layout to use a tag and schema for ``Dataset``. This allows
-reading of asdf files independant from the `dkist.Dataset` class.

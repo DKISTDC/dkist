@@ -1,2 +1,0 @@
-Correctly parse headers when generating gwcses so that only values that change
-along that physical axis are considered.

@@ -1,1 +1,0 @@
-Added support for starting and monitoring Globus transfer tasks

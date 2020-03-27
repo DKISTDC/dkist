@@ -1,2 +1,0 @@
-Implement correct extraction of dataset inventory from headers and gwcs. Also
-updates some data to be closer to the in progress outgoing header spec (214)

@@ -1,2 +1,0 @@
-Initial implementation of `dkist.Dataset.download` method for transferring
-files via globus

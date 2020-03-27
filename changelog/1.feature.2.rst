@@ -1,1 +1,0 @@
-Add code for converting a nested list of `asdf.ExternalArrayReference` objects to a `dask.array.Array`.

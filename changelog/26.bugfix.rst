@@ -1,1 +1,0 @@
-Fix incorrect chunks when creating a dask array from a loader_array.
