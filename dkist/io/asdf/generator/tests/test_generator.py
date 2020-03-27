@@ -28,7 +28,7 @@ def test_array_container_shape(header_filenames):
 
 
 def test_asdf_tree(header_filenames):
-    tree = asdf_tree_from_filenames(header_filenames, "test_file.asdf")
+    tree = asdf_tree_from_filenames(header_filenames)
     assert isinstance(tree, dict)
 
 

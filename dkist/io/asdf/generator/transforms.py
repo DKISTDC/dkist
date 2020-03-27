@@ -17,8 +17,8 @@ __all__ = ['TransformBuilder', 'spectral_model_from_framewave',
            'spatial_model_from_quantity', 'spatial_model_from_header']
 
 
-def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
-                                projection='TAN'):
+def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1,
+                                crval2, lon_pole, projection='TAN'):
     """
     Given quantity representations of a HPLx FITS WCS return a model for the
     spatial transform.
@@ -33,7 +33,7 @@ def spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crva
     scale = Multiply(cdelt1) & Multiply(cdelt2)
     rotu = AffineTransformation2D(pc, translation=(0, 0)*u.arcsec)
     tanu = projections[projection]
-    skyrotu = RotateNative2Celestial(crval1, crval2, 180*u.deg)
+    skyrotu = RotateNative2Celestial(crval1, crval2, lon_pole)
     return shiftu | scale | rotu | tanu | skyrotu
 
 
@@ -70,22 +70,30 @@ def spatial_model_from_header(header):
     pc = np.matrix([[header[f'PC{lonind}_{lonind}'], header[f'PC{lonind}_{latind}']],
                     [header[f'PC{latind}_{lonind}'], header[f'PC{latind}_{latind}']]]) * cunit1
 
-    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc, crval1, crval2,
+    lonpole = header.get("LONPOLE")
+    if not lonpole and latproj == "TAN":
+        lonpole = 180
+
+    if not lonpole:
+        raise ValueError("LONPOLE not specified and not known for projection {latproj}")
+
+    return spatial_model_from_quantity(crpix1, crpix2, cdelt1, cdelt2, pc,
+                                       crval1, crval2, lonpole * u.deg,
                                        projection=latproj)
 
 
 @u.quantity_input
 def linear_spectral_model(spectral_width: u.nm, reference_val: u.nm):
     """
-    A linear model in a spectral dimension. The reference pixel is always 0.
+    Linear model in a spectral dimension. The reference pixel is always 0.
     """
-    return Linear1D(slope=spectral_width/(1*u.pix), intercept=reference_val)
+    return Linear1D(slope=spectral_width / (1 * u.pix), intercept=reference_val)
 
 
 @u.quantity_input
 def linear_time_model(cadence: u.s, reference_val: u.s = 0*u.s):
     """
-    A linear model in a temporal dimension. The reference pixel is always 0.
+    Linear model in a temporal dimension. The reference pixel is always 0.
     """
     if not reference_val:
         reference_val = 0 * cadence.unit
@@ -165,12 +173,13 @@ class TransformBuilder:
         self.header = headers[0]
 
         # Reshape the headers to match the Dataset shape, so we can extract headers along various axes.
-        shape = tuple((self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
-                                                                self.header['DAAXES'], -1)))
+        shape = tuple(self.header[f'DNAXIS{n}'] for n in range(self.header['DNAXIS'],
+                                                               self.header['DAAXES'], -1))
         arr_headers = np.empty(shape, dtype=object)
         for i in range(arr_headers.size):
             arr_headers.flat[i] = headers[i]
 
+        self.pixel_shape = tuple(self.header[f'DNAXIS{n}'] for n in range(1, self.header['DNAXIS'] + 1))
         self.headers = arr_headers
         self.reset()
         self._build()
@@ -190,14 +199,17 @@ class TransformBuilder:
     @property
     def gwcs(self):
         """
-        A `gwcs.WCS` object representing these headers.
+        `gwcs.WCS` object representing these headers.
         """
         world_frame = cf.CompositeFrame(self.frames)
 
-        return gwcs.WCS(forward_transform=self.transform,
-                        input_frame=self.pixel_frame,
-                        output_frame=world_frame)
+        out_wcs = gwcs.WCS(forward_transform=self.transform,
+                           input_frame=self.pixel_frame,
+                           output_frame=world_frame)
+        out_wcs.pixel_shape = self.pixel_shape
+        out_wcs.array_shape = self.pixel_shape[::-1]
 
+        return out_wcs
 
     @property
     def frames(self):

@@ -8,8 +8,8 @@ from astropy.io.fits.hdu.base import BITPIX2DTYPE
 
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.io.asdf.generator.helpers import headers_from_filenames, preprocess_headers
-from dkist.io.asdf.generator.simulated_data import generate_datset_inventory_from_headers
+from dkist.io.asdf.generator.helpers import (extract_inventory, headers_from_filenames,
+                                             preprocess_headers)
 from dkist.io.asdf.generator.transforms import TransformBuilder
 
 try:
@@ -46,9 +46,9 @@ def references_from_filenames(filenames, headers, array_shape, hdu_index=0, rela
     Returns
     -------
     `dkist.io.DaskFITSArrayContainer`
-        A container that represents a set of FITS files, and can generate a `dask.array.Array` from them.
+        A container that represents a set of FITS files, and can generate a
+        `dask.array.Array` from them.
     """
-
     filenames = np.asanyarray(filenames)
     filepaths = np.empty(array_shape, dtype=object)
     if filenames.size != filepaths.size:
@@ -79,38 +79,52 @@ def references_from_filenames(filenames, headers, array_shape, hdu_index=0, rela
         raise ValueError("Not all the shapes of these files are the same")
     shape = list(shape)[0]
 
-    return DaskFITSArrayContainer(filepaths.tolist(), hdu_index, dtype, shape, loader=AstropyFITSLoader)
+    return DaskFITSArrayContainer(filepaths.tolist(), hdu_index, dtype, shape,
+                                  loader=AstropyFITSLoader)
 
 
-def asdf_tree_from_filenames(filenames, asdf_filename, inventory=None, hdu=0,
+def asdf_tree_from_filenames(filenames, headers=None, inventory=None, hdu=0,
                              relative_to=None, extra_inventory=None):
     """
     Build a DKIST asdf tree from a list of (unsorted) filenames.
 
     Parameters
     ----------
-
     filenames : `list`
         The filenames to process into a DKIST asdf dataset.
 
+    headers : `list`
+        The FITS headers if already known. If not specified will be read from
+        filenames.
+
+    inventory: `dict`
+        The frame inventory to put in the tree, if not specified a dummy one
+        will be generated.
+
     hdu : `int`
-        The HDU to read from the FITS files.
+        The HDU to read the headers from and reference the data to.
+
+    relative_to : `pathlib.Path`
+        The path to reference the FITS files to inside the asdf. If not
+        specified will be local to the asdf (i.e. ``./``).
+
+    extra_inventory : `dict`
+        An extra set of inventory to override the generated one.
     """
     # In case filenames is a generator we cast to list.
     filenames = list(filenames)
 
     # headers is an iterator
-    headers = headers_from_filenames(filenames, hdu=hdu)
+    if not headers:
+        headers = headers_from_filenames(filenames, hdu=hdu)
 
     table_headers, sorted_filenames, sorted_headers = preprocess_headers(headers, filenames)
 
-    if not inventory:
-        inventory = generate_datset_inventory_from_headers(table_headers, asdf_filename)
-    if extra_inventory:
-        inventory.update(extra_inventory)
-
-
     ds_wcs = TransformBuilder(sorted_headers).gwcs
+
+    if extra_inventory is None:
+        extra_inventory = {}
+    inventory = extract_inventory(table_headers, ds_wcs, **extra_inventory)
 
     # Get the array shape
     shape = tuple((headers[0][f'DNAXIS{n}'] for n in range(headers[0]['DNAXIS'],
@@ -158,7 +172,7 @@ def dataset_from_fits(path, asdf_filename, inventory=None, hdu=0, relative_to=No
 
     files = path.glob("*fits")
 
-    tree = asdf_tree_from_filenames(list(files), asdf_filename, inventory=inventory,
+    tree = asdf_tree_from_filenames(list(files), inventory=inventory,
                                     hdu=hdu, relative_to=relative_to)
 
     with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
