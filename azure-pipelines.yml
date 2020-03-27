@@ -24,10 +24,6 @@ trigger:
   tags:
     include:
     - 'v*'
-    #exclude:
-    #- '*dev*'
-    #- '*pre*'
-    #- '*post*'
 
 jobs:
 - template: run-tox-env.yml@OpenAstronomy
@@ -53,7 +49,7 @@ jobs:
       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
         pypi_connection_name : 'PyPI'
       test_command: 'pytest -p no:warnings --pyargs dkist'
-      test_extras: "test"
+      test_extras: "tests"
       targets:
         - sdist
       dependsOn:
