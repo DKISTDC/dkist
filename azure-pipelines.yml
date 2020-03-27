@@ -53,6 +53,7 @@ jobs:
       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
         pypi_connection_name : 'PyPI'
       test_command: 'pytest -p no:warnings --pyargs dkist'
+      test_extras: "test"
       targets:
         - sdist
       dependsOn:
