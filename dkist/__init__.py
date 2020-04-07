@@ -3,7 +3,7 @@ import os
 from pkg_resources import DistributionNotFound, get_distribution
 
 import astropy.config as _config
-from astropy.tests.helper import TestRunner
+from astropy.tests.runner import TestRunner
 
 from .dataset import Dataset  # noqa
 
