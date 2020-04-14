@@ -161,7 +161,8 @@ def _(wlk, attr, params):
                     "contained": "rectangleContainedByBoundingBox",
                     "intersecting": "rectangleIntersectingBoundingBox"}
 
-    return params.update({search_types[attr.search_type]: str(attr.hpc_bounding_box_arcsec)[1:-1]})
+    # strip all spaces and the outer most ()
+    return params.update({search_types[attr.search_type]: str(attr.hpc_bounding_box_arcsec).replace(' ', '')[1:-1]})
 
 
 @walker.add_applier(Provider)
