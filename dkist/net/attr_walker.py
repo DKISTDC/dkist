@@ -157,8 +157,11 @@ def _(wlk, attr, params):
 
 @walker.add_applier(BoundingBox)
 def _(wlk, attr, params):
-    raise NotImplementedError("Support for bounding box isn't implemented")
-    return params.update({'': ''})
+    search_types = {"containing": "rectangleContainingBoundingBox",
+                    "contained": "rectangleContainedByBoundingBox",
+                    "intersecting": "rectangleIntersectingBoundingBox"}
+
+    return params.update({search_types[attr.search_type]: str(attr.hpc_bounding_box_arcsec)[1:-1]})
 
 
 @walker.add_applier(Provider)
