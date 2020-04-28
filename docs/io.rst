@@ -24,6 +24,3 @@ API Reference
 
 .. automodapi:: dkist.io.array_containers
    :headings: #^
-
-.. automodapi:: dkist.io.asdf.generator
-   :headings: #^
