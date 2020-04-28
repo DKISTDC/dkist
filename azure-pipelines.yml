@@ -30,8 +30,8 @@ jobs:
   parameters:
     coverage: codecov
     envs:
-      - macos: py36
-        name: macos_36
+      - macos: py38
+        name: macos_38
 
       - linux: py37
         name: linux_37
@@ -56,4 +56,4 @@ jobs:
       dependsOn:
         - linux_37
         - linux_38
-        - macos_36
+        - macos_38
