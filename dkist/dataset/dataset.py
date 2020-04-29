@@ -1,5 +1,6 @@
 from pathlib import Path
 from textwrap import dedent
+from importlib import resources
 
 from jsonschema.exceptions import ValidationError
 
@@ -16,12 +17,6 @@ from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTR
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 from .utils import dataset_info_str
-
-try:
-    from importlib import resources  # >= py 3.7
-except ImportError:
-    import importlib_resources as resources
-
 
 __all__ = ['Dataset']
 

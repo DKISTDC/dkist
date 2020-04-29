@@ -12,7 +12,6 @@ from sunpy.coordinates.frames import Helioprojective
 
 from dkist.dataset import Dataset
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
-from dkist.io.asdf.generator.transforms import generate_lookup_table
 
 
 @pytest.fixture
@@ -125,6 +124,24 @@ def identity_gwcs_4d():
     wcs.array_shape = wcs.pixel_shape[::-1]
 
     return wcs
+
+
+# This function lives in dkist_inventory, but is copied here to avoid a test dep
+def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pix, **kwargs):
+    if not isinstance(lookup_table, u.Quantity):
+        raise TypeError("lookup_table must be a Quantity.")
+
+    # The integer location is at the centre of the pixel.
+    points = (np.arange(lookup_table.size) - 0) * points_unit
+
+    kwargs = {
+        'bounds_error': False,
+        'fill_value': np.nan,
+        'method': interpolation,
+        **kwargs
+        }
+
+    return m.Tabular1D(points, lookup_table, **kwargs)
 
 
 @pytest.fixture
