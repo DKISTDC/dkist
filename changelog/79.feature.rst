@@ -1,0 +1,1 @@
+Move asdf generation code into dkist-inventory package
