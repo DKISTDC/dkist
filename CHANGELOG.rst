@@ -1,3 +1,12 @@
+Dkist v0.1a2 (2020-04-29)
+=========================
+
+Features
+--------
+
+- Move asdf generation code into dkist-inventory package (`#79 <https://github.com/DKISTDC/dkist/pull/79>`_)
+
+
 Dkist v0.1a1 (2020-03-27)
 =========================
 
