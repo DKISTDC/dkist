@@ -18,7 +18,7 @@ from dkist.net.attr_walker import walker
 
 
 def _generate_from_register_values(attr_type):
-    possible_values = DKISTDatasetClient.register_values()[DKISTDatasetClient][attr_type]
+    possible_values = DKISTDatasetClient.register_values()[attr_type]
     possible_values = list(map(lambda x: x[0], possible_values))
 
     return st.builds(attr_type, st.sampled_from(possible_values))
@@ -64,7 +64,7 @@ def _embargo_end(draw, time=Times(
     return a.dkist.EmbargoEndTime(t1, t2)
 
 
-for attr_type in DKISTDatasetClient.register_values()[DKISTDatasetClient]:
+for attr_type in DKISTDatasetClient.register_values():
     st.register_type_strategy(attr_type, _generate_from_register_values)
 
 st.register_type_strategy(a.Time, time_attr())

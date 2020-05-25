@@ -239,7 +239,7 @@ class DKISTDatasetClient(BaseClient):
         """
         Known search values for DKIST data, currently manually specified.
         """
-        return {cls: {
+        return {
             sattrs.vso.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
             # instrumentNames
             sattrs.Instrument: [("VBI", "Visible Broadband Imager"),
@@ -251,11 +251,11 @@ class DKISTDatasetClient(BaseClient):
             sattrs.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
                              ("intensity", "Only Stokes I is provided in the dataset.")],
             # isEmbargoed
-            dattrs.Embargoed: [(True, "Data is subject to access restrictions."),
-                               (False, "Data is not subject to access restrictions.")],
+            dattrs.Embargoed: [("True", "Data is subject to access restrictions."),
+                               ("False", "Data is not subject to access restrictions.")],
             # targetTypes
             #dattrs.TargetType: [],  # This should be a controlled list.
 
             # Completeness
-            sattrs.Level: [(1, "DKIST data calibrated to level 1.")],
-        }}
+            sattrs.Level: [("1", "DKIST data calibrated to level 1.")],
+        }
