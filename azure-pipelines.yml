@@ -50,7 +50,7 @@ jobs:
         pypi_connection_name : 'PyPI'
       # Upload to artifacts on master only
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-        artifact_feed : 'DKISTDC/dkistpypi'
+        artifact_feed : 'dkist/dkistpypi'
         artifact_feed2 : 'dkistpypi'
       # We can't run sdist tests here until we have pypi deps to rely on
       #test_command: 'pytest -p no:warnings --pyargs dkist'
@@ -58,7 +58,7 @@ jobs:
       targets:
         - sdist
         - wheels_universal
-      dependsOn:
-        - linux_37
-        - linux_38
-        - macos_38
+      #dependsOn:
+      #  - linux_37
+      #  - linux_38
+      #  - macos_38
