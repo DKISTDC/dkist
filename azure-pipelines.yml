@@ -13,7 +13,7 @@ resources:
     type: github
     endpoint: DKISTDC
     name: OpenAstronomy/azure-pipelines-templates
-    ref: master
+    ref: azure_upload
 
 trigger:
   branches:
