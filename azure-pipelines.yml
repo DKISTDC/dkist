@@ -52,6 +52,7 @@ jobs:
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
         artifact_project : 'dkist'
         artifact_feed : 'dkistpypi'
+        remove_local_scheme: true
       # We can't run sdist tests here until we have pypi deps to rely on
       #test_command: 'pytest -p no:warnings --pyargs dkist'
       #test_extras: "tests"
