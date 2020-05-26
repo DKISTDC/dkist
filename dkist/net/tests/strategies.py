@@ -4,7 +4,7 @@ Hypothesis strategies for testing the DKIST client.
 import datetime
 
 import hypothesis.strategies as st
-from hypothesis import assume, settings
+from hypothesis import HealthCheck, assume, settings
 
 import astropy.units as u
 from astropy.time import Time
@@ -75,7 +75,7 @@ st.register_type_strategy(a.dkist.PolarimetricAccuracy, _unit_range)
 st.register_type_strategy(a.dkist.ExposureTime, _unit_range)
 st.register_type_strategy(a.dkist.EmbargoEndTime, _embargo_end())
 
-@settings(deadline=5000)
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
 def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
                                      min_size=1, unique=True)):
@@ -87,7 +87,7 @@ def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
     return attr.and_(*query_attrs)
 
 
-@settings(deadline=5000)
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
 def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
                                     min_size=1, unique=True)):
@@ -99,7 +99,7 @@ def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
     return attr.or_(*query_attrs)
 
 
-@settings(deadline=5000)
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
 def query_or_composite(draw, qands=st.lists(query_and(), min_size=2, max_size=5)):
     """
