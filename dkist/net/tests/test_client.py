@@ -2,7 +2,7 @@ import json
 
 import hypothesis.strategies as st  # noqa
 import pytest
-from hypothesis import given
+from hypothesis import HealthCheck, given, settings
 
 from sunpy.net import Fido, attr
 from sunpy.net import attrs as a
@@ -117,21 +117,25 @@ def test_length_0_qr(empty_query_response):
     assert empty_query_response._repr_html_()
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_and())
 def test_apply_and(s):
     assert isinstance(s, (attr.AttrAnd, attr.DataAttr))
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_or())
 def test_apply_or(s):
     assert isinstance(s, (attr.AttrOr, attr.DataAttr))
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_or_composite())
 def test_apply_or_and(s):
     assert isinstance(s, (attr.AttrOr, attr.DataAttr, attr.AttrAnd))
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_and())
 def test_search_query_and(mocked_client, query):
     res = mocked_client.search(query)
@@ -139,6 +143,7 @@ def test_search_query_and(mocked_client, query):
     assert len(res) == 1
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_or_composite())
 def test_search_query_or(mocked_client, query):
     res = mocked_client.search(query)
@@ -146,6 +151,7 @@ def test_search_query_or(mocked_client, query):
     assert len(res) == 1
 
 
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(dst.query_and())
 def test_can_handle_query(client, query):
     # Can handle query never gets passed an AttrOr
@@ -170,6 +176,7 @@ def test_cant_handle_query(client, query):
 
 
 @no_vso
+@settings(suppress_health_check=[HealthCheck.too_slow])
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client
