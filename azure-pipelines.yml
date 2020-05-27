@@ -4,8 +4,7 @@ variables:
   CI_BUILD_ID: $(Build.BuildId)
   # These will need to be changed for your project.
   CI_BUILD_URL: "https://dev.azure.com/DKISTDC/dkist/_build/results?buildId=$(Build.BuildId)"
-  CIBW_ENVIRONMENT: "PIP_EXTRA_INDEX_URL=https://pkgs.dev.azure.com/sunpy/ndcube/_packaging/ndcube/pypi/simple/"
-  CIBW_BEFORE_BUILD: "env"
+  PIP_EXTRA_INDEX_URL: "https://pkgs.dev.azure.com/sunpy/ndcube/_packaging/ndcube/pypi/simple/"
 
 # These resources need to be setup on the Azure Pipeline website
 # as a service connection (if it has not been already).
