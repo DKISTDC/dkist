@@ -2,8 +2,9 @@ name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
 variables:
   CI_NAME: Azure Pipelines
   CI_BUILD_ID: $(Build.BuildId)
-  # These will need to be changed  for your project.
+  # These will need to be changed for your project.
   CI_BUILD_URL: "https://dev.azure.com/DKISTDC/dkist/_build/results?buildId=$(Build.BuildId)"
+  CIBW_ENVIRONMENT: "PIP_EXTRA_INDEX_URL=https://pkgs.dev.azure.com/sunpy/ndcube/_packaging/ndcube/pypi/simple/"
 
 # These resources need to be setup on the Azure Pipeline website
 # as a service connection (if it has not been already).
@@ -55,7 +56,6 @@ jobs:
         remove_local_scheme: true
       # We can't run sdist tests here until we have pypi deps to rely on
       #test_command: 'pytest -p no:warnings --pyargs dkist'
-      #test_extras: "tests"
       targets:
         - sdist
         - wheels_universal
