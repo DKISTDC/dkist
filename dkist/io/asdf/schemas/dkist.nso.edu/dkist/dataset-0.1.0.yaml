@@ -16,7 +16,9 @@ properties:
 
   wcs:
     description: The coordinate system for the complete dataset.
-    $ref: "http://stsci.edu/schemas/gwcs/wcs-1.0.0"
+    anyOf:
+      - $ref: "http://stsci.edu/schemas/gwcs/wcs-1.0.0"
+      - $ref: "http://stsci.edu/schemas/gwcs/wcs-1.1.0"
 
   headers:
     description: A table of all the headers for the constituent files.
