@@ -11,7 +11,9 @@ tag: "tag:stsci.edu:asdf/core/asdf-1.1.0"
 type: object
 properties:
   dataset:
-    $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.1.0"
+    anyOf:
+      - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.1.0"
+      - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.2.0"
 
 required: [dataset]
 additionalProperties: true

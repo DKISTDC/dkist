@@ -14,7 +14,7 @@ class DatasetType(DKISTType):
     name = "dataset"
     types = ['dkist.dataset.Dataset']
     requires = ['dkist']
-    version = "0.1.0"
+    versions = ["0.1.0", "0.2.0"]
 
     @classmethod
     def from_tree(cls, node, ctx):
