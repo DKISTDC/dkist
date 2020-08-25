@@ -1,0 +1,2 @@
+# git deps for read the docs
+git+https://github.com/sunpy/ndcube
