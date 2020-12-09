@@ -14,7 +14,7 @@ class DatasetType(DKISTType):
     name = "dataset"
     types = ['dkist.dataset.Dataset']
     requires = ['dkist']
-    versions = ["0.1.0", "0.2.0"]
+    version = "0.2.0"
 
     @classmethod
     def from_tree(cls, node, ctx):
@@ -50,10 +50,9 @@ class DatasetType(DKISTType):
         from asdf.tests import helpers
         assert old.name == new.name
         assert len(old.available_frames) == len(new.available_frames)
-        for (old_frame, old_transform), (new_frame, new_transform) in zip(
-                old.pipeline, new.pipeline):
-            helpers.assert_tree_match(old_frame, new_frame)
-            helpers.assert_tree_match(old_transform, new_transform)
+        for old_step, new_step in zip(old.pipeline, new.pipeline):
+            helpers.assert_tree_match(old_step.frame, new_step.frame)
+            helpers.assert_tree_match(old_step.transform, new_step.transform)
 
     @classmethod
     def _assert_table_equal(cls, old, new):
@@ -82,3 +81,6 @@ class DatasetType(DKISTType):
         assert ac_new == ac_old
         assert old.unit == new.unit
         assert old.mask == new.mask
+
+class DatasetTypev1(DatasetType):
+    version = "0.1.0"

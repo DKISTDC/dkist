@@ -1,5 +1,9 @@
+from pathlib import Path
+from importlib import resources
+
 import pytest
 
+import asdf
 from asdf.tests import helpers
 
 from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
@@ -26,3 +30,16 @@ def array_container():
 def test_tags(tagobj, tmpdir):
     tree = {'object': tagobj}
     helpers.assert_roundtrip_tree(tree, tmpdir)
+
+
+def test_save_dataset_without_file_schema(tmpdir, dataset):
+    tree = {'dataset': dataset}
+    with asdf.AsdfFile(tree) as afile:
+        afile.write_to(Path(tmpdir / "test.asdf"))
+
+
+def test_save_dataset_with_file_schema(tmpdir, dataset):
+    tree = {'dataset': dataset}
+    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+        with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
+            afile.write_to(Path(tmpdir / "test.asdf"))
