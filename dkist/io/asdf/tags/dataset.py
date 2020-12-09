@@ -7,27 +7,28 @@ from dkist.dataset import Dataset
 
 from ..types import DKISTType
 
-__all__ = ['DatasetType']
+__all__ = ["DatasetType"]
 
 
 class DatasetType(DKISTType):
     name = "dataset"
-    types = ['dkist.dataset.Dataset']
-    requires = ['dkist']
+    types = ["dkist.dataset.Dataset"]
+    requires = ["dkist"]
     version = "0.2.0"
+    supported_versions = ["0.2.0", "0.1.0"]
 
     @classmethod
     def from_tree(cls, node, ctx):
-        data = node['data'].array
-        wcs = node['wcs']
-        headers = node['headers']
-        meta = node.get('meta')
-        unit = node.get('unit')
-        mask = node.get('mask')
+        data = node["data"].array
+        wcs = node["wcs"]
+        headers = node["headers"]
+        meta = node.get("meta")
+        unit = node.get("unit")
+        mask = node.get("mask")
 
         dataset = Dataset(data, headers=headers, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
-        dataset._array_container = node['data']
+        dataset._array_container = node["data"]
         return dataset
 
     @classmethod
@@ -36,12 +37,12 @@ class DatasetType(DKISTType):
             raise ValueError("This Dataset object can not be saved to asdf as "
                              "it was not constructed from a set of FITS files.")
         node = {}
-        node['meta'] = dataset.meta or None
-        node['wcs'] = dataset.wcs
-        node['headers'] = dataset.headers
-        node['data'] = dataset._array_container
-        node['unit'] = dataset.unit
-        node['mask'] = dataset.mask
+        node["meta"] = dataset.meta or None
+        node["wcs"] = dataset.wcs
+        node["headers"] = dataset.headers
+        node["data"] = dataset._array_container
+        node["unit"] = dataset.unit
+        node["mask"] = dataset.mask
 
         return custom_tree_to_tagged_tree(node, ctx)
 
@@ -81,6 +82,3 @@ class DatasetType(DKISTType):
         assert ac_new == ac_old
         assert old.unit == new.unit
         assert old.mask == new.mask
-
-class DatasetTypev1(DatasetType):
-    version = "0.1.0"
