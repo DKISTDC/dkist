@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 import dask.array as da
-import numpy as np
 import pytest
 
 import asdf
@@ -38,15 +37,15 @@ def test_repr(dataset, dataset_3d):
 
 def test_wcs_roundtrip(dataset):
     p = (10*u.pixel, 10*u.pixel)
-    w = dataset.pixel_to_world(*p)
-    p2 = dataset.world_to_pixel(w)
-    assert_quantity_allclose(p, p2)
+    w = dataset.wcs.pixel_to_world(*p)
+    p2 = dataset.wcs.world_to_pixel(w)
+    assert_quantity_allclose(p, p2 * u.pix)
 
 
 def test_wcs_roundtrip_3d(dataset_3d):
     p = (10*u.pixel, 10*u.pixel, 10*u.pixel)
-    w = dataset_3d.pixel_to_world(*p)
-    p2 = dataset_3d.world_to_pixel(*w)
+    w = dataset_3d.wcs.pixel_to_world(*p)
+    p2 = dataset_3d.wcs.world_to_pixel(*w) * u.pix
     assert_quantity_allclose(p[:2], p2[:2])
     assert_quantity_allclose(p[2], p2[2])
 
@@ -98,35 +97,6 @@ def test_array_container():
 
 def test_no_filenames(dataset_3d):
     assert dataset_3d.filenames == []
-
-
-def test_crop_by_coords(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5*u.nm, 5*u.arcsec, 5*u.arcsec),
-                                    (9*u.nm, 9*u.arcsec, 9*u.arcsec))
-
-    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
-    assert arr.data.shape == da_crop.shape
-    assert np.allclose(arr.data, da_crop)
-
-
-def test_crop_by_coords_units(dataset_3d):
-    arr = dataset_3d.crop_by_coords((5, 5, 5),
-                                    (9, 9, 9),
-                                    (u.nm, u.arcsec, u.arcsec))
-
-    da_crop = dataset_3d.data[5:10, 5:10, 5:10]
-    assert arr.data.shape == da_crop.shape
-    assert np.allclose(arr.data, da_crop)
-
-
-def test_crop_by_coords_bad_args(dataset_3d):
-    with pytest.raises(ValueError):
-        dataset_3d.crop_by_coords((5, 5)*u.arcsec, (5, 5))
-
-
-def test_crop_by_coords_bad_units(dataset_3d):
-    with pytest.raises(ValueError):
-        dataset_3d.crop_by_coords((5, 5, 5), (9, 9, 9), units=(u.pix, u.pix))
 
 
 def test_download(mocker, dataset):

@@ -7,8 +7,7 @@ from jsonschema.exceptions import ValidationError
 import asdf
 import astropy.table
 import gwcs
-from astropy.visualization.wcsaxes import WCSAxes
-from astropy.wcs.wcsapi import SlicedLowLevelWCS
+from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube
 
 from dkist.io import DaskFITSArrayContainer
@@ -92,28 +91,6 @@ class Dataset(NDCube):
 
         self._header_table = headers
         self._array_container = None
-
-    """
-    Changes to the NDCube APIs.
-    """
-
-    # Overload this to only expose the new API in this package, this can be
-    # removed once NDCube 2 is finalised.
-    def crop_by_coords(self, lower_corner, upper_corner, units=None):
-        return super().crop_by_coords(lower_corner, upper_corner=upper_corner, units=units)
-
-    @property
-    def world_axis_physical_types(self):
-        """
-        Returns an iterable of strings describing the physical type for each world axis.
-
-        The strings conform to the International Virtual Observatory Alliance
-        standard, UCD1+ controlled Vocabulary.  For a description of the standard and
-        definitions of the different strings and string components,
-        see http://www.ivoa.net/documents/latest/UCDlist.html.
-
-        """
-        return self.wcs.world_axis_physical_types[::-1]
 
     """
     Properties.
@@ -200,12 +177,6 @@ class Dataset(NDCube):
 
     def __str__(self):
         return dataset_info_str(self)
-
-    def _as_mpl_axes(self):
-        """
-        Allow this object to be passed to matplotlib as a projection.
-        """
-        return WCSAxes, {'transform': self.wcs}
 
     """
     DKIST specific methods.

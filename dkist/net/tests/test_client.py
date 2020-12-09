@@ -107,8 +107,6 @@ def test_append_query_response(empty_query_response, example_api_response):
     assert isinstance(qr.blocks, list)
     assert qr.blocks == list(qr.table.iterrows())
 
-    assert DKISTQueryReponse.from_results(example_api_response["searchResults"]) == qr
-
 
 def test_length_0_qr(empty_query_response):
     assert len(empty_query_response) == 0
