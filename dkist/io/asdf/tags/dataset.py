@@ -7,27 +7,28 @@ from dkist.dataset import Dataset
 
 from ..types import DKISTType
 
-__all__ = ['DatasetType']
+__all__ = ["DatasetType"]
 
 
 class DatasetType(DKISTType):
     name = "dataset"
-    types = ['dkist.dataset.Dataset']
-    requires = ['dkist']
-    versions = ["0.1.0", "0.2.0"]
+    types = ["dkist.dataset.Dataset"]
+    requires = ["dkist"]
+    version = "0.2.0"
+    supported_versions = ["0.2.0", "0.1.0"]
 
     @classmethod
     def from_tree(cls, node, ctx):
-        data = node['data'].array
-        wcs = node['wcs']
-        headers = node['headers']
-        meta = node.get('meta')
-        unit = node.get('unit')
-        mask = node.get('mask')
+        data = node["data"].array
+        wcs = node["wcs"]
+        headers = node["headers"]
+        meta = node.get("meta")
+        unit = node.get("unit")
+        mask = node.get("mask")
 
         dataset = Dataset(data, headers=headers, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
-        dataset._array_container = node['data']
+        dataset._array_container = node["data"]
         return dataset
 
     @classmethod
@@ -36,12 +37,12 @@ class DatasetType(DKISTType):
             raise ValueError("This Dataset object can not be saved to asdf as "
                              "it was not constructed from a set of FITS files.")
         node = {}
-        node['meta'] = dataset.meta or None
-        node['wcs'] = dataset.wcs
-        node['headers'] = dataset.headers
-        node['data'] = dataset._array_container
-        node['unit'] = dataset.unit
-        node['mask'] = dataset.mask
+        node["meta"] = dataset.meta or None
+        node["wcs"] = dataset.wcs
+        node["headers"] = dataset.headers
+        node["data"] = dataset._array_container
+        node["unit"] = dataset.unit
+        node["mask"] = dataset.mask
 
         return custom_tree_to_tagged_tree(node, ctx)
 
@@ -50,10 +51,9 @@ class DatasetType(DKISTType):
         from asdf.tests import helpers
         assert old.name == new.name
         assert len(old.available_frames) == len(new.available_frames)
-        for (old_frame, old_transform), (new_frame, new_transform) in zip(
-                old.pipeline, new.pipeline):
-            helpers.assert_tree_match(old_frame, new_frame)
-            helpers.assert_tree_match(old_transform, new_transform)
+        for old_step, new_step in zip(old.pipeline, new.pipeline):
+            helpers.assert_tree_match(old_step.frame, new_step.frame)
+            helpers.assert_tree_match(old_step.transform, new_step.transform)
 
     @classmethod
     def _assert_table_equal(cls, old, new):

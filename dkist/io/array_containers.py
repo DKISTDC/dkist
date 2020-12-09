@@ -237,7 +237,7 @@ class NumpyFITSArrayContainer(BaseFITSArrayContainer):
         """
         The `~numpy.ndarray` associated with this array of references.
         """
-        aa = map(np.asarray, self.loader_array.flat)
+        aa = list(map(np.asarray, self.loader_array.flat))
         return np.stack(aa, axis=0).reshape(self.output_shape)
 
 

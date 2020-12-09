@@ -20,7 +20,7 @@ def externalarray():
     """
     An array of external array references.
     """
-    with asdf.AsdfFile.open(
+    with asdf.open(
             os.path.join(eitdir, "eit_test_dataset.asdf")) as f:
         return f.tree['dataset']._array_container.external_array_references
 
