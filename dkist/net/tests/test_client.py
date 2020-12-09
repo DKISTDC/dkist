@@ -12,7 +12,7 @@ from dkist.net.client import DKISTDatasetClient, DKISTQueryReponse
 from dkist.net.tests import strategies as dst  # noqa
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def client():
     return DKISTDatasetClient()
 
