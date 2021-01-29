@@ -37,8 +37,11 @@ jobs:
       - linux: py37
         name: linux_37
 
-      - linux: py38
-        name: linux_38
+      - windows: py38
+        name: win_38
+
+      - linux: py39
+        name: linux_39
 
       - linux: codestyle
 
@@ -61,5 +64,6 @@ jobs:
         - wheels_universal
       dependsOn:
         - linux_37
-        - linux_38
+        - win_38
+        - linux_39
         - macos_38
