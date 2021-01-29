@@ -4,7 +4,6 @@ variables:
   CI_BUILD_ID: $(Build.BuildId)
   # These will need to be changed for your project.
   CI_BUILD_URL: "https://dev.azure.com/DKISTDC/dkist/_build/results?buildId=$(Build.BuildId)"
-  PIP_EXTRA_INDEX_URL: "https://pkgs.dev.azure.com/sunpy/ndcube/_packaging/ndcube/pypi/simple/"
 
 # These resources need to be setup on the Azure Pipeline website
 # as a service connection (if it has not been already).
@@ -31,17 +30,19 @@ jobs:
   parameters:
     coverage: codecov
     envs:
-      - macos: py38
-        name: macos_38
-
       - linux: py37
         name: linux_37
+
+      - macos: py38
+        name: macos_38
 
       - windows: py38
         name: win_38
 
       - linux: py39
         name: linux_39
+
+      - linux: py39-devdeps
 
       - linux: codestyle
 
@@ -64,6 +65,6 @@ jobs:
         - wheels_universal
       dependsOn:
         - linux_37
+        - macos_38
         - win_38
         - linux_39
-        - macos_38
