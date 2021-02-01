@@ -6,19 +6,11 @@ import sunpy.net._attrs as _sunpy_attrs
 from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
-from sunpy.net.vso.attrs import Provider
 
 __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
-           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox', 'Provider']
-
-
-# The attrs we are using from VSO should appear like they are defined in this
-# module for documentation purposes. These should really be moved in sunpy from
-# a.vso. to a.?
-for attr in [Provider]:
-    attr.__module__ = __name__
+           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox']
 
 
 # SimpleAttrs

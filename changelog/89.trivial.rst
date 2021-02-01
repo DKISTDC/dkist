@@ -1,0 +1,2 @@
+Update Fido client for changes in sunpy 2.1; bump the sunpy dependancy to at
+least 2.1rc3.

@@ -6,9 +6,10 @@ from hypothesis import HealthCheck, given, settings
 
 from sunpy.net import Fido, attr
 from sunpy.net import attrs as a
+from sunpy.net.base_client import QueryResponseRow
 from sunpy.tests.helpers import no_vso
 
-from dkist.net.client import DKISTDatasetClient, DKISTQueryReponse
+from dkist.net.client import DKISTDatasetClient, DKISTQueryResponseTable
 from dkist.net.tests import strategies as dst  # noqa
 
 
@@ -17,16 +18,16 @@ def client():
     return DKISTDatasetClient()
 
 
-@pytest.mark.remote_data
 @pytest.mark.skip
+@pytest.mark.remote_data
 def test_search(client):
+    # TODO: Write an online test to verify real behaviour once there is stable data
     res = client.search(a.Time("2019/01/01", "2021/01/01"))
-    print(res)
 
 
 @pytest.fixture
 def empty_query_response():
-    return DKISTQueryReponse()
+    return DKISTQueryResponseTable()
 
 
 @pytest.fixture
@@ -88,24 +89,16 @@ def mocked_client(mocker, client, example_api_response):
     return client
 
 
-def test_append_query_response(empty_query_response, example_api_response):
-    qr = empty_query_response
-    qr._append_results(example_api_response["searchResults"])
+def test_query_response_from_results(empty_query_response, example_api_response):
+    dclient = DKISTDatasetClient()
+    qr = DKISTQueryResponseTable.from_results(example_api_response["searchResults"], client=dclient)
 
     assert len(qr) == 1
     assert isinstance(qr.client, DKISTDatasetClient)
-    dclient = DKISTDatasetClient()
-    qr.client = dclient
     assert qr.client is dclient
-    assert qr.build_table() is qr.table
-    assert len(qr.table) == len(qr)
-    assert isinstance(qr[0], DKISTQueryReponse)
-    assert not set(qr.table.columns).difference(DKISTQueryReponse.key_map.values())
-    assert set(qr.table.columns).isdisjoint(DKISTQueryReponse.key_map.keys())
-    assert all(x in str(qr) for x in DKISTQueryReponse._core_keys)
-    assert all(x in qr._repr_html_() for x in DKISTQueryReponse._core_keys)
-    assert isinstance(qr.blocks, list)
-    assert qr.blocks == list(qr.table.iterrows())
+    assert isinstance(qr[0], QueryResponseRow)
+    assert not set(qr.colnames).difference(DKISTQueryResponseTable.key_map.values())
+    assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
 
 
 def test_length_0_qr(empty_query_response):
@@ -133,23 +126,26 @@ def test_apply_or_and(s):
     assert isinstance(s, (attr.AttrOr, attr.DataAttr, attr.AttrAnd))
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 @given(dst.query_and())
 def test_search_query_and(mocked_client, query):
     res = mocked_client.search(query)
-    assert isinstance(res, DKISTQueryReponse)
+    assert isinstance(res, DKISTQueryResponseTable)
     assert len(res) == 1
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 @given(dst.query_or_composite())
 def test_search_query_or(mocked_client, query):
     res = mocked_client.search(query)
-    assert isinstance(res, DKISTQueryReponse)
-    assert len(res) == 1
+    assert isinstance(res, DKISTQueryResponseTable)
+    if isinstance(query, attr.AttrOr):
+        assert len(res) == len(query.attrs)
+    else:
+        assert len(res) == 1
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 @given(dst.query_and())
 def test_can_handle_query(client, query):
     # Can handle query never gets passed an AttrOr
@@ -174,12 +170,12 @@ def test_cant_handle_query(client, query):
 
 
 @no_vso
-@settings(suppress_health_check=[HealthCheck.too_slow])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client
     mocked_search = mocker.patch('dkist.net.client.DKISTDatasetClient.search')
-    mocked_search.return_value = DKISTQueryReponse()
+    mocked_search.return_value = DKISTQueryResponseTable()
 
     Fido.search(query)
     assert mocked_search.called

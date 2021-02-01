@@ -28,6 +28,7 @@ def api_param_names():
         a.Instrument: ('instrumentNames',),
         a.Wavelength: ('wavelengthMinMin', 'wavelengthMaxMax'),
         a.Physobs: ('hasAllStokes',),
+        a.Provider: tuple(),
         da.Dataset: ('datasetIds',),
         da.WavelengthBand: ('filterWavelengths',),
         da.Observable: ('observables',),
@@ -40,5 +41,4 @@ def api_param_names():
         da.PolarimetricAccuracy: ('qualityAveragePolarimetricAccuracyMin', 'qualityAveragePolarimetricAccuracyMax'),
         da.ExposureTime: ('exposureTimeMin', 'exposureTimeMax'),
         da.EmbargoEndTime: ('embargoEndDateMin', 'embargoEndDateMax'),
-        da.Provider: tuple(),
-        }
+    }

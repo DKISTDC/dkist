@@ -84,6 +84,7 @@ def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
     """
     attr_types = draw(stattrs)
     query_attrs = list(map(draw, map(st.from_type, attr_types)))
+    assume(not(len(query_attrs) == 1 and isinstance(query_attrs[0], a.Time)))
     return attr.and_(*query_attrs)
 
 
@@ -96,6 +97,7 @@ def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
     """
     attr_types = draw(stattrs)
     query_attrs = list(map(draw, map(st.from_type, attr_types)))
+    assume(not(any(isinstance(q, a.Time) for q in query_attrs)))
     return attr.or_(*query_attrs)
 
 
