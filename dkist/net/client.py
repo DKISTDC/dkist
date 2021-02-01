@@ -8,6 +8,9 @@ from pathlib import Path
 from functools import partial
 from collections import defaultdict
 
+import aiohttp
+import parfive
+
 from sunpy import config
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
@@ -116,7 +119,7 @@ class DKISTDatasetClient(BaseClient):
         return res[[col for col in all_cols]]
 
     @staticmethod
-    def _make_filename(path: os.PathLike, row: QueryResponseRow, resp: "aiohttp.ClientResponse", url: str):
+    def _make_filename(path: os.PathLike, row: QueryResponseRow, resp: aiohttp.ClientResponse, url: str):
         """
         Generate a filename for a file based on the Content Disposition header.
         """
@@ -132,7 +135,7 @@ class DKISTDatasetClient(BaseClient):
         return str(path).format(file=name, **row.response_block_map)
 
     @convert_row_to_table
-    def fetch(self, query_results: QueryResponseTable, *, path: os.PathLike = None, downloader: "parfive.Downloader", **kwargs):
+    def fetch(self, query_results: QueryResponseTable, *, path: os.PathLike = None, downloader: parfive.Downloader, **kwargs):
         """
         Fetch asdf files describing the datasets.
 
