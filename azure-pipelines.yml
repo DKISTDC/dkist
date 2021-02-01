@@ -36,8 +36,8 @@ jobs:
       - macos: py38
         name: macos_38
 
-      - windows: py38
-        name: win_38
+      # - windows: py38
+      #   name: win_38
 
       - linux: py39
         name: linux_39
@@ -66,5 +66,5 @@ jobs:
       dependsOn:
         - linux_37
         - macos_38
-        - win_38
+        # - win_38
         - linux_39
