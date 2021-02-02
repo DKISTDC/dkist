@@ -11,6 +11,8 @@ from collections import defaultdict
 import aiohttp
 import parfive
 
+import astropy.units as u
+from astropy.time import Time
 from sunpy import config
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
@@ -29,9 +31,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
     """
 
     # Define some class properties to better format the results table.
+    hide_keys = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
+                 "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
+                 "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
+                 "Preview URL"]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength Min", "Wavelength Max")
+    _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength")
 
     # Map the keys in the response to human friendly ones.
     key_map: Mapping[str, str] = {
@@ -66,34 +72,66 @@ class DKISTQueryResponseTable(QueryResponseTable):
         "recipeRunId": "Recipie Run ID",
         "startTime": "Start Time",
         "stokesParameters": "Stokes Parameters",
-        "targetType": "Target Type",
+        "targetTypes": "Target Types",
         "updateDate": "Last Updated",
         "wavelengthMax": "Wavelength Max",
-        "wavelengthMin": "Wavelength Min"
+        "wavelengthMin": "Wavelength Min",
     }
+
+    @staticmethod
+    def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
+        times = ["Creation Date", "End Time", "Start Time", "Last Updated", "Embargo End Date"]
+        units = {"Exposure Time": u.s, "Wavelength Min": u.nm,
+                 "Wavelength Max": u.nm, "Dataset Size": u.Gibyte,
+                 "Filter Wavelengths": u.nm}
+
+        for colname in times:
+            if colname not in results.colnames:
+                continue
+            if not any([v is None for v in results[colname]]):
+                results[colname] = Time(results[colname])
+
+        for colname, unit in units.items():
+            if colname not in results.colnames:
+                continue
+            results[colname] = u.Quantity(results[colname], unit=unit)
+
+        results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
+        results.remove_columns(("Wavelength Min", "Wavelength Max"))
+
+        return results
+
 
     @classmethod
     def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTDatasetClient") -> "DKISTQueryResponseTable":
         """
         Construct the results table from the API results.
         """
-        # TODO: Follow the other sunpy clients and make wavelength and len-2 Quantity
-        # Also map Time to Time objects etc
         new_results = defaultdict(list)
         for result in results:
             for key, value in result.items():
                 new_results[cls.key_map[key]].append(value)
 
-        return cls(new_results, client=client)
+        data = cls._process_table(cls(new_results, client=client))
+
+        all_cols = list(data.colnames)
+        first_names = [n for n in cls._core_keys if n in all_cols]
+        extra_cols = [col for col in all_cols if col not in first_names]
+        all_cols = first_names + extra_cols
+        results = data[[col for col in all_cols if data[col] is not None]]
+        empty_cols = [col.info.name for col in data.itercols() if col.info.dtype.kind == 'O' and all(val is None for val in col)]
+        results.remove_columns(empty_cols)
+
+        return results
 
 
 class DKISTDatasetClient(BaseClient):
     """
-    Search DKIST datasets and retrie metadata files describing them.
+    Search DKIST datasets and retrieve metadata files describing them.
     """
 
-    _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://dkistdcapi2.colorado.edu/datasets/v1")
-    _BASE_ASDF_URL = os.environ.get("DKIST_ASDF_ENDPOINT", "https://dkistdcapi2.colorado.edu/download/")
+    _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://api.dkistdc.nso.edu/datasets/v1")
+    _BASE_DOWNLOAD_URL = os.environ.get("DKIST_DOWNLOAD_ENDPOINT", "https://api.dkistdc.nso.edu/download/")
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
@@ -106,7 +144,7 @@ class DKISTDatasetClient(BaseClient):
         for url_parameters in queries:
             query_string = urllib.parse.urlencode(url_parameters)
 
-            full_url = f"{self._BASE_URL}?{query_string}"
+            full_url = f"{self._BASE_SEARCH_URL}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results += data["searchResults"]
@@ -166,7 +204,7 @@ class DKISTDatasetClient(BaseClient):
             return
 
         for row in query_results:
-            url = urllib.parse.urljoin(self._BASE_ASDF_URL, "?" + urllib.parse.urlencode((('datasetId', row['Dataset ID']),)))
+            url = f"{self._BASE_DOWNLOAD_URL}/asdf?datasetId={row['Dataset ID']}"
             downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
 
     @classmethod

@@ -70,9 +70,9 @@ def _(wlk, attr, params):
 
 @walker.add_applier(Physobs)
 def _(wlk, attr, params):
-    if attr.value == "stokes_parameters":
+    if attr.value.lower() == "stokes_parameters":
         return params.update({'hasAllStokes': True})
-    if attr.value == "intensity":
+    if attr.value.lower() == "intensity":
         return params.update({'hasAllStokes': False})
 
     # The client should not have accepted the query if we make it this far.
