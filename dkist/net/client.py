@@ -1,13 +1,24 @@
 import os
+import cgi
 import json
 import urllib.parse
 import urllib.request
-from typing import Any, Mapping, Iterable
+from typing import Any, List, Mapping, Iterable
+from pathlib import Path
+from functools import partial
 from collections import defaultdict
 
+import aiohttp
+import parfive
+
+import astropy.units as u
+from astropy.table import TableAttribute
+from astropy.time import Time
+from sunpy import config
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
-from sunpy.net.base_client import BaseClient, QueryResponseTable
+from sunpy.net.base_client import (BaseClient, QueryResponseRow,
+                                   QueryResponseTable, convert_row_to_table)
 
 from . import attrs as dattrs
 from .attr_walker import walker
@@ -21,9 +32,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
     """
 
     # Define some class properties to better format the results table.
+    hide_keys: List[str] = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
+                            "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
+                            "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
+                            "Preview URL"]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength Min", "Wavelength Max")
+    _core_keys: List[str] = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
     # Map the keys in the response to human friendly ones.
     key_map: Mapping[str, str] = {
@@ -58,33 +73,60 @@ class DKISTQueryResponseTable(QueryResponseTable):
         "recipeRunId": "Recipie Run ID",
         "startTime": "Start Time",
         "stokesParameters": "Stokes Parameters",
-        "targetType": "Target Type",
+        "targetTypes": "Target Types",
         "updateDate": "Last Updated",
         "wavelengthMax": "Wavelength Max",
-        "wavelengthMin": "Wavelength Min"
+        "wavelengthMin": "Wavelength Min",
     }
+
+    @staticmethod
+    def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
+        times = ["Creation Date", "End Time", "Start Time", "Last Updated", "Embargo End Date"]
+        units = {"Exposure Time": u.s, "Wavelength Min": u.nm,
+                 "Wavelength Max": u.nm, "Dataset Size": u.Gibyte,
+                 "Filter Wavelengths": u.nm}
+
+        for colname in times:
+            if colname not in results.colnames:
+                continue  # pragma: no cover
+            if not any([v is None for v in results[colname]]):
+                results[colname] = Time(results[colname])
+
+        for colname, unit in units.items():
+            if colname not in results.colnames:
+                continue  # pragma: no cover
+            results[colname] = u.Quantity(results[colname], unit=unit)
+
+        results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
+        results.remove_columns(("Wavelength Min", "Wavelength Max"))
+
+        return results
+
 
     @classmethod
     def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTDatasetClient") -> "DKISTQueryResponseTable":
         """
         Construct the results table from the API results.
         """
-        # TODO: Follow the other sunpy clients and make wavelength and len-2 Quantity
-        # Also map Time to Time objects etc
         new_results = defaultdict(list)
         for result in results:
             for key, value in result.items():
                 new_results[cls.key_map[key]].append(value)
 
-        return cls(new_results, client=client)
+        data = cls._process_table(cls(new_results, client=client))
+        if hasattr(data, '_reorder_columns'):
+            data = data._reorder_columns(cls._core_keys, remove_empty=True)
+
+        return data
 
 
 class DKISTDatasetClient(BaseClient):
     """
-    Search DKIST datasets and retrie metadata files describing them.
+    Search DKIST datasets and retrieve metadata files describing them.
     """
 
-    _BASE_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://dkistdcapi2.colorado.edu/datasets/v1")
+    _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://api.dkistdc.nso.edu/datasets/v1")
+    _BASE_DOWNLOAD_URL = os.environ.get("DKIST_DOWNLOAD_ENDPOINT", "https://api.dkistdc.nso.edu/download")
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
@@ -97,7 +139,7 @@ class DKISTDatasetClient(BaseClient):
         for url_parameters in queries:
             query_string = urllib.parse.urlencode(url_parameters)
 
-            full_url = f"{self._BASE_URL}?{query_string}"
+            full_url = f"{self._BASE_SEARCH_URL}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results += data["searchResults"]
@@ -109,8 +151,24 @@ class DKISTDatasetClient(BaseClient):
         all_cols = first_names + extra_cols
         return res[[col for col in all_cols]]
 
-    def fetch(self, *query_results, path=None, overwrite=False, progress=True,
-              max_conn=5, downloader=None, wait=True, **kwargs):
+    @staticmethod
+    def _make_filename(path: os.PathLike, row: QueryResponseRow, resp: aiohttp.ClientResponse, url: str):
+        """
+        Generate a filename for a file based on the Content Disposition header.
+        """
+        # The fallback name is just the dataset id.
+        name = f"{row['Dataset ID']}.asdf"
+
+        if resp:
+            cdheader = resp.headers.get("Content-Disposition", None)
+            if cdheader:
+                _, params = cgi.parse_header(cdheader)
+                name = params.get('filename', "")
+
+        return str(path).format(file=name, **row.response_block_map)
+
+    @convert_row_to_table
+    def fetch(self, query_results: QueryResponseTable, *, path: os.PathLike = None, downloader: parfive.Downloader, **kwargs):
         """
         Fetch asdf files describing the datasets.
 
@@ -120,26 +178,24 @@ class DKISTDatasetClient(BaseClient):
             Results to download.
         path : `str` or `pathlib.Path`, optional
             Path to the download directory
-        overwrite : `bool`, optional
-            Replace files with the same name if True.
-
-        progress : `bool`, optional
-            Print progress info to terminal.
-
-        max_conns : `int`, optional
-            Maximum number of download connections.
-        downloader : `parfive.Downloader`, optional
+        downloader : `parfive.Downloader`
             The download manager to use.
-        wait : `bool`, optional
-           If `False` ``downloader.download()`` will not be called. Only has
-           any effect if `downloader` is not `None`.
-
-        Returns
-        -------
-        `parfive.Results`
-            The results object, can be `None` if ``wait`` is `False`.
         """
-        raise NotImplementedError("Download of asdf files is not yet implemented.")
+        # This logic is being upstreamed into Fido hopefully in 2.1rc4
+        if path is None:
+            path = Path(config.get('downloads', 'download_dir')) / '{file}'  # pragma: no cover
+        elif isinstance(path, (str, os.PathLike)) and '{file}' not in str(path):
+            path = Path(path) / '{file}'  # pragma: no cover
+        else:
+            path = Path(path)  # pragma: no cover
+        path = path.expanduser()
+
+        if not len(query_results):
+            return
+
+        for row in query_results:
+            url = f"{self._BASE_DOWNLOAD_URL}/asdf?datasetId={row['Dataset ID']}"
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:
