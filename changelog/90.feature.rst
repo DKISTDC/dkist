@@ -1,0 +1,2 @@
+Implement `DKISTDatasetClient.fetch` to download asdf files from the metadata
+streamer service.
