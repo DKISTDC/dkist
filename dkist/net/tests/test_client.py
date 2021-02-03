@@ -1,6 +1,7 @@
 import json
 
 import hypothesis.strategies as st  # noqa
+import parfive
 import pytest
 from hypothesis import HealthCheck, given, settings
 
@@ -195,3 +196,25 @@ def test_fido_valid(mocker, mocked_client, query):
 
     if isinstance(query, attr.AttrOr):
         assert mocked_search.call_count == len(query.attrs)
+
+
+def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
+    httpserver.expect_request("/download/asdf",
+                              query_string="datasetId=abcd").respond_with_data(
+                                  b"This isn't an asdf",
+                                  headers={"Content-Disposition": "attachment; filename=abcd.asdf"}
+                              )
+
+    mocked_client._BASE_DOWNLOAD_URL = httpserver.url_for("/download")
+
+    response = DKISTQueryResponseTable({'Dataset ID': ['abcd']})
+
+    downloader = parfive.Downloader()
+    mocked_client.fetch(response, downloader=downloader, path=tmpdir)
+
+    assert len(downloader.http_queue) == 1
+
+    results = downloader.download()
+    assert len(results) == 1
+
+    assert results[0] == str(tmpdir / "abcd.asdf")

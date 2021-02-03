@@ -88,13 +88,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
 
         for colname in times:
             if colname not in results.colnames:
-                continue
+                continue  # pragma: no cover
             if not any([v is None for v in results[colname]]):
                 results[colname] = Time(results[colname])
 
         for colname, unit in units.items():
             if colname not in results.colnames:
-                continue
+                continue  # pragma: no cover
             results[colname] = u.Quantity(results[colname], unit=unit)
 
         results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
@@ -126,7 +126,7 @@ class DKISTDatasetClient(BaseClient):
     """
 
     _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://api.dkistdc.nso.edu/datasets/v1")
-    _BASE_DOWNLOAD_URL = os.environ.get("DKIST_DOWNLOAD_ENDPOINT", "https://api.dkistdc.nso.edu/download/")
+    _BASE_DOWNLOAD_URL = os.environ.get("DKIST_DOWNLOAD_ENDPOINT", "https://api.dkistdc.nso.edu/download")
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
@@ -181,18 +181,13 @@ class DKISTDatasetClient(BaseClient):
         downloader : `parfive.Downloader`
             The download manager to use.
         """
-        if downloader is None:
-            raise ValueError("The DKIST client should only be used via sunpy's Fido. "
-                             "It does not support downloading files directly.")
-
-        # This logic is being upstreamed into Fido
+        # This logic is being upstreamed into Fido hopefully in 2.1rc4
         if path is None:
-            path = Path(config.get('downloads', 'download_dir')) / '{file}'
+            path = Path(config.get('downloads', 'download_dir')) / '{file}'  # pragma: no cover
         elif isinstance(path, (str, os.PathLike)) and '{file}' not in str(path):
-            path = Path(path) / '{file}'
+            path = Path(path) / '{file}'  # pragma: no cover
         else:
-            path = Path(path)
-
+            path = Path(path)  # pragma: no cover
         path = path.expanduser()
 
         if not len(query_results):
