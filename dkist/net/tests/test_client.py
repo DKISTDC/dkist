@@ -62,7 +62,7 @@ def example_api_response():
                 "startTime": "2020-02-28T17:05:53.330Z",
                 "hasAllStokes": True,
                 "stokesParameters": "string",
-                "targetType": "string",
+                "targetTypes": ["string"],
                 "wavelengthMax": 0,
                 "wavelengthMin": 0,
                 "createDate": "2020-02-28T17:05:53.330Z",
@@ -78,6 +78,16 @@ def example_api_response():
 
 
 @pytest.fixture
+def expected_table_keys():
+    translated_keys = set(DKISTQueryResponseTable.key_map.values())
+    removed_keys = {'Wavelength Min', 'Wavelength Max'}
+    added_keys = {'Wavelength'}
+    expected_keys = translated_keys - removed_keys
+    expected_keys.update(added_keys)
+    return expected_keys
+
+
+@pytest.fixture
 def mocked_client(mocker, client, example_api_response):
     """
     Return a client instance with any external service calls mocked.
@@ -89,7 +99,7 @@ def mocked_client(mocker, client, example_api_response):
     return client
 
 
-def test_query_response_from_results(empty_query_response, example_api_response):
+def test_query_response_from_results(empty_query_response, example_api_response, expected_table_keys):
     dclient = DKISTDatasetClient()
     qr = DKISTQueryResponseTable.from_results(example_api_response["searchResults"], client=dclient)
 
@@ -97,7 +107,7 @@ def test_query_response_from_results(empty_query_response, example_api_response)
     assert isinstance(qr.client, DKISTDatasetClient)
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
-    assert not set(qr.colnames).difference(DKISTQueryResponseTable.key_map.values())
+    assert not set(qr.colnames).difference(expected_table_keys)
     assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
 
 

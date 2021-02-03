@@ -3,7 +3,7 @@ import cgi
 import json
 import urllib.parse
 import urllib.request
-from typing import Any, Mapping, Iterable
+from typing import Any, List, Mapping, Iterable
 from pathlib import Path
 from functools import partial
 from collections import defaultdict
@@ -12,6 +12,7 @@ import aiohttp
 import parfive
 
 import astropy.units as u
+from astropy.table import TableAttribute
 from astropy.time import Time
 from sunpy import config
 from sunpy.net import attr
@@ -31,13 +32,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
     """
 
     # Define some class properties to better format the results table.
-    hide_keys = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
-                 "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
-                 "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
-                 "Preview URL"]
+    hide_keys: List[str] = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
+                            "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
+                            "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
+                            "Preview URL"]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys = ("Start Time", "End Time", "Instrument", "Wavelength")
+    _core_keys: List[str] = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
     # Map the keys in the response to human friendly ones.
     key_map: Mapping[str, str] = {
@@ -113,16 +114,10 @@ class DKISTQueryResponseTable(QueryResponseTable):
                 new_results[cls.key_map[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
+        if hasattr(data, '_reorder_columns'):
+            data = data._reorder_columns(cls._core_keys, remove_empty=True)
 
-        all_cols = list(data.colnames)
-        first_names = [n for n in cls._core_keys if n in all_cols]
-        extra_cols = [col for col in all_cols if col not in first_names]
-        all_cols = first_names + extra_cols
-        results = data[[col for col in all_cols if data[col] is not None]]
-        empty_cols = [col.info.name for col in data.itercols() if col.info.dtype.kind == 'O' and all(val is None for val in col)]
-        results.remove_columns(empty_cols)
-
-        return results
+        return data
 
 
 class DKISTDatasetClient(BaseClient):
