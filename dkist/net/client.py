@@ -38,7 +38,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
                             "Preview URL"]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys: List[str] = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
+    _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
     # Map the keys in the response to human friendly ones.
     key_map: Mapping[str, str] = {
@@ -115,7 +115,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
 
         data = cls._process_table(cls(new_results, client=client))
         if hasattr(data, '_reorder_columns'):
-            data = data._reorder_columns(cls._core_keys, remove_empty=True)
+            data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
 
         return data
 
