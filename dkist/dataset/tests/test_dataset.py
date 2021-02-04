@@ -76,7 +76,7 @@ def test_from_not_directory():
 
 def test_from_directory_not_dir():
     with pytest.raises(ValueError) as e:
-        Dataset.from_directory(os.path.join(rootdir, 'EIT', 'eit_2004-03-01T00:00:10.515000.asdf'))
+        Dataset.from_directory(rootdir / 'EIT' / 'eit_2004-03-01T00:00:10.515000.asdf')
         assert "must be a directory" in str(e)
 
 
