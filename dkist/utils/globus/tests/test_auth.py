@@ -1,6 +1,7 @@
 import json
 import stat
 import pathlib
+import platform
 from unittest import mock
 
 import globus_sdk
@@ -73,9 +74,11 @@ def test_save_auth_cache(tmpdir):
     # Test that the user can read and write
     assert bool(statinfo.mode & stat.S_IRUSR)
     assert bool(statinfo.mode & stat.S_IWUSR)
-    # Test that neither "Group" or "Other" have read permissions
-    assert not bool(statinfo.mode & stat.S_IRGRP)
-    assert not bool(statinfo.mode & stat.S_IROTH)
+
+    if platform.system() != 'Windows':
+        # Test that neither "Group" or "Other" have read permissions
+        assert not bool(statinfo.mode & stat.S_IRGRP)
+        assert not bool(statinfo.mode & stat.S_IROTH)
 
 
 def test_get_refresh_token_authorizer():
