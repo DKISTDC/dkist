@@ -2,7 +2,6 @@ import json
 import stat
 import pathlib
 import platform
-from unittest import mock
 
 import globus_sdk
 import requests
@@ -24,8 +23,8 @@ def test_http_server():
     assert code == inp_code
 
 
-@mock.patch("appdirs.user_cache_dir", return_value="/tmp/test/")
-def test_get_cache_file_path(mock_appdirs):
+def test_get_cache_file_path(mocker):
+    mocker.patch("appdirs.user_cache_dir", return_value="/tmp/test/")
     path = get_cache_file_path()
     assert isinstance(path, pathlib.Path)
 
@@ -33,40 +32,40 @@ def test_get_cache_file_path(mock_appdirs):
     assert path.name == "globus_auth_cache.json"
 
 
-def test_get_no_cache(tmpdir):
-    with mock.patch("appdirs.user_cache_dir", return_value=str(tmpdir)):
-        # Test file not exists
-        cache = get_cache_contents()
-        assert isinstance(cache, dict)
-        assert not cache
+def test_get_no_cache(mocker, tmpdir):
+    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    # Test file not exists
+    cache = get_cache_contents()
+    assert isinstance(cache, dict)
+    assert not cache
 
 
-def test_get_cache(tmpdir):
-    with mock.patch("appdirs.user_cache_dir", return_value=str(tmpdir)):
-        with open(tmpdir / "globus_auth_cache.json", "w") as fd:
-            json.dump({"hello": "world"}, fd)
+def test_get_cache(mocker, tmpdir):
+    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    with open(tmpdir / "globus_auth_cache.json", "w") as fd:
+        json.dump({"hello": "world"}, fd)
 
-        cache = get_cache_contents()
-        assert isinstance(cache, dict)
-        assert len(cache) == 1
-        assert cache == {"hello": "world"}
-
-
-def test_get_cache_not_json(tmpdir):
-    with mock.patch("appdirs.user_cache_dir", return_value=str(tmpdir)):
-        with open(tmpdir / "globus_auth_cache.json", "w") as fd:
-            fd.write("aslkjdasdjjdlsajdjklasjdj, akldjaskldjasd, lkjasdkljasldkjas")
-
-        cache = get_cache_contents()
-        assert isinstance(cache, dict)
-        assert not cache
+    cache = get_cache_contents()
+    assert isinstance(cache, dict)
+    assert len(cache) == 1
+    assert cache == {"hello": "world"}
 
 
-def test_save_auth_cache(tmpdir):
+def test_get_cache_not_json(mocker, tmpdir):
+    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    with open(tmpdir / "globus_auth_cache.json", "w") as fd:
+        fd.write("aslkjdasdjjdlsajdjklasjdj, akldjaskldjasd, lkjasdkljasldkjas")
+
+    cache = get_cache_contents()
+    assert isinstance(cache, dict)
+    assert not cache
+
+
+def test_save_auth_cache(mocker, tmpdir):
     filename = tmpdir / "globus_auth_cache.json"
     assert not filename.exists()  # Sanity check
-    with mock.patch("appdirs.user_cache_dir", return_value=str(tmpdir)):
-        save_auth_cache({"hello": "world"})
+    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    save_auth_cache({"hello": "world"})
 
     assert filename.exists()
     statinfo = filename.stat()
@@ -81,7 +80,7 @@ def test_save_auth_cache(tmpdir):
         assert not bool(statinfo.mode & stat.S_IROTH)
 
 
-def test_get_refresh_token_authorizer():
+def test_get_refresh_token_authorizer(mocker):
     # An example cache without real tokens
     cache = {
         "transfer.api.globus.org": {
@@ -94,19 +93,19 @@ def test_get_refresh_token_authorizer():
         }
     }
 
-    with mock.patch("dkist.utils.globus.auth.get_cache_contents", return_value=cache):
-        auth = get_refresh_token_authorizer()['transfer.api.globus.org']
-        assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
-        assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
+    mocker.patch("dkist.utils.globus.auth.get_cache_contents", return_value=cache)
+    auth = get_refresh_token_authorizer()['transfer.api.globus.org']
+    assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
+    assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 
-    with mock.patch("dkist.utils.globus.auth.do_native_app_authentication", return_value=cache):
-        auth = get_refresh_token_authorizer(force_reauth=True)['transfer.api.globus.org']
-        assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
-        assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
+    mocker.patch("dkist.utils.globus.auth.do_native_app_authentication", return_value=cache)
+    auth = get_refresh_token_authorizer(force_reauth=True)['transfer.api.globus.org']
+    assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
+    assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 
 
 def test_ensure_auth_decorator(mocker):
-    error = globus_sdk.AuthAPIError(mock.MagicMock())
+    error = globus_sdk.AuthAPIError(mocker.MagicMock())
     mocker.patch.object(error, "http_status", 400)
     mocker.patch.object(error, "message", "invalid_grant")
     reauth = mocker.patch("dkist.utils.globus.auth.get_refresh_token_authorizer")

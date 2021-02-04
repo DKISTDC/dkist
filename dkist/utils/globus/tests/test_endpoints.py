@@ -1,6 +1,5 @@
 import json
 import pathlib
-from unittest import mock
 
 import globus_sdk
 import pytest
@@ -24,9 +23,9 @@ def ls_response(mocker):
     with open(rootdir / "globus_operation_ls_response.json") as fd:
         data = json.load(fd)
 
-    resp = globus_sdk.transfer.response.IterableTransferResponse(mock.MagicMock())
+    resp = globus_sdk.transfer.response.IterableTransferResponse(mocker.MagicMock())
     mocker.patch("globus_sdk.transfer.response.IterableTransferResponse.data",
-                 new_callable=mock.PropertyMock(return_value=data))
+                 new_callable=mocker.PropertyMock(return_value=data))
 
     return resp
 
@@ -36,7 +35,7 @@ def mock_search(mocker):
     mocker.patch("globus_sdk.TransferClient.endpoint_search",
                  return_value=globus_sdk.transfer.paging.PaginatedResource)
     return mocker.patch("globus_sdk.transfer.paging.PaginatedResource.data",
-                        new_callable=mock.PropertyMock)
+                        new_callable=mocker.PropertyMock)
 
 
 def test_get_transfer_client(mocker, transfer_client):
@@ -46,7 +45,7 @@ def test_get_transfer_client(mocker, transfer_client):
 @pytest.mark.parametrize("endpoint_id", ("12345", None))
 def test_get_local_endpoint_id(mocker, endpoint_id):
     lgcp_mock = mocker.patch("globus_sdk.LocalGlobusConnectPersonal.endpoint_id",
-                             new_callable=mock.PropertyMock)
+                             new_callable=mocker.PropertyMock)
     lgcp_mock.return_value = endpoint_id
 
     if endpoint_id is None:
@@ -85,9 +84,9 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
 
 def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
     mocker.patch.object(transfer_client, "get_endpoint",
-                        mock.Mock(return_value=globus_sdk.transfer.paging.PaginatedResource))
+                        mocker.Mock(return_value=globus_sdk.transfer.paging.PaginatedResource))
     get_ep_mock = mocker.patch("globus_sdk.transfer.paging.PaginatedResource.data",
-                               new_callable=mock.PropertyMock)
+                               new_callable=mocker.PropertyMock)
     get_ep_mock.return_value = endpoint_search[0:1]
 
     endpoint_id = get_endpoint_id('dd1ee92a-6d04-11e5-ba46-22000b92c6ec', transfer_client)
@@ -95,7 +94,7 @@ def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
 
 
 def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endpoint_search):
-    err = globus_sdk.TransferAPIError(mock.MagicMock())
+    err = globus_sdk.TransferAPIError(mocker.MagicMock())
     mocker.patch("globus_sdk.TransferClient.get_endpoint",
                  side_effect=err)
     mock_search.return_value = endpoint_search[0:1]
