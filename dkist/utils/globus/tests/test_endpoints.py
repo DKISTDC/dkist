@@ -39,7 +39,6 @@ def mock_search(mocker):
                         new_callable=mock.PropertyMock)
 
 
-@pytest.mark.skip
 def test_get_transfer_client(mocker, transfer_client):
     assert isinstance(transfer_client, globus_sdk.TransferClient)
 
@@ -58,7 +57,6 @@ def test_get_local_endpoint_id(mocker, endpoint_id):
         assert a is endpoint_id
 
 
-@pytest.mark.skip
 def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_client):
     mock_search.return_value = endpoint_search
 
@@ -85,7 +83,6 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     assert "No matches" in str(e_info.value)
 
 
-@pytest.mark.skip
 def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
     mocker.patch.object(transfer_client, "get_endpoint",
                         mock.Mock(return_value=globus_sdk.transfer.paging.PaginatedResource))
@@ -97,7 +94,6 @@ def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
 
-@pytest.mark.skip
 def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endpoint_search):
     err = globus_sdk.TransferAPIError(mock.MagicMock())
     mocker.patch("globus_sdk.TransferClient.get_endpoint",
@@ -114,7 +110,6 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
 
-@pytest.mark.skip
 def test_directory_listing(mocker, transfer_client, ls_response):
     mocker.patch("dkist.utils.globus.endpoints.auto_activate_endpoint")
     mocker.patch("dkist.utils.globus.endpoints.get_endpoint_id", return_value="12345")
