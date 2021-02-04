@@ -119,6 +119,7 @@ jobs:
       - name: debug missing secret
         run: |
           echo ${{ secrets.TEST_PYPI_API_TOKEN }}
+          echo ${{ secrets.TEST_SECRET }}
 
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
