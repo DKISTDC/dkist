@@ -4,7 +4,6 @@
 name: Publish
 
 on:
-  push:
   release:
     types:
       - released
@@ -34,18 +33,18 @@ jobs:
       - name: Build package
         run: python -m build --sdist .
 
-      # - name: Test package
-      #   run: |
-      #     cd ..
-      #     echo "::group::Install dist"
-      #     python -m venv testenv
-      #     testenv/bin/pip install -U pip setuptools wheel
-      #     for filename in ${{ github.workspace }}/dist/*; do
-      #       testenv/bin/pip install pytest $filename[$EXTRAS]
-      #     done
-      #     echo "::endgroup::"
+      - name: Test package
+        run: |
+          cd ..
+          echo "::group::Install dist"
+          python -m venv testenv
+          testenv/bin/pip install -U pip setuptools wheel
+          for filename in ${{ github.workspace }}/dist/*; do
+            testenv/bin/pip install pytest $filename[$EXTRAS]
+          done
+          echo "::endgroup::"
 
-      #     testenv/bin/pytest --pyargs $PACKAGE
+          testenv/bin/pytest --pyargs $PACKAGE
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -72,18 +71,18 @@ jobs:
       - name: Build package
         run: python -m build --wheel .
 
-      # - name: Test package
-      #   run: |
-      #     cd ..
-      #     echo "::group::Install dist"
-      #     python -m venv testenv
-      #     testenv/bin/pip install -U pip setuptools wheel
-      #     for filename in ${{ github.workspace }}/dist/*; do
-      #       testenv/bin/pip install pytest $filename[$EXTRAS]
-      #     done
-      #     echo "::endgroup::"
+      - name: Test package
+        run: |
+          cd ..
+          echo "::group::Install dist"
+          python -m venv testenv
+          testenv/bin/pip install -U pip setuptools wheel
+          for filename in ${{ github.workspace }}/dist/*; do
+            testenv/bin/pip install pytest $filename[$EXTRAS]
+          done
+          echo "::endgroup::"
 
-      #     testenv/bin/pytest --pyargs $PACKAGE
+          testenv/bin/pytest --pyargs $PACKAGE
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -116,14 +115,8 @@ jobs:
           mkdir ./dist
           find ./artifacts -type f -exec mv {} ./dist \;
 
-      - name: debug missing secret
-        run: |
-          echo ${{ secrets.TEST_PYPI_API_TOKEN }}
-          echo ${{ secrets.TEST_SECRET }}
-
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-          repository_url: https://test.pypi.org/legacy/
           user: __token__
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          password: ${{ secrets.PYPI_API_TOKEN }}
