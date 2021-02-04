@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 import pytest
@@ -68,7 +69,7 @@ def test_start_transfer(mocker, transfer_client, mock_endpoints):
 
     for filepath, tfr in zip(file_list, transfer_manifest):
         assert str(filepath) == tfr['source_path']
-        assert "/" + filepath.name == tfr['destination_path']
+        assert os.path.sep + filepath.name == tfr['destination_path']
 
 
 def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):
@@ -85,7 +86,7 @@ def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):
 
     for filepath, tfr in zip(file_list, transfer_manifest):
         assert str(filepath) == tfr['source_path']
-        assert "/b/" + filepath.name == tfr['destination_path']
+        assert "{0}b{0}".format(os.path.sep) + filepath.name == tfr['destination_path']
 
 
 def test_process_event_list(transfer_client, mock_task_event_list):

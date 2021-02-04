@@ -118,7 +118,7 @@ def save_auth_cache(auth_cache):
     # Ensure the cache dir exists.
     cache_dir = cache_file.parent
     if not cache_dir.exists():
-        cache_dir.mkdir()
+        cache_dir.mkdir(parents=True)
 
     # Write the token to the cache file.
     with open(cache_file, "w") as fd:
