@@ -1,17 +1,20 @@
 name: CI
 
 on:
-  push:
-  pull_request:
+  - push
+  - pull_request
 
 jobs:
   tests:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - toxenv: codestyle
             os: ubuntu-latest
             python: 3.8
+            cov: false
+            name: Style Check
 
           - toxenv: py39
             os: ubuntu-latest
@@ -25,19 +28,20 @@ jobs:
             os: ubuntu-latest
             python: 3.7
 
-          - toxenv: py39-devdeps
-            os: ubuntu-latest
-            python: 3.9
+          # TODO: Fixme
+          # - toxenv: py39-devdeps
+          #   os: ubuntu-latest
+          #   python: 3.9
 
-          - toxenv: py37
-            os: windows-latest
-            python: 3.7
+          # - toxenv: py37
+          #   os: windows-latest
+          #   python: 3.7
 
-    name: ${{ matrix.name || format('{0} [{1}]', matrix.toxenv, matrix.os }}
+    name: ${{ matrix.name || format('{0} [{1}]', matrix.toxenv, matrix.os) }}
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -47,11 +51,19 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Install Python dependencies
+      - name: Install Tox
         run: python -m pip install --upgrade tox
 
-      - name: Run tests
-        run: tox ${{ matrix.toxargs }} -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
+      - name: Compute pytest flags
+        id: pytest
+        if: ${{ !(contains(matrix.cov, 'false')) }}
+        run: echo '::set-output name=pytest_flags::--cov-report=xml:${{ github.workspace }}/coverage.xml'
+
+      - name: Run Tox
+        run: tox ${{ matrix.toxargs }} -e ${{ matrix.toxenv }} -- ${{ steps.pytest.outputs.pytest_flags || '' }} ${{ matrix.toxposargs }}
 
       - name: Upload coverage to codecov
+        if: ${{ !(contains(matrix.cov, 'false')) }}
         uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
