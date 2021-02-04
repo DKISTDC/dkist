@@ -34,18 +34,18 @@ jobs:
       - name: Build package
         run: python -m build --sdist .
 
-      - name: Test package
-        run: |
-          cd ..
-          echo "::group::Install dist"
-          python -m venv testenv
-          testenv/bin/pip install -U pip setuptools wheel
-          for filename in ${{ github.workspace }}/dist/*; do
-            testenv/bin/pip install pytest $filename[$EXTRAS]
-          done
-          echo "::endgroup::"
+      # - name: Test package
+      #   run: |
+      #     cd ..
+      #     echo "::group::Install dist"
+      #     python -m venv testenv
+      #     testenv/bin/pip install -U pip setuptools wheel
+      #     for filename in ${{ github.workspace }}/dist/*; do
+      #       testenv/bin/pip install pytest $filename[$EXTRAS]
+      #     done
+      #     echo "::endgroup::"
 
-          testenv/bin/pytest --pyargs $PACKAGE
+      #     testenv/bin/pytest --pyargs $PACKAGE
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -72,18 +72,18 @@ jobs:
       - name: Build package
         run: python -m build --wheel .
 
-      - name: Test package
-        run: |
-          cd ..
-          echo "::group::Install dist"
-          python -m venv testenv
-          testenv/bin/pip install -U pip setuptools wheel
-          for filename in ${{ github.workspace }}/dist/*; do
-            testenv/bin/pip install pytest $filename[$EXTRAS]
-          done
-          echo "::endgroup::"
+      # - name: Test package
+      #   run: |
+      #     cd ..
+      #     echo "::group::Install dist"
+      #     python -m venv testenv
+      #     testenv/bin/pip install -U pip setuptools wheel
+      #     for filename in ${{ github.workspace }}/dist/*; do
+      #       testenv/bin/pip install pytest $filename[$EXTRAS]
+      #     done
+      #     echo "::endgroup::"
 
-          testenv/bin/pytest --pyargs $PACKAGE
+      #     testenv/bin/pytest --pyargs $PACKAGE
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
