@@ -4,8 +4,10 @@
 name: Publish
 
 on:
+  push:
   release:
-    - released
+    types:
+      - released
 
 env:
   # The name of the python package after install
