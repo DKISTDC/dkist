@@ -27,7 +27,7 @@ jobs:
             os: ubuntu-latest
             python: 3.9
 
-          - toxenv: py37
+          - toxenv: py37-oldestdeps
             os: windows-latest
             python: 3.7
 
