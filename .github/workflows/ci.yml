@@ -23,10 +23,9 @@ jobs:
             os: macos-latest
             python: 3.8
 
-          # TODO: Fixme
-          # - toxenv: py39-devdeps
-          #   os: ubuntu-latest
-          #   python: 3.9
+          - toxenv: py39-devdeps
+            os: ubuntu-latest
+            python: 3.9
 
           - toxenv: py37
             os: windows-latest
