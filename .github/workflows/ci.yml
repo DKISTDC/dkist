@@ -23,18 +23,13 @@ jobs:
             os: macos-latest
             python: 3.8
 
-          - toxenv: py37
+          - toxenv: py39-devdeps
             os: ubuntu-latest
+            python: 3.9
+
+          - toxenv: py37-oldestdeps
+            os: windows-latest
             python: 3.7
-
-          # TODO: Fixme
-          # - toxenv: py39-devdeps
-          #   os: ubuntu-latest
-          #   python: 3.9
-
-          # - toxenv: py37
-          #   os: windows-latest
-          #   python: 3.7
 
     name: ${{ matrix.name || format('{0} [{1}]', matrix.toxenv, matrix.os) }}
     runs-on: ${{ matrix.os }}

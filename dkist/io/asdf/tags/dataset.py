@@ -41,8 +41,10 @@ class DatasetType(DKISTType):
         node["wcs"] = dataset.wcs
         node["headers"] = dataset.headers
         node["data"] = dataset._array_container
-        node["unit"] = dataset.unit
-        node["mask"] = dataset.mask
+        if dataset.unit:
+            node["unit"] = dataset.unit
+        if dataset.mask:
+            node["mask"] = dataset.mask
 
         return custom_tree_to_tagged_tree(node, ctx)
 
