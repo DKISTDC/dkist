@@ -3,6 +3,8 @@ Search attrs for DKIST data.
 """
 import astropy.units as u
 import sunpy.net._attrs as _sunpy_attrs
+from sunpy.coordinates.frames import Helioprojective
+from sunpy.coordinates.utils import get_rectangle_coordinates
 from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
@@ -214,9 +216,65 @@ class BrowseMovie(_DataAttr):
 class BoundingBox(_DataAttr):
     """
     The dataset bounding box in spatial coordinates.
+
+    Parameters
+    ----------
+    bottom_left : `~astropy.coordinates.BaseCoordinateFrame` or `~astropy.coordinates.SkyCoord`
+        The bottom-left coordinate of the rectangle.
+        Supports passing both the bottom left and top right coordinates by passing with a shape of ``(2,)``.
+    top_right : `~astropy.coordinates.BaseCoordinateFrame` or `~astropy.coordinates.SkyCoord`, optional
+        The top-right coordinate of the rectangle.
+        If in a different frame than ``bottom_left`` and all required metadata for frame conversion is present,
+        ``top_right`` will be transformed to ``bottom_left`` frame.
+    width : `~astropy.units.Quantity`, optional
+        The width of the rectangle.
+        Must be omitted if the coordinates of both corners have been specified.
+    height : `~astropy.units.Quantity`, optional
+        The height of the rectangle.
+        Must be omitted if the coordinates of both corners have been specified.
+    search : {"containing", "contained", "intersecting"}, optional
+        The type of search to perform, defaults to ``"containing"``. A
+        "containing" search, is where the specified search box fully contains
+        the dataset bounding box, a "contained" search is where the specified
+        search box is fully contained by the dataset bounding box and
+        "intersecting" is where there is any intersection of the search and
+        dataset boxes.
+    Notes
+    -----
+    The dataset search is performed only with the latitude and longitude
+    coordinate in helioprojective coordinates at the observatory at the time of
+    the observation. This search API is not designed to provide the ability to
+    search based on fully specified coordinate frames, however, if used
+    correctly the SunPy coordinate transformations can be used to do limited
+    searches in other frames.
+    The coordinates specified to this search attribute are converted to a
+    helioprojective frame with Earth as the observer
+    (``sunpy.coordinates.Helioprojective(observer="earth")``).
+    Therefore any input which is convertible to this frame is acceptable.
+    However, it is important to consider how these coordinates will be
+    interpreted. The coordinates will not be interpreted **at the time of the
+    observation**, they will be interpreted as an inertial point in space at
+    the time specified when passed to this function. This means that if you for
+    instance pass a heliographic coordinate to this attribute for Jan 1st
+    2020, but you search for a dataset on Jan 1st 2025, it will use the
+    helioprojective coordinate equivalent to the heliographic coordinate passed
+    as seen by an observer on Earth **on Jan 1st 2020**.
     """
-    def __init__(self, bottom_left, *, top_right=None, width=None, height=None, search="containing"):
-        pass
+
+    def __init__(self, bottom_left, *, top_right=None, width: u.deg = None,
+                 height: u.deg = None, search="containing"):
+        bottom_left, top_right = get_rectangle_coordinates(bottom_left,
+                                                           top_right=top_right,
+                                                           width=width, height=height)
+        bottom_left = bottom_left.transform_to(Helioprojective(observer="earth"))
+        top_right = top_right.transform_to(Helioprojective(observer="earth"))
+
+        self.hpc_bounding_box_arcsec = ((bottom_left.Tx.to_value(u.arcsec),
+                                         bottom_left.Ty.to_value(u.arcsec)),
+                                        (top_right.Tx.to_value(u.arcsec),
+                                         top_right.Ty.to_value(u.arcsec)))
+
+        self.search_type = search
 
     def collides(self, other):
         return isinstance(other, self.__class__)
