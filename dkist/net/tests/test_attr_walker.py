@@ -4,6 +4,8 @@ import astropy.units as u
 from sunpy.net import attr
 from sunpy.net import attrs as a
 
+from astropy.coordinates import SkyCoord, ICRS
+
 import dkist.net.attrs as da
 from dkist.net.attr_walker import walker
 
@@ -19,6 +21,41 @@ def query_or_instrument():
     A query which applies or to array types.
     """
     return (a.Instrument("VBI") | a.Instrument("VISP")) & a.Time("2020/06/01", "2020/06/02")
+
+@pytest.fixture(scope="function")
+def boundingbox_params():
+    """
+    Create possible bounding box input coordinates and args
+    for inputs to the bounding box tests.
+    """
+    bottom_left_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km)],
+                                  obstime='2021-01-02T12:34:56')
+    top_right_icrs = SkyCoord([ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+                                obstime='2021-01-02T12:34:56')
+    bottom_left_vector_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
+                                   ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+                                  obstime='2021-01-02T12:34:56')
+    bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
+    top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
+
+    width = 3.4 * u.deg
+    height = 1.2 * u.deg
+
+    yield {
+        # bottom_left, top_right, width, height
+        "bottom left vector icrs": [bottom_left_vector_icrs, None, None, None],
+        "bottom left top right icrs": [bottom_left_icrs, top_right_icrs, None, None],
+        "bottom left top right": [bottom_left, top_right, None, None],
+        "bottom left width height": [bottom_left, None, width, height],
+    }
+
+@pytest.fixture(scope="function",
+                params=["bottom left vector icrs",
+                        "bottom left top right icrs",
+                        "bottom left top right",
+                        "bottom left width height",],)
+def boundingbox_param(request, boundingbox_params):
+    yield boundingbox_params[request.param]
 
 
 def test_walker_single(all_attrs_classes, api_param_names):
@@ -42,6 +79,14 @@ def test_walker_single(all_attrs_classes, api_param_names):
         at = all_attrs_classes(movieurl="klsdjalkjd", movieobjectkey="lkajsd")
         api_param_names[all_attrs_classes] = ('browseMovieUrl', 'browseMovieObjectKey')
 
+    elif issubclass(all_attrs_classes, da.BoundingBox):
+        bottom_left = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
+                                   ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+                                  obstime='2021-01-02T12:34:56')
+        at = all_attrs_classes(bottom_left=bottom_left)
+        api_param_names[all_attrs_classes] = ('rectangleContainingBoundingBox',)
+
+
     if not at:
         pytest.skip(f"Not testing {all_attrs_classes!r}")
 
@@ -52,6 +97,18 @@ def test_walker_single(all_attrs_classes, api_param_names):
     assert len(params[0]) == len(api_param_names[all_attrs_classes])
     assert not set(api_param_names[all_attrs_classes]).difference(params[0].keys())
 
+
+def test_boundingbox_containing(boundingbox_param):
+    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+                       width= boundingbox_param[2], height=boundingbox_param[3], search="containing")
+
+def test_boundingbox_contained(boundingbox_param):
+    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+                       width= boundingbox_param[2], height=boundingbox_param[3], search="contained")
+
+def test_boundingbox_intersecting(boundingbox_param):
+    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+                       width= boundingbox_param[2], height=boundingbox_param[3], search="intersecting")
 
 def test_args_browsemovie():
     with pytest.raises(ValueError):
