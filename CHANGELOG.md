@@ -1,5 +1,3 @@
-- added bounding box tests
-- Added bounding box functionality
 - Find and test against minimum versions of deps (#98)
 - Test against git deps (#97)
 - Convert everything to use pytest-mock (#96)

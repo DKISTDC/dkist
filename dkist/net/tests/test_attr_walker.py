@@ -1,10 +1,9 @@
 import pytest
 
 import astropy.units as u
+from astropy.coordinates import ICRS, SkyCoord
 from sunpy.net import attr
 from sunpy.net import attrs as a
-
-from astropy.coordinates import SkyCoord, ICRS
 
 import dkist.net.attrs as da
 from dkist.net.attr_walker import walker
@@ -29,12 +28,12 @@ def boundingbox_params():
     for inputs to the bounding box tests.
     """
     bottom_left_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km)],
-                                  obstime='2021-01-02T12:34:56')
-    top_right_icrs = SkyCoord([ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
                                 obstime='2021-01-02T12:34:56')
+    top_right_icrs = SkyCoord([ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+                              obstime='2021-01-02T12:34:56')
     bottom_left_vector_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
-                                   ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
-                                  obstime='2021-01-02T12:34:56')
+                                        ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+                                       obstime='2021-01-02T12:34:56')
     bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
     top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
 
@@ -99,16 +98,42 @@ def test_walker_single(all_attrs_classes, api_param_names):
 
 
 def test_boundingbox_containing(boundingbox_param):
-    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
                        width= boundingbox_param[2], height=boundingbox_param[3], search="containing")
 
+    out = walker.create(bb_query)
+    assert len(out) == 1
+    assert all([isinstance(a, dict) for a in out])
+
+    #can't verify exact coordinates, they change a bit
+    for key in out[0].keys():
+        assert key == 'rectangleContainingBoundingBox'
+
+
+
 def test_boundingbox_contained(boundingbox_param):
-    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
                        width= boundingbox_param[2], height=boundingbox_param[3], search="contained")
 
+    out = walker.create(bb_query)
+    assert len(out) == 1
+    assert all([isinstance(a, dict) for a in out])
+
+    # can't verify exact coordinates, they change a bit
+    for key in out[0].keys():
+        assert key == 'rectangleContainedByBoundingBox'
+
 def test_boundingbox_intersecting(boundingbox_param):
-    da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
+    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
                        width= boundingbox_param[2], height=boundingbox_param[3], search="intersecting")
+
+    out = walker.create(bb_query)
+    assert len(out) == 1
+    assert all([isinstance(a, dict) for a in out])
+
+    # can't verify exact coordinates, they change a bit
+    for key in out[0].keys():
+        assert key == 'rectangleIntersectingBoundingBox'
 
 def test_args_browsemovie():
     with pytest.raises(ValueError):
