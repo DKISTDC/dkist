@@ -114,8 +114,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
                 new_results[cls.key_map[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
-        if hasattr(data, '_reorder_columns'):
-            data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
+        data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
 
         return data
 
@@ -144,12 +143,7 @@ class DKISTDatasetClient(BaseClient):
             data = json.loads(data.read())
             results += data["searchResults"]
 
-        res = DKISTQueryResponseTable.from_results(results, client=self)
-        all_cols: Iterable[str] = list(res.colnames)
-        first_names = [n for n in res._core_keys if n in all_cols]
-        extra_cols = [col for col in all_cols if col not in first_names]
-        all_cols = first_names + extra_cols
-        return res[[col for col in all_cols]]
+        return DKISTQueryResponseTable.from_results(results, client=self)
 
     @staticmethod
     def _make_filename(path: os.PathLike, row: QueryResponseRow, resp: aiohttp.ClientResponse, url: str):

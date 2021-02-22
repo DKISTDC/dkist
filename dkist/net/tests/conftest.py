@@ -5,6 +5,10 @@ from sunpy.net import attrs as a
 import dkist.net.attrs as da
 
 
+@pytest.fixture(scope="session")
+def httpserver_listen_address():
+    return ("127.0.0.1", 8888)
+
 @pytest.fixture(params=da.__all__)
 def all_dkist_attrs_classes(request):
     return getattr(da, request.param)
