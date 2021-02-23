@@ -134,7 +134,7 @@ def test_boundingbox_contained(boundingbox_param):
     for value in out[0].values():
         # want to make sure the value is of the format (flt, flt), (flt, flt)
         coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
-        coordinate_regex.search(value)
+        assert coordinate_regex.search(value)
 
 def test_boundingbox_intersecting(boundingbox_param):
     bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
