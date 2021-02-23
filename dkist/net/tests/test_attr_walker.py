@@ -134,6 +134,7 @@ def test_boundingbox_contained(boundingbox_param):
         coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
         assert coordinate_regex.search(value)
 
+
 def test_boundingbox_intersecting(boundingbox_param):
     bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
                        width= boundingbox_param[2], height=boundingbox_param[3], search="intersecting")
