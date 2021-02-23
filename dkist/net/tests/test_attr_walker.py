@@ -29,9 +29,9 @@ def boundingbox_params():
     Create possible bounding box input coordinates and args
     for inputs to the bounding box tests.
     """
-    bottom_left_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km)],
+    bottom_left_icrs = SkyCoord(ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                 obstime='2021-01-02T12:34:56')
-    top_right_icrs = SkyCoord([ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
+    top_right_icrs = SkyCoord(ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km),
                               obstime='2021-01-02T12:34:56')
     bottom_left_vector_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                         ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
