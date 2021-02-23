@@ -117,8 +117,6 @@ def test_boundingbox_containing(boundingbox_param):
         assert coordinate_regex.search(value)
 
 
-
-
 def test_boundingbox_contained(boundingbox_param):
     bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
                        width= boundingbox_param[2], height=boundingbox_param[3], search="contained")
