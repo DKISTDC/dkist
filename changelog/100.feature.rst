@@ -1,2 +1,1 @@
-Added bounding box tests
-Added bounding box functionality to DKIST client in attrs.py
+Added search bounding box functionality to DKIST client.
