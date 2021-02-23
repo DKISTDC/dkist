@@ -114,7 +114,7 @@ def test_boundingbox_containing(boundingbox_param):
     for value in out[0].values():
         # want to make sure the value is of the format (flt, flt), (flt, flt)
         coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
-        coordinate_regex.search(value)
+        assert coordinate_regex.search(value)
 
 
 
