@@ -99,27 +99,16 @@ def test_walker_single(all_attrs_classes, api_param_names):
     assert not set(api_param_names[all_attrs_classes]).difference(params[0].keys())
 
 
-def test_boundingbox_containing(boundingbox_param):
+@pytest.mark.parametrize("search,search_type",
+                         [
+                             ('containing', 'rectangleContainingBoundingBox'),
+                             ('contained', 'rectangleContainedByBoundingBox'),
+                             ('intersecting', 'rectangleIntersectingBoundingBox'),
+                         ]
+                         )
+def test_boundingbox(search, search_type, boundingbox_param):
     bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
-                       width= boundingbox_param[2], height=boundingbox_param[3], search="containing")
-
-    out = walker.create(bb_query)
-    assert len(out) == 1
-    assert all([isinstance(a, dict) for a in out])
-
-    #can't verify exact coordinates, they change a bit
-    for key in out[0].keys():
-        assert key == 'rectangleContainingBoundingBox'
-
-    for value in out[0].values():
-        # want to make sure the value is of the format (flt, flt), (flt, flt)
-        coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
-        assert coordinate_regex.search(value)
-
-
-def test_boundingbox_contained(boundingbox_param):
-    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
-                       width= boundingbox_param[2], height=boundingbox_param[3], search="contained")
+                       width= boundingbox_param[2], height=boundingbox_param[3], search=search)
 
     out = walker.create(bb_query)
     assert len(out) == 1
@@ -127,25 +116,7 @@ def test_boundingbox_contained(boundingbox_param):
 
     # can't verify exact coordinates, they change a bit
     for key in out[0].keys():
-        assert key == 'rectangleContainedByBoundingBox'
-
-    for value in out[0].values():
-        # want to make sure the value is of the format (flt, flt), (flt, flt)
-        coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
-        assert coordinate_regex.search(value)
-
-
-def test_boundingbox_intersecting(boundingbox_param):
-    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
-                       width= boundingbox_param[2], height=boundingbox_param[3], search="intersecting")
-
-    out = walker.create(bb_query)
-    assert len(out) == 1
-    assert all([isinstance(a, dict) for a in out])
-
-    # can't verify exact coordinates, they change a bit
-    for key in out[0].keys():
-        assert key == 'rectangleIntersectingBoundingBox'
+        assert key == search_type
 
     for value in out[0].values():
         # want to make sure the value is of the format (flt, flt), (flt, flt)
