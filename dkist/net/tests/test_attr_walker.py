@@ -107,8 +107,8 @@ def test_walker_single(all_attrs_classes, api_param_names):
                          ]
                          )
 def test_boundingbox(search, search_type, boundingbox_param):
-    bb_query = da.BoundingBox(bottom_left= boundingbox_param[0], top_right= boundingbox_param[1],
-                       width= boundingbox_param[2], height=boundingbox_param[3], search=search)
+    bb_query = da.BoundingBox(bottom_left=boundingbox_param[0], top_right=boundingbox_param[1],
+                       width=boundingbox_param[2], height=boundingbox_param[3], search=search)
 
     out = walker.create(bb_query)
     assert len(out) == 1
