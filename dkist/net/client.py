@@ -26,6 +26,14 @@ from .attr_walker import walker
 __all__ = ['DKISTQueryReponse', 'DKISTDatasetClient']
 
 
+class DefaultMap(defaultdict):
+    """
+    A tweak of default dict where the default value is the key that's missing.
+    """
+    def __missing__(self, key):
+        return key
+
+
 class DKISTQueryResponseTable(QueryResponseTable):
     """
     Results of a DKIST Dataset search.
@@ -41,7 +49,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
     # Map the keys in the response to human friendly ones.
-    key_map: Mapping[str, str] = {
+    key_map: Mapping[str, str] = DefaultMap(None, {
         "asdfObjectKey": "asdf Filename",
         "boundingBox": "Bounding Box",
         "browseMovieObjectKey": "Movie Filename",
@@ -77,7 +85,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         "updateDate": "Last Updated",
         "wavelengthMax": "Wavelength Max",
         "wavelengthMin": "Wavelength Min",
-    }
+    })
 
     @staticmethod
     def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
@@ -97,8 +105,9 @@ class DKISTQueryResponseTable(QueryResponseTable):
                 continue  # pragma: no cover
             results[colname] = u.Quantity(results[colname], unit=unit)
 
-        results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
-        results.remove_columns(("Wavelength Min", "Wavelength Max"))
+        if results:
+            results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
+            results.remove_columns(("Wavelength Min", "Wavelength Max"))
 
         return results
 
@@ -189,7 +198,8 @@ class DKISTDatasetClient(BaseClient):
 
         for row in query_results:
             url = f"{self._BASE_DOWNLOAD_URL}/asdf?datasetId={row['Dataset ID']}"
-            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
+            # Set max_splits here as the metadata streamer doesn't like accept-range at the moment.
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), max_splits=1)
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:

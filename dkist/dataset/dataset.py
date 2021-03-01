@@ -205,10 +205,10 @@ class Dataset(NDCube):
 
         base_path = DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta)
         # TODO: Default path to the config file
-        destination_path = Path(path) / self.meta['dataset_id']
+        destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
 
         file_list = [Path(base_path) / fn for fn in self.filenames]
-        file_list.append(Path(base_path) / self.meta['asdf_object_key'])
+        file_list.append(Path('/' + self.meta['bucket']) / self.meta['asdfObjectKey'])
 
         if not destination_endpoint:
             destination_endpoint = get_local_endpoint_id()
@@ -225,9 +225,10 @@ class Dataset(NDCube):
 
         # TODO: This is a hack to change the base dir of the dataset.
         # The real solution to this is to use the database.
+        local_destination = destination_path.relative_to("/").expanduser()
         old_ac = self._array_container
         self._array_container = DaskFITSArrayContainer.from_external_array_references(
             old_ac.external_array_references,
             loader=old_ac._loader,
-            basepath=destination_path)
+            basepath=local_destination)
         self._data = self._array_container.array
