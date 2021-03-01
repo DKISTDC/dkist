@@ -149,13 +149,13 @@ def _(wlk, attr, params):
 
 @walker.add_applier(SpectralSampling)
 def _(wlk, attr, params):
-    return params.update({'averageDatasetSpectralSamplingMin': attr.min,
-                          'averageDatasetSpectralSamplingMax': attr.max})
+    return params.update({'averageDatasetSpectralSamplingMin': attr.min.to_value(float),
+                          'averageDatasetSpectralSamplingMax': attr.max.to_value(float)})
 
 @walker.add_applier(SpatialSampling)
 def _(wlk, attr, params):
-    return params.update({'averageDatasetSpatialSamplingMin': attr.min,
-                          'averageDatasetSpatialSamplingMax': attr.max})
+    return params.update({'averageDatasetSpatialSamplingMin': attr.min.to_value(float),
+                          'averageDatasetSpatialSamplingMax': attr.max.to_value(float)})
 
 @walker.add_applier(TemporalSampling)
 def _(wlk, attr, params):

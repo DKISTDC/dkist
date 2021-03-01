@@ -293,7 +293,7 @@ class SpectralSampling(_Range):
     spectralmax : `u.Quantity`
         The maximum value of the average spectral sampling to search between.
     """
-   u.quantity_input(equivalencies=u.spectral())
+    u.quantity_input(equivalencies=u.spectral())
     def __init__(self, spectralmin: u.nm, spectralmax: u.nm):
         super().__init__(spectralmin, spectralmax)
 
@@ -313,7 +313,7 @@ class SpatialSampling(_Range):
     spatialmax :
         The maximum value of the average spatial sampling to search between.
     """
-    def __init__(self, spatialmin, spatialmax):
+    def __init__(self, spatialmin: u.arcsec/u.pix, spatialmax: u.arcsec/u.pix):
         super().__init__(spatialmin, spatialmax)
 
     def collides(self, other):
