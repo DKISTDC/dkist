@@ -293,6 +293,7 @@ class SpectralSampling(_Range):
     spectralmax : `u.Quantity`
         The maximum value of the average spectral sampling to search between.
     """
+   u.quantity_input(equivalencies=u.spectral())
     def __init__(self, spectralmin: u.nm, spectralmax: u.nm):
         super().__init__(spectralmin, spectralmax)
 
