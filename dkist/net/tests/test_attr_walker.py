@@ -62,7 +62,16 @@ def boundingbox_param(request, boundingbox_params):
 def test_walker_single(all_attrs_classes, api_param_names):
     at = None
 
-    if issubclass(all_attrs_classes, attr.SimpleAttr):
+    if issubclass(all_attrs_classes, da.SpatialSampling):
+        at = all_attrs_classes(spatialmin= 1.3 * u.arcsec/u.pix, spatialmax= 1.5 * u.arcsec/u.pix)
+
+    elif issubclass(all_attrs_classes, da.SpectralSampling):
+        at = all_attrs_classes(spectralmin=580 * u.nm, spectralmax=590 * u.nm)
+
+    elif issubclass(all_attrs_classes, da.TemporalSampling):
+        at = all_attrs_classes(temporalmin= 1 * u.s, temporalmax= 500 * u.s)
+
+    elif issubclass(all_attrs_classes, attr.SimpleAttr):
         at = all_attrs_classes("stokes_parameters")
 
     elif issubclass(all_attrs_classes, a.Time):
@@ -92,6 +101,8 @@ def test_walker_single(all_attrs_classes, api_param_names):
         pytest.skip(f"Not testing {all_attrs_classes!r}")
 
     params = walker.create(at)
+    print(params)
+    print(' ')
     assert isinstance(params, list)
     assert len(params) == 1
     assert isinstance(params[0], dict)
