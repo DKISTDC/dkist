@@ -12,7 +12,8 @@ from sunpy.net.attr import SimpleAttr as _SimpleAttr
 __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
-           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox']
+           'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
+           'SpectralSampling', 'SpatialSampling', 'TemporalSampling']
 
 
 # SimpleAttrs
@@ -275,6 +276,64 @@ class BoundingBox(_DataAttr):
                                          top_right.Ty.to_value(u.arcsec)))
 
         self.search_type = search
+
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
+# averageDatasetSpectralSamplingMin, averageDatasetSpectralSamplingMax
+class SpectralSampling(_Range):
+    """
+    The average spectral sampling of a dataset.
+
+    Parameters
+    ----------
+    spectralmin : `u.Quantity`
+        The minimum value of the average spectral sampling to search between.
+
+    spectralmax : `u.Quantity`
+        The maximum value of the average spectral sampling to search between.
+    """
+    u.quantity_input(equivalencies=u.spectral())
+    def __init__(self, spectralmin: u.nm, spectralmax: u.nm):
+        super().__init__(spectralmin, spectralmax)
+
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
+# averageDatasetSpatialSamplingMin, averageDatasetSpatialSamplingMax
+class SpatialSampling(_Range):
+    """
+    The average spatial sampling of a dataset.
+
+    Parameters
+    ----------
+    spatialmin :
+        The minimum value of the average spatial sampling to search between.
+
+    spatialmax :
+        The maximum value of the average spatial sampling to search between.
+    """
+    def __init__(self, spatialmin: u.arcsec/u.pix, spatialmax: u.arcsec/u.pix):
+        super().__init__(spatialmin, spatialmax)
+
+    def collides(self, other):
+        return isinstance(other, self.__class__)
+
+# averageDatasetTemporalSamplingMin, averageDatasetTemporalSamplingMax
+class TemporalSampling(_Range):
+    """
+    The average temporal sampling of a dataset.
+
+    Parameters
+    ----------
+    temporalmin : `u.Quantity`
+        The minimum value of the average temporal sampling to search between.
+
+    temporalmax : `u.Quantity`
+        The maximum value of the average temporal sampling to search between.
+    """
+    def __init__(self, temporalmin: u.s, temporalmax: u.s):
+        super().__init__(temporalmin, temporalmax)
 
     def collides(self, other):
         return isinstance(other, self.__class__)

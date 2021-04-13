@@ -1,0 +1,1 @@
+Added new dataset search parameters (hasSpectralAxis, hasTemporalAxis, averageDatasetSpectralSamplingMin, averageDatasetSpectralSamplingMax, averageDatasetSpatialSamplingMin, averageDatasetSpatialSamplingMax, averageDatasetTemporalSamplingMin, averageDatasetTemporalSamplingMax)

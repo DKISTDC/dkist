@@ -45,4 +45,7 @@ def api_param_names():
         da.PolarimetricAccuracy: ('qualityAveragePolarimetricAccuracyMin', 'qualityAveragePolarimetricAccuracyMax'),
         da.ExposureTime: ('exposureTimeMin', 'exposureTimeMax'),
         da.EmbargoEndTime: ('embargoEndDateMin', 'embargoEndDateMax'),
+        da.SpectralSampling: ('averageDatasetSpectralSamplingMin', 'averageDatasetSpectralSamplingMax'),
+        da.SpatialSampling: ('averageDatasetSpatialSamplingMin', 'averageDatasetSpatialSamplingMax'),
+        da.TemporalSampling: ('averageDatasetTemporalSamplingMin', 'averageDatasetTemporalSamplingMax'),
     }

@@ -213,7 +213,7 @@ class DKISTDatasetClient(BaseClient):
                     return False
 
             if isinstance(x, a.Physobs):
-                if x.value.lower() not in ("stokes_parameters", "intensity"):
+                if x.value.lower() not in ("stokes_parameters", "intensity", "spectral_axis", "temporal_axis"):
                     return False
 
             if isinstance(x, a.Level):
