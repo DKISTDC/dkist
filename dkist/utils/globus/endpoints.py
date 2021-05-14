@@ -122,7 +122,7 @@ def auto_activate_endpoint(endpoint_id, tfr_client):  # pragma: no cover
     if needs_activation and not activated:
         r = tfr_client.endpoint_autoactivate(endpoint_id)
         if r['code'] == "AutoActivationFailed":
-            webbrowser.open(f"https://www.globus.org/app/endpoints/{endpoint_id}/activate",
+            webbrowser.open(f"https://app.globus.org/file-manager?origin_id={endpoint_id}",
                             new=1)
             input("Press Return after completing activation in your webbrowser...")
             r = tfr_client.endpoint_autoactivate(endpoint_id)
