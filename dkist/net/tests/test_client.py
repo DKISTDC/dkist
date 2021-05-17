@@ -215,6 +215,6 @@ def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
     assert len(downloader.http_queue) == 1
 
     results = downloader.download()
-    assert len(results) == 1
+    assert len(results) == 1, results.errors
 
     assert results[0] == str(tmpdir / "abcd.asdf")
