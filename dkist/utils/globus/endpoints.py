@@ -62,7 +62,8 @@ def get_endpoint_id(endpoint, tfr_client):
     <https://docs.globus.org/api/transfer/endpoint_search/#endpoint_search>`__
     functionality of the Globus API will be used, so any endpoint search can be
     specified. One and only one result must be returned from the search or a
-    `ValueError` will be raised.
+    `ValueError` will be raised, unless one of the results is an exact text
+    match for the search string, when that result will be used.
 
     Parameters
     ----------
