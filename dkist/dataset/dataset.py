@@ -64,8 +64,8 @@ class Dataset(NDCube):
         A Table of all FITS headers for all files comprising this dataset.
     """
 
-    def __init__(self, data, wcs, uncertainty=None, mask=None, meta=None,
-                 unit=None, extra_coords=None, headers=None):
+    def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
+                 unit=None, copy=False, headers=None):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
@@ -87,7 +87,7 @@ class Dataset(NDCube):
             raise ValueError("The headers keyword argument must be an Astropy Table instance.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
-                         unit=unit, extra_coords=extra_coords, copy=False)
+                         unit=unit, copy=copy)
 
         self._header_table = headers
         self._array_container = None
