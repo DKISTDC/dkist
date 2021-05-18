@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: DKIST Help Desk
+    url: https://nso.atlassian.net/servicedesk/customer/portals
+    about: The offical DKIST support help desk, the best place to ask questions on data access or products etc.
   - name: DKIST Community Chat
     url: https://openastronomy.element.io/#/room/#dki-solar-telescope:openastronomy.org
     about: A community support forum to help other community members.
