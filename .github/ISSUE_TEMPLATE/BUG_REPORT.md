@@ -44,8 +44,11 @@ Code goes here
 
 <!--
 We need to know the the package version you are using.
+Please include the output of the `dkist.system_info() function below, or fill
+in the details:
 -->
 
+- DKIST Version:
 - SunPy Version:
 - Astropy Version:
 - Python Version:
