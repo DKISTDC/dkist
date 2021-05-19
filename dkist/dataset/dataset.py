@@ -190,7 +190,7 @@ class Dataset(NDCube):
         ----------
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
-        endpoint.
+            endpoint.
 
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local

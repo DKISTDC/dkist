@@ -101,8 +101,6 @@ def test_walker_single(all_attrs_classes, api_param_names):
         pytest.skip(f"Not testing {all_attrs_classes!r}")
 
     params = walker.create(at)
-    print(params)
-    print(' ')
     assert isinstance(params, list)
     assert len(params) == 1
     assert isinstance(params[0], dict)
