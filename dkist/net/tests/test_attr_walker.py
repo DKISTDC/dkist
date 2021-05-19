@@ -148,6 +148,13 @@ def test_both_physobs():
     assert len(params) == 1
     assert params[0]["hasAllStokes"] is True
 
+    params = walker.create(a.Physobs("spectral_axis"))
+    assert len(params) == 1
+    assert params[0]["hasSpectralAxis"] is True
+
+    params = walker.create(a.Physobs("temporal_axis"))
+    assert len(params) == 1
+    assert params[0]["hasTemporalAxis"] is True
 
 def test_and_simple(query_and_simple):
     out = walker.create(query_and_simple)

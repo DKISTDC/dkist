@@ -168,8 +168,9 @@ def identity_gwcs_5d_stokes(identity_gwcs_4d):
 @pytest.fixture
 def dataset(array, identity_gwcs):
     meta = {'bucket': 'data',
-            'dataset_id': 'test_dataset',
-            'asdf_object_key': 'test_dataset.asdf'}
+            'datasetId': 'test_dataset',
+            'primaryProposalId': 'test_proposal',
+            'asdfObjectKey': 'test_dataset.asdf'}
 
     identity_gwcs.array_shape = array.shape
     identity_gwcs.pixel_shape = array.shape[::-1]

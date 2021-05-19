@@ -190,7 +190,7 @@ class Dataset(NDCube):
         ----------
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
-            endpoint.
+        endpoint.
 
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
@@ -203,12 +203,12 @@ class Dataset(NDCube):
            while waiting for the transfer to complete.
         """
 
-        base_path = DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta)
+        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta))
         # TODO: Default path to the config file
         destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
 
-        file_list = [Path(base_path) / fn for fn in self.filenames]
-        file_list.append(Path('/' + self.meta['bucket']) / self.meta['asdfObjectKey'])
+        file_list = [base_path / fn for fn in self.filenames]
+        file_list.append(base_path / self.meta['asdfObjectKey'])
 
         if not destination_endpoint:
             destination_endpoint = get_local_endpoint_id()
