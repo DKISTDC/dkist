@@ -6,7 +6,7 @@ name: Publish
 on:
   release:
     types:
-      - released
+      - published
 
 env:
   # The name of the python package after install
