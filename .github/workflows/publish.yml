@@ -4,9 +4,13 @@
 name: Publish
 
 on:
-  release:
-    types:
-      - published
+  push:
+    # Pattern matched against refs/tags
+    tags:
+      - 'v*'           # Push events to every tag not containing /
+    tags-ignore:
+      - 'v*dev*'       # Ignore dev tags
+
 
 env:
   # The name of the python package after install
