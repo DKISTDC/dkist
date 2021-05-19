@@ -8,8 +8,7 @@ on:
     # Pattern matched against refs/tags
     tags:
       - 'v*'           # Push events to every tag not containing /
-    tags-ignore:
-      - 'v*dev*'       # Ignore dev tags
+      - '!*dev'
 
 
 env:
