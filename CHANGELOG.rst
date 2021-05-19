@@ -1,3 +1,24 @@
+Dkist 0.1a4 (2021-05-19)
+========================
+
+Features
+--------
+
+- Implement `DKISTDatasetClient.fetch` to download asdf files from the metadata
+  streamer service. (`#90 <https://github.com/DKISTDC/dkist/pull/90>`_)
+- Enable tests on Windows (`#95 <https://github.com/DKISTDC/dkist/pull/95>`_)
+- Added search bounding box functionality to DKIST client. (`#100 <https://github.com/DKISTDC/dkist/pull/100>`_)
+- Added support for new dataset search parameters (``hasSpectralAxis``, ``hasTemporalAxis``, ``averageDatasetSpectralSamplingMin``, ``averageDatasetSpectralSamplingMax``, ``averageDatasetSpatialSamplingMin``, ``averageDatasetSpatialSamplingMax``, ``averageDatasetTemporalSamplingMin``, ``averageDatasetTemporalSamplingMax``) (`#108 <https://github.com/DKISTDC/dkist/pull/108>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Support gwcs 0.14 and ndcube 2.0.0b1 (`#86 <https://github.com/DKISTDC/dkist/pull/86>`_)
+- Update Fido client for changes in sunpy 2.1; bump the sunpy dependancy to at
+  least 2.1rc3. (`#89 <https://github.com/DKISTDC/dkist/pull/89>`_)
+
+
 Dkist v0.1a2 (2020-04-29)
 =========================
 
