@@ -74,6 +74,10 @@ def _(wlk, attr, params):
         return params.update({'hasAllStokes': True})
     if attr.value.lower() == "intensity":
         return params.update({'hasAllStokes': False})
+    if attr.value.lower() == "spectral_axis":
+        return params.update({'hasSpectralAxis': True})
+    if attr.value.lower() == "temporal_axis":
+        return params.update({'hasTemporalAxis': True})
 
     # The client should not have accepted the query if we make it this far.
     raise ValueError(f"Physobs({attr.value}) is not supported by the DKIST client.")  # pragma: no cover
@@ -143,6 +147,20 @@ def _(wlk, attr, params):
     return params.update({'embargoEndDateMin': attr.start.isot,
                           'embargoEndDateMax': attr.end.isot})
 
+@walker.add_applier(SpectralSampling)
+def _(wlk, attr, params):
+    return params.update({'averageDatasetSpectralSamplingMin': attr.min.to_value(equivalencies=float),
+                          'averageDatasetSpectralSamplingMax': attr.max.to_value(equivalencies=float)})
+
+@walker.add_applier(SpatialSampling)
+def _(wlk, attr, params):
+    return params.update({'averageDatasetSpatialSamplingMin': attr.min.to_value(equivalencies=float),
+                          'averageDatasetSpatialSamplingMax': attr.max.to_value(equivalencies=float)})
+
+@walker.add_applier(TemporalSampling)
+def _(wlk, attr, params):
+    return params.update({'averageDatasetTemporalSamplingMin': attr.min.to_value(u.s),
+                          'averageDatasetTemporalSamplingMax': attr.max.to_value(u.s)})
 
 @walker.add_applier(BrowseMovie)
 def _(wlk, attr, params):

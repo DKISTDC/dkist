@@ -110,14 +110,14 @@ def test_download(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + [Path("test_dataset.asdf")]
+    file_list = dataset.filenames + [base_path / "test_dataset.asdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.download()
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
-                                       Path("/~/test_dataset"),
+                                       Path("/~/test_proposal/test_dataset"),
                                        file_list)
 
 
@@ -132,14 +132,14 @@ def test_download_no_progress(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + [Path("test_dataset.asdf")]
+    file_list = dataset.filenames + [base_path / "test_dataset.asdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.download(progress=False)
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
-                                       Path("/~/test_dataset"),
+                                       Path("/~/test_proposal/test_dataset"),
                                        file_list)
 
     progress_mock.assert_not_called()

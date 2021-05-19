@@ -28,7 +28,7 @@ def _supported_attr_types():
     attr_types = list(walker.applymm.registry)
     attr_types.remove(object)
     attr_types.remove(AttrAnd)
-    attr_types.remove(a.dkist.BoundingBox)  # TODO: Support BoundingBox
+    attr_types.remove(a.dkist.BoundingBox)
     return attr_types
 
 
@@ -41,8 +41,17 @@ def _browse_movie(draw):
 def _unit_range(attr_type):
     unit = list(attr_type.__init__.__annotations__.values())
     unit = unit[0] if unit else u.one
-    if attr_type is a.Wavelength:
+
+    # Attrs which have unit decorations not type decorations need special
+    # handling or else hypothesis dies.
+    if attr_type in (a.Wavelength, a.dkist.SpectralSampling):
         unit = u.nm
+
+    if attr_type is a.dkist.SpatialSampling:
+        unit = u.arcsec / u.pix
+
+    if attr_type is a.dkist.TemporalSampling:
+        unit = u.s
 
     @st.composite
     def aunit(draw, number=st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=1e10)):
@@ -69,6 +78,9 @@ for attr_type in DKISTDatasetClient.register_values():
 
 st.register_type_strategy(a.Time, time_attr())
 st.register_type_strategy(a.Wavelength, _unit_range)
+st.register_type_strategy(a.dkist.SpectralSampling, _unit_range)
+st.register_type_strategy(a.dkist.TemporalSampling, _unit_range)
+st.register_type_strategy(a.dkist.SpatialSampling, _unit_range)
 st.register_type_strategy(a.dkist.BrowseMovie, _browse_movie())
 st.register_type_strategy(a.dkist.FriedParameter, _unit_range)
 st.register_type_strategy(a.dkist.PolarimetricAccuracy, _unit_range)

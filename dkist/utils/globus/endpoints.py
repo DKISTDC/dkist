@@ -62,7 +62,8 @@ def get_endpoint_id(endpoint, tfr_client):
     <https://docs.globus.org/api/transfer/endpoint_search/#endpoint_search>`__
     functionality of the Globus API will be used, so any endpoint search can be
     specified. One and only one result must be returned from the search or a
-    `ValueError` will be raised.
+    `ValueError` will be raised, unless one of the results is an exact text
+    match for the search string, when that result will be used.
 
     Parameters
     ----------
@@ -122,7 +123,7 @@ def auto_activate_endpoint(endpoint_id, tfr_client):  # pragma: no cover
     if needs_activation and not activated:
         r = tfr_client.endpoint_autoactivate(endpoint_id)
         if r['code'] == "AutoActivationFailed":
-            webbrowser.open(f"https://www.globus.org/app/endpoints/{endpoint_id}/activate",
+            webbrowser.open(f"https://app.globus.org/file-manager?origin_id={endpoint_id}",
                             new=1)
             input("Press Return after completing activation in your webbrowser...")
             r = tfr_client.endpoint_autoactivate(endpoint_id)

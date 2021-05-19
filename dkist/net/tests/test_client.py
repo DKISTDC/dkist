@@ -112,6 +112,23 @@ def test_query_response_from_results(empty_query_response, example_api_response,
     assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
 
 
+def test_query_response_from_results_unknown_field(empty_query_response, example_api_response, expected_table_keys):
+    """
+    This test asserts that if the API starts returning new fields we don't error, they get passed though verbatim.
+    """
+    dclient = DKISTDatasetClient()
+    resp = example_api_response["searchResults"]
+    resp[0].update({'spamEggs': 'Some Spam'})
+    qr = DKISTQueryResponseTable.from_results(resp, client=dclient)
+
+    assert len(qr) == 1
+    assert isinstance(qr.client, DKISTDatasetClient)
+    assert qr.client is dclient
+    assert isinstance(qr[0], QueryResponseRow)
+    assert set(qr.colnames).difference(expected_table_keys) == {'spamEggs'}
+    assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
+
+
 def test_length_0_qr(empty_query_response):
     assert len(empty_query_response) == 0
     assert str(empty_query_response)
