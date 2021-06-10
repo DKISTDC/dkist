@@ -208,7 +208,7 @@ class Dataset(NDCube):
         destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
 
         file_list = [base_path / fn for fn in self.filenames]
-        file_list.append(base_path / self.meta['asdfObjectKey'])
+        file_list.append(Path("/") / self.meta['bucket'] / self.meta['asdfObjectKey'])
 
         if not destination_endpoint:
             destination_endpoint = get_local_endpoint_id()

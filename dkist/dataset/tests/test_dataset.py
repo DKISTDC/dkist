@@ -110,7 +110,7 @@ def test_download(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + [base_path / "test_dataset.asdf"]
+    file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.download()
@@ -132,7 +132,7 @@ def test_download_no_progress(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + [base_path / "test_dataset.asdf"]
+    file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.download(progress=False)
