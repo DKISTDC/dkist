@@ -170,7 +170,7 @@ def dataset(array, identity_gwcs):
     meta = {'bucket': 'data',
             'datasetId': 'test_dataset',
             'primaryProposalId': 'test_proposal',
-            'asdfObjectKey': 'test_dataset.asdf'}
+            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf'}
 
     identity_gwcs.array_shape = array.shape
     identity_gwcs.pixel_shape = array.shape[::-1]
