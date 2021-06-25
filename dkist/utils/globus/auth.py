@@ -143,10 +143,9 @@ def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: n
     url = client.oauth2_get_authorize_url()
 
     result = webbrowser.open(url, new=1)
-    if not result:
-        print(f"Please go to {url} to authenticate with globus.")
-
     print("Waiting for completion of Globus Authentication in your webbrowser...")
+    print(f"If your webbrowser has not opened, please go to {url} to authenticate with globus.")
+
     try:
         auth_code = server.wait_for_code()
     except KeyboardInterrupt:
