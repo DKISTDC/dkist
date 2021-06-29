@@ -98,7 +98,7 @@ class ExternalArrayReferenceCollection:
         return self._to_ears(self.fileuris)
 
     def __getitem__(self, item):
-        uris = self.fileuris[item]
+        uris = np.array(self.fileuris)[item].tolist()
         if isinstance(uris, str):
             uris = [uris]
         return type(self)(uris, self.target, self.dtype, self.shape)
@@ -196,9 +196,11 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABC
         self._loader = partial(loader, **kwargs)
 
     def __getitem__(self, item):
-        uris = self.fileuris[item]
+        # Apply slice as array, but then back to nested lists
+        uris = np.array(self.fileuris)[item].tolist()
         if isinstance(uris, str):
             uris = [uris]
+        # Override this method to set loader
         return type(self)(uris, self.target, self.dtype, self.shape, loader=self._loader)
 
     @property
