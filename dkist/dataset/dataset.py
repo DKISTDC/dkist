@@ -92,6 +92,12 @@ class Dataset(NDCube):
         self._header_table = headers
         self._array_container = None
 
+    def __getitem__(self, item):
+        sliced_dataset = super().__getitem__(item)
+        if self._array_container is not None:
+            sliced_dataset._array_container = self._array_container[item]
+        return sliced_dataset
+
     """
     Properties.
     """
