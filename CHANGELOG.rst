@@ -1,3 +1,12 @@
+Dkist 0.1a5 (2021-06-29)
+========================
+
+Bug Fixes
+---------
+
+- Fix display of sliced datasets in repr and correctly propagate slicing operations to the array container. (`#119 <https://github.com/DKISTDC/dkist/pull/119>`_)
+
+
 Dkist 0.1a4 (2021-05-19)
 ========================
 

@@ -1,1 +1,0 @@
-Fix display of sliced datasets in repr and correctly propagate slicing operations to the array container.
