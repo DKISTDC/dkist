@@ -33,6 +33,7 @@ length_sort_stdlib = true
     filename = "CHANGELOG.rst"
     directory = "changelog/"
     issue_format = "`#{issue} <https://github.com/DKISTDC/dkist/pull/{issue}>`_"
+    title_format = "{version} ({project_date})"
 
     [[tool.towncrier.type]]
         directory = "breaking"

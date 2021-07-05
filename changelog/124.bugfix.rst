@@ -1,1 +1,0 @@
-Fix a bug where sometimes the path wouldn't be set correctly after FITS file download.

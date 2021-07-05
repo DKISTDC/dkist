@@ -1,5 +1,14 @@
-Dkist 0.1a5 (2021-06-29)
-========================
+0.1a6 (2021-07-05)
+==================
+
+Bug Fixes
+---------
+
+- Fix a bug where sometimes the path wouldn't be set correctly after FITS file download. (`#124 <https://github.com/DKISTDC/dkist/pull/124>`_)
+
+
+0.1a5 (2021-06-29)
+==================
 
 Bug Fixes
 ---------
@@ -7,8 +16,8 @@ Bug Fixes
 - Fix display of sliced datasets in repr and correctly propagate slicing operations to the array container. (`#119 <https://github.com/DKISTDC/dkist/pull/119>`_)
 
 
-Dkist 0.1a4 (2021-05-19)
-========================
+0.1a4 (2021-05-19)
+==================
 
 Features
 --------
@@ -28,8 +37,8 @@ Trivial/Internal Changes
   least 2.1rc3. (`#89 <https://github.com/DKISTDC/dkist/pull/89>`_)
 
 
-Dkist v0.1a2 (2020-04-29)
-=========================
+v0.1a2 (2020-04-29)
+===================
 
 Features
 --------
@@ -37,8 +46,8 @@ Features
 - Move asdf generation code into dkist-inventory package (`#79 <https://github.com/DKISTDC/dkist/pull/79>`_)
 
 
-Dkist v0.1a1 (2020-03-27)
-=========================
+v0.1a1 (2020-03-27)
+===================
 
 Backwards Incompatible Changes
 ------------------------------
