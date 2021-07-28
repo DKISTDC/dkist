@@ -8,8 +8,8 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.array_containers import (DaskFITSArrayContainer, ExternalArrayReferenceCollection,
-                                       NumpyFITSArrayContainer)
+from dkist.io.array_containers import (DaskFITSArrayCollection, ExternalArrayReferenceCollection,
+                                       NumpyFITSArrayCollection)
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = os.path.join(rootdir, "EIT")
@@ -26,47 +26,38 @@ def externalarray():
 
 
 def test_slicing(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    ac = NumpyFITSArrayCollection.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
     ext_shape = np.array(externalarray, dtype=object).shape
     assert ac.loader_array.shape == ext_shape
-    assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert ac.get_output_shape() == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
+    assert isinstance(ac.get_array(), np.ndarray)
 
-    ac = ac[5:8]
-    ext_shape = np.array(externalarray[5:8], dtype=object).shape
-    assert ac.loader_array.shape == ext_shape
-    assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
-
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
+    assert isinstance(ac.get_array(np.s_[5:8]), np.ndarray)
 
 
 def test_filenames(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
-    assert len(ac.filenames) == len(externalarray)
-    assert ac.filenames == [e.fileuri for e in externalarray]
+    ac = NumpyFITSArrayCollection.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    assert len(ac.get_filenames()) == len(externalarray)
+    assert ac.get_filenames() == [e.fileuri for e in externalarray]
 
 
 def test_numpy(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    ac = NumpyFITSArrayCollection.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
     ext_shape = np.array(externalarray, dtype=object).shape
     assert ac.loader_array.shape == ext_shape
-    assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert ac.get_output_shape() == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
+    assert isinstance(ac.get_array(), np.ndarray)
 
 
 def test_dask(externalarray):
-    ac = DaskFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    ac = DaskFITSArrayCollection.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
     ext_shape = np.array(externalarray, dtype=object).shape
     assert ac.loader_array.shape == ext_shape
-    assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert ac.get_output_shape() == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(ac.array, da.Array)
-    assert_allclose(ac.array, np.array(ac.array))
+    assert isinstance(ac.get_array(), da.Array)
 
 
 @pytest.fixture
@@ -88,9 +79,20 @@ def test_collection_to_references(tmpdir, earcollection):
         assert ear.dtype == earcollection.dtype
         assert ear.shape == earcollection.shape
 
+def _make_collection_with_shape(file_shape, array_shape):
+    uris = np.zeros(file_shape, dtype=str).tolist()
+    target = 0
+    dtype = np.float32
+    shape = array_shape
+    return NumpyFITSArrayCollection(uris, target, dtype, shape, loader=AstropyFITSLoader)
 
-def test_collection_getitem(tmpdir, earcollection):
-    assert isinstance(earcollection[0], ExternalArrayReferenceCollection)
-    assert isinstance(earcollection[1], ExternalArrayReferenceCollection)
-    assert len(earcollection[0]) == len(earcollection[1]) == 1
-    assert earcollection[0:2] == earcollection
+# def test_slice_conversion():
+#     ac = _make_collection_with_shape((5, 6), (1, 10, 10))
+#     assert ac.array_slice_to_reference_slice(np.s_[:, 3:4]) == (slice(None), slice(None))
+#     assert ac.array_slice_to_reference_slice(np.s_[:]) == (slice(None), slice(None))
+#     assert ac.array_slice_to_reference_slice(np.s_[3, :]) == (3, slice(None))
+
+#     ac = _make_collection_with_shape((5, 6), (10, 10))
+#     assert ac.array_slice_to_reference_slice(np.s_[2, 4, :]) == (slice(None), slice(None))
+#     assert ac.array_slice_to_reference_slice(np.s_[:]) == (slice(None), slice(None))
+#     assert ac.array_slice_to_reference_slice(np.s_[:, :, 3, :]) == (3, slice(None))

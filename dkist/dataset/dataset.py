@@ -10,7 +10,7 @@ import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube
 
-from dkist.io import DaskFITSArrayContainer
+from dkist.io import DaskFITSArrayCollection
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
@@ -124,7 +124,8 @@ class Dataset(NDCube):
         if self._array_container is None:
             return []
         else:
-            return self._array_container.filenames
+            return self._array_container.get_filenames()
+
 
     """
     Dataset loading and saving routines.
@@ -233,8 +234,8 @@ class Dataset(NDCube):
         # The real solution to this is to use the database.
         local_destination = destination_path.relative_to("/").expanduser()
         old_ac = self._array_container
-        self._array_container = DaskFITSArrayContainer.from_external_array_references(
+        self._array_container = DaskFITSArrayCollection.from_external_array_references(
             old_ac.external_array_references,
             loader=old_ac._loader,
             basepath=local_destination)
-        self._data = self._array_container.array
+        self._data = self._array_container.get_array()

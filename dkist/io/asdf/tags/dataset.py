@@ -19,7 +19,7 @@ class DatasetType(DKISTType):
 
     @classmethod
     def from_tree(cls, node, ctx):
-        data = node["data"].array
+        data = node["data"].get_array()
         wcs = node["wcs"]
         headers = node["headers"]
         meta = node.get("meta")

@@ -11,7 +11,7 @@ from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
 
 from dkist.dataset import Dataset
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.io import AstropyFITSLoader, DaskFITSArrayCollection
 
 
 @pytest.fixture
@@ -179,7 +179,7 @@ def dataset(array, identity_gwcs):
     assert ds.data is array
     assert ds.wcs is identity_gwcs
 
-    ds._array_container = DaskFITSArrayContainer(['test1.fits'], 0, 'float', array.shape,
+    ds._array_container = DaskFITSArrayCollection(['test1.fits'], 0, 'float', array.shape,
                                                  loader=AstropyFITSLoader)
 
     return ds
