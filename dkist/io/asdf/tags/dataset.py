@@ -19,7 +19,7 @@ class DatasetType(DKISTType):
 
     @classmethod
     def from_tree(cls, node, ctx):
-        data = node["data"].get_array()
+        data = node["data"]
         wcs = node["wcs"]
         headers = node["headers"]
         meta = node.get("meta")
@@ -28,19 +28,17 @@ class DatasetType(DKISTType):
 
         dataset = Dataset(data, headers=headers, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
-        dataset._array_container = node["data"]
+        dataset._array_collection = node["data"]
         return dataset
 
     @classmethod
     def to_tree(cls, dataset, ctx):
-        if dataset._array_container is None:
-            raise ValueError("This Dataset object can not be saved to asdf as "
-                             "it was not constructed from a set of FITS files.")
         node = {}
         node["meta"] = dataset.meta or None
         node["wcs"] = dataset.wcs
         node["headers"] = dataset.headers
-        node["data"] = dataset._array_container
+        # TODO: Support slice here?
+        node["data"] = dataset.files.array_collection
         if dataset.unit:
             node["unit"] = dataset.unit
         if dataset.mask:
@@ -79,8 +77,8 @@ class DatasetType(DKISTType):
         assert old.meta == new.meta
         cls._assert_wcs_equal(old.wcs, new.wcs)
         cls._assert_table_equal(old.headers, new.headers)
-        ac_new = new._array_container.external_array_references
-        ac_old = old._array_container.external_array_references
+        ac_new = new.files.array_collection.external_array_references
+        ac_old = old.files.array_collection.external_array_references
         assert ac_new == ac_old
         assert old.unit == new.unit
         assert old.mask == new.mask

@@ -11,7 +11,7 @@ from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
 
 from dkist.dataset import Dataset
-from dkist.io import AstropyFITSLoader, DaskFITSArrayCollection
+from dkist.io import AstropyFITSLoader, DaskFITSArrayCollection, BaseFITSArrayCollection
 
 
 @pytest.fixture
@@ -165,6 +165,20 @@ def identity_gwcs_5d_stokes(identity_gwcs_4d):
     return wcs
 
 
+class NullArrayCollection(BaseFITSArrayCollection):
+    def __init__(self, fileuris, target, dtype, shape, *, loader, data, **kwargs):
+        super().__init__(fileuris, target, dtype, shape, loader=loader, **kwargs)
+
+        self._loader_array_cache = data
+
+    @staticmethod
+    def get_new_array(loader_array, aslice, output_shape):
+        return loader_array[aslice]
+
+def generate_array_collection(array):
+    return NullArrayCollection(['test1.fits'], 0, 'float', array.shape, loader=AstropyFITSLoader, data=array)
+
+
 @pytest.fixture
 def dataset(array, identity_gwcs):
     meta = {'bucket': 'data',
@@ -174,13 +188,12 @@ def dataset(array, identity_gwcs):
 
     identity_gwcs.array_shape = array.shape
     identity_gwcs.pixel_shape = array.shape[::-1]
-    ds = Dataset(array, wcs=identity_gwcs, meta=meta, headers=Table())
+
+    ac = generate_array_collection(array)
+    ds = Dataset(ac, wcs=identity_gwcs, meta=meta, headers=Table())
     # Sanity checks
     assert ds.data is array
     assert ds.wcs is identity_gwcs
-
-    ds._array_container = DaskFITSArrayCollection(['test1.fits'], 0, 'float', array.shape,
-                                                 loader=AstropyFITSLoader)
 
     return ds
 
@@ -190,11 +203,12 @@ def dataset_3d(identity_gwcs_3d):
     shape = (25, 50, 50)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
+    ac = generate_array_collection(array)
 
     identity_gwcs_3d.pixel_shape = array.shape[::-1]
     identity_gwcs_3d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_3d)
+    return Dataset(ac, wcs=identity_gwcs_3d)
 
 
 @pytest.fixture
@@ -202,8 +216,9 @@ def dataset_4d(identity_gwcs_4d):
     shape = (50, 60, 70, 80)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
+    ac = generate_array_collection(array)
 
     identity_gwcs_4d.pixel_shape = array.shape[::-1]
     identity_gwcs_4d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_4d)
+    return Dataset(ac, wcs=identity_gwcs_4d)

@@ -3,18 +3,16 @@ from textwrap import dedent
 from importlib import resources
 
 from jsonschema.exceptions import ValidationError
-
+import numpy as np
 import asdf
 import astropy.table
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube
 
-from dkist.io import DaskFITSArrayCollection
-from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                start_transfer_from_file_list, watch_transfer_progress)
-from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.io import BaseFITSArrayCollection
 
+from .filemanager import FileManager
 from .utils import dataset_info_str
 
 __all__ = ['Dataset']
@@ -67,6 +65,17 @@ class Dataset(NDCube):
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
                  unit=None, copy=False, headers=None):
 
+        if isinstance(data, FileManager):
+            self._files = data
+        elif isinstance(data, BaseFITSArrayCollection):
+            self._files = FileManager(data)
+        else:
+            raise TypeError("The Dataset object must be instantiated with an "
+                            "ArrayCollection or FileManager object as the data.")
+
+        # We need to trick the NDData constructor
+        data = np.empty((0,))
+
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
             (isinstance(wcs, SlicedLowLevelWCS) and not isinstance(wcs._wcs, gwcs.WCS))):
@@ -75,11 +84,12 @@ class Dataset(NDCube):
         if isinstance(wcs, gwcs.WCS):
             # Set the array shape to be that of the data.
             if wcs.array_shape is None:
-                wcs.array_shape = data.shape
-            if wcs.pixel_shape is None:
-                wcs.pixel_shape = data.shape[::-1]
+                wcs.array_shape = self.data.shape
 
-            if (wcs.pixel_shape != data.shape[::-1] or wcs.array_shape != data.shape):
+            if wcs.pixel_shape is None:
+                wcs.pixel_shape = self.data.shape[::-1]
+
+            if (wcs.pixel_shape != self.data.shape[::-1] or wcs.array_shape != self.data.shape):
                 raise ValueError("The pixel and array shape on the WCS object "
                                  "do not match the given array.")
 
@@ -89,43 +99,34 @@ class Dataset(NDCube):
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)
 
+        # The upstream constructor set's the fake array we gave it to the
+        # hidden _data property.
+        self._data = None
         self._header_table = headers
-        self._array_container = None
 
-    def __getitem__(self, item):
-        sliced_dataset = super().__getitem__(item)
-        if self._array_container is not None:
-            sliced_dataset._array_container = self._array_container[item]
-        return sliced_dataset
+    def _slice(self, item):
+        """
+        Customise the slicing of the "data" argument.
+        """
+        kwargs = super()._slice(item)
+        kwargs['data'] = self.files._get_array_item(item)
+        return kwargs
 
     """
     Properties.
     """
 
     @property
+    def files(self):
+        return self._files
+
+    @property
+    def data(self):
+        return self._files.data
+
+    @property
     def headers(self):
         return self._header_table
-
-    @property
-    def array_container(self):
-        """
-        A reference to the files containing the data.
-        """
-        return self._array_container
-
-    @property
-    def filenames(self):
-        """
-        The filenames referenced by this dataset.
-
-        .. note::
-            This is not their full file paths.
-        """
-        if self._array_container is None:
-            return []
-        else:
-            return self._array_container.get_filenames()
-
 
     """
     Dataset loading and saving routines.
@@ -184,58 +185,3 @@ class Dataset(NDCube):
 
     def __str__(self):
         return dataset_info_str(self)
-
-    """
-    DKIST specific methods.
-    """
-
-    def download(self, path="/~/", destination_endpoint=None, progress=True):
-        """
-        Start a Globus file transfer for all files in this Dataset.
-
-        Parameters
-        ----------
-        path : `pathlib.Path` or `str`, optional
-            The path to save the data in, must be accessible by the Globus
-            endpoint.
-
-        destination_endpoint : `str`, optional
-            A unique specifier for a Globus endpoint. If `None` a local
-            endpoint will be used if it can be found, otherwise an error will
-            be raised. See `~dkist.utils.globus.get_endpoint_id` for valid
-            endpoint specifiers.
-
-        progress : `bool`, optional
-           If `True` status information and a progress bar will be displayed
-           while waiting for the transfer to complete.
-        """
-
-        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta))
-        # TODO: Default path to the config file
-        destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
-
-        file_list = [base_path / fn for fn in self.filenames]
-        file_list.append(Path("/") / self.meta['bucket'] / self.meta['asdfObjectKey'])
-
-        if not destination_endpoint:
-            destination_endpoint = get_local_endpoint_id()
-
-        task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                                destination_endpoint, destination_path,
-                                                file_list)
-
-        tc = get_transfer_client()
-        if progress:
-            watch_transfer_progress(task_id, tc, initial_n=len(file_list))
-        else:
-            tc.task_wait(task_id, timeout=1e6)
-
-        # TODO: This is a hack to change the base dir of the dataset.
-        # The real solution to this is to use the database.
-        local_destination = destination_path.relative_to("/").expanduser()
-        old_ac = self._array_container
-        self._array_container = DaskFITSArrayCollection.from_external_array_references(
-            old_ac.external_array_references,
-            loader=old_ac._loader,
-            basepath=local_destination)
-        self._data = self._array_container.get_array()

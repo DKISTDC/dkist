@@ -18,13 +18,13 @@ def tagobj(request):
 
 
 @pytest.fixture
-def array_container():
+def array_collection():
     return DaskFITSArrayCollection(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
                                    loader=AstropyFITSLoader)
 
 
 @pytest.mark.parametrize("tagobj",
-                         ["array_container",
+                         ["array_collection",
                           "dataset"],
                          indirect=True)
 def test_tags(tagobj, tmpdir):

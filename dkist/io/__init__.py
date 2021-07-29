@@ -1,6 +1,6 @@
 import dkist.config as _config
 
-from .array_containers import (BaseFITSArrayCollection, DaskFITSArrayCollection,
+from .array_collections import (BaseFITSArrayCollection, DaskFITSArrayCollection,
                                NumpyFITSArrayCollection)
 from .loaders import AstropyFITSLoader, BaseFITSLoader
 

@@ -1,16 +1,16 @@
-
-
-
 from dkist.io import DaskFITSArrayCollection
 
 from ..types import DKISTType
 
 __all__ = ['ArrayContainerType']
 
+# Note: renaming this tag / schema from container to collection would have
+# invalidated all asdf files generated so far, to avoid this I haven't renamed
+# the tag / schema at the same time as the class it's serialising.
 
 class ArrayContainerType(DKISTType):
     name = "array_container"
-    types = ['dkist.io.array_containers.BaseFITSArrayCollection']
+    types = ['dkist.io.array_collections.BaseFITSArrayCollection']
     requires = ['dkist']
     version = "0.2.0"
 
@@ -19,8 +19,8 @@ class ArrayContainerType(DKISTType):
         return DaskFITSArrayCollection.from_tree(node, ctx)
 
     @classmethod
-    def to_tree(cls, array_container, ctx):
-        return array_container.to_tree(array_container, ctx)
+    def to_tree(cls, array_collection, ctx):
+        return array_collection.to_tree(array_collection, ctx)
 
     @classmethod
     def assert_equal(cls, old, new):

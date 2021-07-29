@@ -16,7 +16,7 @@ from sunpy.util.decorators import add_common_docstring
 from dkist.io.loaders import AstropyFITSLoader
 from dkist.io.utils import SliceCache
 
-__all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
+__all__ = ['BaseFITSArrayCollection', 'NumpyFITSArrayCollection', 'DaskFITSArrayCollection']
 
 
 # This class should probably live in asdf, and there are PRs open to add it.
@@ -253,7 +253,7 @@ class BaseFITSArrayCollection(ExternalArrayReferenceCollection, metaclass=abc.AB
 
     def get_filenames(self, aslice=None):
         """
-        Return a list of file names referenced by this Array Container.
+        Return a list of file names referenced by this Array Collection.
         """
         reference_array = self.reference_array[aslice]
         return [ear.fileuri for ear in reference_array.flat]
@@ -318,7 +318,7 @@ def stack_loader_array(loader_array):
 
     Parameters
     ----------
-    loader_array : `dkist.io.reference_collections.BaseFITSArrayContainer`
+    loader_array : `dkist.io.reference_collections.BaseFITSArrayCollection`
 
     Returns
     -------

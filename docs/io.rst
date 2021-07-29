@@ -10,10 +10,10 @@ expose a single Python array-like object. This is done by instantiating a
 object, these loader objects, provide a delayed-io interface to the FITS file,
 only opening the file for reading when the data or the header is accessed.
 
-The `~dkist.io.array_containers.BaseFITSArrayContainer` class handles
+The `~dkist.io.array_collections.BaseFITSArrayCollection` class handles
 converting an array of `asdf.ExternalArrayReference` objects into an array of
 `~dkist.io.loaders.BaseFITSLoader` objects and then providing a method of
-converting this array of loaders into an array class. Currently, a container for
+converting this array of loaders into an array class. Currently, a collection for
 `numpy.ndarray` and `dask.array.Array` are provided.
 
 API Reference
@@ -22,5 +22,5 @@ API Reference
 .. automodapi:: dkist.io.loaders
    :headings: #^
 
-.. automodapi:: dkist.io.array_containers
+.. automodapi:: dkist.io.array_collections
    :headings: #^
