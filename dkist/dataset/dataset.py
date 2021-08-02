@@ -10,7 +10,6 @@ import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube
 
-from dkist.io import DaskFITSArrayContainer
 from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                                 start_transfer_from_file_list, watch_transfer_progress)
 from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
@@ -90,12 +89,12 @@ class Dataset(NDCube):
                          unit=unit, copy=copy)
 
         self._header_table = headers
-        self._array_container = None
+        self._file_manager = None
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
-        if self._array_container is not None:
-            sliced_dataset._array_container = self._array_container[item]
+        if self._file_manager is not None:
+            sliced_dataset._file_manager = self._file_manager[item]
         return sliced_dataset
 
     """
@@ -107,11 +106,11 @@ class Dataset(NDCube):
         return self._header_table
 
     @property
-    def array_container(self):
+    def file_manager(self):
         """
-        A reference to the files containing the data.
+        A helper for interacting with the files backing the data in this ``Dataset``.
         """
-        return self._array_container
+        return self._file_manager
 
     @property
     def filenames(self):
@@ -121,10 +120,10 @@ class Dataset(NDCube):
         .. note::
             This is not their full file paths.
         """
-        if self._array_container is None:
+        if self._file_manager is None:
             return []
         else:
-            return self._array_container.filenames
+            return self._file_manager.filenames
 
     """
     Dataset loading and saving routines.
@@ -231,10 +230,6 @@ class Dataset(NDCube):
 
         # TODO: This is a hack to change the base dir of the dataset.
         # The real solution to this is to use the database.
-        local_destination = destination_path.relative_to("/").expanduser()
-        old_ac = self._array_container
-        self._array_container = DaskFITSArrayContainer.from_external_array_references(
-            old_ac.external_array_references,
-            loader=old_ac._loader,
-            basepath=local_destination)
-        self._data = self._array_container.array
+        if self.file_manager is not None:
+            local_destination = destination_path.relative_to("/").expanduser()
+            self.file_manager.basepath = local_destination

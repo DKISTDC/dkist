@@ -11,7 +11,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
-from dkist.io.array_containers import BaseFITSArrayContainer
+from dkist.io import FileManager
 from dkist.utils.globus import DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID
 
 
@@ -86,16 +86,16 @@ def test_crop_few_slices(dataset_4d):
     assert sds.wcs.world_n_dim == 2
 
 
-def test_array_container():
+def test_file_manager():
     dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
-    assert dataset.array_container is dataset._array_container
+    assert dataset.file_manager is dataset._file_manager
     with pytest.raises(AttributeError):
-        dataset.array_container = 10
+        dataset.file_manager = 10
 
-    assert len(dataset.array_container.filenames) == 11
+    assert len(dataset.file_manager.filenames) == 11
     assert len(dataset.filenames) == 11
 
-    assert isinstance(dataset[5]._array_container, BaseFITSArrayContainer)
+    assert isinstance(dataset[5]._file_manager, FileManager)
     assert len(dataset[5].filenames) == 1
 
 

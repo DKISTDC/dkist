@@ -7,7 +7,7 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.array_containers import DaskFITSArrayContainer
+from dkist.io.file_manager import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = Path(rootdir) / 'EIT'
@@ -30,8 +30,12 @@ def absolute_ear():
 
 @pytest.fixture
 def relative_ac(relative_ear):
-    return DaskFITSArrayContainer.from_external_array_references(
-        [relative_ear], loader=AstropyFITSLoader, basepath=eitdir)
+    return FileManager([relative_ear.fileuri],
+                       relative_ear.target,
+                       relative_ear.dtype,
+                       relative_ear.shape,
+                       loader=AstropyFITSLoader,
+                       basepath=eitdir)
 
 
 @pytest.fixture
@@ -41,8 +45,12 @@ def relative_fl(relative_ac):
 
 @pytest.fixture
 def absolute_ac(absolute_ear):
-    return DaskFITSArrayContainer.from_external_array_references(
-        [absolute_ear], loader=AstropyFITSLoader)
+    return FileManager([absolute_ear.fileuri],
+                       absolute_ear.target,
+                       absolute_ear.dtype,
+                       absolute_ear.shape,
+                       loader=AstropyFITSLoader,
+                       basepath=eitdir)
 
 
 @pytest.fixture
@@ -72,7 +80,7 @@ def test_array(absolute_fl):
 
 def test_nan(relative_ac, tmpdir):
     relative_ac.basepath = tmpdir
-    array = relative_ac.array
+    array = relative_ac.generate_array()
     assert_allclose(array[10:20, :], np.nan)
 
 

@@ -1,7 +1,6 @@
 import dkist.config as _config
 
-from .array_containers import DaskFITSArrayContainer
-from .loaders import AstropyFITSLoader
+from .file_manager import FileManager
 
 __all__ = ['AstropyFITSLoader', 'DaskFITSArrayContainer', 'conf']
 
