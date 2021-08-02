@@ -8,8 +8,7 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.array_containers import (DaskFITSArrayContainer, ExternalArrayReferenceCollection,
-                                       NumpyFITSArrayContainer)
+from dkist.io.array_containers import DaskFITSArrayContainer, ExternalArrayReferenceCollection
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = os.path.join(rootdir, "EIT")
@@ -26,37 +25,26 @@ def externalarray():
 
 
 def test_slicing(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    ac = DaskFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
     ext_shape = np.array(externalarray, dtype=object).shape
     assert ac.loader_array.shape == ext_shape
     assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
+    array = ac.array.compute()
+    assert isinstance(array, np.ndarray)
 
     ac = ac[5:8]
     ext_shape = np.array(externalarray[5:8], dtype=object).shape
     assert ac.loader_array.shape == ext_shape
     assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
+    assert isinstance(ac.array.compute(), np.ndarray)
 
 
 def test_filenames(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
+    ac = DaskFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
     assert len(ac.filenames) == len(externalarray)
     assert ac.filenames == [e.fileuri for e in externalarray]
-
-
-def test_numpy(externalarray):
-    ac = NumpyFITSArrayContainer.from_external_array_references(externalarray, loader=AstropyFITSLoader, basepath=eitdir)
-    ext_shape = np.array(externalarray, dtype=object).shape
-    assert ac.loader_array.shape == ext_shape
-    assert ac.output_shape == tuple(list(ext_shape) + [128, 128])
-
-    assert isinstance(ac.array, np.ndarray)
-    assert_allclose(ac.array, np.array(ac))
 
 
 def test_dask(externalarray):
@@ -94,3 +82,24 @@ def test_collection_getitem(tmpdir, earcollection):
     assert isinstance(earcollection[1], ExternalArrayReferenceCollection)
     assert len(earcollection[0]) == len(earcollection[1]) == 1
     assert earcollection[0:2] == earcollection
+
+
+def test_basepath_change(externalarray):
+    ac = DaskFITSArrayContainer.from_external_array_references(
+        externalarray, loader=AstropyFITSLoader)
+    array = ac.array
+    assert np.isnan(array).all()
+    ac.basepath = eitdir
+    assert not np.isnan(array).any()
+
+
+def test_sliced_basepath_change(externalarray):
+    ac = DaskFITSArrayContainer.from_external_array_references(
+        externalarray, loader=AstropyFITSLoader)
+    array = ac.array
+    assert np.isnan(array).all()
+
+    sub_array = array[3:4]
+    ac.basepath = eitdir
+    assert not np.isnan(sub_array).any()
+    assert not np.isnan(array).any()

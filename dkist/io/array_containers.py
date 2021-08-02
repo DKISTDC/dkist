@@ -14,7 +14,7 @@ from sunpy.util.decorators import add_common_docstring
 
 from dkist.io.loaders import AstropyFITSLoader
 
-__all__ = ['BaseFITSArrayContainer', 'NumpyFITSArrayContainer', 'DaskFITSArrayContainer']
+__all__ = ['BaseFITSArrayContainer', 'DaskFITSArrayContainer']
 
 
 # This class should probably live in asdf, and there are PRs open to add it.
@@ -161,23 +161,24 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABC
 
     @classmethod
     def from_tree(cls, node, ctx):
-        # TODO: Work out a way over overriding this at dataset load.
         filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
-        # TODO: The choice of Dask and Astropy here should be in a config somewhere.
-        array_container = DaskFITSArrayContainer(node['fileuris'],
-                                                 node['target'],
-                                                 node['datatype'],
-                                                 node['shape'],
-                                                 loader=AstropyFITSLoader,
-                                                 basepath=base_path)
+        array_container = cls(node['fileuris'],
+                              node['target'],
+                              node['datatype'],
+                              node['shape'],
+                              loader=AstropyFITSLoader,
+                              basepath=base_path)
         return array_container
 
 
-    def __init__(self, fileuris, target, dtype, shape, *, loader, **kwargs):
+    def __init__(self, fileuris, target, dtype, shape, *, loader, basepath=None):
         super().__init__(fileuris, target, dtype, shape)
         reference_array = np.asarray(self.external_array_references, dtype=object)
+
+        self.basepath = basepath
+        self._loader = loader
 
         # If the first dimension is one we are going to squash it.
         reference_shape = self.shape
@@ -190,10 +191,9 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABC
 
         loader_array = np.empty_like(reference_array, dtype=object)
         for i, ele in enumerate(reference_array.flat):
-            loader_array.flat[i] = loader(ele, **kwargs)
+            loader_array.flat[i] = loader(ele, self)
 
         self.loader_array = loader_array
-        self._loader = partial(loader, **kwargs)
 
     def __getitem__(self, item):
         # Apply slice as array, but then back to nested lists
@@ -202,6 +202,14 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABC
             uris = [uris]
         # Override this method to set loader
         return type(self)(uris, self.target, self.dtype, self.shape, loader=self._loader)
+
+    @property
+    def basepath(self):
+        return self._basepath
+
+    @basepath.setter
+    def basepath(self, value):
+        self._basepath = Path(value) if value is not None else None
 
     @property
     def filenames(self):
@@ -218,29 +226,6 @@ class BaseFITSArrayContainer(ExternalArrayReferenceCollection, metaclass=abc.ABC
         """
         Return an array type for the given array of external file references.
         """
-
-
-@add_common_docstring(append=common_parameters)
-class NumpyFITSArrayContainer(BaseFITSArrayContainer):
-    """
-    Load an array of `~asdf.ExternalArrayReference` objects into a single
-    in-memory numpy array.
-    """
-
-    def __array__(self):
-        """
-        This dosen't seem to work if it returns a Dask array, so it's only
-        useful here.
-        """
-        return self.array
-
-    @property
-    def array(self):
-        """
-        The `~numpy.ndarray` associated with this array of references.
-        """
-        aa = list(map(np.asarray, self.loader_array.flat))
-        return np.stack(aa, axis=0).reshape(self.output_shape)
 
 
 @add_common_docstring(append=common_parameters)
