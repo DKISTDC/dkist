@@ -94,7 +94,7 @@ class Dataset(NDCube):
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
-            sliced_dataset._file_manager = self._file_manager[item]
+            sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
         return sliced_dataset
 
     """

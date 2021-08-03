@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import dask.array as da
 import numpy as np
 import pytest
 
+import asdf
 import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
@@ -10,6 +13,7 @@ from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
 
+from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
@@ -208,3 +212,10 @@ def dataset_4d(identity_gwcs_4d):
     identity_gwcs_4d.array_shape = array.shape
 
     return Dataset(array, wcs=identity_gwcs_4d)
+
+
+@pytest.fixture
+def eit_dataset():
+    eitdir = Path(rootdir) / "EIT"
+    with asdf.open(eitdir / "eit_test_dataset.asdf") as f:
+        return f.tree['dataset']

@@ -89,7 +89,6 @@ def test_np_array(absolute_fl):
     assert_allclose(narr, absolute_fl.fits_array)
     assert narr is not absolute_fl.fits_array
 
-
 def test_slicing(absolute_fl):
     aslice = np.s_[10:20, 10:20]
     sarr = absolute_fl[aslice]
