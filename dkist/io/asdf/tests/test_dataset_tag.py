@@ -6,7 +6,8 @@ import pytest
 import asdf
 from asdf.tests import helpers
 
-from dkist.io import AstropyFITSLoader, DaskFITSArrayContainer
+from dkist.io import FileManager
+from dkist.io.loaders import AstropyFITSLoader
 
 
 @pytest.fixture
@@ -19,8 +20,8 @@ def tagobj(request):
 
 @pytest.fixture
 def array_container():
-    return DaskFITSArrayContainer(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
-                                  loader=AstropyFITSLoader)
+    return FileManager(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
+                       loader=AstropyFITSLoader)
 
 
 @pytest.mark.parametrize("tagobj",

@@ -5,9 +5,9 @@ import pytest
 from numpy.testing import assert_allclose
 
 import asdf
-from astropy.io import fits
 
 from dkist.data.test import rootdir
+from dkist.io.file_manager import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
 eitdir = Path(rootdir) / 'EIT'
@@ -28,15 +28,34 @@ def absolute_ear():
                                        "float64",
                                        (128, 128))
 
+@pytest.fixture
+def relative_ac(relative_ear):
+    return FileManager([relative_ear.fileuri],
+                       relative_ear.target,
+                       relative_ear.dtype,
+                       relative_ear.shape,
+                       loader=AstropyFITSLoader,
+                       basepath=eitdir)
+
 
 @pytest.fixture
-def relative_fl(relative_ear):
-    return AstropyFITSLoader(relative_ear, basepath=eitdir)
+def relative_fl(relative_ac):
+    return relative_ac.loader_array.flat[0]
 
 
 @pytest.fixture
-def absolute_fl(absolute_ear):
-    return AstropyFITSLoader(absolute_ear)
+def absolute_ac(absolute_ear):
+    return FileManager([absolute_ear.fileuri],
+                       absolute_ear.target,
+                       absolute_ear.dtype,
+                       absolute_ear.shape,
+                       loader=AstropyFITSLoader,
+                       basepath=eitdir)
+
+
+@pytest.fixture
+def absolute_fl(absolute_ac):
+    return absolute_ac.loader_array.flat[0]
 
 
 def test_construct(relative_fl, absolute_fl):
@@ -53,40 +72,25 @@ def test_construct(relative_fl, absolute_fl):
 def test_array(absolute_fl):
     a = absolute_fl.fits_array
     assert isinstance(a, np.ndarray)
-    assert absolute_fl._array is a
-    assert absolute_fl._fits_header is not None
-    assert absolute_fl.fits_header is absolute_fl._fits_header
-    assert isinstance(absolute_fl.fits_header, fits.Header)
 
     for contain in ("efz20040301.000010_s.fits", str(absolute_fl.shape), absolute_fl.dtype):
         assert contain in repr(absolute_fl)
         assert contain in str(absolute_fl)
 
 
-def test_nan():
-    ear = asdf.ExternalArrayReference("/tmp/not_a_path.fits",
-                                      0,
-                                      "float64",
-                                      (128, 128))
-    loader = AstropyFITSLoader(ear)
-
-    assert_allclose(loader[10:20, :], np.nan)
-
-
-def test_header(absolute_fl):
-    h = absolute_fl.fits_header
-    assert isinstance(h, fits.Header)
-    assert absolute_fl.fits_header is absolute_fl._fits_header
+def test_nan(relative_ac, tmpdir):
+    relative_ac.basepath = tmpdir
+    array = relative_ac.generate_array()
+    assert_allclose(array[10:20, :], np.nan)
 
 
 def test_np_array(absolute_fl):
     narr = np.array(absolute_fl)
-    assert_allclose(narr, absolute_fl._array)
-    assert narr is not absolute_fl._array
-
+    assert_allclose(narr, absolute_fl.fits_array)
+    assert narr is not absolute_fl.fits_array
 
 def test_slicing(absolute_fl):
     aslice = np.s_[10:20, 10:20]
     sarr = absolute_fl[aslice]
 
-    assert_allclose(sarr, absolute_fl._array[aslice])
+    assert_allclose(sarr, absolute_fl.fits_array[aslice])

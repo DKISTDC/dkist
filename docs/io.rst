@@ -22,5 +22,5 @@ API Reference
 .. automodapi:: dkist.io.loaders
    :headings: #^
 
-.. automodapi:: dkist.io.array_containers
+.. automodapi:: dkist.io.file_manager
    :headings: #^
