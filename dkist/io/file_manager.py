@@ -8,10 +8,12 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import AstropyFITSLoader
 
+__all__ = ['SlicedFileManagerProxy', 'FileManager']
+
 
 class SlicedFileManagerProxy:
     """
-    A sliced view into a FileManager object.
+    A sliced view into a `.FileManager` object.
     """
     __slots__ = ["parent", "parent_slice"]
 
