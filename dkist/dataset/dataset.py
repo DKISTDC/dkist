@@ -107,13 +107,14 @@ class Dataset(NDCube):
                 raise ValueError("The pixel and array shape on the WCS object "
                                  "do not match the given array.")
 
-        if headers is not None and not isinstance(headers, astropy.table.Table):
-            raise ValueError("The headers keyword argument must be an Astropy Table instance.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)
 
-        self._header_table = headers
+        if headers is not None and not isinstance(headers, astropy.table.Table):
+            raise ValueError("The headers metadata key must be an Astropy Table instance.")
+
+        self._headers = headers
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
@@ -127,27 +128,22 @@ class Dataset(NDCube):
 
     @property
     def headers(self):
-        return self._header_table
+        """
+        An `~astropy.table.Table` of all the FITS headers for all files in this dataset.
+
+        .. note::
+            This table is read from the asdf file and not from the FITS files,
+            so any modifications to the FITS files will not be reflected here.
+
+        """
+        return self._headers
 
     @property
-    def file_manager(self):
+    def files(self):
         """
         A helper for interacting with the files backing the data in this ``Dataset``.
         """
         return self._file_manager
-
-    @property
-    def filenames(self):
-        """
-        The filenames referenced by this dataset.
-
-        .. note::
-            This is not their full file paths.
-        """
-        if self._file_manager is None:
-            return []
-        else:
-            return self._file_manager.filenames
 
     """
     Dataset loading and saving routines.

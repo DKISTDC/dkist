@@ -88,19 +88,19 @@ def test_crop_few_slices(dataset_4d):
 
 def test_file_manager():
     dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
-    assert dataset.file_manager is dataset._file_manager
+    assert dataset.files is dataset._file_manager
     with pytest.raises(AttributeError):
-        dataset.file_manager = 10
+        dataset.files = 10
 
-    assert len(dataset.file_manager.filenames) == 11
-    assert len(dataset.filenames) == 11
+    assert len(dataset.files.filenames) == 11
+    assert len(dataset.files.filenames) == 11
 
     assert isinstance(dataset[5]._file_manager, FileManager)
-    assert len(dataset[..., 5].filenames) == 1
+    assert len(dataset[..., 5].files.filenames) == 1
 
 
-def test_no_filenames(dataset_3d):
-    assert dataset_3d.filenames == []
+def test_no_file_manager(dataset_3d):
+    assert dataset_3d.files is None
 
 
 def test_download(mocker, dataset):
@@ -114,10 +114,10 @@ def test_download(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.file_manager.download()
+    dataset.files.download()
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
@@ -136,10 +136,10 @@ def test_download_no_progress(mocker, dataset):
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.file_manager.download(progress=False)
+    dataset.files.download(progress=False)
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",

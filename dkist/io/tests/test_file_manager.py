@@ -18,7 +18,7 @@ def file_manager(eit_dataset):
     """
     A file manager
     """
-    return eit_dataset.file_manager
+    return eit_dataset.files
 
 
 @pytest.fixture
@@ -97,29 +97,29 @@ def test_file_manager_cube_slice(eit_dataset):
     Slice the cube and then see that the file manager is a new instance sharing the same base path.
     """
     ds = eit_dataset
-    assert ds.file_manager is not None
+    assert ds.files is not None
 
     sds = ds[5:7]
 
     # Check that we haven't made a copy
-    assert ds.file_manager is not sds.file_manager
+    assert ds.files is not sds.files
 
     # Assert that we have copied the value of basepath
-    assert ds.file_manager.basepath == sds.file_manager.basepath
+    assert ds.files.basepath == sds.files.basepath
 
     ## Running sds.download() here would affect the parent cubes data, because
     ## the base paths are the same.
 
     # If we set a new basepath on the parent cube the sub-cube shouldn't update
-    ds.file_manager.basepath = "test1"
-    assert ds.file_manager.basepath != sds.file_manager.basepath
+    ds.files.basepath = "test1"
+    assert ds.files.basepath != sds.files.basepath
 
     ## Running ds.download() or sds.download() here wouldn't affect the other
     ## one now as the base paths have diverged.
 
     # Correspondingly changing the base path on the sub cube shouldn't change the parent cube
-    sds.file_manager.basepath = "test2"
-    assert ds.file_manager.basepath == Path("test1")
+    sds.files.basepath = "test2"
+    assert ds.files.basepath == Path("test1")
 
 
 def test_file_manager_direct_slice(eit_dataset):
@@ -127,16 +127,16 @@ def test_file_manager_direct_slice(eit_dataset):
     Assert that slicing the file_manager directly doesn't create a copy.
     """
     ds = eit_dataset
-    assert ds.file_manager is not None
+    assert ds.files is not None
 
-    sub_file = ds.file_manager[5]
+    sub_file = ds.files[5]
 
     # Demonstrate that any operation on a directly sliced file manager also
     # affect the parent object.
-    assert sub_file.basepath == ds.file_manager.basepath
+    assert sub_file.basepath == ds.files.basepath
 
-    ds.file_manager.basepath = "test1"
-    assert sub_file.basepath == ds.file_manager.basepath
+    ds.files.basepath = "test1"
+    assert sub_file.basepath == ds.files.basepath
 
     sub_file.basepath = "test2"
-    assert sub_file.basepath == ds.file_manager.basepath
+    assert sub_file.basepath == ds.files.basepath
