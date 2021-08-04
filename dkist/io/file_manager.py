@@ -7,6 +7,9 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import AstropyFITSLoader
+from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
+                                start_transfer_from_file_list, watch_transfer_progress)
+from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -100,6 +103,10 @@ class FileManager:
         self._loader = loader
         self._basepath = None
         self._reference_array = np.asarray(self._to_ears(fileuris), dtype=object)
+        # When this object is attached to a Dataset object this attribute will
+        # be populated with a reference to that Dataset instance.
+        self._ndcube = None
+
         # Use the setter to convert to a Path
         self.basepath = basepath
 
@@ -233,15 +240,24 @@ class FileManager:
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
         """
+        if self._ndcube is None:
+            raise ValueError(
+                "This file manager has no associated Dataset object, so the data can not be downloaded."
+            )
 
-        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta))
+        inv = self._ndcube.meta
+
+        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**inv))
         # TODO: Default path to the config file
-        destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
+        destination_path = Path(path) / inv['primaryProposalId'] / inv['datasetId']
 
         file_list = [base_path / fn for fn in self.filenames]
-        file_list.append(Path("/") / self.meta['bucket'] / self.meta['asdfObjectKey'])
+        file_list.append(Path("/") / inv['bucket'] / inv['asdfObjectKey'])
 
+        # TODO: Ascertain if the destination path is local better than this
+        is_local = False
         if not destination_endpoint:
+            is_local = True
             destination_endpoint = get_local_endpoint_id()
 
         task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
@@ -254,12 +270,6 @@ class FileManager:
         else:
             tc.task_wait(task_id, timeout=1e6)
 
-        # TODO: This is a hack to change the base dir of the dataset.
-        # The real solution to this is to use the database.
-        local_destination = destination_path.relative_to("/").expanduser()
-        old_ac = self._array_container
-        self._array_container = FileManager.from_external_array_references(
-            old_ac.external_array_references,
-            loader=old_ac._loader,
-            basepath=local_destination)
-        self._data = self._array_container.array
+        if is_local:
+            local_destination = destination_path.relative_to("/").expanduser()
+            self.basepath = local_destination

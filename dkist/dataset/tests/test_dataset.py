@@ -104,20 +104,20 @@ def test_no_filenames(dataset_3d):
 
 
 def test_download(mocker, dataset):
-    mocker.patch("dkist.dataset.dataset.watch_transfer_progress",
+    mocker.patch("dkist.io.file_manager.watch_transfer_progress",
                  autospec=True)
-    mocker.patch("dkist.dataset.dataset.get_local_endpoint_id",
+    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
                  autospec=True, return_value="mysecretendpoint")
-    mocker.patch("dkist.dataset.dataset.get_transfer_client",
+    mocker.patch("dkist.io.file_manager.get_transfer_client",
                  autospec=True)
-    start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
+    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
     file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.download()
+    dataset.file_manager.download()
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",
@@ -126,20 +126,20 @@ def test_download(mocker, dataset):
 
 
 def test_download_no_progress(mocker, dataset):
-    progress_mock = mocker.patch("dkist.dataset.dataset.watch_transfer_progress",
+    progress_mock = mocker.patch("dkist.io.file_manager.watch_transfer_progress",
                                  autospec=True)
-    mocker.patch("dkist.dataset.dataset.get_local_endpoint_id",
+    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
                  autospec=True, return_value="mysecretendpoint")
-    tc_mock = mocker.patch("dkist.dataset.dataset.get_transfer_client",
+    tc_mock = mocker.patch("dkist.io.file_manager.get_transfer_client",
                            autospec=True)
-    start_mock = mocker.patch("dkist.dataset.dataset.start_transfer_from_file_list",
+    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
     base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
     file_list = dataset.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.download(progress=False)
+    dataset.file_manager.download(progress=False)
 
     start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
                                        "mysecretendpoint",

@@ -8,15 +8,38 @@ import asdf
 import astropy.table
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
-from ndcube.ndcube import NDCube
+from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
-from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                start_transfer_from_file_list, watch_transfer_progress)
-from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.io.file_manager import FileManager
 
 from .utils import dataset_info_str
 
 __all__ = ['Dataset']
+
+
+class FileManagerDescriptor(NDCubeLinkedDescriptor):
+    """
+    This is a special version of the NDCubeLinked descriptor which gives a
+    FileManager object a reference to the cube when it is assigned to the
+    attribute.
+
+    Unlike the upstream code this version does not allow the assignment of a
+    class, only an already initialised instance.
+    """
+
+    def __get__(self, obj, objtype=None):
+        # Override the parent get so that we just return None if not set.
+        if obj is None:
+            return
+
+        return getattr(obj, self._attribute_name, None)
+
+    def __set__(self, obj, value):
+        # Do not allow setting by class not instance.
+        if not isinstance(value, self._default_type) and issubclass(value, self._default_type):
+            raise ValueError("You must set this property with an instance of FileManager.")
+
+        super().__set__(obj, value)
 
 
 class Dataset(NDCube):
@@ -63,6 +86,8 @@ class Dataset(NDCube):
         A Table of all FITS headers for all files comprising this dataset.
     """
 
+    _file_manager = FileManagerDescriptor(default_type=FileManager)
+
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
                  unit=None, copy=False, headers=None):
 
@@ -89,7 +114,6 @@ class Dataset(NDCube):
                          unit=unit, copy=copy)
 
         self._header_table = headers
-        self._file_manager = None
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
@@ -182,54 +206,3 @@ class Dataset(NDCube):
 
     def __str__(self):
         return dataset_info_str(self)
-
-    """
-    DKIST specific methods.
-    """
-
-    def download(self, path="/~/", destination_endpoint=None, progress=True):
-        """
-        Start a Globus file transfer for all files in this Dataset.
-
-        Parameters
-        ----------
-        path : `pathlib.Path` or `str`, optional
-            The path to save the data in, must be accessible by the Globus
-            endpoint.
-
-        destination_endpoint : `str`, optional
-            A unique specifier for a Globus endpoint. If `None` a local
-            endpoint will be used if it can be found, otherwise an error will
-            be raised. See `~dkist.utils.globus.get_endpoint_id` for valid
-            endpoint specifiers.
-
-        progress : `bool`, optional
-           If `True` status information and a progress bar will be displayed
-           while waiting for the transfer to complete.
-        """
-
-        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**self.meta))
-        # TODO: Default path to the config file
-        destination_path = Path(path) / self.meta['primaryProposalId'] / self.meta['datasetId']
-
-        file_list = [base_path / fn for fn in self.filenames]
-        file_list.append(Path("/") / self.meta['bucket'] / self.meta['asdfObjectKey'])
-
-        if not destination_endpoint:
-            destination_endpoint = get_local_endpoint_id()
-
-        task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                                destination_endpoint, destination_path,
-                                                file_list)
-
-        tc = get_transfer_client()
-        if progress:
-            watch_transfer_progress(task_id, tc, initial_n=len(file_list))
-        else:
-            tc.task_wait(task_id, timeout=1e6)
-
-        # TODO: This is a hack to change the base dir of the dataset.
-        # The real solution to this is to use the database.
-        if self.file_manager is not None:
-            local_destination = destination_path.relative_to("/").expanduser()
-            self.file_manager.basepath = local_destination
