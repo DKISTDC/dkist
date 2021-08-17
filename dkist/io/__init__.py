@@ -1,8 +1,11 @@
+"""
+Functionality for loading many DKIST FITS files into a single Dask array.
+"""
 import dkist.config as _config
 
 from .file_manager import FileManager
 
-__all__ = ['AstropyFITSLoader', 'DaskFITSArrayContainer', 'conf']
+__all__ = ['FileManager', 'conf']
 
 
 class Conf(_config.ConfigNamespace):

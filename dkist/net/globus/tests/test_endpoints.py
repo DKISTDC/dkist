@@ -5,8 +5,8 @@ import globus_sdk
 import pytest
 
 from dkist.data.test import rootdir
-from dkist.utils.globus.endpoints import (get_directory_listing, get_endpoint_id,
-                                          get_local_endpoint_id, get_transfer_client)
+from dkist.net.globus.endpoints import (get_directory_listing, get_endpoint_id,
+                                        get_local_endpoint_id, get_transfer_client)
 
 
 @pytest.fixture
@@ -110,9 +110,9 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
 
 
 def test_directory_listing(mocker, transfer_client, ls_response):
-    mocker.patch("dkist.utils.globus.endpoints.auto_activate_endpoint")
-    mocker.patch("dkist.utils.globus.endpoints.get_endpoint_id", return_value="12345")
-    mocker.patch("dkist.utils.globus.endpoints.get_local_endpoint_id",
+    mocker.patch("dkist.net.globus.endpoints.auto_activate_endpoint")
+    mocker.patch("dkist.net.globus.endpoints.get_endpoint_id", return_value="12345")
+    mocker.patch("dkist.net.globus.endpoints.get_local_endpoint_id",
                  return_value="12345")
     mocker.patch("globus_sdk.TransferClient.operation_ls",
                  return_value=ls_response)

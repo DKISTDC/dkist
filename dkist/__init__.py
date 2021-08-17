@@ -1,3 +1,6 @@
+"""
+The DKIST package aims to help you search, obtain and use DKIST data as part of your Python software.
+"""
 from pkg_resources import DistributionNotFound, get_distribution
 
 import astropy.config as _config

@@ -7,9 +7,9 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import AstropyFITSLoader
-from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                start_transfer_from_file_list, watch_transfer_progress)
-from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.net.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
+                              start_transfer_from_file_list, watch_transfer_progress)
+from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -235,7 +235,7 @@ class FileManager(BaseFileManager):
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
             endpoint will be used if it can be found, otherwise an error will
-            be raised. See `~dkist.utils.globus.get_endpoint_id` for valid
+            be raised. See `~dkist.net.globus.get_endpoint_id` for valid
             endpoint specifiers.
 
         progress : `bool`, optional
