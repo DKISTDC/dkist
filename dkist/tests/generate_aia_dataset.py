@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 from pathlib import Path
 
 import numpy as np
@@ -68,8 +68,8 @@ def references_from_filenames(filename_array, relative_to=None):
     shape.
     """
 
-    from astropy.io.fits.hdu.base import BITPIX2DTYPE
     from asdf.tags.core.external_reference import ExternalArrayReference
+    from astropy.io.fits.hdu.base import BITPIX2DTYPE
 
     reference_array = np.empty_like(filename_array, dtype=object)
     for i, filepath in enumerate(filename_array.flat):

@@ -75,6 +75,9 @@ class BaseFileManager:
 
     @classmethod
     def from_tree(cls, node, ctx):
+        """
+        Deserializes this class from an asdf tree.
+        """
         filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
@@ -88,6 +91,9 @@ class BaseFileManager:
 
     @classmethod
     def to_tree(cls, data, ctx):
+        """
+        Serializes this class to an asdf tree.
+        """
         node = {}
         node['fileuris'] = data.filenames
         node['target'] = data.target
@@ -133,7 +139,7 @@ class BaseFileManager:
 
     def _array_slice_to_reference_slice(self, aslice):
         """
-        Convert a slice for the reconstructed array to a slice fort the reference_array.
+        Convert a slice for the reconstructed array to a slice for the reference_array.
         """
         shape = self.shape
         aslice = list(sanitize_slices(aslice, len(self.output_shape)))
@@ -182,6 +188,9 @@ class BaseFileManager:
     def _loader_array(self):
         """
         An array of `.BaseFITSLoader` objects.
+
+        These loader objects implement the minimal array-like interface for
+        conversion to a dask array.
         """
         return self.__loader_array
 
@@ -204,6 +213,9 @@ class BaseFileManager:
 
     @property
     def output_shape(self):
+        """
+        The final shape of the reconstructed data array.
+        """
         # If the first dimension is one we are going to squash it.
         shape = self.shape
         if self.shape[0] == 1:
@@ -216,7 +228,11 @@ class BaseFileManager:
 
     def _generate_array(self):
         """
-        The `~dask.array.Array` associated with this array of references.
+        Construct a `dask.array.Array` object from this set of references.
+
+        Each call to this method generates a new array, but all the loaders
+        still have a reference to this `~.FileManager` object, meaning changes
+        to this object will be reflected in the data loaded by the array.
         """
         return stack_loader_array(self._loader_array).reshape(self.output_shape)
 
