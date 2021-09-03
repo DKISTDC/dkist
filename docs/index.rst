@@ -4,7 +4,7 @@ DKIST Python Tools Documentation
 The DKIST Python tools provide a package (`dkist`) which aims to help you search, obtain and use DKIST data as part of your Python software.
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
   :hidden:
 
   self
@@ -16,11 +16,18 @@ The DKIST Python tools provide a package (`dkist`) which aims to help you search
 First Steps
 -----------
 
-New to DKIST data, or new to Python?
+* **From the start**: :ref:`overview` | :ref:`install`.
+* **Guide**: :ref:`overview` | :ref:`level1data` | :ref:`searchdownload` | :ref:`loadinglevel1data`.
+* **Details**: :ref:`api` | :ref:`release_history`.
 
 
 Getting Help
 ------------
+
+* Stuck with understanding DKIST data or accessing your observations? Visit the `DKIST Help Desk <https://nso.atlassian.net/servicedesk/customer/portals>`__.
+* Want to chat to people about the DKIST user tools? Join our `community chat room <https://openastronomy.element.io/#/room/#dki-solar-telescope:openastronomy.org>`__.
+* Have a great example you want to share or questions about using DKIST data with other packages? Try the `OpenAstronomy Discourse Forum <https://community.openastronomy.org>`__.
+* Found a bug or have a feature request? Open an issue on `the issue tracker <https://github.com/DKISTDC/dkist/issues/new/choose>`__.
 
 
 Getting Around the Documentation
