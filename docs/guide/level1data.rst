@@ -3,8 +3,8 @@
 Level One DKIST Data
 ====================
 
-The level one data provided by the DKIST data center has been calibrated to remove any effects introduced by the atmosphere, telescope or instruments.
-The result of these calibration recipes is a level one "dataset" which are the smallest units of DKIST data which are searchable from the data center.
+The level one data provided by the DKIST data center has been calibrated to remove any effects introduced by the telescope or instruments.
+The result of these calibration recipes is a level one "dataset" which are the smallest units of DKIST data whic are searchable from the data center.
 
 Many FITS, one ASDF
 -------------------
