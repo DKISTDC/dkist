@@ -68,7 +68,7 @@ class SlicedFileManagerProxy:
             return tuple(list(self.reference_array.shape) + list(shape))
 
 
-class FileManager:
+class BaseFileManager:
     """
     Manage a collection of arrays in files and their conversion to a Dask Array.
     """
@@ -220,6 +220,8 @@ class FileManager:
         """
         return stack_loader_array(self.loader_array).reshape(self.output_shape)
 
+
+class FileManager(BaseFileManager):
     def download(self, path="/~/", destination_endpoint=None, progress=True):
         """
         Start a Globus file transfer for all files in this Dataset.
