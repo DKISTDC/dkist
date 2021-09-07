@@ -26,6 +26,7 @@ An example search is:
 .. code-block:: python
 
    from sunpy.net import Fido, attrs as a
+   import dkist
    import dkist.net
 
    results = Fido.search(a.Instrument("VBI"), a.Time("2022-01-01", "2022-01-02"))
@@ -45,3 +46,35 @@ It is also possible to use the ``|`` (or) operator to specify multiple criteria,
 This would return any datasets taken by the VBI or VISP instruments in our time range.
 
 Many other combinations of searches are available, such as searching for a specific proposal identifier with `~dkist.net.attrs.Proposal`.
+
+
+Downloading the ASDF Metadata Files
+-----------------------------------
+
+Once you have identified one or more datasets of interest, you can download the metadata only ASDF file using ``Fido.fetch``.
+
+.. code-block:: python
+
+   files = Fido.fetch(results)
+
+This will return a list-like object which contains one or more filepaths to the downloaded ASDF files.
+
+Downloading FITS files with Globus
+----------------------------------
+
+As is detailed in the next section :ref:`loadinglevel1data` these can be passed to `dkist.Dataset` to open the file.
+For example, to load only the first ASDF file we would do:
+
+.. code-block:: python
+
+   ds = dkist.Dataset.from_asdf(files[0])
+
+Once we have loaded the dataset, if we wish to transfer all the FITS files a single call to `~dkist.io.FileManager.download` will initiate the transfer:
+
+.. code-block:: python
+
+   ds.files.download()
+
+If this is the first time you have run this method a login page should open in your webbrowser to authenticate with the Globus system.
+Without overriding any of the default arguments calling this method **expects you to already have a running Globus personal endpoint** local to the Python session.
+If you wish to transfer the dataset to a non-local endpoint, you can do so by setting the ``destination_endpoint=`` keyword argument.
