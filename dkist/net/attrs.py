@@ -1,5 +1,7 @@
 """
-Search attrs for DKIST data.
+Search attributes which are specific to the `dkist.net.DKISTDatasetClient`.
+
+Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
 import astropy.units as u
 import sunpy.net._attrs as _sunpy_attrs

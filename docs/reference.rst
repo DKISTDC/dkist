@@ -10,6 +10,9 @@ Reference / API
    :headings: #~
    :no-inheritance-diagram:
 
+.. automodapi:: dkist.net.attrs
+   :headings: ~.
+
 .. automodapi:: dkist.net.globus
    :headings: ~.
 
