@@ -19,3 +19,6 @@ Reference / API
 .. automodapi:: dkist.io
    :headings: #~
    :no-inheritance-diagram:
+
+.. automodapi:: dkist.io.loaders
+   :headings: ~.
