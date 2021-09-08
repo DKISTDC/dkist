@@ -107,6 +107,9 @@ napoleon_use_rtype = False
 # Disable google style docstrings
 napoleon_google_docstring = False
 
+# Enable showing inherited members by default
+automodsumm_inherited_members = True
+
 # -- Options for intersphinx extension -----------------------------------------
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {

@@ -17,7 +17,7 @@ First Steps
 -----------
 
 * **From the start**: :ref:`overview` | :ref:`install`.
-* **Guide**: :ref:`overview` | :ref:`level1data` | :ref:`searchdownload` | :ref:`loadinglevel1data`.
+* **Guide**: :ref:`level1data` | :ref:`searchdownload` | :ref:`loadinglevel1data`.
 * **Details**: :ref:`api` | :ref:`release_history`.
 
 

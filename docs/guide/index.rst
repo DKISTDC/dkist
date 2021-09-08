@@ -10,7 +10,6 @@ This guide is broken up into the following sections:
 
 .. toctree::
 
-   overview
    level1data
    usertools
    install

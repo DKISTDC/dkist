@@ -7,18 +7,18 @@ Reference / API
    :headings: ^#
 
 .. automodapi:: dkist.net
-   :headings: #~
+   :headings: ^#
    :no-inheritance-diagram:
 
 .. automodapi:: dkist.net.attrs
-   :headings: ~.
+   :headings: #~
 
 .. automodapi:: dkist.net.globus
-   :headings: ~.
+   :headings: #~
 
 .. automodapi:: dkist.io
-   :headings: #~
+   :headings: ^#
    :no-inheritance-diagram:
 
 .. automodapi:: dkist.io.loaders
-   :headings: ~.
+   :headings: #~
