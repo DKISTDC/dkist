@@ -31,15 +31,15 @@ def externalarray(file_manager):
 
 def test_slicing(file_manager, externalarray):
     ext_shape = np.array(externalarray, dtype=object).shape
-    assert file_manager.loader_array.shape == ext_shape
+    assert file_manager._loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
-    array = file_manager.generate_array().compute()
+    array = file_manager._generate_array().compute()
     assert isinstance(array, np.ndarray)
 
     sliced_manager = file_manager[5:8]
     ext_shape = np.array(externalarray[5:8], dtype=object).shape
-    assert sliced_manager.loader_array.shape == ext_shape
+    assert sliced_manager._loader_array.shape == ext_shape
     assert sliced_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
 
@@ -50,11 +50,11 @@ def test_filenames(file_manager, externalarray):
 
 def test_dask(file_manager, externalarray):
     ext_shape = np.array(externalarray, dtype=object).shape
-    assert file_manager.loader_array.shape == ext_shape
+    assert file_manager._loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
-    assert isinstance(file_manager.generate_array(), da.Array)
-    assert_allclose(file_manager.generate_array(), np.array(file_manager.generate_array()))
+    assert isinstance(file_manager._generate_array(), da.Array)
+    assert_allclose(file_manager._generate_array(), np.array(file_manager._generate_array()))
 
 
 def test_collection_to_references(tmpdir, file_manager):
@@ -75,7 +75,7 @@ def test_collection_getitem(tmpdir, file_manager):
 
 def test_basepath_change(file_manager):
     file_manager.basepath = None
-    array = file_manager.generate_array()
+    array = file_manager._generate_array()
     assert np.isnan(array).all()
     file_manager.basepath = eitdir
     assert not np.isnan(array).any()
@@ -83,7 +83,7 @@ def test_basepath_change(file_manager):
 
 def test_sliced_basepath_change(file_manager):
     file_manager.basepath = None
-    array = file_manager.generate_array()
+    array = file_manager._generate_array()
     assert np.isnan(array).all()
 
     sub_array = array[3:4]

@@ -37,22 +37,22 @@ class SlicedFileManagerProxy:
         return super().__setattr__(name, value)
 
     def __len__(self):
-        return self.reference_array.size
+        return self._reference_array.size
 
     @property
-    def loader_array(self):
+    def _loader_array(self):
         """
         An array of `.BaseFITSLoader` objects.
         """
-        la = self.parent.loader_array
+        la = self.parent._loader_array
         return np.array(la[self.parent_slice])
 
     @property
-    def reference_array(self):
+    def _reference_array(self):
         """
         An array of `asdf.ExternalArrayReference` objects.
         """
-        ra = self.parent.reference_array
+        ra = self.parent._reference_array
         return np.array(ra[self.parent_slice])
 
     @property
@@ -62,13 +62,13 @@ class SlicedFileManagerProxy:
         if self.shape[0] == 1:
             shape = self.parent.shape[1:]
 
-        if len(self.reference_array) == 1:
+        if len(self._reference_array) == 1:
             return shape
         else:
-            return tuple(list(self.reference_array.shape) + list(shape))
+            return tuple(list(self._reference_array.shape) + list(shape))
 
 
-class FileManager:
+class BaseFileManager:
     """
     Manage a collection of arrays in files and their conversion to a Dask Array.
     """
@@ -102,7 +102,7 @@ class FileManager:
         self.target = target
         self._loader = loader
         self._basepath = None
-        self._reference_array = np.asarray(self._to_ears(fileuris), dtype=object)
+        self.__reference_array = np.asarray(self._to_ears(fileuris), dtype=object)
         # When this object is attached to a Dataset object this attribute will
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
@@ -110,14 +110,14 @@ class FileManager:
         # Use the setter to convert to a Path
         self.basepath = basepath
 
-        loader_array = np.empty_like(self.reference_array, dtype=object)
-        for i, ele in enumerate(self.reference_array.flat):
+        loader_array = np.empty_like(self._reference_array, dtype=object)
+        for i, ele in enumerate(self._reference_array.flat):
             loader_array.flat[i] = loader(ele, self)
 
-        self._loader_array = loader_array
+        self.__loader_array = loader_array
 
     def __len__(self):
-        return self.reference_array.size
+        return self._reference_array.size
 
     def __eq__(self, other):
         uri = self.filenames == other.filenames
@@ -128,7 +128,7 @@ class FileManager:
         return all((uri, target, dtype, shape))
 
     def __getitem__(self, item):
-        item = sanitize_slices(item, self.reference_array.ndim)
+        item = sanitize_slices(item, self._reference_array.ndim)
         return SlicedFileManagerProxy(self, item)
 
     def _array_slice_to_reference_slice(self, aslice):
@@ -165,7 +165,7 @@ class FileManager:
         """
         Represent this collection as a list of `asdf.ExternalArrayReference` objects.
         """
-        return self.reference_array.tolist()
+        return self._reference_array.tolist()
 
     @property
     def basepath(self):
@@ -179,18 +179,18 @@ class FileManager:
         self._basepath = Path(value) if value is not None else None
 
     @property
-    def loader_array(self):
+    def _loader_array(self):
         """
         An array of `.BaseFITSLoader` objects.
         """
-        return self._loader_array
+        return self.__loader_array
 
     @property
-    def reference_array(self):
+    def _reference_array(self):
         """
         An array of `asdf.ExternalArrayReference` objects.
         """
-        return self._reference_array
+        return self.__reference_array
 
     @property
     def filenames(self):
@@ -198,7 +198,7 @@ class FileManager:
         Return a list of file names referenced by this Array Container.
         """
         names = []
-        for ear in self.reference_array.flat:
+        for ear in self._reference_array.flat:
             names.append(ear.fileuri)
         return names
 
@@ -209,17 +209,19 @@ class FileManager:
         if self.shape[0] == 1:
             shape = self.shape[1:]
 
-        if len(self.reference_array) == 1:
+        if len(self._reference_array) == 1:
             return shape
         else:
-            return tuple(list(self.reference_array.shape) + list(shape))
+            return tuple(list(self._reference_array.shape) + list(shape))
 
-    def generate_array(self):
+    def _generate_array(self):
         """
         The `~dask.array.Array` associated with this array of references.
         """
-        return stack_loader_array(self.loader_array).reshape(self.output_shape)
+        return stack_loader_array(self._loader_array).reshape(self.output_shape)
 
+
+class FileManager(BaseFileManager):
     def download(self, path="/~/", destination_endpoint=None, progress=True):
         """
         Start a Globus file transfer for all files in this Dataset.

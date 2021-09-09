@@ -40,7 +40,7 @@ def relative_ac(relative_ear):
 
 @pytest.fixture
 def relative_fl(relative_ac):
-    return relative_ac.loader_array.flat[0]
+    return relative_ac._loader_array.flat[0]
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def absolute_ac(absolute_ear):
 
 @pytest.fixture
 def absolute_fl(absolute_ac):
-    return absolute_ac.loader_array.flat[0]
+    return absolute_ac._loader_array.flat[0]
 
 
 def test_construct(relative_fl, absolute_fl):
@@ -80,7 +80,7 @@ def test_array(absolute_fl):
 
 def test_nan(relative_ac, tmpdir):
     relative_ac.basepath = tmpdir
-    array = relative_ac.generate_array()
+    array = relative_ac._generate_array()
     assert_allclose(array[10:20, :], np.nan)
 
 
