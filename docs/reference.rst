@@ -12,6 +12,7 @@ Reference / API
 
 .. automodapi:: dkist.net.attrs
    :headings: #~
+   :no-inherited-members:
 
 .. automodapi:: dkist.net.globus
    :headings: #~

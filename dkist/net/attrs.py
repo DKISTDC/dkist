@@ -61,7 +61,7 @@ class Experiment(_SimpleAttr):
     """
     Unique identifier for a grouping of observations that meet the same scientific goal.
 
-    ..note ::
+    .. note::
 
         One `~dkist.net.attrs.Proposal` can consist of many
         `~dkist.net.attrs.Experiment` which can consist of many datasets.
@@ -80,7 +80,7 @@ class Proposal(_SimpleAttr):
     """
     Unique identifier for a proposal.
 
-    ..note ::
+    .. note::
 
         One `~dkist.net.attrs.Proposal` can consist of many
         `~dkist.net.attrs.Experiment` which can consist of many datasets.
@@ -242,6 +242,7 @@ class BoundingBox(_DataAttr):
         search box is fully contained by the dataset bounding box and
         "intersecting" is where there is any intersection of the search and
         dataset boxes.
+
     Notes
     -----
     The dataset search is performed only with the latitude and longitude
