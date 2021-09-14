@@ -16,8 +16,8 @@ repos:
       - id: flake8
         additional_dependencies: [flake8-docstrings]
         args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
-  - repo: https://github.com/timothycrosley/isort
-    rev: 4.3.21-2
+  - repo: https://github.com/pycqa/isort
+    rev: 5.8.0
     hooks:
       - id: isort
         additional_dependencies: [toml]

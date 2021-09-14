@@ -131,6 +131,10 @@ class DKISTQueryResponseTable(QueryResponseTable):
 class DKISTDatasetClient(BaseClient):
     """
     Search DKIST datasets and retrieve metadata files describing them.
+
+    .. note::
+
+        This class is not intended to be used directly. You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:fido_guide`.
     """
 
     _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://api.dkistdc.nso.edu/datasets/v1")

@@ -8,9 +8,9 @@ import pathlib
 import datetime
 
 import globus_sdk
+from parfive.utils import in_notebook
 from tqdm import tqdm, tqdm_notebook
 
-from .. import in_notebook
 from .endpoints import auto_activate_endpoint, get_endpoint_id, get_transfer_client
 
 __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
@@ -25,11 +25,11 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
     ----------
     src_endpoint : `str`
         The endpoint to copy file from. Can be any identifier accepted by
-        `~dkist.utils.globus.get_endpoint_id`.
+        `~dkist.net.globus.get_endpoint_id`.
 
     dst_endpoint : `str`
         The endpoint to copy file to. Can be any identifier accepted by
-        `~dkist.utils.globus.get_endpoint_id`.
+        `~dkist.net.globus.get_endpoint_id`.
 
     dst_base_path : `~pathlib.Path`
         The destination path, must be accessible from the endpoint, will be

@@ -5,10 +5,12 @@ from pkg_resources import get_distribution
 from sunpy.extern.distro import linux_distribution
 from sunpy.util.sysinfo import find_dependencies
 
+__all__ = ['system_info']
+
 
 def system_info():
     """
-    Prints ones' system info in an "attractive" fashion.
+    Display information about your system for submitting bug reports.
     """
     base_reqs = get_distribution("dkist").requires()
     base_reqs = {base_req.name.lower() for base_req in base_reqs}

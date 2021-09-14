@@ -4,16 +4,16 @@ import pathlib
 import pytest
 from globus_sdk import GlobusResponse
 
-from dkist.utils.globus.transfer import (_get_speed, _process_task_events,
-                                         start_transfer_from_file_list)
+from dkist.net.globus.transfer import (_get_speed, _process_task_events,
+                                       start_transfer_from_file_list)
 
 
 @pytest.fixture
 def mock_endpoints(mocker):
     def id_mock(endpoint, tc):
         return endpoint
-    mocker.patch("dkist.utils.globus.transfer.auto_activate_endpoint")
-    return mocker.patch("dkist.utils.globus.transfer.get_endpoint_id",
+    mocker.patch("dkist.net.globus.transfer.auto_activate_endpoint")
+    return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
                         side_effect=id_mock)
 
 

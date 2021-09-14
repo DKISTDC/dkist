@@ -46,41 +46,44 @@ class Dataset(NDCube):
     """
     The base class for DKIST datasets.
 
-    This class is backed by `dask.array.Array` and `gwcs.wcs.WCS` objects.
-
     Parameters
     ----------
-    data: `numpy.ndarray`
+    data: `dask.array.Array` or `astropy.nddata.NDData`
         The array holding the actual data in this object.
 
-    wcs: `ndcube.wcs.wcs.WCS`
-        The WCS object containing the axes' information
+    wcs: `gwcs.wcs.WCS`, optional
+        The WCS object containing the axes' information, optional only if
+        ``data`` is an `astropy.nddata.NDData` object.
 
     uncertainty : any type, optional
         Uncertainty in the dataset. Should have an attribute uncertainty_type
         that defines what kind of uncertainty is stored, for example "std"
-        for standard deviation or "var" for variance. A metaclass defining
-        such an interface is NDUncertainty - but isn’t mandatory. If the uncertainty
-        has no such attribute the uncertainty is stored as UnknownUncertainty.
+        for standard deviation or "var" for variance. A metaclass defining such
+        an interface is `~astropy.nddata.NDUncertainty` - but isn’t mandatory.
+        If the uncertainty has no such attribute the uncertainty is stored as
+        `~astropy.nddata.UnknownUncertainty`.
         Defaults to None.
 
     mask : any type, optional
         Mask for the dataset. Masks should follow the numpy convention
-        that valid data points are marked by False and invalid ones with True.
-        Defaults to None.
+        that valid data points are marked by `False` and invalid ones with `True`.
+        Defaults to `None`.
 
     meta : dict-like object, optional
         Additional meta information about the dataset. If no meta is provided
-        an empty collections.OrderedDict is created. Default is None.
+        an empty dictionary is created.
 
-    unit : Unit-like or str, optional
-        Unit for the dataset. Strings that can be converted to a Unit are allowed.
-        Default is None.
+    unit : Unit-like or `str`, optional
+        Unit for the dataset. Strings that can be converted to a
+        `~astropy.unit.Unit` are allowed.
+        Default is `None` which results in dimensionless units.
 
-    extra_coords : iterable of `tuple`, each with three entries
-        (`str`, `int`, `astropy.units.quantity` or array-like)
-        Gives the name, axis of data, and values of coordinates of a data axis not
-        included in the WCS object.
+    copy : bool, optional
+        Indicates whether to save the arguments as copy. `True` copies every
+        attribute before saving it while `False` tries to save every parameter
+        as reference. Note however that it is not always possible to save the
+        input as reference.
+        Default is `False`.
 
     headers : `astropy.table.Table`
         A Table of all FITS headers for all files comprising this dataset.
@@ -141,7 +144,7 @@ class Dataset(NDCube):
     @property
     def files(self):
         """
-        A helper for interacting with the files backing the data in this ``Dataset``.
+        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
         return self._file_manager
 

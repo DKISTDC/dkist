@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [tool.isort]
 line_length = 99
-not_skip = "__init__.py"
+skip = "docs/conf.py,.tox"
 sections = "FUTURE,STDLIB,THIRDPARTY,ASTRO,FIRSTPARTY,LOCALFOLDER"
 default_section = "THIRDPARTY"
 known_first_party = "dkist"
@@ -13,7 +13,7 @@ multi_line_output = 0
 balanced_wrapping = true
 include_trailing_comma = false
 length_sort = false
-length_sort_stdlib = true
+length_sort_sections = "stdlib"
 
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]

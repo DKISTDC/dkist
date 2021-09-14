@@ -7,9 +7,9 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import AstropyFITSLoader
-from dkist.utils.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                start_transfer_from_file_list, watch_transfer_progress)
-from dkist.utils.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.net.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
+                              start_transfer_from_file_list, watch_transfer_progress)
+from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -75,6 +75,9 @@ class BaseFileManager:
 
     @classmethod
     def from_tree(cls, node, ctx):
+        """
+        Deserializes this class from an asdf tree.
+        """
         filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
@@ -88,6 +91,9 @@ class BaseFileManager:
 
     @classmethod
     def to_tree(cls, data, ctx):
+        """
+        Serializes this class to an asdf tree.
+        """
         node = {}
         node['fileuris'] = data.filenames
         node['target'] = data.target
@@ -133,7 +139,7 @@ class BaseFileManager:
 
     def _array_slice_to_reference_slice(self, aslice):
         """
-        Convert a slice for the reconstructed array to a slice fort the reference_array.
+        Convert a slice for the reconstructed array to a slice for the reference_array.
         """
         shape = self.shape
         aslice = list(sanitize_slices(aslice, len(self.output_shape)))
@@ -182,6 +188,9 @@ class BaseFileManager:
     def _loader_array(self):
         """
         An array of `.BaseFITSLoader` objects.
+
+        These loader objects implement the minimal array-like interface for
+        conversion to a dask array.
         """
         return self.__loader_array
 
@@ -204,6 +213,9 @@ class BaseFileManager:
 
     @property
     def output_shape(self):
+        """
+        The final shape of the reconstructed data array.
+        """
         # If the first dimension is one we are going to squash it.
         shape = self.shape
         if self.shape[0] == 1:
@@ -216,7 +228,11 @@ class BaseFileManager:
 
     def _generate_array(self):
         """
-        The `~dask.array.Array` associated with this array of references.
+        Construct a `dask.array.Array` object from this set of references.
+
+        Each call to this method generates a new array, but all the loaders
+        still have a reference to this `~.FileManager` object, meaning changes
+        to this object will be reflected in the data loaded by the array.
         """
         return stack_loader_array(self._loader_array).reshape(self.output_shape)
 
@@ -235,7 +251,7 @@ class FileManager(BaseFileManager):
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
             endpoint will be used if it can be found, otherwise an error will
-            be raised. See `~dkist.utils.globus.get_endpoint_id` for valid
+            be raised. See `~dkist.net.globus.get_endpoint_id` for valid
             endpoint specifiers.
 
         progress : `bool`, optional

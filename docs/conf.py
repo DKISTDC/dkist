@@ -1,143 +1,173 @@
-# -*- coding: utf-8 -*-
+"""
+Configuration file for the Sphinx documentation builder.
+"""
+# -- stdlib imports ------------------------------------------------------------
 import os
 import sys
-import pathlib
 import datetime
-from configparser import ConfigParser
-
+import warnings
 from pkg_resources import get_distribution
-from sphinx_astropy.conf.v1 import *
+from packaging.version import Version
 
-conf = ConfigParser()
+# -- Check for dependencies ----------------------------------------------------
+doc_requires = get_distribution("dkist").requires(extras=("docs",))
+missing_requirements = []
+for requirement in doc_requires:
+    try:
+        get_distribution(requirement)
+    except Exception as e:
+        missing_requirements.append(requirement.name)
+if missing_requirements:
+    print(
+        f"The {' '.join(missing_requirements)} package(s) could not be found and "
+        "is needed to build the documentation, please install the 'docs' requirements."
+    )
+    sys.exit(1)
 
-conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
-setup_cfg = dict(conf.items('metadata'))
+# -- Read the Docs Specific Configuration --------------------------------------
+# This needs to be done before sunpy is imported
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    os.environ['SUNPY_CONFIGDIR'] = '/home/docs/'
+    os.environ['HOME'] = '/home/docs/'
+    os.environ['LANG'] = 'C'
+    os.environ['LC_ALL'] = 'C'
+    os.environ['HIDE_PARFIVE_PROGESS'] = 'True'
 
-# -- General configuration ----------------------------------------------------
+# -- Non stdlib imports --------------------------------------------------------
+import dkist  # NOQA
+from dkist import __version__  # NOQA
 
-# By default, highlight as Python 3.
-highlight_language = 'python3'
+# -- Project information -------------------------------------------------------
+project = 'DKIST'
+author = 'NSO / AURA'
+copyright = '{}, {}'.format(datetime.datetime.now().year, author)
+
+# The full version, including alpha/beta/rc tags
+release = __version__
+dkist_version = Version(__version__)
+is_release = not(dkist_version.is_prerelease or dkist_version.is_devrelease)
+
+# We want to ignore all warnings in a release version.
+if is_release:
+    warnings.simplefilter("ignore")
+
+# Suppress warnings about overriding directives as we overload some of the
+# doctest extensions.
+suppress_warnings = ['app.add_directive', ]
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    'matplotlib.sphinxext.plot_directive',
+    'sphinx_automodapi.automodapi',
+    'sphinx_automodapi.smart_resolver',
+    'sphinx_changelog',
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
+    'sphinx.ext.inheritance_diagram',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sunpy.util.sphinx.doctest',
+    'sunpy.util.sphinx.generate',
+]
+
+# Add any paths that contain templates here, relative to this directory.
+# templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns.append('_templates')
+# This pattern also affects html_static_path and html_extra_path.
 
-# This is added to the end of RST files - a good place to put substitutions to
-# be used globally.
-rst_epilog += """
-"""
+# Add any extra paths that contain custom files (such as robots.txt or
+# .htaccess) here, relative to this directory. These files are copied
 
-intersphinx_mapping.pop("h5py")
-intersphinx_mapping['sunpy'] = ('http://docs.sunpy.org/en/latest/', None)
-intersphinx_mapping['ndcube'] = ('http://docs.sunpy.org/projects/ndcube/en/latest/', None)
-intersphinx_mapping['gwcs'] = ('http://gwcs.readthedocs.io/en/latest/', None)
-intersphinx_mapping['asdf'] = ('http://asdf.readthedocs.io/en/latest/', None)
-intersphinx_mapping['dask'] = ('http://dask.pydata.org/en/latest/', None)
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-automodsumm_inherited_members = True
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+source_suffix = '.rst'
 
-# -- Project information ------------------------------------------------------
+# The master toctree document.
+master_doc = 'index'
 
-# This does not *have* to match the package name, but typically does
-project = setup_cfg['name']
-author = setup_cfg['author']
-copyright = '{0}, {1}'.format(
-    datetime.datetime.now().year, setup_cfg['author'])
-
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-
-
-release = get_distribution(setup_cfg['name']).version
-version = '.'.join(release.split('.')[:3])
-is_development = '.dev' in release
-
-# -- Options for HTML output --------------------------------------------------
-
-try:
-    from dkist_sphinx_theme.conf import *
-except ImportError:
-    html_theme = 'default'
-
-# Disable the links to the internal projects
-html_theme_options = {'navbar_links': []}
-
-# The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-html_title = '{0} v{1}'.format(project, release)
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = project + 'doc'
-
-# Remove numpydoc
-extensions.remove('numpydoc')
-extensions.append('sphinx.ext.napoleon')
+# The reST default role (used for this markup: `text`) to use for all
+# documents. Set to the "smart" one.
+default_role = 'obj'
 
 # Disable having a separate return type row
 napoleon_use_rtype = False
+
 # Disable google style docstrings
 napoleon_google_docstring = False
 
-# -- Options for LaTeX output -------------------------------------------------
+# Enable showing inherited members by default
+automodsumm_inherited_members = True
 
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [('index', project + '.tex', project + u' Documentation',
-                    author, 'manual')]
-
-# -- Options for the edit_on_github extension ---------------------------------
-
-if str(setup_cfg.get('edit_on_github')).lower() == "true":
-    extensions += ['sphinx_astropy.ext.edit_on_github']
-
-    edit_on_github_project = setup_cfg['github_project']
-    if release == version:
-        edit_on_github_branch = "v" + release
-    else:
-        edit_on_github_branch = "master"
-
-    edit_on_github_source_root = ""
-    edit_on_github_doc_root = "docs"
-
-# -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
-
-
-# -- Sphinx Gallery -----------------------------
-extensions += ["sphinx_gallery.gen_gallery"]
-path = pathlib.Path.cwd()
-example_dir = path.parent.joinpath('examples')
-
-sphinx_gallery_conf = {
-    # path to store the module using example template
-    'backreferences_dir': path.joinpath('generated', 'modules'),
-    # execute all examples except those that start with "skip_"
-    'filename_pattern': '^((?!skip_).)*$',
-    'examples_dirs': example_dir,  # path to the examples scripts
-    'gallery_dirs': path.joinpath('generated', 'gallery'),  # path to save gallery generated examples
-    'default_thumb_file': str(path.joinpath('logo', 'icon_square.jpg')),
-    # 'reference_url': {
-    #     'sunpy': 'http://docs.sunpy.org/en/latest',
-    #     'astropy': 'http://docs.astropy.org/en/latest',
-    #     'matplotlib': 'https://matplotlib.org',
-    #     'numpy': 'http://docs.scipy.org/doc/numpy',
-    # },
-    'abort_on_example_error': True,
-    'plot_gallery': True,
-    'download_all_examples': False
+# -- Options for intersphinx extension -----------------------------------------
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "python": (
+        "https://docs.python.org/3/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
+    ),
+    "numpy": (
+        "https://numpy.org/doc/stable/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
+    ),
+    "scipy": (
+        "https://docs.scipy.org/doc/scipy/reference/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+    ),
+    "matplotlib": (
+        "https://matplotlib.org/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/matplotlib.inv"),
+    ),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
+    "sunpy": ('http://docs.sunpy.org/en/latest/', None),
+    "ndcube": ('http://docs.sunpy.org/projects/ndcube/en/latest/', None),
+    "gwcs": ('http://gwcs.readthedocs.io/en/latest/', None),
+    "asdf": ('http://asdf.readthedocs.io/en/latest/', None),
+    "dask": ('http://dask.pydata.org/en/latest/', None),
 }
 
-"""
-Write the latest changelog into the documentation.
-"""
-target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
-try:
-    from sunpy.util.towncrier import generate_changelog_for_docs
-    if is_development:
-        generate_changelog_for_docs("../", target_file)
-except Exception as e:
-    print(f"Failed to add changelog to docs with error {e}.")
+# -- Options for HTML output ---------------------------------------------------
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
 
-# Make sure the file exists or else sphinx will complain.
-open(target_file, 'a').close()
+from dkist_sphinx_theme.conf import *
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
+
+graphviz_dot_args = [
+    '-Nfontsize=10',
+    '-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Efontsize=10',
+    '-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Gfontsize=10',
+    '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
+]
+
+# -- Sphinx Gallery ------------------------------------------------------------
+sphinx_gallery_conf = {
+    'backreferences_dir': os.path.join('generated', 'modules'),
+    'filename_pattern': '^((?!skip_).)*$',
+    'examples_dirs': os.path.join('..', 'examples'),
+    'gallery_dirs': os.path.join('generated', 'gallery'),
+    'abort_on_example_error': False,
+    'plot_gallery': 'True',
+    'remove_config_comments': True,
+    'doc_module': ('dkist'),
+    'only_warn_on_example_error': True,
+}
