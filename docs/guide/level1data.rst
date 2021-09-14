@@ -4,12 +4,12 @@ Level One DKIST Data
 ====================
 
 The level one data provided by the DKIST data center has been calibrated to remove any effects introduced by the telescope or instruments.
-The result of these calibration recipes is a level one "dataset" which are the smallest units of DKIST data whic are searchable from the data center.
+The result of these calibration recipes is a level one "dataset" which are the smallest units of DKIST data which are searchable from the data center.
 
 Many FITS, one ASDF
 -------------------
 
-Due to the potential size of each of these datasets, and to eliminate on demand processing at the data center a single level one dataset is distributed across many FITS files each individual FITS file represents what can be considered to be a "single calibrated exposure".
+Due to the potential size of each of these datasets, and to eliminate on demand processing at the data center a single level one dataset is distributed across many FITS files. Each individual FITS file represents what can be considered to be a "single calibrated exposure".
 This means that when all the processing steps have been taken into account there can be many actual exposures of the instrument involved, but these have all been reduced to a single array.
 The exact contents of each FITS file vary depending on the type of instrument and the mode it was operating in, but some examples would be:
 

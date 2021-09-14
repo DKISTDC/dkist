@@ -30,7 +30,7 @@ The relationship between `~dkist.Dataset.data` and `~dkist.Dataset.files`
 #########################################################################
 
 When an ASDF file containing a dataset is loaded, a new array is generated from the list of FITS filenames provided in that ASDF file.
-These FITS filenames are ordered in the correct way so that an array of the correct dimensionality to represent the whole dataset as a higher dimensional array that is contained in any FITS file.
+These FITS filenames are ordered in the correct way so that an array of the correct dimensionality is created. This array represents the whole dataset as a higher dimensional array than is contained in any single FITS file.
 Depending on how the ASDF file was obtained, you may or may not have some or all of the corresponding FITS files.
 If any of the FITS files referenced by the ADSF file are in the same directory as the ASDF file they will be opened automatically when their slice of the array is requested.
 

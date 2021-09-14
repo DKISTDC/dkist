@@ -16,7 +16,7 @@ The DKIST Python tools provide a package (`dkist`) which aims to help you search
 First Steps
 -----------
 
-* **From the start**: :ref:`overview` | :ref:`install`.
+* **From the start**: :ref:`install`.
 * **Guide**: :ref:`level1data` | :ref:`searchdownload` | :ref:`loadinglevel1data`.
 * **Details**: :ref:`api` | :ref:`release_history`.
 
