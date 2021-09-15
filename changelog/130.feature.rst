@@ -1,3 +1,0 @@
-Modify the `dkist.io.FileManager` class so that most of the functionality
-exists in the new base class and the dowload method is in the separate child
-class. In addition make more of the API private to not confuse end users.
