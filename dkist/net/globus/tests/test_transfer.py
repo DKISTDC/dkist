@@ -1,8 +1,9 @@
 import os
 import pathlib
+from unittest import mock
 
 import pytest
-from globus_sdk import GlobusResponse
+from globus_sdk import GlobusHTTPResponse
 
 from dkist.net.globus.transfer import (_get_speed, _process_task_events,
                                        start_transfer_from_file_list)
@@ -16,11 +17,16 @@ def mock_endpoints(mocker):
     return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
                         side_effect=id_mock)
 
+def json_to_response(json):
+    response = mock.MagicMock()
+    response.json = lambda: json
+    return response
+
 
 @pytest.fixture
-def mock_task_event_list(mocker):
+def mock_task_event_list(mocker, transfer_client):
     task_list = [
-        GlobusResponse({
+        GlobusHTTPResponse(json_to_response({
             'DATA_TYPE': 'event',
             'code': 'STARTED',
             'description': 'started',
@@ -29,8 +35,8 @@ def mock_task_event_list(mocker):
             'is_error': False,
             'parent_task_id': None,
             'time': '2019-05-16 10:13:26+00:00'
-        }),
-        GlobusResponse({
+        }), transfer_client),
+        GlobusHTTPResponse(json_to_response({
             'DATA_TYPE': 'event',
             'code': 'SUCCEEDED',
             'description': 'succeeded',
@@ -38,8 +44,8 @@ def mock_task_event_list(mocker):
             'is_error': False,
             'parent_task_id': None,
             'time': '2019-05-16 10:13:24+00:00'
-        }),
-        GlobusResponse({
+        }), transfer_client),
+        GlobusHTTPResponse(json_to_response({
             'DATA_TYPE': 'event',
             'code': 'STARTED',
             'description': 'started',
@@ -47,7 +53,7 @@ def mock_task_event_list(mocker):
             'is_error': False,
             'parent_task_id': None,
             'time': '2019-05-16 10:13:20+00:00'
-        })
+        }), transfer_client)
     ]
     return mocker.patch("globus_sdk.TransferClient.task_event_list",
                         return_value=task_list)
