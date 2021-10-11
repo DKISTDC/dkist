@@ -95,7 +95,7 @@ class BaseFileManager:
         Serializes this class to an asdf tree.
         """
         node = {}
-        node['fileuris'] = data.filenames
+        node['fileuris'] = data._fileuris
         node['target'] = data.target
         node['datatype'] = data.dtype
         node['shape'] = data.shape
@@ -210,6 +210,15 @@ class BaseFileManager:
         for ear in self._reference_array.flat:
             names.append(ear.fileuri)
         return names
+
+    @property
+    def _fileuris(self):
+        """
+        Nested lists of filenames.
+
+        Note: this is not a flat list unlike `self.filenames`
+        """
+        return np.array(self.filenames).reshape(self._loader_array.shape).tolist()
 
     @property
     def output_shape(self):
