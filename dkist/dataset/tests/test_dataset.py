@@ -113,8 +113,8 @@ def test_download(mocker, dataset):
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
@@ -135,8 +135,8 @@ def test_download_no_progress(mocker, dataset):
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(progress=False)
