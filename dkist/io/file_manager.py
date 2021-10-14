@@ -272,7 +272,7 @@ class FileManager(BaseFileManager):
                 "This file manager has no associated Dataset object, so the data can not be downloaded."
             )
 
-        inv = self._ndcube.meta
+        inv = self._ndcube.meta["inventory"]
 
         base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**inv))
         # TODO: Default path to the config file

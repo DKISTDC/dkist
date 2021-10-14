@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import dask.array as da
+import numpy as np
 import pytest
 
 import asdf
@@ -27,6 +28,19 @@ def invalid_asdf(tmpdir):
 def test_load_invalid_asdf(invalid_asdf):
     with pytest.raises(TypeError):
         Dataset.from_asdf(invalid_asdf)
+
+
+def test_missing_quality(dataset):
+    assert dataset.quality_report is None
+
+
+def test_init_missing_meta_keys(identity_gwcs):
+    data = np.zeros(identity_gwcs.array_shape)
+    with pytest.raises(ValueError, match=".*must contain the headers table."):
+        Dataset(data, wcs=identity_gwcs, meta={'inventory': {}})
+
+    with pytest.raises(ValueError, match=".*must contain the inventory record."):
+        Dataset(data, wcs=identity_gwcs, meta={'headers': {}})
 
 
 def test_repr(dataset, dataset_3d):
@@ -71,7 +85,7 @@ def test_from_directory_no_asdf(tmpdir):
 
 def test_from_not_directory():
     with pytest.raises(ValueError) as e:
-        Dataset.from_directory(rootdir/"notadirectory")
+        Dataset.from_directory(rootdir / "notadirectory")
         assert "directory argument" in str(e)
 
 
@@ -113,8 +127,8 @@ def test_download(mocker, dataset):
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
@@ -135,8 +149,8 @@ def test_download_no_progress(mocker, dataset):
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta)]
+    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(progress=False)

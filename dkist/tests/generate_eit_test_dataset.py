@@ -120,7 +120,8 @@ def main():
 
     from dkist.dataset import Dataset
 
-    ds = Dataset(ac._generate_array(), wcs, headers=table_from_headers(headers))
+    meta = {"inventory": {}, "headers": table_from_headers(headers)}
+    ds = Dataset(ac._generate_array(), wcs, meta=meta)
     ds._file_manager = ac
 
     tree = {

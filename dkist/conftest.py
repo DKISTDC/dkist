@@ -172,14 +172,19 @@ def identity_gwcs_5d_stokes(identity_gwcs_4d):
 
 @pytest.fixture
 def dataset(array, identity_gwcs):
-    meta = {'bucket': 'data',
+    meta = {
+        'inventory': {
+            'bucket': 'data',
             'datasetId': 'test_dataset',
             'primaryProposalId': 'test_proposal',
-            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf'}
+            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf'
+        },
+        'headers': Table()
+    }
 
     identity_gwcs.array_shape = array.shape
     identity_gwcs.pixel_shape = array.shape[::-1]
-    ds = Dataset(array, wcs=identity_gwcs, meta=meta, headers=Table())
+    ds = Dataset(array, wcs=identity_gwcs, meta=meta)
     # Sanity checks
     assert ds.data is array
     assert ds.wcs is identity_gwcs
@@ -191,7 +196,12 @@ def dataset(array, identity_gwcs):
 
 
 @pytest.fixture
-def dataset_3d(identity_gwcs_3d):
+def empty_meta():
+    return {'inventory': {}, 'headers': {}}
+
+
+@pytest.fixture
+def dataset_3d(identity_gwcs_3d, empty_meta):
     shape = (25, 50, 50)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
@@ -199,11 +209,11 @@ def dataset_3d(identity_gwcs_3d):
     identity_gwcs_3d.pixel_shape = array.shape[::-1]
     identity_gwcs_3d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_3d)
+    return Dataset(array, wcs=identity_gwcs_3d, meta=empty_meta)
 
 
 @pytest.fixture
-def dataset_4d(identity_gwcs_4d):
+def dataset_4d(identity_gwcs_4d, empty_meta):
     shape = (50, 60, 70, 80)
     x = np.ones(shape)
     array = da.from_array(x, tuple(shape))
@@ -211,7 +221,7 @@ def dataset_4d(identity_gwcs_4d):
     identity_gwcs_4d.pixel_shape = array.shape[::-1]
     identity_gwcs_4d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_4d)
+    return Dataset(array, wcs=identity_gwcs_4d, meta=empty_meta)
 
 
 @pytest.fixture
