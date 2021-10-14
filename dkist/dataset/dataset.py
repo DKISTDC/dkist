@@ -144,7 +144,7 @@ class Dataset(NDCube):
         """
         Information regarding the quality of the observations.
         """
-        return self.meta["quality"]
+        return self.meta.get("quality", None)
 
     @property
     def files(self):
