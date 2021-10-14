@@ -1,6 +1,3 @@
-import glob
-from pathlib import Path
-
 import numpy as np
 
 import asdf
@@ -14,8 +11,9 @@ from astropy.time import Time
 from gwcs import coordinate_frames as cf
 from sunpy.time import parse_time
 
-from dkist.asdf_maker.generator import table_from_headers
-from dkist.asdf_maker.helpers import generate_lookup_table, references_from_filenames
+from dkist_inventory.asdf_generator import references_from_filenames
+from dkist_inventory.inventory import table_from_headers
+from dkist_inventory.transforms import generate_lookup_table
 
 
 def map_to_transform(smap):
@@ -59,8 +57,8 @@ def map_to_transform(smap):
 
 
 def main():
-    path = Path('~/Git/DKIST/dkist/dkist/data/test/EIT').expanduser()
-    files = glob.glob(str(path / '*.fits'))
+    from dkist.data.test import rootdir
+    files = list((rootdir / "EIT").glob("*.fits"))
 
     files.sort()
     files = np.array(files)
@@ -117,19 +115,20 @@ def main():
 
     print(wcs(*[1*u.pix]*3, with_units=True))
 
-    ac = references_from_filenames(files, np.asanyarray(headers), (len(files),), relative_to=str(path))
+    ac = references_from_filenames(files, np.asanyarray(headers), (len(files),), relative_to=str(rootdir / "EIT"))
+    ac.basepath = rootdir / "EIT" # TODO: We shouldn't need to do this really
 
     from dkist.dataset import Dataset
 
-    ds = Dataset(ac.array, wcs, meta=None, headers=table_from_headers(headers))
-    ds._array_container = ac
+    ds = Dataset(ac._generate_array(), wcs, headers=table_from_headers(headers))
+    ds._file_manager = ac
 
     tree = {
         'dataset': ds
     }
 
     with asdf.AsdfFile(tree) as ff:
-        filename = path / "eit_test_dataset.asdf"
+        filename = rootdir / "EIT" / "eit_test_dataset.asdf"
         ff.write_to(filename)
         print("Saved to : {}".format(filename))
 
