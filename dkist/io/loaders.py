@@ -91,17 +91,16 @@ class AstropyFITSLoader(BaseFITSLoader):
     """
 
     def _read_fits_array(self):
-        """
-        Make sure we cache the header while we have the file open.
-        """
         if not self.absolute_uri.exists():
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
             return da.from_delayed(delayed(np.broadcast_to)(np.nan, self.shape) * np.nan,
                                    self.shape, self.dtype)
 
-        with fits.open(self.absolute_uri, memmap=True,
-                       do_not_scale_image_data=False, mode="denywrite") as hdul:
+        with fits.open(self.absolute_uri,
+                       memmap=True,  # don't load the whole array into memory, let dask access the part it needs
+                       do_not_scale_image_data=True,  # don't scale as that would cause it to be loaded into memory
+                       mode="denywrite") as hdul:
 
             hdul.verify('fix')
             hdu = hdul[self.externalarray.target]
