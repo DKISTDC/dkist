@@ -6,6 +6,9 @@ but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
 
+__all__ = ['TiledDataset']
+
+
 class TiledDataset:
     """
     A class for holding a dataset where the spatial axes are tiled.
