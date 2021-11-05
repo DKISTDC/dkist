@@ -73,8 +73,8 @@ class TiledDataset(Collection):
         return True
 
     @property
-    def meta(self):
-        return self._meta
+    def inventory(self):
+        return self._inventory
 
     @property
     def combined_headers(self):
@@ -89,4 +89,4 @@ class TiledDataset(Collection):
         if isinstance(new_data, Dataset):
             return new_data
 
-        return type(self)(new_data, meta=self.meta)
+        return type(self)(new_data, inventory=self.inventory)
