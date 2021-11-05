@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from asdf.yamlutil import custom_tree_to_tagged_tree
