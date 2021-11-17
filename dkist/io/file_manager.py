@@ -247,6 +247,14 @@ class BaseFileManager:
 
 
 class FileManager(BaseFileManager):
+    """
+    Manage the collection of FITS files backing a `~dkist.Dataset`.
+
+    Each `~dkist.Dataset` object is backed by a number of FITS files, each holding a
+    slice of the total array. This class provides tools for inspecting and
+    retrieving these FITS files, as well as specifying where to load these
+    files from.
+    """
     def download(self, path="/~/", destination_endpoint=None, progress=True):
         """
         Start a Globus file transfer for all files in this Dataset.
