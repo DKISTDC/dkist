@@ -18,7 +18,24 @@ __all__ = ['TiledDataset']
 
 class TiledDataset(Collection):
     """
-    A class for holding a dataset where the spatial axes are tiled.
+    Holds a grid of `.Dataset` objects.
+
+    In the case where multiple images are taken in different locations on the
+    sky and the images do not share a common pixel grid they can not be
+    represented as a single `.Dataset` object.
+    This class represented these tiled or "mosaicked" data can be regridded to
+    be represented as a single `.Dataset`, but this involves some level of
+    interpolation, so it is not always done by default.
+
+    This `.TiledDataset` class can be sliced in an array-like fashion to
+    extract one or more `.Dataset` objects given their location in the grid.
+
+    .. note::
+
+        This class does not currently implement helper functions to regrid the
+        data. This functionality will be added in the future, see the reproject
+        and montage packages for possible ways to achieve this.
+
     """
 
     @classmethod
@@ -43,9 +60,9 @@ class TiledDataset(Collection):
 
         return cls(datasets, inventory)
 
-    def __init__(self, dataset_array, inventory={}):
+    def __init__(self, dataset_array, inventory=None):
         self._data = np.array(dataset_array, dtype=object)
-        self._inventory = inventory
+        self._inventory = inventory or {}
         if not self._validate_component_datasets(self._data, inventory):
             raise ValueError("All component datasets must have the same physical types and inventory dict")
 
@@ -74,14 +91,24 @@ class TiledDataset(Collection):
 
     @property
     def inventory(self):
+        """
+        The inventory record as kept by the data center for this dataset.
+        """
         return self._inventory
 
     @property
     def combined_headers(self):
+        """
+        A single `astropy.table.Table` containing all the FITS headers for all
+        files in this dataset.
+        """
         return vstack([ds.meta["headers"] for ds in self._data.flat])
 
     @property
     def shape(self):
+        """
+        The shape of the tiled grid.
+        """
         return self._data.shape
 
     def __getitem__(self, aslice):
