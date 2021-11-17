@@ -64,7 +64,10 @@ class TiledDataset(Collection):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
         if not self._validate_component_datasets(self._data, inventory):
-            raise ValueError("All component datasets must have the same physical types and inventory dict")
+            raise ValueError(
+                "All component datasets must have the same"
+                " physical types and inventory dict"
+            )
 
     def __contains__(self, x):
         return self._data.__contains__(x)
@@ -74,6 +77,13 @@ class TiledDataset(Collection):
 
     def __iter__(self):
         self._data.__iter__()
+
+    def __getitem__(self, aslice):
+        new_data = self._data[aslice]
+        if isinstance(new_data, Dataset):
+            return new_data
+
+        return type(self)(new_data, inventory=self.inventory)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
@@ -111,9 +121,5 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
-    def __getitem__(self, aslice):
-        new_data = self._data[aslice]
-        if isinstance(new_data, Dataset):
-            return new_data
-
-        return type(self)(new_data, inventory=self.inventory)
+    # TODO: def plot()
+    # TODO: def regrid()
