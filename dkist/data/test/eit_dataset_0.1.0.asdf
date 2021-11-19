@@ -9,7 +9,7 @@ history:
   extensions:
   - !core/extension_metadata-1.0.0
     extension_class: dkist.io.asdf.extension.DKISTExtension
-    software: {name: dkist, version: 0.1.dev399+g18c5da3}
+    software: {name: dkist, version: 0.1.dev399}
   - !core/extension_metadata-1.0.0
     extension_class: astropy.io.misc.asdf.extension.AstropyExtension
     software: {name: astropy, version: '4.0'}
