@@ -6,12 +6,6 @@ import pytest
 from dkist import Dataset, TiledDataset
 
 
-@pytest.fixture
-def simple_tiled_dataset(dataset):
-    dataset_array = np.array([dataset]*4).reshape((2,2))
-    return TiledDataset(dataset_array, dataset.meta['inventory'])
-
-
 def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert isinstance(simple_tiled_dataset, TiledDataset)
     assert dataset in simple_tiled_dataset

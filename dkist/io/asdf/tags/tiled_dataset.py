@@ -25,7 +25,3 @@ class TiledDatasetType(DKISTType):
         tree["datasets"] = tiled_dataset._data.tolist()
 
         return custom_tree_to_tagged_tree(tree, ctx)
-
-    @classmethod
-    def assert_equal(cls, old, new):
-        pass
