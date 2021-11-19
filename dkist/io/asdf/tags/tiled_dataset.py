@@ -1,6 +1,6 @@
 from asdf.yamlutil import custom_tree_to_tagged_tree
 
-from dkist.tiled_dataset import TiledDataset
+from dkist.dataset.tiled_dataset import TiledDataset
 
 from ..types import DKISTType
 
@@ -9,7 +9,7 @@ __all__ = ["DatasetType"]
 
 class TiledDatasetType(DKISTType):
     name = "tiled_dataset"
-    types = ["dkist.dataset.tiled_dataset.TiledDataset"]
+    types = ["dkist.dataset.TiledDataset"]
     requires = ["dkist"]
     version = "0.1.0"
     supported_versions = ["0.1.0"]
@@ -21,8 +21,8 @@ class TiledDatasetType(DKISTType):
     @classmethod
     def to_tree(cls, tiled_dataset, ctx):
         tree = {}
-        tree["datasets"] = tiled_datasets._data.tolist()
-        tree["inventory"] = tiled_datasets._inventory
+        tree["inventory"] = tiled_dataset._inventory
+        tree["datasets"] = tiled_dataset._data.tolist()
 
         return custom_tree_to_tagged_tree(tree, ctx)
 
