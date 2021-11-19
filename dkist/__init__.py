@@ -5,7 +5,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 import astropy.config as _config
 
-from .dataset import Dataset  # noqa
+from .dataset import Dataset, TiledDataset  # noqa
 from .utils.sysinfo import system_info  # noqa
 
 try:
@@ -14,7 +14,7 @@ except DistributionNotFound:
     # package is not installed
     __version__ = "unknown"
 
-__all__ = ['Dataset', 'system_info']
+__all__ = ['TiledDataset', 'Dataset', 'system_info']
 
 
 def write_default_config():

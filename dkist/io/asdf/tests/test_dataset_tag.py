@@ -30,22 +30,37 @@ def array_container():
 
 
 @pytest.mark.parametrize("tagobj",
-                         ["array_container",
-                          "dataset"],
+                         [
+                             "array_container",
+                             "dataset",
+                             "simple_tiled_dataset",
+                         ],
                          indirect=True)
 def test_tags(tagobj, tmpdir):
     tree = {'object': tagobj}
     helpers.assert_roundtrip_tree(tree, tmpdir)
 
 
-def test_save_dataset_without_file_schema(tmpdir, dataset):
-    tree = {'dataset': dataset}
+@pytest.mark.parametrize("tagobj",
+                         [
+                             "dataset",
+                             "simple_tiled_dataset",
+                         ],
+                         indirect=True)
+def test_save_dataset_without_file_schema(tagobj, tmpdir):
+    tree = {'dataset': tagobj}
     with asdf.AsdfFile(tree) as afile:
         afile.write_to(Path(tmpdir / "test.asdf"))
 
 
-def test_save_dataset_with_file_schema(tmpdir, dataset):
-    tree = {'dataset': dataset}
+@pytest.mark.parametrize("tagobj",
+                         [
+                             "dataset",
+                             "simple_tiled_dataset",
+                         ],
+                         indirect=True)
+def test_save_dataset_with_file_schema(tagobj, tmpdir):
+    tree = {'dataset': tagobj}
     with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to(Path(tmpdir / "test.asdf"))

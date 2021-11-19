@@ -1,7 +1,4 @@
-
 import numpy as np
-
-from asdf.yamlutil import custom_tree_to_tagged_tree
 
 from dkist.dataset import Dataset
 
@@ -51,7 +48,7 @@ class DatasetType(DKISTType):
         if dataset.mask:
             node["mask"] = dataset.mask
 
-        return custom_tree_to_tagged_tree(node, ctx)
+        return node
 
     @staticmethod
     def _assert_wcs_equal(old, new):

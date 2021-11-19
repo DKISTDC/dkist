@@ -5,6 +5,7 @@ from asdf.util import filepath_to_url
 
 from .tags.array_container import ArrayContainerType  # noqa
 from .tags.dataset import DatasetType  # noqa
+from .tags.tiled_dataset import TiledDatasetType  # noqa
 from .types import DKISTType
 
 __all__ = ['DKISTExtension']

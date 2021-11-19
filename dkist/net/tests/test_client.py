@@ -154,7 +154,8 @@ def test_apply_or_and(s):
     assert isinstance(s, (attr.AttrOr, attr.DataAttr, attr.AttrAnd))
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+          deadline=None)
 @given(dst.query_and())
 def test_search_query_and(mocked_client, query):
     res = mocked_client.search(query)
@@ -162,7 +163,8 @@ def test_search_query_and(mocked_client, query):
     assert len(res) == 1
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+          deadline=None)
 @given(dst.query_or_composite())
 def test_search_query_or(mocked_client, query):
     res = mocked_client.search(query)

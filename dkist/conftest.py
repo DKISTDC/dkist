@@ -1,3 +1,4 @@
+import copy
 from pathlib import Path
 
 import dask.array as da
@@ -15,6 +16,7 @@ from sunpy.coordinates.frames import Helioprojective
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
+from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
@@ -229,3 +231,12 @@ def eit_dataset():
     eitdir = Path(rootdir) / "EIT"
     with asdf.open(eitdir / "eit_test_dataset.asdf") as f:
         return f.tree['dataset']
+
+
+@pytest.fixture
+def simple_tiled_dataset(dataset):
+    datasets = [copy.deepcopy(dataset) for i in range(4)]
+    for ds in datasets:
+        ds.meta['inventory'] = dataset.meta['inventory']
+    dataset_array = np.array(datasets).reshape((2,2))
+    return TiledDataset(dataset_array, dataset.meta['inventory'])
