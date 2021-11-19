@@ -85,15 +85,13 @@ class TiledDataset(Collection):
     def _validate_component_datasets(datasets, inventory):
         datasets = datasets.flat
         inv_1 = datasets[0].meta["inventory"]
-        # TODO: Change this to is not when asdf reference code is fixed
-        if inv_1 and inv_1 != inventory:
+        if inv_1 and inv_1 is not inventory:
             raise ValueError("The inventory record of the first dataset does not match the one passed to TiledDataset")
         pt_1 = datasets[0].wcs.world_axis_physical_types
         for ds in datasets[1:]:
             if ds.wcs.world_axis_physical_types != pt_1:
                 raise ValueError("The physical types do not match between all datasets")
-            # TODO: Change this to is not when asdf reference code is fixed
-            if ds.meta["inventory"] and ds.meta["inventory"] != inventory:
+            if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
                 raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
         return True
 
