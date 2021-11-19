@@ -8,7 +8,7 @@ from dkist import Dataset, TiledDataset
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert isinstance(simple_tiled_dataset, TiledDataset)
-    assert dataset in simple_tiled_dataset
+    assert simple_tiled_dataset._data[0, 0] in simple_tiled_dataset
     assert 5 not in simple_tiled_dataset
     assert all([isinstance(t, Dataset) for t in simple_tiled_dataset.flat])
     assert all([t.shape == (2,) for t in simple_tiled_dataset])
