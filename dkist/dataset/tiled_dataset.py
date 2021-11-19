@@ -63,11 +63,7 @@ class TiledDataset(Collection):
     def __init__(self, dataset_array, inventory=None):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
-        if not self._validate_component_datasets(self._data, inventory):
-            raise ValueError(
-                "All component datasets must have the same"
-                " physical types and inventory dict"
-            )
+        self._validate_component_datasets(self._data, inventory)
 
     def __contains__(self, x):
         return self._data.__contains__(x)
@@ -76,7 +72,7 @@ class TiledDataset(Collection):
         return self._data.__len__()
 
     def __iter__(self):
-        self._data.__iter__()
+        return self._data.__iter__()
 
     def __getitem__(self, aslice):
         new_data = self._data[aslice]
@@ -90,14 +86,21 @@ class TiledDataset(Collection):
         datasets = datasets.flat
         inv_1 = datasets[0].meta["inventory"]
         if inv_1 and inv_1 is not inventory:
-            return False
+            raise ValueError("The inventory record of the first dataset does not match the one passed to TiledDataset")
         pt_1 = datasets[0].wcs.world_axis_physical_types
         for ds in datasets[1:]:
             if ds.wcs.world_axis_physical_types != pt_1:
-                return False
+                raise ValueError("The physical types do not match between all datasets")
             if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
-                return False
+                raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
         return True
+
+    @property
+    def flat(self):
+        """
+        Represent this `.TiledDataset` as a 1D array.
+        """
+        return type(self)(self._data.flat, self.inventory)
 
     @property
     def inventory(self):
