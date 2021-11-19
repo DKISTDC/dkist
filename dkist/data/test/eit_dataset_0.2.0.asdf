@@ -12,7 +12,7 @@ history:
     software: !core/software-1.0.0 {name: asdf, version: 2.8.1}
   - !core/extension_metadata-1.0.0
     extension_class: dkist.io.asdf.extension.DKISTExtension
-    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b3.dev0+g9c24957.d20211013}
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b3.dev0}
 dataset: !<tag:dkist.nso.edu:dkist/dataset-0.2.0>
   data: !<tag:dkist.nso.edu:dkist/array_container-0.2.0>
     datatype: float64
