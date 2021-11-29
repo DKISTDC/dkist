@@ -10,6 +10,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
+from astropy.modeling import Model, Parameter
 from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
@@ -28,15 +29,27 @@ def array():
     return da.from_array(x, tuple(shape))
 
 
+class TwoDScale(Model):
+    n_inputs = 2
+    n_outputs = 2
+    scale = Parameter()
+    separable = False
+
+    def evaluate(self, x, y, scale=1*u.deg):
+        return u.Quantity([x, y]) * scale
+
+
 @pytest.fixture
 def identity_gwcs():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    identity = TwoDScale(1 * u.arcsec / u.pixel)
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1),
+                                  name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
-                                  unit=(u.arcsec, u.arcsec))
+                                  unit=(u.arcsec, u.arcsec),
+                                  axis_physical_types=("custom:pos.helioprojective.lat", "custom:pos.helioprojective.lon"))
     detector_frame = cf.CoordinateFrame(name="detector", naxes=2,
                                         axes_order=(0, 1),
                                         axes_type=("pixel", "pixel"),
@@ -53,14 +66,14 @@ def identity_gwcs_3d():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = (m.Multiply(1 * u.arcsec / u.pixel) &
-                m.Multiply(1 * u.arcsec / u.pixel) &
+    identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.nm / u.pixel))
 
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"),
-                                  unit=(u.arcsec, u.arcsec))
+                                  unit=(u.arcsec, u.arcsec),
+                                  axis_physical_types=("custom:pos.helioprojective.lon", "custom:pos.helioprojective.lat"))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm, axes_names=("wavelength",))
 
     frame = cf.CompositeFrame([sky_frame, wave_frame])
@@ -82,14 +95,14 @@ def identity_gwcs_3d_temporal():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = (m.Multiply(1 * u.arcsec / u.pixel) &
-                m.Multiply(1 * u.arcsec / u.pixel) &
+    identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.s / u.pixel))
 
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"),
-                                  unit=(u.arcsec, u.arcsec))
+                                  unit=(u.arcsec, u.arcsec),
+                                  axis_physical_types=("custom:pos.helioprojective.lon", "custom:pos.helioprojective.lat"))
     time_frame = cf.TemporalFrame(Time("2020-01-01T00:00", format="isot", scale="utc"),
                                   axes_order=(2,), unit=u.s)
 
@@ -110,11 +123,12 @@ def identity_gwcs_4d():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
     """
-    identity = (m.Multiply(1 * u.arcsec/u.pixel) & m.Multiply(1 * u.arcsec/u.pixel) &
+    identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.nm/u.pixel) & m.Multiply(1 * u.s/u.pixel))
     sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
-                                  unit=(u.arcsec, u.arcsec))
+                                  unit=(u.arcsec, u.arcsec),
+                                  axis_physical_types=("custom:pos.helioprojective.lon", "custom:pos.helioprojective.lat"))
     wave_frame = cf.SpectralFrame(axes_order=(2, ), unit=u.nm)
     time_frame = cf.TemporalFrame(Time("2020-01-01T00:00", format="isot", scale="utc"), axes_order=(3, ), unit=u.s)
 
