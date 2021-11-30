@@ -1,4 +1,0 @@
-The inventory record and the headers table are now both stored in the
-``Dataset.meta`` dict rather than headers being it's own attribute. This means
-it is more likely to be carried through correctly when doing operations
-designed for ``NDCube`` objects.

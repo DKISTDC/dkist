@@ -1,3 +1,19 @@
+v1.0.0b3 (2021-11-30)
+=====================
+
+Features
+--------
+
+- The inventory record and the headers table are now both stored in the
+  ``Dataset.meta`` dict rather than headers being it's own attribute. This means
+  it is more likely to be carried through correctly when doing operations
+  designed for ``NDCube`` objects. (`#139 <https://github.com/DKISTDC/dkist/pull/139>`_)
+- Add support for tiled datasets in the spatial dimensions.
+
+  This adds a new class `.TiledDataset` which holds a 2D grid of `.Dataset`
+  objects, and associated asdf schemas to serialise them. (`#143 <https://github.com/DKISTDC/dkist/pull/143>`_)
+
+
 1.0.0b1 (2021-09-15)
 ====================
 

@@ -1,4 +1,0 @@
-Add support for tiled datasets in the spatial dimensions.
-
-This adds a new class `.TiledDataset` which holds a 2D grid of `.Dataset`
-objects, and associated asdf schemas to serialise them.
