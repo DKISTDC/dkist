@@ -38,18 +38,25 @@ class TwoDScale(Model):
     def evaluate(self, x, y, scale=1*u.deg):
         return u.Quantity([x, y]) * scale
 
+    @property
+    def inverse(self):
+        return TwoDScale(1 / self.scale)
+
 
 @pytest.fixture
 def identity_gwcs():
     """
     A simple 1-1 gwcs that converts from pixels to arcseconds
+
+    Note this WCS does not have a correct axis correlation matrix.
     """
-    identity = TwoDScale(1 * u.arcsec / u.pixel)
+    identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1),
                                   name='helioprojective',
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   unit=(u.arcsec, u.arcsec),
-                                  axis_physical_types=("custom:pos.helioprojective.lat", "custom:pos.helioprojective.lon"))
+                                  axis_physical_types=("custom:pos.helioprojective.lat",
+                                                       "custom:pos.helioprojective.lon"))
     detector_frame = cf.CoordinateFrame(name="detector", naxes=2,
                                         axes_order=(0, 1),
                                         axes_type=("pixel", "pixel"),
