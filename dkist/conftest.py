@@ -21,6 +21,9 @@ from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
+# Enforce the use of the new asdf-astropy package for testing
+asdf.get_config().remove_extension(package='astropy')
+
 
 @pytest.fixture
 def array():
