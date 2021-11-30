@@ -200,7 +200,7 @@ def test_cant_handle_query(client, query):
 
 
 @no_vso
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture], deadline=None)
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client
