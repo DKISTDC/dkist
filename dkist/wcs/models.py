@@ -1,4 +1,7 @@
+from typing import Union, Iterable
+
 import numpy as np
+import numpy.typing as npt
 
 import astropy.modeling.models as m
 import astropy.units as u
@@ -7,96 +10,60 @@ from astropy.modeling import CompoundModel, Model, Parameter
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
            'VaryingCelestialTransform',
-           'BaseVaryingCelestialTransform',
-           'SimpleCelestialTransform']
+           'BaseVaryingCelestialTransform']
 
 
-# TODO: (soon) Decide if we want to keep this model around at all.
-# Pros: Easier to reason with, easier for users to modify
-# Cons: non-standard, need to serialise it, no hard requirement on it, just
-# need a function to generate the compound model for the given input
-class SimpleCelestialTransform(Model):
+def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
+                                 cdelt: Union[Iterable[float], u.Quantity],
+                                 pc: Union[npt.ArrayLike, u.Quantity],
+                                 crval: Union[Iterable[float], u.Quantity],
+                                 lon_pole: Union[float, u.Quantity] = None,
+                                 projection: Model = m.Pix2Sky_TAN()) -> CompoundModel:
     """
-    A representation of a celestial WCS as described in the FITS specification.
+    Create a simple celestial transform from FITS like parameters.
+
+    Supports unitful or unitless parameters, but if any parameters have units
+    all must have units.
+
+    Parameters
+    ----------
+    crpix
+        The reference pixel.
+    crval
+        The world coordinate at the reference pixel.
+    pc
+        The rotation matrix for the affine transform. If specifying parameters
+        with units this should have celestial (``u.deg``) units.
+    lon_pole
+        The longitude of the celestial pole, defaults to 180 degrees.
+    projection
+        The map projection to use, defaults to ``TAN``.
     """
+    spatial_unit = None
+    if hasattr(crval[0], "unit"):
+        spatial_unit = crval[0].unit
+    if lon_pole is None:
+        lon_pole = 180
+    if spatial_unit is not None and spatial_unit.is_equivalent(u.deg):
+        lon_pole = lon_pole * u.deg
 
-    n_inputs = 2
-    n_outputs = 2
+    # Make translation unitful if all parameters have units
+    translation = (0, 0)
+    if spatial_unit is not None:
+        translation *= pc.unit
+        # If we have units then we need to convert all things to Quantity
+        # as they might be Parameter classes
+        crpix = u.Quantity(crpix)
+        cdelt = u.Quantity(cdelt)
+        crval = u.Quantity(crval)
+        lon_pole = u.Quantity(lon_pole)
+        pc = u.Quantity(pc)
 
-    crpix = Parameter()
-    cdelt = Parameter()
-    pc = Parameter(default=[[1.0, 0.0], [0.0, 1.0]])
-    crval = Parameter()
-    lon_pole = Parameter(default=180)
-
-    standard_broadcasting = False
-    _separable = False
-    _input_units_allow_dimensionless = True
-
-    @property
-    def input_units(self):
-        return {"x": u.pix, "y": u.pix}
-
-    def __init__(self, *args, projection=m.Pix2Sky_TAN(), **kwargs):
-        super().__init__(*args, **kwargs)
-        if type(self) is SimpleCelestialTransform:
-            self.inputs = ("x", "y")
-        self.outputs = ("lon", "lat")
-        if not isinstance(projection, m.Pix2SkyProjection):
-            raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
-        self.projection = projection
-
-    # TODO: Evaluate if this method should be replaced with
-    # https://github.com/spacetelescope/gwcs/blob/master/gwcs/utils.py#L328
-    def _generate_transform(self,
-                            crpix,
-                            cdelt,
-                            pc,
-                            crval,
-                            lon_pole):
-
-        # Make translation unitful if all parameters have units
-        translation = (0, 0)
-        if hasattr(pc, "unit") and pc.unit is not None:
-            translation *= pc.unit
-            # If we have units then we need to convert all things to Quantity
-            # as they might be Parameter classes
-            crpix = u.Quantity(crpix)
-            cdelt = u.Quantity(cdelt)
-            crval = u.Quantity(crval)
-            lon_pole = u.Quantity(lon_pole)
-            pc = u.Quantity(pc)
-
-        shift = m.Shift(-crpix[0]) & m.Shift(-crpix[1])
-        scale = m.Multiply(cdelt[0]) & m.Multiply(cdelt[1])
-        rot = m.AffineTransformation2D(pc, translation=translation)
-        skyrot = m.RotateNative2Celestial(crval[0], crval[1], lon_pole)
-        return shift | scale | rot | self.projection | skyrot
-
-    def evaluate(self,
-                 x,
-                 y,
-                 crpix,
-                 cdelt,
-                 pc,
-                 crval,
-                 lon_pole):
-
-        celestial = self._generate_transform(crpix[0],
-                                             cdelt[0],
-                                             pc[0],
-                                             crval[0],
-                                             lon_pole)
-        return celestial(x, y)
-
-    @property
-    def inverse(self):
-        celestial = self._generate_transform(self.crpix,
-                                             self.cdelt,
-                                             self.pc,
-                                             self.crval,
-                                             self.lon_pole)
-        return celestial.inverse
+    shift = m.Shift(-crpix[0]) & m.Shift(-crpix[1])
+    scale = m.Multiply(cdelt[0]) & m.Multiply(cdelt[1])
+    rot = m.AffineTransformation2D(pc, translation=translation)
+    skyrot = m.RotateNative2Celestial(crval[0], crval[1], lon_pole)
+    return shift | scale | rot | projection | skyrot
 
 
 class BaseVaryingCelestialTransform(Model):
@@ -184,22 +151,22 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
 
     def transform_at_index(self, z):
         pc, crval = self.get_pc_crval(z, self.pc_table, self.crval_table)
-        return SimpleCelestialTransform(crpix=self.crpix,
-                                        cdelt=self.cdelt,
-                                        pc=pc,
-                                        crval=crval,
-                                        lon_pole=self.lon_pole,
-                                        projection=self.projection)
+        return generate_celestial_transform(crpix=self.crpix,
+                                            cdelt=self.cdelt,
+                                            pc=pc,
+                                            crval=crval,
+                                            lon_pole=self.lon_pole,
+                                            projection=self.projection)
 
     def evaluate(self, x, y, z, crpix, cdelt, lon_pole):
         pc, crval = self.get_pc_crval(z, self.pc_table, self.crval_table)
 
-        sct = SimpleCelestialTransform(crpix=crpix[0],
-                                       cdelt=cdelt[0],
-                                       pc=pc,
-                                       crval=crval,
-                                       lon_pole=lon_pole[0],
-                                       projection=self.projection)
+        sct = generate_celestial_transform(crpix=crpix[0],
+                                           cdelt=cdelt[0],
+                                           pc=pc,
+                                           crval=crval,
+                                           lon_pole=lon_pole[0],
+                                           projection=self.projection)
         return sct(x, y)
 
     @property
@@ -237,12 +204,12 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
                                       self.pc_table,
                                       self.crval_table)
 
-        sct = SimpleCelestialTransform(crpix=crpix[0],
-                                       cdelt=cdelt[0],
-                                       pc=pc,
-                                       crval=crval,
-                                       lon_pole=lon_pole[0],
-                                       projection=self.projection)
+        sct = generate_celestial_transform(crpix=crpix[0],
+                                           cdelt=cdelt[0],
+                                           pc=pc,
+                                           crval=crval,
+                                           lon_pole=lon_pole[0],
+                                           projection=self.projection)
 
         return sct.inverse(lon, lat)
 
@@ -277,21 +244,21 @@ class CoupledCompoundModel(CompoundModel):
 
     The forward transform uses the "z" pixel dimension as input to both the
     Celestial and Temporal models, this leads to the following transform in the
-    forward direction:
+    forward direction::
 
-      x  y           z
-      │  │           │
-      │  │  ┌────────┤
-      │  │  │        │
-      ▼  ▼  ▼        ▼
-    ┌─────────┐  ┌────────┐
-    │Celestial│  │Temporal│
-    └─┬───┬───┘  └───┬────┘
-      │   │          │
-      │   │          │
-      │   │          │
-      ▼   ▼          ▼
-     lon lat       time
+        x  y           z
+        │  │           │
+        │  │  ┌────────┤
+        │  │  │        │
+        ▼  ▼  ▼        ▼
+      ┌─────────┐  ┌────────┐
+      │Celestial│  │Temporal│
+      └─┬───┬───┘  └───┬────┘
+        │   │          │
+        │   │          │
+        │   │          │
+        ▼   ▼          ▼
+       lon lat       time
 
     This could trivially be reproduced using `~astropy.modeling.models.Mapping`.
 
@@ -301,24 +268,24 @@ class CoupledCompoundModel(CompoundModel):
     duplicated as an input to the Celestial transform's inverse.
     This is achieved by the use of the ``Mapping`` models in
     ``CoupledCompoundModel.inverse`` to create a multi-stage compound model
-    which duplicates the output of the right hand side model.
+    which duplicates the output of the right hand side model::
 
-     lon lat       time
-      │   │         │
-      │   │         ▼
-      │   │     ┌─────────┐
-      │   │     │Temporal'│
-      │   │     └──┬──┬───┘
-      │   │    z   │  │
-      │   │  ┌─────┘  │
-      │   │  │        │
-      ▼   ▼  ▼        │
-    ┌──────────┐      │
-    │Celestial'│      │
-    └─┬───┬────┘      │
-      │   │           │
-      ▼   ▼           ▼
-      x   y           z
+       lon lat       time
+        │   │         │
+        │   │         ▼
+        │   │     ┌─────────┐
+        │   │     │Temporal'│
+        │   │     └──┬──┬───┘
+        │   │    z   │  │
+        │   │  ┌─────┘  │
+        │   │  │        │
+        ▼   ▼  ▼        │
+      ┌──────────┐      │
+      │Celestial'│      │
+      └─┬───┬────┘      │
+        │   │           │
+        ▼   ▼           ▼
+        x   y           z
 
     """
 
