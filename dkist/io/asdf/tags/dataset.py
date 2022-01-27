@@ -52,12 +52,8 @@ class DatasetType(DKISTType):
 
     @staticmethod
     def _assert_wcs_equal(old, new):
-        from asdf.tests import helpers
         assert old.name == new.name
         assert len(old.available_frames) == len(new.available_frames)
-        for old_step, new_step in zip(old.pipeline, new.pipeline):
-            helpers.assert_tree_match(old_step.frame, new_step.frame)
-            helpers.assert_tree_match(old_step.transform, new_step.transform)
 
     @classmethod
     def _assert_table_equal(cls, old, new):
