@@ -324,6 +324,6 @@ class CoupledCompoundModel(CompoundModel):
         # This mapping duplicates the output of the right inverse to be fed
         # into the left and also out unmodified at the end of the transform
         inter_mapping = mapping + list(range(max(mapping) + 1, max(mapping) + 1 + right_inverse.n_outputs)) * 2
-        step2 = m.Mapping(inter_mapping) | (left_inverse & m.Mapping(list(range(right_inverse.n_outputs))))
+        step2 = m.Mapping(inter_mapping) | (left_inverse & m.Identity(right_inverse.n_outputs))
 
         return step1 | step2
