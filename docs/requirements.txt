@@ -1,2 +1,1 @@
-# git deps for read the docs
-git+https://github.com/sunpy/ndcube
+git+https://bitbucket.org/dkistdc/dkist-sphinx-theme.git@pydata
