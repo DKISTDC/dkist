@@ -38,10 +38,17 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
         The longitude of the celestial pole, defaults to 180 degrees.
     projection
         The map projection to use, defaults to ``TAN``.
+
+    Notes
+    -----
+
+    This function has not been tested with more complex projections. Ensure
+    that your lon_pole is correct for your projection.
     """
     spatial_unit = None
     if hasattr(crval[0], "unit"):
         spatial_unit = crval[0].unit
+    # TODO: Note this assumption is only valid for certain projections.
     if lon_pole is None:
         lon_pole = 180
     if spatial_unit is not None:
