@@ -1,7 +1,11 @@
-from typing import Union, Iterable
+from typing import Any, Union, Iterable
 
 import numpy as np
-import numpy.typing as npt
+
+try:
+    from numpy.typing import ArrrayLike  # NOQA
+except ImportError:
+    ArrayLike = Any
 
 import astropy.modeling.models as m
 import astropy.units as u
@@ -15,7 +19,7 @@ __all__ = ['CoupledCompoundModel',
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
                                  cdelt: Union[Iterable[float], u.Quantity],
-                                 pc: Union[npt.ArrayLike, u.Quantity],
+                                 pc: Union[ArrayLike, u.Quantity],
                                  crval: Union[Iterable[float], u.Quantity],
                                  lon_pole: Union[float, u.Quantity] = None,
                                  projection: Model = m.Pix2Sky_TAN()) -> CompoundModel:
