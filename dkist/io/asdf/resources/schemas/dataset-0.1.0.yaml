@@ -1,8 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "http://dkist.nso.edu/schemas/dkist/dataset-0.2.0"
-tag: "tag:dkist.nso.edu:dkist/dataset-0.2.0"
+id: "asdf://dkist.nso.edu/schemas/dataset-0.1.0"
 
 title: |
   A DKIST Level 1 Dataset object.
@@ -12,13 +11,11 @@ description:
 type: object
 properties:
   data:
-    $ref: "http://dkist.nso.edu/schemas/dkist/array_container-0.2.0"
+    $ref: "asdf://dkist.nso.edu/schemas/array_container-0.2.0"
 
   wcs:
     description: The coordinate system for the complete dataset.
-    anyOf:
-      - $ref: "http://stsci.edu/schemas/gwcs/wcs-1.0.0"
-      - $ref: "http://stsci.edu/schemas/gwcs/wcs-1.1.0"
+    $ref: "http://stsci.edu/schemas/gwcs/wcs-1.0.0"
 
   headers:
     description: A table of all the headers for the constituent files.
