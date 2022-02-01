@@ -1,5 +1,3 @@
-import numpy as np
-
 from dkist.dataset import Dataset
 
 from ..types import DKISTType
@@ -49,40 +47,3 @@ class DatasetType(DKISTType):
             node["mask"] = dataset.mask
 
         return node
-
-    @staticmethod
-    def _assert_wcs_equal(old, new):
-        assert old.name == new.name
-        assert len(old.available_frames) == len(new.available_frames)
-
-    @classmethod
-    def _assert_table_equal(cls, old, new):
-        from asdf.tags.core.ndarray import NDArrayType
-        assert old.meta == new.meta
-        try:
-            NDArrayType.assert_equal(np.array(old), np.array(new))
-        except (AttributeError, TypeError, ValueError):
-            for col0, col1 in zip(old, new):
-                try:
-                    NDArrayType.assert_equal(np.array(col0), np.array(col1))
-                except (AttributeError, TypeError, ValueError):
-                    assert col0 == col1
-
-    @classmethod
-    def assert_equal(cls, old, new):
-        """
-        This method is used by asdf to test that to_tree > from_tree gives an
-        equivalent object.
-        """
-        old_headers = old.meta.pop("headers")
-        new_headers = new.meta.pop("headers")
-        cls._assert_table_equal(old_headers, new_headers)
-        assert old.meta == new.meta
-        old.meta["headers"] = old_headers
-        new.meta["headers"] = new_headers
-        cls._assert_wcs_equal(old.wcs, new.wcs)
-        ac_new = new.files.external_array_references
-        ac_old = old.files.external_array_references
-        assert ac_new == ac_old
-        assert old.unit == new.unit
-        assert old.mask == new.mask

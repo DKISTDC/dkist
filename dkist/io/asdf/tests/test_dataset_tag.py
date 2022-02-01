@@ -7,12 +7,13 @@ import pytest
 import asdf
 import astropy.table
 import gwcs
-from asdf.tests import helpers
 
 import dkist
 from dkist.data.test import rootdir
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
+
+from .helpers import roundtrip_object
 
 
 @pytest.fixture
@@ -29,17 +30,40 @@ def array_container():
                        loader=AstropyFITSLoader)
 
 
-@pytest.mark.parametrize("tagobj",
-                         [
-                             "array_container",
-                             "dataset",
-                             "simple_tiled_dataset",
-                         ],
-                         indirect=True)
-def test_tags(tagobj, tmpdir):
-    tree = {'object': tagobj}
-    helpers.assert_roundtrip_tree(tree, tmpdir)
+def test_roundtrip_array_container(array_container):
+    newobj = roundtrip_object(array_container)
+    assert newobj == array_container
 
+
+def assert_dataset_equal(new, old):
+    old_headers = old.meta.pop("headers")
+    new_headers = new.meta.pop("headers")
+    assert old_headers.columns == new_headers.columns
+    assert len(old_headers) == len(new_headers)
+    assert old.meta == new.meta
+    old.meta["headers"] = old_headers
+    new.meta["headers"] = new_headers
+    assert old.wcs.name == new.wcs.name
+    assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
+    ac_new = new.files.external_array_references
+    ac_old = old.files.external_array_references
+    assert ac_new == ac_old
+    assert old.unit == new.unit
+    assert old.mask == new.mask
+
+
+def test_roundtrip_dataset(dataset):
+    newobj = roundtrip_object(dataset)
+    assert_dataset_equal(newobj, dataset)
+
+
+def test_roundtrip_tiled_dataset(simple_tiled_dataset):
+    newobj = roundtrip_object(simple_tiled_dataset)
+
+    assert simple_tiled_dataset.inventory == newobj.inventory
+
+    for old_ds, new_ds in zip(simple_tiled_dataset.flat, newobj.flat):
+        assert_dataset_equal(new_ds, old_ds)
 
 @pytest.mark.parametrize("tagobj",
                          [
