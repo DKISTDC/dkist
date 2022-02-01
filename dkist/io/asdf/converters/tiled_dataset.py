@@ -1,5 +1,4 @@
 from asdf.extension import Converter
-from asdf.yamlutil import custom_tree_to_tagged_tree
 
 
 class TiledDatasetConverter(Converter):
@@ -7,7 +6,7 @@ class TiledDatasetConverter(Converter):
         "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
         "asdf://dkist.nso.edu/tiled_dataset-1.0.0",
     ]
-    types = ["dkist.dataset.TiledDataset"]
+    types = ["dkist.dataset.tiled_dataset.TiledDataset"]
 
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
@@ -18,5 +17,4 @@ class TiledDatasetConverter(Converter):
         tree = {}
         tree["inventory"] = tiled_dataset._inventory
         tree["datasets"] = tiled_dataset._data.tolist()
-
-        return custom_tree_to_tagged_tree(tree, ctx)
+        return tree

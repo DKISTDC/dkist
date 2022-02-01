@@ -15,7 +15,9 @@ properties:
       - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.1.0"
       - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.2.0"
       - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.3.0"
+      - $ref: "http://dkist.nso.edu/schemas/dkist/dataset-1.0.0"
       - $ref: "http://dkist.nso.edu/schemas/dkist/tiled_dataset-0.1.0"
+      - $ref: "http://dkist.nso.edu/schemas/dkist/tiled_dataset-1.0.0"
 
 required: [dataset]
 additionalProperties: true

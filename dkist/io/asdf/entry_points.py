@@ -39,7 +39,11 @@ def get_extensions():
     """
     Get the list of extensions.
     """
+    converters=[FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
-        converters=[FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()])
+                                   converters=converters),
+        # This manifest handles all pre-refactor tags
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0",
+                                   converters=converters)
     ]
