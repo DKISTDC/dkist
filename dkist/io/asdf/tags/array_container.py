@@ -18,11 +18,3 @@ class ArrayContainerType(DKISTType):
     @classmethod
     def to_tree(cls, array_container, ctx):
         return array_container.to_tree(array_container, ctx)
-
-    @classmethod
-    def assert_equal(cls, old, new):
-        """
-        This method is used by asdf to test that to_tree > from_tree gives an
-        equivalent object.
-        """
-        assert new == old
