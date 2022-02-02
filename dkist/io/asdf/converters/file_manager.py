@@ -14,7 +14,7 @@ class FileManagerConverter(Converter):
         from dkist.io.file_manager import FileManager
         from dkist.io.loaders import AstropyFITSLoader
 
-        filepath = Path((".").replace("file:", ""))
+        filepath = Path((ctx.uri or ".").replace("file:", ""))
         base_path = filepath.parent
 
         file_manager = FileManager(node["fileuris"],
