@@ -11,7 +11,7 @@ description:
 type: object
 properties:
   data:
-    $ref: "asdf://dkist.nso.edu/schemas/array_container-0.2.0"
+    $ref: "asdf://dkist.nso.edu/schemas/file_manager-1.0.0"
 
   wcs:
     description: The coordinate system for the complete dataset.

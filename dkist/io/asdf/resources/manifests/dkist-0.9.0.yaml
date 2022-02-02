@@ -6,7 +6,7 @@ title: DKIST extension
 description: ASDF schemas and tags for pre-1.0 DKIST tags.
 
 tags:
-  - schema_uri: "asdf://dkist.nso.edu/schemas/array_container-0.2.0"
+  - schema_uri: "asdf://dkist.nso.edu/schemas/file_manager-1.0.0"
     tag_uri: "tag:dkist.nso.edu:dkist/array_container-0.2.0"
   - schema_uri: "asdf://dkist.nso.edu/schemas/dataset-0.1.0"
     tag_uri: "tag:dkist.nso.edu:dkist/dataset-0.1.0"
