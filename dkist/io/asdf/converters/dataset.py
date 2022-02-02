@@ -21,7 +21,8 @@ class DatasetConverter(Converter):
 
         # Support older versions of the schema where headers was it's own top
         # level property
-        if "headers" in node and "headers" not in meta:
+        if tag in ("tag:dkist.nso.edu:dkist/dataset-0.1.0",
+                   "tag:dkist.nso.edu:dkist/dataset-0.2.0"):
             meta["inventory"] = node.get("meta")
             meta["headers"] = node["headers"]
 
