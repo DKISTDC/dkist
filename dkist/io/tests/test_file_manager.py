@@ -36,6 +36,7 @@ def test_slicing(file_manager, externalarray):
 
     array = file_manager._generate_array().compute()
     assert isinstance(array, np.ndarray)
+    assert not np.isnan(array).all()
 
     sliced_manager = file_manager[5:8]
     ext_shape = np.array(externalarray[5:8], dtype=object).shape
