@@ -1,5 +1,5 @@
 try:
-    from asdf.helpers import roundtrip_object
+    from asdf.testing.helpers import roundtrip_object
 except ImportError:
     from io import BytesIO
 
