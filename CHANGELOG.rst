@@ -10,7 +10,7 @@ Features
   designed for ``NDCube`` objects. (`#139 <https://github.com/DKISTDC/dkist/pull/139>`_)
 - Add support for tiled datasets in the spatial dimensions.
 
-  This adds a new class `.TiledDataset` which holds a 2D grid of `.Dataset`
+  This adds a new class `dkist.TiledDataset` which holds a 2D grid of `dkist.Dataset`
   objects, and associated asdf schemas to serialise them. (`#143 <https://github.com/DKISTDC/dkist/pull/143>`_)
 
 
