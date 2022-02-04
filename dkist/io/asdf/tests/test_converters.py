@@ -7,13 +7,12 @@ import pytest
 import asdf
 import astropy.table
 import gwcs
+from asdf.testing.helpers import roundtrip_object
 
 import dkist
 from dkist.data.test import rootdir
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
-
-from .helpers import roundtrip_object
 
 
 @pytest.fixture
