@@ -4,7 +4,7 @@ from asdf.extension import Converter
 class TiledDatasetConverter(Converter):
     tags = [
         "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
-        "asdf://dkist.nso.edu/tiled_dataset-1.0.0",
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.0.0",
     ]
     types = ["dkist.dataset.tiled_dataset.TiledDataset"]
 

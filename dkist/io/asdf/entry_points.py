@@ -45,5 +45,7 @@ def get_extensions():
                                    converters=converters),
         # This manifest handles all pre-refactor tags
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0",
-                                   converters=converters)
+                                   converters=converters,
+                                   # Register that this is a replacement for the old extension
+                                   legacy_class_names=["dkist.io.asdf.extension.DKISTExtension"])
     ]

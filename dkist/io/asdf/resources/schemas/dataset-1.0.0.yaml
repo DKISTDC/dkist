@@ -11,7 +11,7 @@ description:
 type: object
 properties:
   data:
-    tag: "asdf://dkist.nso.edu/file_manager-1.0.0"
+    tag: "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
 
   wcs:
     description: The coordinate system for the complete dataset.

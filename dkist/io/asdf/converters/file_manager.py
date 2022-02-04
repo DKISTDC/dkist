@@ -6,7 +6,7 @@ from asdf.extension import Converter
 class FileManagerConverter(Converter):
     tags = [
         "tag:dkist.nso.edu:dkist/array_container-0.2.0",
-        "asdf://dkist.nso.edu/array_container-1.0.0",
+        "asdf://dkist.nso.edu/tags/file_manager-1.0.0",
     ]
     types = ["dkist.io.file_manager.FileManager"]
 

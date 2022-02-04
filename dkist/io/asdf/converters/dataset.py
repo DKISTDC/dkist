@@ -6,7 +6,7 @@ class DatasetConverter(Converter):
         "tag:dkist.nso.edu:dkist/dataset-0.1.0",
         "tag:dkist.nso.edu:dkist/dataset-0.2.0",
         "tag:dkist.nso.edu:dkist/dataset-0.3.0",
-        "asdf://dkist.nso.edu/dataset-1.0.0",
+        "asdf://dkist.nso.edu/tags/dataset-1.0.0",
     ]
     types = ["dkist.dataset.dataset.Dataset"]
 
