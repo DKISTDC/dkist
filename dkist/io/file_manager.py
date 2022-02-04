@@ -85,7 +85,7 @@ class BaseFileManager:
         self._ndcube = None
 
         # Use the setter to convert to a Path
-        self.basepath = basepath
+        self.basepath = Path(basepath) if basepath is not None else None
 
         loader_array = np.empty_like(self._reference_array, dtype=object)
         for i, ele in enumerate(self._reference_array.flat):

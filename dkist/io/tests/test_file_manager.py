@@ -29,13 +29,14 @@ def externalarray(file_manager):
     return file_manager.external_array_references
 
 
-def test_slicing(file_manager, externalarray):
+def test_load_and_slicing(file_manager, externalarray):
     ext_shape = np.array(externalarray, dtype=object).shape
     assert file_manager._loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
     array = file_manager._generate_array().compute()
     assert isinstance(array, np.ndarray)
+    # Validate the data is actually loaded from the FITS
     assert not np.isnan(array).all()
 
     sliced_manager = file_manager[5:8]
