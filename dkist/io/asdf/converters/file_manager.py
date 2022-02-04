@@ -16,7 +16,7 @@ class FileManagerConverter(Converter):
         from dkist.io.loaders import AstropyFITSLoader
 
         url = urlparse(ctx.url or ".")
-        if url.scheme != "file":
+        if url.scheme not in ("file", ""):
             raise ValueError("Currently only loading local asdf files is supported.")
         filepath = Path(url.path)
         if isinstance(filepath, PureWindowsPath):
