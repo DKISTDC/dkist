@@ -13,7 +13,7 @@ history:
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
-    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b4.dev18+gad8eda6}
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b3}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.0.0
@@ -40,7 +40,7 @@ history:
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-0.9.0
-    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b4.dev18+gad8eda6}
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b3}
 dataset: !<asdf://dkist.nso.edu/tags/dataset-1.0.0>
   data: !<tag:dkist.nso.edu:dkist/array_container-0.2.0>
     datatype: float64

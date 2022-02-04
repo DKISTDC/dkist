@@ -18,9 +18,9 @@ jobs:
             os: macos-latest
             python: 3.8
 
-          - toxenv: py39-devdeps
+          - toxenv: py310-devdeps
             os: ubuntu-latest
-            python: 3.9
+            python: "3.10"
 
           - toxenv: py37-oldestdeps
             os: windows-latest
