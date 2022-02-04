@@ -1,8 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "http://dkist.nso.edu/schemas/dkist/tiled_dataset-0.1.0"
-tag: "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0"
+id: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.0.0"
 
 title: |
   A DKIST Tiled Dataset object.
@@ -17,7 +16,7 @@ properties:
     items:
       type: array
       items:
-        $ref: "http://dkist.nso.edu/schemas/dkist/dataset-0.3.0"
+        tag: "asdf://dkist.nso.edu/tags/dataset-1.0.0"
   inventory:
     description: A copy of the inventory record for this dataset.
     type: object
