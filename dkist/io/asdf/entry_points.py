@@ -39,13 +39,16 @@ def get_extensions():
     """
     Get the list of extensions.
     """
-    converters=[FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
+    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
+    wcs_converters = []
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
-                                   converters=converters),
+                                   converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0",
+                                   converters=wcs_converters),
         # This manifest handles all pre-refactor tags
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0",
-                                   converters=converters,
+                                   converters=dkist_converters,
                                    # Register that this is a replacement for the old extension
                                    legacy_class_names=["dkist.io.asdf.extension.DKISTExtension"])
     ]
