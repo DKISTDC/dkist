@@ -11,7 +11,8 @@ if sys.version_info < (3, 9):
 else:
     import importlib.resources as importlib_resources
 
-from dkist.io.asdf.converters import DatasetConverter, FileManagerConverter, TiledDatasetConverter
+from dkist.io.asdf.converters import (DatasetConverter, FileManagerConverter,
+                                      TiledDatasetConverter, VaryingCelestialConverter)
 
 
 def get_resource_mappings():
@@ -40,7 +41,7 @@ def get_extensions():
     Get the list of extensions.
     """
     dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
-    wcs_converters = []
+    wcs_converters = [VaryingCelestialConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
                                    converters=dkist_converters),

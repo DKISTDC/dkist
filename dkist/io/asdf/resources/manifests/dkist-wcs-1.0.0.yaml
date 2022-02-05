@@ -6,7 +6,7 @@ title: DKIST WCS extension
 description: ASDF schemas and tags for models and WCS related classes.
 
 tags:
-  - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.0.0"
-    tag_uri: "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
-  - schema_uri: "asdf://dkist.nso.edu/schemas/inverse_varying_celestial_transform-1.0.0"
-    tag_uri: "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
+  # - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.0.0"
+  - tag_uri: "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
+  # - schema_uri: "asdf://dkist.nso.edu/schemas/inverse_varying_celestial_transform-1.0.0"
+  - tag_uri: "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
