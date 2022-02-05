@@ -7,13 +7,12 @@ import pytest
 import asdf
 import astropy.table
 import gwcs
+from asdf.testing.helpers import roundtrip_object
 
 import dkist
 from dkist.data.test import rootdir
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
-
-from .helpers import roundtrip_object
 
 
 @pytest.fixture
@@ -25,14 +24,14 @@ def tagobj(request):
 
 
 @pytest.fixture
-def array_container():
+def file_manager():
     return FileManager(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
                        loader=AstropyFITSLoader)
 
 
-def test_roundtrip_array_container(array_container):
-    newobj = roundtrip_object(array_container)
-    assert newobj == array_container
+def test_roundtrip_file_manager(file_manager):
+    newobj = roundtrip_object(file_manager)
+    assert newobj == file_manager
 
 
 def assert_dataset_equal(new, old):

@@ -11,6 +11,7 @@ The DKIST Python tools provide a package (`dkist`) which aims to help you search
   guide/index
   reference
   whatsnew/index
+  developer
 
 
 First Steps

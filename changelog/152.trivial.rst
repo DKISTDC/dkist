@@ -1,0 +1,2 @@
+Migate to the asdf 2.8+ ``Converter`` interface, this bumps various
+dependancies but should have no effect on reading or writing asdf files.

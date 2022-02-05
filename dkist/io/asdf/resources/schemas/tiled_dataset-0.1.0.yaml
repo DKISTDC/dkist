@@ -1,0 +1,26 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/tiled_dataset-0.1.0"
+
+title: |
+  A DKIST Tiled Dataset object.
+description:
+  The container for a set of Dataset objects.
+
+type: object
+properties:
+  datasets:
+    description: A nested structure of Dataset objects
+    type: array
+    items:
+      type: array
+      items:
+        tag: "asdf://dkist.nso.edu/tags/dataset-0.3.0"
+  inventory:
+    description: A copy of the inventory record for this dataset.
+    type: object
+
+required: [datasets, inventory]
+additionalProperties: false
+...
