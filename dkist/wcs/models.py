@@ -27,14 +27,15 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
     Create a simple celestial transform from FITS like parameters.
 
     Supports unitful or unitless parameters, but if any parameters have units
-    all must have units.
+    all must have units, if parameters are unitless they are assumed to be in
+    degrees.
 
     Parameters
     ----------
     crpix
-        The reference pixel.
+        The reference pixel (a length two array).
     crval
-        The world coordinate at the reference pixel.
+        The world coordinate at the reference pixel (a length two array).
     pc
         The rotation matrix for the affine transform. If specifying parameters
         with units this should have celestial (``u.deg``) units.
@@ -172,6 +173,9 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     def evaluate(self, x, y, z, crpix, cdelt, lon_pole):
         pc, crval = self.get_pc_crval(z, self.pc_table, self.crval_table)
 
+        # For some reason the parameters passed to evaluate always seem to have
+        # the shape (1, N), so when we pass the though we drop the leading
+        # dimension.
         sct = generate_celestial_transform(crpix=crpix[0],
                                            cdelt=cdelt[0],
                                            pc=pc,
@@ -209,12 +213,14 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         self.inputs = ("lon", "lat", "z")
         self.outputs = ("x", "y")
 
-
     def evaluate(self, lon, lat, z, crpix, cdelt, lon_pole, **kwargs):
         pc, crval = self.get_pc_crval(z,
                                       self.pc_table,
                                       self.crval_table)
 
+        # For some reason the parameters passed to evaluate always seem to have
+        # the shape (1, N), so when we pass the though we drop the leading
+        # dimension.
         sct = generate_celestial_transform(crpix=crpix[0],
                                            cdelt=cdelt[0],
                                            pc=pc,
@@ -309,7 +315,10 @@ class CoupledCompoundModel(CompoundModel):
             )
         super().__init__(op, left, right, name=name)
         self.n_inputs = self.n_inputs - shared_inputs
-        self.inputs = self.inputs[:-shared_inputs]
+        # The shared inputs are the ones at the end of the left model and the
+        # start of the right model, so that we don't duplicate them drop the
+        # ones in the right model
+        self.inputs = left.inputs + right.inputs[shared_inputs:]
         self.shared_inputs = shared_inputs
 
     def _evaluate(self, *args, **kw):
