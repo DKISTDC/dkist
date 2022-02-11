@@ -39,3 +39,53 @@ class VaryingCelestialConverter(TransformConverterBase):
             "pc_table": parameter_to_value(model.pc_table),
             "projection": model.projection,
         }
+
+
+class CoupledCompoundConverter(TransformConverterBase):
+    """
+    ASDF serialization support for CompoundModel.
+    """
+    tags = [
+        "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0",
+    ]
+
+    types = ["dkist.wcs.models.CoupledCompoundModel"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        left = model.left
+
+        if isinstance(model.right, dict):
+            right = {
+                "keys": list(model.right.keys()),
+                "values": list(model.right.values())
+            }
+        else:
+            right = model.right
+
+        return {
+            "forward": [left, right],
+            "shared_inputs": model.shared_inputs
+        }
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from astropy.modeling.core import Model
+
+        from dkist.wcs.models import CoupledCompoundModel
+
+        oper = "&"
+
+        left = node["forward"][0]
+        if not isinstance(left, Model):
+            raise TypeError("Unknown model type '{0}'".format(
+                node["forward"][0]._tag))
+
+        right = node["forward"][1]
+        if (not isinstance(right, Model) and
+                not (oper == "fix_inputs" and isinstance(right, dict))):
+            raise TypeError("Unknown model type '{0}'".format(
+                node["forward"][1]._tag))
+
+        model = CoupledCompoundModel("&", left, right,
+                                     shared_inputs=node["shared_inputs"])
+
+        return model

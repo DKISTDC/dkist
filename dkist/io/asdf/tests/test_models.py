@@ -1,10 +1,11 @@
 import numpy as np
 
+import astropy.modeling.models as m
 import astropy.units as u
 from asdf.testing.helpers import roundtrip_object
 from astropy.coordinates.matrix_utilities import rotation_matrix
 
-from dkist.wcs.models import VaryingCelestialTransform
+from dkist.wcs.models import CoupledCompoundModel, VaryingCelestialTransform
 
 
 def test_roundtrip_vct():
@@ -30,3 +31,8 @@ def test_roundtrip_vct():
     assert u.allclose(world, (359.99804329*u.deg, 0.00017119*u.deg))
 
     assert u.allclose(new_ivct.inverse(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
+
+
+def test_coupled_compound_model():
+    ccm = CoupledCompoundModel("&", m.Shift(5), m.Shift(10))
+    roundtrip_object(ccm)
