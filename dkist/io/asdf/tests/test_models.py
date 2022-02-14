@@ -34,5 +34,11 @@ def test_roundtrip_vct():
 
 
 def test_coupled_compound_model():
-    ccm = CoupledCompoundModel("&", m.Shift(5), m.Shift(10))
-    roundtrip_object(ccm)
+    ccm = CoupledCompoundModel("&", m.Shift(5), m.Scale(10))
+    new = roundtrip_object(ccm)
+    assert isinstance(new, CoupledCompoundModel)
+    assert isinstance(new.left, m.Shift)
+    assert isinstance(new.right, m.Scale)
+
+    assert ccm.n_inputs == new.n_inputs
+    assert ccm.inputs == new.inputs

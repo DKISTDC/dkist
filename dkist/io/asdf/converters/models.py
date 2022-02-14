@@ -46,7 +46,7 @@ class CoupledCompoundConverter(TransformConverterBase):
     ASDF serialization support for CompoundModel.
     """
     tags = [
-        "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0",
+        "asdf://dkist.nso.edu/tags/coupled_compound_model-1.0.0",
     ]
 
     types = ["dkist.wcs.models.CoupledCompoundModel"]
