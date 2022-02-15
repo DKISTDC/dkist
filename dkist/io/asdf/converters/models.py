@@ -11,15 +11,24 @@ class VaryingCelestialConverter(TransformConverterBase):
         "dkist.wcs.models.InverseVaryingCelestialTransform",
     ]
 
+    def select_tag(self, obj, tags, ctx):
+        from dkist.wcs.models import InverseVaryingCelestialTransform, VaryingCelestialTransform
+        if isinstance(obj, VaryingCelestialTransform):
+            return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
+        elif isinstance(obj, InverseVaryingCelestialTransform):
+            return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
+        else:
+            raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
+
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import InverseVaryingCelestialTransform, VaryingCelestialTransform
 
-        if tag.endswith("varying_celestial_transform-1.0.0"):
-            cls = VaryingCelestialTransform
-        elif tag.endswith("inverse_varying_celestial_transform-1.0.0"):
+        if tag.endswith("inverse_varying_celestial_transform-1.0.0"):
             cls = InverseVaryingCelestialTransform
+        elif tag.endswith("varying_celestial_transform-1.0.0"):
+            cls = VaryingCelestialTransform
         else:
-            raise ValueError(f"Unsupported tag: {tag}")
+            raise ValueError(f"Unsupported tag: {tag}")  # pragma: no cover
 
         return cls(
             crpix=node["crpix"],
@@ -76,14 +85,12 @@ class CoupledCompoundConverter(TransformConverterBase):
 
         left = node["forward"][0]
         if not isinstance(left, Model):
-            raise TypeError("Unknown model type '{0}'".format(
-                node["forward"][0]._tag))
+            raise TypeError("Unknown model type '{0}'".format(node["forward"][0]._tag))  # pragma: no cover
 
         right = node["forward"][1]
         if (not isinstance(right, Model) and
                 not (oper == "fix_inputs" and isinstance(right, dict))):
-            raise TypeError("Unknown model type '{0}'".format(
-                node["forward"][1]._tag))
+            raise TypeError("Unknown model type '{0}'".format(node["forward"][1]._tag))  # pragma: no cover
 
         model = CoupledCompoundModel("&", left, right,
                                      shared_inputs=node["shared_inputs"])
