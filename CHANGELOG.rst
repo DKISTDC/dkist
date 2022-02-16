@@ -1,3 +1,27 @@
+v1.0.0b4 (2022-02-16)
+=====================
+
+Features
+--------
+
+- Implement Astropy models to support spatial transforms which change with
+  a thrid pixel axis. (`#148 <https://github.com/DKISTDC/dkist/pull/148>`_)
+- Add ASDF serialization for `VaryingCelestialTransform` and `CoupledCompoundModel`. (`#156 <https://github.com/DKISTDC/dkist/pull/156>`_)
+
+
+Bug Fixes
+---------
+
+- Fix asdf using old schema and tag versions when saving new files. (`#157 <https://github.com/DKISTDC/dkist/pull/157>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Migate to the asdf 2.8+ ``Converter`` interface, this bumps various
+  dependancies but should have no effect on reading or writing asdf files. (`#152 <https://github.com/DKISTDC/dkist/pull/152>`_)
+
+
 v1.0.0b3 (2021-11-30)
 =====================
 
