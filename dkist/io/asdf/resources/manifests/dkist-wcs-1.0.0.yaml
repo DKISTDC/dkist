@@ -1,0 +1,14 @@
+%YAML 1.1
+---
+id: asdf://dkist.nso.edu/dkist/manifests/dkist-wcs-1.0.0
+extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-wcs-1.0.0
+title: DKIST WCS extension
+description: ASDF schemas and tags for models and WCS related classes.
+
+tags:
+  - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.0.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
+  - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.0.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
+  - schema_uri: "asdf://dkist.nso.edu/schemas/coupled_compound_model-1.0.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/coupled_compound_model-1.0.0"
