@@ -1,0 +1,37 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.0.0"
+
+title: A varying FITS-like celestial transform.
+description:
+  A model which represents a FITS-like celestial WCS transform which varies over a third pixel input.
+
+type: object
+properties:
+  crpix:
+    anyOf:
+      - tag: "core/ndarray-1.0.0"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+  cdelt:
+    anyOf:
+      - tag: "core/ndarray-1.0.0"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+  lon_pole:
+    anyOf:
+      - type: number
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+  crval_table:
+    anyOf:
+      - tag: "core/ndarray-1.0.0"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+  pc_table:
+    anyOf:
+      - tag: "core/ndarray-1.0.0"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+  projection:
+    $ref: "tag:stsci.edu:asdf/transform/transform-1.2.0"
+
+required: [crpix, cdelt, lon_pole, crval_table, pc_table, projection]
+additionalProperties: true
+...
