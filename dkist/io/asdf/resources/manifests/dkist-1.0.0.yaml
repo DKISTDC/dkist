@@ -7,8 +7,8 @@ description: ASDF schemas and tags for DKIST classes.
 
 tags:
   - schema_uri: "asdf://dkist.nso.edu/schemas/file_manager-1.0.0"
-    tag_uri: "asdf://dkist.nso.edu/tags/array_container-1.0.0"
-  - schema_uri: "asdf://dkist.nso.edu/schemas/dataset-0.3.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
+  - schema_uri: "asdf://dkist.nso.edu/schemas/dataset-1.0.0"
     tag_uri: "asdf://dkist.nso.edu/tags/dataset-1.0.0"
   - schema_uri: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.0.0"
     tag_uri: "asdf://dkist.nso.edu/tags/tiled_dataset-1.0.0"
