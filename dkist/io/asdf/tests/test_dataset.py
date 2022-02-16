@@ -64,16 +64,33 @@ def test_roundtrip_tiled_dataset(simple_tiled_dataset):
     for old_ds, new_ds in zip(simple_tiled_dataset.flat, newobj.flat):
         assert_dataset_equal(new_ds, old_ds)
 
+
 @pytest.mark.parametrize("tagobj",
                          [
                              "dataset",
                              "simple_tiled_dataset",
                          ],
                          indirect=True)
-def test_save_dataset_without_file_schema(tagobj, tmpdir):
+def test_save_dataset_without_file_schema(tagobj, tmp_path):
     tree = {'dataset': tagobj}
     with asdf.AsdfFile(tree) as afile:
-        afile.write_to(Path(tmpdir / "test.asdf"))
+        afile.write_to(tmp_path / "test.asdf")
+
+
+def test_asdf_tags(dataset, tmp_path):
+    """
+    Test the tags and extensions used when saving a dataset.
+    """
+    tree = {'dataset': dataset}
+    with asdf.AsdfFile(tree) as afile:
+        afile.write_to(tmp_path / "test.asdf")
+
+    with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
+        assert af.tree["dataset"]._tag == 'asdf://dkist.nso.edu/tags/dataset-1.0.0'
+        assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
+
+        extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
+        assert "asdf://dkist.nso.edu/dkist/extensions/dkist-0.9.0" not in extension_uris
 
 
 @pytest.mark.parametrize("tagobj",
