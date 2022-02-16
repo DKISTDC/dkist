@@ -86,7 +86,7 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == 'asdf://dkist.nso.edu/tags/dataset-1.0.0'
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.0.0"
         assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
