@@ -53,19 +53,37 @@ def test_varying_transform_pc():
                                     pc_table=varying_matrix_lt,
                                     lon_pole=180 * u.deg)
 
-    trans5 = vct.transform_at_index(5*u.pix)
-    assert isinstance(trans5, CompoundModel)
-
-    # Verify that we have the 5th matrix in the series
-    affine = trans5.left.left.right
-    assert isinstance(affine, m.AffineTransformation2D)
-    assert u.allclose(affine.matrix, varying_matrix_lt[5])
-
+    # x.shape=(1,), y.shape=(1,), z.shape=(1,)
     pixel = (0*u.pix, 0*u.pix, 5*u.pix)
     world = vct(*pixel)
+    assert np.array(world[0]).shape == ()
     assert u.allclose(world, (359.99804329*u.deg, 0.00017119*u.deg))
-
     assert u.allclose(vct.inverse(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
+
+
+@pytest.mark.parametrize(("pixel", "lon_shape"), (
+    ((*np.mgrid[0:10, 0:10] * u.pix, np.arange(10) * u.pix), (10, 10)),
+    (np.mgrid[0:10, 0:10, 0:5] * u.pix, (10, 10, 5)),
+    ((2 * u.pix, 2 * u.pix, np.arange(10) * u.pix), (10,)),
+    ((np.arange(10) * u.pix,
+      np.arange(10) * u.pix,
+      np.arange(10)[..., None] * u.pix), (10, 10)),
+    (np.mgrid[0:4096, 0:4000, 0:2] * u.pix, (4096, 4000, 2)),
+))
+def test_varying_transform_pc_shapes(pixel, lon_shape):
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+
+    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                    cdelt=(1, 1) * u.arcsec/u.pix,
+                                    crval_table=(0, 0) * u.arcsec,
+                                    pc_table=varying_matrix_lt,
+                                    lon_pole=180 * u.deg)
+    world = vct(*pixel)
+    assert np.array(world[0]).shape == lon_shape
+    new_pixel = vct.inverse(*world, pixel[-1])
+    assert u.allclose(new_pixel,
+                      np.broadcast_arrays(*pixel, subok=True)[:2],
+                      atol=0.01*u.pix)
 
 
 def test_varying_transform_pc_unitless():
