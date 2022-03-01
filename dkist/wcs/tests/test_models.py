@@ -75,7 +75,7 @@ def test_varying_transform_pc():
     ((np.arange(10) * u.pix,
       np.arange(10) * u.pix,
       np.arange(10)[..., None] * u.pix), (10, 10)),
-    (np.mgrid[0:4096, 0:4000, 0:2] * u.pix, (4096, 4000, 2)),
+    (np.mgrid[0:1024, 0:1000, 0:2] * u.pix, (1024, 1000, 2)),
 ))
 def test_varying_transform_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
