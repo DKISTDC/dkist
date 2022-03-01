@@ -5,6 +5,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
+from astropy.modeling.separable import separability_matrix
 
 from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
                               generate_celestial_transform)
@@ -225,3 +226,18 @@ def test_coupled(vct_crval, linear_time):
     assert isinstance(inverse, CompoundModel)
 
     assert u.allclose(inverse(*world), pixel, atol=1e-9*u.pix)
+
+
+def test_coupled_sep(linear_time):
+    crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
+    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                    cdelt=(1, 1) * u.arcsec/u.pix,
+                                    crval_table=crval_table,
+                                    pc_table=np.identity(2) * u.arcsec,
+                                    lon_pole=180 * u.deg)
+
+    tfrm = CoupledCompoundModel("&", vct, linear_time, shared_inputs=1)
+    smatrix = separability_matrix(tfrm)
+    assert np.allclose(smatrix, np.array([[True,  True,  True],
+                                          [True,  True,  True],
+                                          [False, False, True]]))

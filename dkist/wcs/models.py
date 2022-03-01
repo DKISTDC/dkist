@@ -9,7 +9,7 @@ except ImportError:
 
 import astropy.modeling.models as m
 import astropy.units as u
-from astropy.modeling import CompoundModel, Model, Parameter
+from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
@@ -383,3 +383,25 @@ class CoupledCompoundModel(CompoundModel):
         step2 = m.Mapping(inter_mapping) | (left_inverse & m.Identity(right_inverse.n_outputs))
 
         return step1 | step2
+
+    def _calculate_separability_matrix(self):
+        sepleft = separable._separable(self.left)
+        sepright = separable._separable(self.right)
+
+        noutp = separable._compute_n_outputs(sepleft, sepright)
+
+        cleft = np.zeros((noutp, sepleft.shape[1]))
+        cleft[: sepleft.shape[0], : sepleft.shape[1]] = sepleft
+
+        cright = np.zeros((noutp, sepright.shape[1]))
+        cright[-sepright.shape[0]:, -sepright.shape[1]:] = 1
+
+        left_solo_end = self.left.n_inputs - self.shared_inputs
+        right_solo_start = left_solo_end + self.shared_inputs
+        matrix = np.zeros((self.n_outputs, self.n_inputs))
+        matrix[:, :left_solo_end] = cleft[:, :left_solo_end]
+        matrix[:, left_solo_end:right_solo_start] = np.logical_or(cleft[:, left_solo_end:],
+                                                                  cright[:, :self.shared_inputs])
+        matrix[:, right_solo_start:] = cright[:, :right_solo_start]
+
+        return matrix
