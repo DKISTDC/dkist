@@ -1,0 +1,1 @@
+Fix behaviour of `VaryingCelestialTransform` when called with arrays of pixel or world coordinates.

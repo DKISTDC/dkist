@@ -186,6 +186,7 @@ class BaseVaryingCelestialTransform(Model):
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
         for zind in np.unique(ind):
+            # Scalar parameters are reshaped to be length one arrays by modeling
             sct = self.transform_at_index(zind, crpix[0], cdelt[0], lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
