@@ -53,6 +53,13 @@ def test_varying_transform_pc():
                                     pc_table=varying_matrix_lt,
                                     lon_pole=180 * u.deg)
 
+    trans5 = vct.transform_at_index(5)
+    assert isinstance(trans5, CompoundModel)
+
+    # Verify that we have the 5th matrix in the series
+    affine = trans5.left.left.right
+    assert isinstance(affine, m.AffineTransformation2D)
+    assert u.allclose(affine.matrix, varying_matrix_lt[5])
     # x.shape=(1,), y.shape=(1,), z.shape=(1,)
     pixel = (0*u.pix, 0*u.pix, 5*u.pix)
     world = vct(*pixel)
@@ -119,7 +126,7 @@ def test_varying_transform_crval():
                                     pc_table=np.identity(2) * u.arcsec,
                                     lon_pole=180 * u.deg)
 
-    trans2 = vct.transform_at_index(2*u.pix)
+    trans2 = vct.transform_at_index(2)
     assert isinstance(trans2, CompoundModel)
 
     # Verify that we have the 2nd crval pair in the series

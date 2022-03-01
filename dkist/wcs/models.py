@@ -137,6 +137,38 @@ class BaseVaryingCelestialTransform(Model):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
+    def transform_at_index(self, zind, crpix=None, cdelt=None, lon_pole=None):
+        """
+        Generate a spatial model based on an index for the pc and crval tables.
+
+        Parameters
+        ----------
+        zind : int
+          The index to the lookup table.Q
+
+        **kwargs
+          The keyword arguments are optional and if not specified will be read
+          from the parameters to this model.
+
+        Returns
+        -------
+        `astropy.modeling.CompoundModel`
+
+        """
+        # If we are being called from inside evaluate we can skip the lookup
+        crpix = crpix if crpix is not None else self.crpix
+        cdelt = cdelt if cdelt is not None else self.cdelt
+        lon_pole = lon_pole if lon_pole is not None else self.lon_pole
+
+        sct = generate_celestial_transform(crpix=crpix,
+                                           cdelt=cdelt,
+                                           pc=self.pc_table[zind],
+                                           crval=self.crval_table[zind],
+                                           lon_pole=lon_pole,
+                                           projection=self.projection)
+
+        return sct
+
     def _map_transform(self, x, y, z, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
         bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
@@ -145,19 +177,16 @@ class BaseVaryingCelestialTransform(Model):
 
         # Generate output arrays (ignore units for simplicity)
         if isinstance(bx, u.Quantity):
-            bxu = bx.value
-            byu = by.value
-        x_out = np.empty_like(bxu)
-        y_out = np.empty_like(byu)
+            x_out = np.empty_like(bx.value)
+            y_out = np.empty_like(by.value)
+        else:
+            x_out = np.empty_like(bx)
+            y_out = np.empty_like(by)
+
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
         for zind in np.unique(ind):
-            sct = generate_celestial_transform(crpix=crpix[0],
-                                               cdelt=cdelt[0],
-                                               pc=self.pc_table[zind],
-                                               crval=self.crval_table[zind],
-                                               lon_pole=lon_pole[0],
-                                               projection=self.projection)
+            sct = self.transform_at_index(zind, crpix[0], cdelt[0], lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
             mask = ind == zind
@@ -165,7 +194,11 @@ class BaseVaryingCelestialTransform(Model):
                 xx, yy = sct.inverse(bx[mask], by[mask])
             else:
                 xx, yy = sct(bx[mask], by[mask])
-            x_out[mask], y_out[mask] = xx.value, yy.value
+
+            if isinstance(xx, u.Quantity):
+                x_out[mask], y_out[mask] = xx.value, yy.value
+            else:
+                x_out[mask], y_out[mask] = xx, yy
 
         # Put the units back
         if isinstance(xx, u.Quantity):
