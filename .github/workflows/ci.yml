@@ -22,9 +22,9 @@ jobs:
             os: ubuntu-latest
             python: "3.10"
 
-          - toxenv: py37-oldestdeps
+          - toxenv: py38-oldestdeps
             os: windows-latest
-            python: 3.7
+            python: 3.8
 
     name: ${{ matrix.name || format('{0} [{1}]', matrix.toxenv, matrix.os) }}
     runs-on: ${{ matrix.os }}

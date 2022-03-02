@@ -9,7 +9,7 @@ except ImportError:
 
 import astropy.modeling.models as m
 import astropy.units as u
-from astropy.modeling import CompoundModel, Model, Parameter
+from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
@@ -83,6 +83,7 @@ class BaseVaryingCelestialTransform(Model):
     Shared components between the forward and reverse varying celestial transforms.
     """
 
+    # This prevents Model from broadcasting the paramters to the inputs
     standard_broadcasting = False
     _separable = False
     _input_units_allow_dimensionless = True
@@ -111,32 +112,101 @@ class BaseVaryingCelestialTransform(Model):
                                      f"crval table has shape {crval_table.shape[:-1]}")
             table_shape = crval_table.shape[:-1]
 
-        return table_shape
+        if pc_table.shape == (2, 2):
+            pc_table = np.broadcast_to(pc_table, list(table_shape) + [2, 2], subok=True)
+        if crval_table.shape == (2,):
+            crval_table = np.broadcast_to(crval_table, list(table_shape) + [2], subok=True)
+
+        return table_shape, pc_table, crval_table
 
     @staticmethod
-    def get_pc_crval(z, pc, crval):
-        # Get crval and pc
+    def sanitize_z(z):
         if isinstance(z, u.Quantity):
-            ind = int(z.value)
-        else:
-            ind = int(z)
-        if pc.shape != (2, 2):
-            pc = pc[ind]
-        if crval.shape != (2,):
-            crval = crval[ind]
-        return pc, crval
+            z = z.value
+        return np.array(np.round(z), dtype=int)
 
     def __init__(self, *args, crval_table=None, pc_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.pc_table = np.asanyarray(pc_table)
-        self.crval_table = np.asanyarray(crval_table)
-        self.table_shape = self._validate_table_shapes(self.pc_table, self.crval_table)
+        (self.table_shape,
+         self.pc_table,
+         self.crval_table) = self._validate_table_shapes(np.asanyarray(pc_table),
+                                                         np.asanyarray(crval_table))
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
+    def transform_at_index(self, zind, crpix=None, cdelt=None, lon_pole=None):
+        """
+        Generate a spatial model based on an index for the pc and crval tables.
+
+        Parameters
+        ----------
+        zind : int
+          The index to the lookup table.Q
+
+        **kwargs
+          The keyword arguments are optional and if not specified will be read
+          from the parameters to this model.
+
+        Returns
+        -------
+        `astropy.modeling.CompoundModel`
+
+        """
+        # If we are being called from inside evaluate we can skip the lookup
+        crpix = crpix if crpix is not None else self.crpix
+        cdelt = cdelt if cdelt is not None else self.cdelt
+        lon_pole = lon_pole if lon_pole is not None else self.lon_pole
+
+        sct = generate_celestial_transform(crpix=crpix,
+                                           cdelt=cdelt,
+                                           pc=self.pc_table[zind],
+                                           crval=self.crval_table[zind],
+                                           lon_pole=lon_pole,
+                                           projection=self.projection)
+
+        return sct
+
+    def _map_transform(self, x, y, z, crpix, cdelt, lon_pole, inverse=False):
+        # We need to broadcast the arrays together so they are all the same shape
+        bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
+        # Convert the z coordinate into an index to the lookup tables
+        ind = self.sanitize_z(bz)
+
+        # Generate output arrays (ignore units for simplicity)
+        if isinstance(bx, u.Quantity):
+            x_out = np.empty_like(bx.value)
+            y_out = np.empty_like(by.value)
+        else:
+            x_out = np.empty_like(bx)
+            y_out = np.empty_like(by)
+
+        # We now loop over every unique value of z and compute the transform.
+        # This means we make the minimum number of calls possible to the transform.
+        for zind in np.unique(ind):
+            # Scalar parameters are reshaped to be length one arrays by modeling
+            sct = self.transform_at_index(zind, crpix[0], cdelt[0], lon_pole[0])
+
+            # Call this transform for all values of x, y where z == zind
+            mask = ind == zind
+            if inverse:
+                xx, yy = sct.inverse(bx[mask], by[mask])
+            else:
+                xx, yy = sct(bx[mask], by[mask])
+
+            if isinstance(xx, u.Quantity):
+                x_out[mask], y_out[mask] = xx.value, yy.value
+            else:
+                x_out[mask], y_out[mask] = xx, yy
+
+        # Put the units back
+        if isinstance(xx, u.Quantity):
+            x_out = x_out << xx.unit
+            y_out = y_out << yy.unit
+
+        return x_out, y_out
 
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
@@ -161,28 +231,8 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     def input_units(self):
         return {"x": u.pix, "y": u.pix, "z": u.pix}
 
-    def transform_at_index(self, z):
-        pc, crval = self.get_pc_crval(z, self.pc_table, self.crval_table)
-        return generate_celestial_transform(crpix=self.crpix,
-                                            cdelt=self.cdelt,
-                                            pc=pc,
-                                            crval=crval,
-                                            lon_pole=self.lon_pole,
-                                            projection=self.projection)
-
     def evaluate(self, x, y, z, crpix, cdelt, lon_pole):
-        pc, crval = self.get_pc_crval(z, self.pc_table, self.crval_table)
-
-        # For some reason the parameters passed to evaluate always seem to have
-        # the shape (1, N), so when we pass the though we drop the leading
-        # dimension.
-        sct = generate_celestial_transform(crpix=crpix[0],
-                                           cdelt=cdelt[0],
-                                           pc=pc,
-                                           crval=crval,
-                                           lon_pole=lon_pole[0],
-                                           projection=self.projection)
-        return sct(x, y)
+        return self._map_transform(x, y, z, crpix, cdelt, lon_pole)
 
     @property
     def inverse(self):
@@ -214,21 +264,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         self.outputs = ("x", "y")
 
     def evaluate(self, lon, lat, z, crpix, cdelt, lon_pole, **kwargs):
-        pc, crval = self.get_pc_crval(z,
-                                      self.pc_table,
-                                      self.crval_table)
-
-        # For some reason the parameters passed to evaluate always seem to have
-        # the shape (1, N), so when we pass the though we drop the leading
-        # dimension.
-        sct = generate_celestial_transform(crpix=crpix[0],
-                                           cdelt=cdelt[0],
-                                           pc=pc,
-                                           crval=crval,
-                                           lon_pole=lon_pole[0],
-                                           projection=self.projection)
-
-        return sct.inverse(lon, lat)
+        return self._map_transform(lon, lat, z, crpix, cdelt, lon_pole, inverse=True)
 
 
 class CoupledCompoundModel(CompoundModel):
@@ -347,3 +383,25 @@ class CoupledCompoundModel(CompoundModel):
         step2 = m.Mapping(inter_mapping) | (left_inverse & m.Identity(right_inverse.n_outputs))
 
         return step1 | step2
+
+    def _calculate_separability_matrix(self):
+        sepleft = separable._separable(self.left)
+        sepright = separable._separable(self.right)
+
+        noutp = separable._compute_n_outputs(sepleft, sepright)
+
+        cleft = np.zeros((noutp, sepleft.shape[1]))
+        cleft[: sepleft.shape[0], : sepleft.shape[1]] = sepleft
+
+        cright = np.zeros((noutp, sepright.shape[1]))
+        cright[-sepright.shape[0]:, -sepright.shape[1]:] = 1
+
+        left_solo_end = self.left.n_inputs - self.shared_inputs
+        right_solo_start = left_solo_end + self.shared_inputs
+        matrix = np.zeros((self.n_outputs, self.n_inputs))
+        matrix[:, :left_solo_end] = cleft[:, :left_solo_end]
+        matrix[:, left_solo_end:right_solo_start] = np.logical_or(cleft[:, left_solo_end:],
+                                                                  cright[:, :self.shared_inputs])
+        matrix[:, right_solo_start:] = cright[:, :right_solo_start]
+
+        return matrix
