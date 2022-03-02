@@ -4,7 +4,7 @@ import pytest
 import astropy.modeling.models as m
 import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
-from astropy.modeling import CompoundModel
+from astropy.modeling import CompoundModel, Model
 from astropy.modeling.separable import separability_matrix
 
 from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
@@ -229,6 +229,9 @@ def test_coupled(vct_crval, linear_time):
 
 
 def test_coupled_sep(linear_time):
+    if not hasattr(Model, "_calculate_separability_matrix"):
+        pytest.skip()
+
     crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
     vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
                                     cdelt=(1, 1) * u.arcsec/u.pix,
