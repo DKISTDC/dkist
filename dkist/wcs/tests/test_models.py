@@ -201,6 +201,23 @@ def test_varying_transform_4d_pc():
     assert u.allclose(new_pixel, pixel[:2], atol=0.01*u.pix)
 
 
+def test_varying_transform_4d_pc_unitless():
+    varying_matrix_lt = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)])
+    varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
+
+    vct = VaryingCelestialTransform4D(crpix=(5, 5),
+                                      cdelt=(1, 1),
+                                      crval_table=(0, 0),
+                                      pc_table=varying_matrix_lt,
+                                      lon_pole=180)
+
+    pixel = 0, 0, 0, 0
+    world = vct(*pixel)
+    new_pixel = vct.inverse(*world, 0, 0)
+
+    assert u.allclose(new_pixel, pixel[:2], atol=0.01)
+
+
 @pytest.mark.parametrize(("pixel", "lon_shape"), (
     ((*np.mgrid[0:5, 0:5] * u.pix, np.arange(5) * u.pix, 0 * u.pix), (5, 5)),
     (np.mgrid[0:10, 0:10, 0:5, 0:3] * u.pix, (10, 10, 5, 3)),
