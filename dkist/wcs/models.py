@@ -270,7 +270,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         return self._map_transform(lon, lat, z, crpix, cdelt, lon_pole, inverse=True)
 
 
-class BaseVaryingCelestialTransform4D(BaseVaryingCelestialTransform):
+class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     def _map_transform(self, x, y, z, q, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
         bx, by, bz, bq = np.broadcast_arrays(x, y, z, q, subok=True)
@@ -313,7 +313,7 @@ class BaseVaryingCelestialTransform4D(BaseVaryingCelestialTransform):
         return x_out, y_out
 
 
-class VaryingCelestialTransform4D(BaseVaryingCelestialTransform4D):
+class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
     n_inputs = 4
     n_outputs = 2
 
@@ -334,7 +334,7 @@ class VaryingCelestialTransform4D(BaseVaryingCelestialTransform4D):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform4D(crpix=self.crpix,
+        ivct = InverseVaryingCelestialTransform2D(crpix=self.crpix,
                                                   cdelt=self.cdelt,
                                                   lon_pole=self.lon_pole,
                                                   pc_table=self.pc_table,
@@ -343,7 +343,7 @@ class VaryingCelestialTransform4D(BaseVaryingCelestialTransform4D):
         return ivct
 
 
-class InverseVaryingCelestialTransform4D(BaseVaryingCelestialTransform4D):
+class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
     n_inputs = 4
     n_outputs = 2
 
@@ -506,7 +506,8 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
                                             pc_table: Union[ArrayLike, u.Quantity],
                                             crval_table: Union[Iterable[float], u.Quantity],
                                             lon_pole: Union[float, u.Quantity] = None,
-                                            projection: Model = m.Pix2Sky_TAN()
+                                            projection: Model = m.Pix2Sky_TAN(),
+                                            inverse=False,
                                             ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -520,7 +521,11 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
 
     cls = VaryingCelestialTransform
     if table_d == 2:
-        cls = VaryingCelestialTransform4D
+        cls = VaryingCelestialTransform2D
+    if inverse:
+        cls = InverseVaryingCelestialTransform
+        if table_d == 2:
+            cls = InverseVaryingCelestialTransform2D
 
     return cls(
         crpix=crpix,

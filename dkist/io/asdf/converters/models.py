@@ -9,34 +9,36 @@ class VaryingCelestialConverter(TransformConverterBase):
     types = [
         "dkist.wcs.models.VaryingCelestialTransform",
         "dkist.wcs.models.InverseVaryingCelestialTransform",
+        "dkist.wcs.models.VaryingCelestialTransform2D",
+        "dkist.wcs.models.InverseVaryingCelestialTransform2D",
     ]
 
     def select_tag(self, obj, tags, ctx):
-        from dkist.wcs.models import InverseVaryingCelestialTransform, VaryingCelestialTransform
-        if isinstance(obj, VaryingCelestialTransform):
+        from dkist.wcs.models import (InverseVaryingCelestialTransform,
+                                      InverseVaryingCelestialTransform2D,
+                                      VaryingCelestialTransform, VaryingCelestialTransform2D)
+        if isinstance(obj, (VaryingCelestialTransform, VaryingCelestialTransform2D)):
             return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
-        elif isinstance(obj, InverseVaryingCelestialTransform):
+        elif isinstance(obj, (InverseVaryingCelestialTransform, InverseVaryingCelestialTransform2D)):
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
         else:
             raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
 
     def from_yaml_tree_transform(self, node, tag, ctx):
-        from dkist.wcs.models import InverseVaryingCelestialTransform, VaryingCelestialTransform
+        from dkist.wcs.models import varying_celestial_transform_from_tables
 
-        if tag.endswith("inverse_varying_celestial_transform-1.0.0"):
-            cls = InverseVaryingCelestialTransform
-        elif tag.endswith("varying_celestial_transform-1.0.0"):
-            cls = VaryingCelestialTransform
-        else:
-            raise ValueError(f"Unsupported tag: {tag}")  # pragma: no cover
+        inverse = False
+        if "inverse_varying_celestial_transform" in tag:
+            inverse = True
 
-        return cls(
+        return varying_celestial_transform_from_tables(
             crpix=node["crpix"],
             cdelt=node["cdelt"],
             lon_pole=node["lon_pole"],
             crval_table=node["crval_table"],
             pc_table=node["pc_table"],
             projection=node["projection"],
+            inverse=inverse,
         )
 
     def to_yaml_tree_transform(self, model, tag, ctx):

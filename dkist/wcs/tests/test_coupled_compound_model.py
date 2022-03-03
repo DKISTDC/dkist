@@ -8,7 +8,7 @@ from astropy.modeling import CompoundModel, Model
 from astropy.modeling.separable import separability_matrix
 
 from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
-                              VaryingCelestialTransform4D)
+                              VaryingCelestialTransform2D)
 
 
 @pytest.fixture
@@ -27,11 +27,11 @@ def vct_crval():
 
 
 @pytest.fixture
-def vct_4d_pc():
+def vct_2d_pc():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    return VaryingCelestialTransform4D(crpix=(5, 5) * u.pix,
+    return VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
                                        cdelt=(1, 1) * u.arcsec/u.pix,
                                        crval_table=(0, 0) * u.arcsec,
                                        pc_table=varying_matrix_lt,
@@ -66,16 +66,16 @@ def test_coupled(vct_crval, linear_time):
     assert u.allclose(inverse(*world), pixel, atol=1e-9*u.pix)
 
 
-def test_coupled_4d(vct_4d_pc, linear_time):
+def test_coupled_2d(vct_2d_pc, linear_time):
     double_time = linear_time & linear_time
-    tfrm = CoupledCompoundModel("&", vct_4d_pc, double_time, shared_inputs=2)
+    tfrm = CoupledCompoundModel("&", vct_2d_pc, double_time, shared_inputs=2)
 
     assert tfrm.n_inputs == 4
     assert len(tfrm.inputs) == 4
 
     pixel = (0, 0, 3, 2) * u.pix
     world = tfrm(*pixel)
-    spatial_world = vct_4d_pc(*pixel)
+    spatial_world = vct_2d_pc(*pixel)
     temporal_world = double_time(*pixel[-2:])
     assert u.allclose(spatial_world, world[:2])
     assert u.allclose(temporal_world, world[-2:])
@@ -101,12 +101,12 @@ def test_coupled_sep(linear_time, vct_crval):
                                           [0, 0, 1]]))
 
 
-def test_coupled_sep_4d(vct_4d_pc, linear_time):
+def test_coupled_sep_2d(vct_2d_pc, linear_time):
     if not hasattr(Model, "_calculate_separability_matrix"):
         pytest.skip()
     linear_spectral = m.Linear1D(slope=10*u.nm/u.pix)
     right = linear_time & linear_spectral
-    tfrm = CoupledCompoundModel("&", vct_4d_pc, right, shared_inputs=2)
+    tfrm = CoupledCompoundModel("&", vct_2d_pc, right, shared_inputs=2)
 
     smatrix = separability_matrix(tfrm)
     assert np.allclose(smatrix, np.array([[1, 1, 1, 1],
@@ -115,12 +115,12 @@ def test_coupled_sep_4d(vct_4d_pc, linear_time):
                                           [0, 0, 0, 1]]))
 
 
-def test_coupled_sep_4d_extra(vct_4d_pc, linear_time):
+def test_coupled_sep_2d_extra(vct_2d_pc, linear_time):
     if not hasattr(Model, "_calculate_separability_matrix"):
         pytest.skip()
     linear_spectral = m.Linear1D(slope=10*u.nm/u.pix)
     right = linear_time & linear_spectral & linear_spectral
-    tfrm = CoupledCompoundModel("&", vct_4d_pc, right, shared_inputs=2)
+    tfrm = CoupledCompoundModel("&", vct_2d_pc, right, shared_inputs=2)
 
     smatrix = separability_matrix(tfrm)
     assert np.allclose(smatrix, np.array([[1, 1, 1, 1, 0],

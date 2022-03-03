@@ -7,7 +7,8 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
 from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
-                              VaryingCelestialTransform)
+                              InverseVaryingCelestialTransform2D, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D)
 
 
 def test_roundtrip_vct():
@@ -35,6 +36,33 @@ def test_roundtrip_vct():
     assert u.allclose(world, (359.99804329*u.deg, 0.00017119*u.deg))
 
     assert u.allclose(new_ivct(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
+
+
+def test_roundtrip_vct_2d():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
+
+    vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
+                                      cdelt=(1, 1) * u.arcsec/u.pix,
+                                      crval_table=(0, 0) * u.arcsec,
+                                      pc_table=varying_matrix_lt,
+                                      lon_pole=180 * u.deg)
+    new_vct = roundtrip_object(vct)
+    assert isinstance(new_vct, VaryingCelestialTransform2D)
+    new_ivct = roundtrip_object(vct.inverse)
+    assert isinstance(new_ivct, InverseVaryingCelestialTransform2D)
+
+    assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
+    assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)
+
+    assert u.allclose(u.Quantity(new_vct.pc_table), varying_matrix_lt)
+    assert u.allclose(u.Quantity(new_ivct.pc_table), varying_matrix_lt)
+
+    pixel = (0*u.pix, 0*u.pix, 4*u.pix, 2*u.pix)
+    world = new_vct(*pixel)
+    assert u.allclose(world, (359.99861111, 0.00138889)*u.deg)
+
+    assert u.allclose(new_ivct(*world, 4*u.pix, 2*u.pix), pixel[:2], atol=0.01*u.pix)
 
 
 def test_coupled_compound_model():
