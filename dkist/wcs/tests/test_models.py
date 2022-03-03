@@ -272,3 +272,20 @@ def test_vct_dispatch():
         varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[1:].reshape((3, 2, 2, 2, 2)),
                                                 crval_table=crval_table[1:].reshape((3, 2, 2, 2)),
                                                 **kwargs)
+
+def test_vct_shape_errors():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = pc_table.reshape((5, 3, 2, 2))
+
+    crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
+    crval_table = crval_table.reshape((5, 3, 2))
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  lon_pole=180 * u.deg)
+
+    with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
+        VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
+
+    with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
+        VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
