@@ -482,7 +482,7 @@ class CoupledCompoundModel(CompoundModel):
         cleft[: sepleft.shape[0], : sepleft.shape[1]] = sepleft
 
         cright = np.zeros((noutp, sepright.shape[1]))
-        cright[-sepright.shape[0]:, -sepright.shape[1]:] = 1
+        cright[-sepright.shape[0]:, -sepright.shape[1]:] = sepright
 
         left_solo_end = self.left.n_inputs - self.shared_inputs
         right_solo_start = left_solo_end + self.shared_inputs
@@ -490,6 +490,6 @@ class CoupledCompoundModel(CompoundModel):
         matrix[:, :left_solo_end] = cleft[:, :left_solo_end]
         matrix[:, left_solo_end:right_solo_start] = np.logical_or(cleft[:, left_solo_end:],
                                                                   cright[:, :self.shared_inputs])
-        matrix[:, right_solo_start:] = cright[:, :right_solo_start]
+        matrix[:, right_solo_start:] = cright[:, self.shared_inputs:]
 
         return matrix
