@@ -227,6 +227,9 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
         self.inputs = ("x", "y", "z")
         self.outputs = ("lon", "lat")
 
+        if len(self.table_shape) != 1:
+            raise ValueError("This model can only be constructed with a one dimensional lookup table.")
+
     @property
     def input_units(self):
         return {"x": u.pix, "y": u.pix, "z": u.pix}
@@ -318,6 +321,9 @@ class VaryingCelestialTransform4D(BaseVaryingCelestialTransform4D):
         super().__init__(*args, **kwargs)
         self.inputs = ("x", "y", "z", "q")
         self.outputs = ("lon", "lat")
+
+        if len(self.table_shape) != 2:
+            raise ValueError("This model can only be constructed with a two dimensional lookup table.")
 
     @property
     def input_units(self):
@@ -493,3 +499,34 @@ class CoupledCompoundModel(CompoundModel):
         matrix[:, right_solo_start:] = cright[:, self.shared_inputs:]
 
         return matrix
+
+
+def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quantity],
+                                            cdelt: Union[Iterable[float], u.Quantity],
+                                            pc_table: Union[ArrayLike, u.Quantity],
+                                            crval_table: Union[Iterable[float], u.Quantity],
+                                            lon_pole: Union[float, u.Quantity] = None,
+                                            projection: Model = m.Pix2Sky_TAN()
+                                            ) -> BaseVaryingCelestialTransform:
+    """
+    Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
+    """
+
+    table_shape, _, _ = BaseVaryingCelestialTransform._validate_table_shapes(pc_table,
+                                                                             crval_table)
+
+    if (table_d := len(table_shape)) not in (1, 2):
+        raise ValueError("Only one or two dimensional lookup tables are supported.")
+
+    cls = VaryingCelestialTransform
+    if table_d == 2:
+        cls = VaryingCelestialTransform4D
+
+    return cls(
+        crpix=crpix,
+        cdelt=cdelt,
+        crval_table=crval_table,
+        pc_table=pc_table,
+        lon_pole=lon_pole,
+        projection=projection
+    )
