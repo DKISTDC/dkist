@@ -1,0 +1,63 @@
+import numpy as np
+import pytest
+
+import astropy.modeling.models as m
+import astropy.units as u
+from astropy.modeling import CompoundModel, Model
+from astropy.modeling.separable import separability_matrix
+
+from dkist.wcs.models import CoupledCompoundModel, VaryingCelestialTransform
+
+
+@pytest.fixture
+def linear_time():
+    return m.Linear1D(slope=1*u.s/u.pix, intercept=0*u.s)
+
+
+@pytest.fixture
+def vct_crval():
+    crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
+    return VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                     cdelt=(1, 1) * u.arcsec/u.pix,
+                                     crval_table=crval_table,
+                                     pc_table=np.identity(2) * u.arcsec,
+                                     lon_pole=180 * u.deg)
+
+
+def test_coupled_init_error():
+    with pytest.raises(ValueError, match="only be used with the & operator"):
+        CoupledCompoundModel("|", None, None)
+
+
+def test_coupled(vct_crval, linear_time):
+    tfrm = CoupledCompoundModel("&", vct_crval, linear_time, shared_inputs=1)
+
+    assert tfrm.n_inputs == 3
+    assert len(tfrm.inputs) == 3
+
+    pixel = (0, 0, 2) * u.pix
+    world = tfrm(*pixel)
+    spatial_world = vct_crval(*pixel)
+    temporal_world = linear_time(pixel[2])
+    assert u.allclose(spatial_world, world[:2])
+    assert u.allclose(temporal_world, world[2])
+
+    inverse = tfrm.inverse
+
+    assert inverse.n_inputs == 3
+    assert inverse.n_outputs == 3
+
+    assert isinstance(inverse, CompoundModel)
+
+    assert u.allclose(inverse(*world), pixel, atol=1e-9*u.pix)
+
+
+def test_coupled_sep(linear_time, vct_crval):
+    if not hasattr(Model, "_calculate_separability_matrix"):
+        pytest.skip()
+
+    tfrm = CoupledCompoundModel("&", vct_crval, linear_time, shared_inputs=1)
+    smatrix = separability_matrix(tfrm)
+    assert np.allclose(smatrix, np.array([[True,  True,  True],
+                                          [True,  True,  True],
+                                          [False, False, True]]))
