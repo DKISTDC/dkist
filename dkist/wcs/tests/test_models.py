@@ -7,6 +7,7 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
 from dkist.wcs.models import (VaryingCelestialTransform, VaryingCelestialTransform2D,
+                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
                               generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
@@ -273,6 +274,7 @@ def test_vct_dispatch():
                                                 crval_table=crval_table[1:].reshape((3, 2, 2, 2)),
                                                 **kwargs)
 
+
 def test_vct_shape_errors():
     pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
     pc_table = pc_table.reshape((5, 3, 2, 2))
@@ -289,3 +291,37 @@ def test_vct_shape_errors():
 
     with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
         VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
+
+
+def test_vct_slit():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  crval_table=(0, 0) * u.arcsec,
+                  lon_pole=180 * u.deg)
+
+    vct_slit = VaryingCelestialTransformSlit(pc_table=pc_table, **kwargs)
+    pixel = (0*u.pix, 0*u.pix)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0*u.pix)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
+
+    world2 = vct_slit(pixel[0], 1*u.pix)
+    assert not u.allclose(world, world2)
+
+
+def test_vct_slit2d():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = pc_table.reshape((5, 3, 2, 2))
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  crval_table=(0, 0) * u.arcsec,
+                  lon_pole=180 * u.deg)
+
+    vct_slit = VaryingCelestialTransformSlit2D(pc_table=pc_table, **kwargs)
+    pixel = (0*u.pix, 0*u.pix, 0*u.pix)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
