@@ -9,10 +9,10 @@ on:
 
 jobs:
   publish:
-    # TODO: Ignore .dev tags
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
     with:
       test_extras: tests
       test_command: pytest --pyargs dkist
+      upload_to_pypi: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && !endsWith(github.event.ref, '.dev') }}
     secrets:
       pypi_token: ${{ secrets.pypi_token }}
