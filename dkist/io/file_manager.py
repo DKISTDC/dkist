@@ -124,7 +124,7 @@ class BaseFileManager:
         item = self._array_slice_to_reference_slice(item)
 
         # Apply slice as array, but then back to nested lists
-        uris = np.array(self.filenames)[item].tolist()
+        uris = np.array(self._fileuris)[item].tolist()
         if isinstance(uris, str):
             uris = [uris]
 

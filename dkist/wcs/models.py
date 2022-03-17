@@ -160,6 +160,9 @@ class BaseVaryingCelestialTransform(Model):
         cdelt = cdelt if cdelt is not None else self.cdelt
         lon_pole = lon_pole if lon_pole is not None else self.lon_pole
 
+        if ind > self.pc_table.shape[0] - 1 or ind < 0:
+            return m.Const1D(np.nan * u.arcsec) & m.Const1D(np.nan * u.arcsec)
+
         sct = generate_celestial_transform(crpix=crpix,
                                            cdelt=cdelt,
                                            pc=self.pc_table[ind],
