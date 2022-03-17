@@ -163,14 +163,6 @@ class FriedParameter(_Range):
 class PolarimetricAccuracy(_Range):
     """
     The average polarimetric accuracy of a dataset.
-
-    Parameters
-    ----------
-    friedmin : `u.Quantity`
-        The minimum value of the average fried parameter to search between.
-
-    friedmax : `u.Quantity`
-        The maximum value of the average fried parameter to search between.
     """
 
     def collides(self, other):
