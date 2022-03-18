@@ -160,7 +160,7 @@ class BaseVaryingCelestialTransform(Model):
         cdelt = cdelt if cdelt is not None else self.cdelt
         lon_pole = lon_pole if lon_pole is not None else self.lon_pole
 
-        if ind > self.pc_table.shape[0] - 1 or ind < 0:
+        if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(np.nan * u.arcsec) & m.Const1D(np.nan * u.arcsec)
 
         sct = generate_celestial_transform(crpix=crpix,
@@ -499,13 +499,13 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for yy in np.unique(yind):
-            for zz in np.unique(zind):
+        for yyind in np.unique(yind):
+            for zzind in np.unique(zind):
                 # Scalar parameters are reshaped to be length one arrays by modeling
-                sct = self.transform_at_index((zz, yy), crpix[0], cdelt[0], lon_pole[0])
+                sct = self.transform_at_index((zzind, yyind), crpix[0], cdelt[0], lon_pole[0])
 
                 # Call this transform for all values of x, y where z == zind
-                mask = np.logical_and(zind == zz, yind == yy)
+                mask = np.logical_and(zind == zzind, yind == yyind)
                 if inverse:
                     xx, yy = sct.inverse(bx[mask], by[mask])
                 else:
