@@ -7,8 +7,11 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
 from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
-                              InverseVaryingCelestialTransform2D, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D)
+                              InverseVaryingCelestialTransform2D,
+                              InverseVaryingCelestialTransformSlit,
+                              InverseVaryingCelestialTransformSlit2D, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
+                              VaryingCelestialTransformSlit2D)
 
 
 def test_roundtrip_vct():
@@ -63,6 +66,36 @@ def test_roundtrip_vct_2d():
     assert u.allclose(world, (359.99861111, 0.00138889)*u.deg)
 
     assert u.allclose(new_ivct(*world, 4*u.pix, 2*u.pix), pixel[:2], atol=0.01*u.pix)
+
+
+def test_roundtrip_vct_slit():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2]
+                         for a in np.linspace(0, 90, 10)] * u.arcsec
+
+    vct = VaryingCelestialTransformSlit(crpix=(5, 5) * u.pix,
+                                        cdelt=(1, 1) * u.arcsec/u.pix,
+                                        crval_table=(0, 0) * u.arcsec,
+                                        pc_table=varying_matrix_lt,
+                                        lon_pole=180 * u.deg)
+    new_vct = roundtrip_object(vct)
+    assert isinstance(new_vct, VaryingCelestialTransformSlit)
+    new_ivct = roundtrip_object(vct.inverse)
+    assert isinstance(new_ivct, InverseVaryingCelestialTransformSlit)
+
+
+def test_roundtrip_vct_slit2d():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
+
+    vct = VaryingCelestialTransformSlit2D(crpix=(5, 5) * u.pix,
+                                          cdelt=(1, 1) * u.arcsec/u.pix,
+                                          crval_table=(0, 0) * u.arcsec,
+                                          pc_table=varying_matrix_lt,
+                                          lon_pole=180 * u.deg)
+    new_vct = roundtrip_object(vct)
+    assert isinstance(new_vct, VaryingCelestialTransformSlit2D)
+    new_ivct = roundtrip_object(vct.inverse)
+    assert isinstance(new_ivct, InverseVaryingCelestialTransformSlit2D)
 
 
 def test_coupled_compound_model():

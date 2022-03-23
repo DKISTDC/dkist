@@ -689,6 +689,7 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
                                             lon_pole: Union[float, u.Quantity] = None,
                                             projection: Model = m.Pix2Sky_TAN(),
                                             inverse=False,
+                                            slit=False,
                                             ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -700,13 +701,22 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
     if (table_d := len(table_shape)) not in (1, 2):
         raise ValueError("Only one or two dimensional lookup tables are supported.")
 
-    cls = VaryingCelestialTransform
-    if table_d == 2:
-        cls = VaryingCelestialTransform2D
     if inverse:
         cls = InverseVaryingCelestialTransform
+        if slit:
+            cls = InverseVaryingCelestialTransformSlit
         if table_d == 2:
             cls = InverseVaryingCelestialTransform2D
+            if slit:
+                cls = InverseVaryingCelestialTransformSlit2D
+    else:
+        cls = VaryingCelestialTransform
+        if slit:
+            cls = VaryingCelestialTransformSlit
+        if table_d == 2:
+            cls = VaryingCelestialTransform2D
+            if slit:
+                cls = VaryingCelestialTransformSlit2D
 
     return cls(
         crpix=crpix,
