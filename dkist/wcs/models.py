@@ -160,8 +160,11 @@ class BaseVaryingCelestialTransform(Model):
         cdelt = cdelt if cdelt is not None else self.cdelt
         lon_pole = lon_pole if lon_pole is not None else self.lon_pole
 
+        fill_val = np.nan
+        if isinstance(crpix, u.Quantity):
+            fill_val = np.nan * u.deg
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
-            return m.Const1D(np.nan * u.arcsec) & m.Const1D(np.nan * u.arcsec)
+            return m.Const1D(fill_val) & m.Const1D(fill_val)
 
         sct = generate_celestial_transform(crpix=crpix,
                                            cdelt=cdelt,
@@ -388,7 +391,9 @@ class BaseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform):
             # Call this transform for all values of x, y where y == yind
             mask = yind == yy
             if inverse:
-                xx, yy = sct.inverse(bx[mask], by[mask])
+                # Note this isn't use as the inverse of this model uses the
+                # standard 2D inverse.
+                xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
             else:
                 xx, yy = sct(bx[mask], by[mask])
 
@@ -415,7 +420,7 @@ class VaryingCelestialTransformSlit(BaseVaryingCelestialTransformSlit):
         self.outputs = ("lon", "lat")
 
         if len(self.table_shape) != 1:
-            raise ValueError("This model can only be constructed with a two dimensional lookup table.")
+            raise ValueError("This model can only be constructed with a one dimensional lookup table.")
 
     @property
     def input_units(self):
@@ -507,7 +512,9 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
                 # Call this transform for all values of x, y where z == zind
                 mask = np.logical_and(zind == zzind, yind == yyind)
                 if inverse:
-                    xx, yy = sct.inverse(bx[mask], by[mask])
+                    # Note this isn't use as the inverse of this model uses the
+                    # standard 2D inverse.
+                    xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
                 else:
                     xx, yy = sct(bx[mask], by[mask])
 
