@@ -145,7 +145,7 @@ def test_coupled_slit_no_repeat(linear_time):
     pixel = (0*u.pix, 4*u.pix)
     world = tfrm(*pixel)
     ipixel = tfrm.inverse(*world)
-    assert u.allclose(ipixel, pixel)
+    assert u.allclose(ipixel, pixel, atol=1e-5*u.pix)
 
 
 def test_coupled_slit_with_repeat(linear_time):
