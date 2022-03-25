@@ -299,7 +299,7 @@ class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
                 # Scalar parameters are reshaped to be length one arrays by modeling
                 sct = self.transform_at_index((zz, qq), crpix[0], cdelt[0], lon_pole[0])
 
-                # Call this transform for all values of x, y where z == zind
+                # Call this transform for all values of x, y where z == zind and q == qind
                 mask = np.logical_and(zind == zz, qind == qq)
                 if inverse:
                     xx, yy = sct.inverse(bx[mask], by[mask])
@@ -382,14 +382,14 @@ class BaseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform):
             x_out = np.empty_like(bx)
             y_out = np.empty_like(by)
 
-        # We now loop over every unique value of z and compute the transform.
+        # We now loop over every unique value of y and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for yy in np.unique(yind):
+        for yyind in np.unique(yind):
             # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(yy, crpix[0], cdelt[0], lon_pole[0])
+            sct = self.transform_at_index(yyind, crpix[0], cdelt[0], lon_pole[0])
 
             # Call this transform for all values of x, y where y == yind
-            mask = yind == yy
+            mask = yind == yyind
             if inverse:
                 # Note this isn't use as the inverse of this model uses the
                 # standard 2D inverse.
@@ -502,7 +502,7 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
             x_out = np.empty_like(bx)
             y_out = np.empty_like(by)
 
-        # We now loop over every unique value of z and compute the transform.
+        # We now loop over every unique value of y and z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
         for yyind in np.unique(yind):
             for zzind in np.unique(zind):
