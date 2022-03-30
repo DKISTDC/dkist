@@ -4,11 +4,12 @@ import pytest
 import astropy.modeling.models as m
 import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
-from astropy.modeling import CompoundModel, Model
-from astropy.modeling.separable import separability_matrix
+from astropy.modeling import CompoundModel
 
-from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
-                              generate_celestial_transform)
+from dkist.wcs.models import (VaryingCelestialTransform, VaryingCelestialTransform2D,
+                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
+                              generate_celestial_transform,
+                              varying_celestial_transform_from_tables)
 
 
 def test_generate_celestial():
@@ -185,62 +186,188 @@ def test_vct_errors():
                                   projection=ValueError)
 
 
-@pytest.fixture
-def linear_time():
-    return m.Linear1D(slope=1*u.s/u.pix, intercept=0*u.s)
+def test_varying_transform_4d_pc():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
+
+    vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
+                                      cdelt=(1, 1) * u.arcsec/u.pix,
+                                      crval_table=(0, 0) * u.arcsec,
+                                      pc_table=varying_matrix_lt,
+                                      lon_pole=180 * u.deg)
+
+    pixel = 0*u.pix, 0*u.pix, 0*u.pix, 0*u.pix
+    world = vct(*pixel)
+    new_pixel = vct.inverse(*world, 0*u.pix, 0*u.pix)
+
+    assert u.allclose(new_pixel, pixel[:2], atol=0.01*u.pix)
+
+    out_of_bounds = u.Quantity(vct(*(0, 0, -10, 0) * u.pix))
+    assert isinstance(out_of_bounds, u.Quantity)
+    assert out_of_bounds.unit.is_equivalent(u.deg)
+    assert np.isnan(out_of_bounds.value).all()
 
 
-@pytest.fixture
-def vct_crval():
-    crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
-    return VaryingCelestialTransform(crpix=(5, 5) * u.pix,
-                                     cdelt=(1, 1) * u.arcsec/u.pix,
-                                     crval_table=crval_table,
-                                     pc_table=np.identity(2) * u.arcsec,
-                                     lon_pole=180 * u.deg)
+def test_varying_transform_4d_pc_unitless():
+    varying_matrix_lt = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)])
+    varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
+
+    vct = VaryingCelestialTransform2D(crpix=(5, 5),
+                                      cdelt=(1, 1),
+                                      crval_table=(0, 0),
+                                      pc_table=varying_matrix_lt,
+                                      lon_pole=180)
+
+    pixel = 0, 0, 0, 0
+    world = vct(*pixel)
+    new_pixel = vct.inverse(*world, 0, 0)
+
+    assert u.allclose(new_pixel, pixel[:2], atol=0.01)
+    assert np.isnan(vct(0, 0, -10, 0)).all()
 
 
-def test_coupled_init_error():
-    with pytest.raises(ValueError, match="only be used with the & operator"):
-        CoupledCompoundModel("|", None, None)
+@pytest.mark.parametrize(("pixel", "lon_shape"), (
+    ((*np.mgrid[0:5, 0:5] * u.pix, np.arange(5) * u.pix, 0 * u.pix), (5, 5)),
+    (np.mgrid[0:10, 0:10, 0:5, 0:3] * u.pix, (10, 10, 5, 3)),
+    ((2 * u.pix, 2 * u.pix, 0*u.pix, np.arange(3) * u.pix), (3,)),
+    ((np.arange(10) * u.pix,
+      np.arange(10) * u.pix,
+      np.arange(5)[..., None] * u.pix,
+      np.arange(3)[..., None, None]), (3, 5, 10)),
+))
+def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
+
+    vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
+                                      cdelt=(1, 1) * u.arcsec/u.pix,
+                                      crval_table=(0, 0) * u.arcsec,
+                                      pc_table=varying_matrix_lt,
+                                      lon_pole=180 * u.deg)
+    world = vct(*pixel)
+    assert np.array(world[0]).shape == lon_shape
+    new_pixel = vct.inverse(*world, *pixel[-2:])
+    assert u.allclose(new_pixel,
+                      np.broadcast_arrays(*pixel, subok=True)[:2],
+                      atol=0.01*u.pix)
 
 
-def test_coupled(vct_crval, linear_time):
-    tfrm = CoupledCompoundModel("&", vct_crval, linear_time, shared_inputs=1)
+def test_vct_dispatch():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    assert tfrm.n_inputs == 3
-    assert len(tfrm.inputs) == 3
+    crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
+    crval_table = crval_table.reshape((5, 3, 2))
 
-    pixel = (0, 0, 2) * u.pix
-    world = tfrm(*pixel)
-    spatial_world = vct_crval(*pixel)
-    temporal_world = linear_time(pixel[2])
-    assert u.allclose(spatial_world, world[:2])
-    assert u.allclose(temporal_world, world[2])
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  lon_pole=180 * u.deg)
 
-    inverse = tfrm.inverse
+    vct_3d = varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[0],
+                                                     crval_table=crval_table[0],
+                                                     **kwargs)
 
-    assert inverse.n_inputs == 3
-    assert inverse.n_outputs == 3
+    assert isinstance(vct_3d, VaryingCelestialTransform)
 
-    assert isinstance(inverse, CompoundModel)
+    vct_2d = varying_celestial_transform_from_tables(pc_table=varying_matrix_lt,
+                                                     crval_table=crval_table,
+                                                     **kwargs)
 
-    assert u.allclose(inverse(*world), pixel, atol=1e-9*u.pix)
+    assert isinstance(vct_2d, VaryingCelestialTransform2D)
+
+    with pytest.raises(ValueError, match="Only one or two dimensional lookup tables are supported"):
+        varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[1:].reshape((3, 2, 2, 2, 2)),
+                                                crval_table=crval_table[1:].reshape((3, 2, 2, 2)),
+                                                **kwargs)
 
 
-def test_coupled_sep(linear_time):
-    if not hasattr(Model, "_calculate_separability_matrix"):
-        pytest.skip()
+def test_vct_shape_errors():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = pc_table.reshape((5, 3, 2, 2))
 
-    crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
-    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
-                                    cdelt=(1, 1) * u.arcsec/u.pix,
-                                    crval_table=crval_table,
-                                    pc_table=np.identity(2) * u.arcsec,
-                                    lon_pole=180 * u.deg)
+    crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
+    crval_table = crval_table.reshape((5, 3, 2))
 
-    tfrm = CoupledCompoundModel("&", vct, linear_time, shared_inputs=1)
-    smatrix = separability_matrix(tfrm)
-    assert np.allclose(smatrix, np.array([[True,  True,  True],
-                                          [True,  True,  True],
-                                          [False, False, True]]))
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  lon_pole=180 * u.deg)
+
+    with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
+        VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
+
+    with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
+        VaryingCelestialTransformSlit(crval_table=crval_table, pc_table=pc_table, **kwargs)
+
+    with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
+        VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
+
+    with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
+        VaryingCelestialTransformSlit2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
+
+
+def test_vct_slit():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  crval_table=(0, 0) * u.arcsec,
+                  lon_pole=180 * u.deg)
+
+    vct_slit = VaryingCelestialTransformSlit(pc_table=pc_table, **kwargs)
+    pixel = (0*u.pix, 0*u.pix)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0*u.pix)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
+
+    world2 = vct_slit(pixel[0], 1*u.pix)
+    assert not u.allclose(world, world2)
+
+
+def test_vct_slit2d():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = pc_table.reshape((5, 3, 2, 2))
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  crval_table=(0, 0) * u.arcsec,
+                  lon_pole=180 * u.deg)
+
+    vct_slit = VaryingCelestialTransformSlit2D(pc_table=pc_table, **kwargs)
+    pixel = (0*u.pix, 0*u.pix, 0*u.pix)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
+
+
+def test_vct_slit_unitless():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)]
+
+    kwargs = dict(crpix=(5, 5),
+                  cdelt=(1, 1),
+                  crval_table=(0, 0),
+                  lon_pole=180)
+
+    vct_slit = VaryingCelestialTransformSlit(pc_table=pc_table, **kwargs)
+    pixel = (0, 0)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5)
+
+    world2 = vct_slit(pixel[0], 1)
+    assert not u.allclose(world, world2)
+
+
+def test_vct_slit2d_unitless():
+    pc_table = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)])
+    pc_table = pc_table.reshape((5, 3, 2, 2))
+
+    kwargs = dict(crpix=(5, 5),
+                  cdelt=(1, 1),
+                  crval_table=(0, 0),
+                  lon_pole=180)
+
+    vct_slit = VaryingCelestialTransformSlit2D(pc_table=pc_table, **kwargs)
+    pixel = (0, 0, 0)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0, 0)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5)

@@ -120,10 +120,10 @@ class BaseVaryingCelestialTransform(Model):
         return table_shape, pc_table, crval_table
 
     @staticmethod
-    def sanitize_z(z):
-        if isinstance(z, u.Quantity):
-            z = z.value
-        return np.array(np.round(z), dtype=int)
+    def sanitize_index(ind):
+        if isinstance(ind, u.Quantity):
+            ind = ind.value
+        return np.array(np.round(ind), dtype=int)
 
     def __init__(self, *args, crval_table=None, pc_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
         super().__init__(*args, **kwargs)
@@ -137,7 +137,7 @@ class BaseVaryingCelestialTransform(Model):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
-    def transform_at_index(self, zind, crpix=None, cdelt=None, lon_pole=None):
+    def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
 
@@ -160,10 +160,16 @@ class BaseVaryingCelestialTransform(Model):
         cdelt = cdelt if cdelt is not None else self.cdelt
         lon_pole = lon_pole if lon_pole is not None else self.lon_pole
 
+        fill_val = np.nan
+        if isinstance(crpix, u.Quantity):
+            fill_val = np.nan * u.deg
+        if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
+            return m.Const1D(fill_val) & m.Const1D(fill_val)
+
         sct = generate_celestial_transform(crpix=crpix,
                                            cdelt=cdelt,
-                                           pc=self.pc_table[zind],
-                                           crval=self.crval_table[zind],
+                                           pc=self.pc_table[ind],
+                                           crval=self.crval_table[ind],
                                            lon_pole=lon_pole,
                                            projection=self.projection)
 
@@ -173,7 +179,7 @@ class BaseVaryingCelestialTransform(Model):
         # We need to broadcast the arrays together so they are all the same shape
         bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
         # Convert the z coordinate into an index to the lookup tables
-        ind = self.sanitize_z(bz)
+        ind = self.sanitize_index(bz)
 
         # Generate output arrays (ignore units for simplicity)
         if isinstance(bx, u.Quantity):
@@ -227,6 +233,9 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
         self.inputs = ("x", "y", "z")
         self.outputs = ("lon", "lat")
 
+        if len(self.table_shape) != 1:
+            raise ValueError("This model can only be constructed with a one dimensional lookup table.")
+
     @property
     def input_units(self):
         return {"x": u.pix, "y": u.pix, "z": u.pix}
@@ -265,6 +274,279 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
 
     def evaluate(self, lon, lat, z, crpix, cdelt, lon_pole, **kwargs):
         return self._map_transform(lon, lat, z, crpix, cdelt, lon_pole, inverse=True)
+
+
+class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
+    def _map_transform(self, x, y, z, q, crpix, cdelt, lon_pole, inverse=False):
+        # We need to broadcast the arrays together so they are all the same shape
+        bx, by, bz, bq = np.broadcast_arrays(x, y, z, q, subok=True)
+        # Convert the z coordinate into an index to the lookup tables
+        zind = self.sanitize_index(bz)
+        qind = self.sanitize_index(bq)
+
+        # Generate output arrays (ignore units for simplicity)
+        if isinstance(bx, u.Quantity):
+            x_out = np.empty_like(bx.value)
+            y_out = np.empty_like(by.value)
+        else:
+            x_out = np.empty_like(bx)
+            y_out = np.empty_like(by)
+
+        # We now loop over every unique value of z and compute the transform.
+        # This means we make the minimum number of calls possible to the transform.
+        for qq in np.unique(qind):
+            for zz in np.unique(zind):
+                # Scalar parameters are reshaped to be length one arrays by modeling
+                sct = self.transform_at_index((zz, qq), crpix[0], cdelt[0], lon_pole[0])
+
+                # Call this transform for all values of x, y where z == zind and q == qind
+                mask = np.logical_and(zind == zz, qind == qq)
+                if inverse:
+                    xx, yy = sct.inverse(bx[mask], by[mask])
+                else:
+                    xx, yy = sct(bx[mask], by[mask])
+
+                if isinstance(xx, u.Quantity):
+                    x_out[mask], y_out[mask] = xx.value, yy.value
+                else:
+                    x_out[mask], y_out[mask] = xx, yy
+
+        # Put the units back
+        if isinstance(xx, u.Quantity):
+            x_out = x_out << xx.unit
+            y_out = y_out << yy.unit
+
+        return x_out, y_out
+
+
+class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
+    n_inputs = 4
+    n_outputs = 2
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("x", "y", "z", "q")
+        self.outputs = ("lon", "lat")
+
+        if len(self.table_shape) != 2:
+            raise ValueError("This model can only be constructed with a two dimensional lookup table.")
+
+    @property
+    def input_units(self):
+        return {"x": u.pix, "y": u.pix, "z": u.pix, "q": u.pix}
+
+    def evaluate(self, x, y, z, q, crpix, cdelt, lon_pole):
+        return self._map_transform(x, y, z, q, crpix, cdelt, lon_pole)
+
+    @property
+    def inverse(self):
+        ivct = InverseVaryingCelestialTransform2D(crpix=self.crpix,
+                                                  cdelt=self.cdelt,
+                                                  lon_pole=self.lon_pole,
+                                                  pc_table=self.pc_table,
+                                                  crval_table=self.crval_table,
+                                                  projection=self.projection)
+        return ivct
+
+
+class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
+    n_inputs = 4
+    n_outputs = 2
+
+    @property
+    def input_units(self):
+        return {"lon": u.deg, "lat": u.deg, "z": u.pix, "q": u.pix}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("lon", "lat", "z", "q")
+        self.outputs = ("x", "y")
+
+    def evaluate(self, lon, lat, z, q, crpix, cdelt, lon_pole, **kwargs):
+        return self._map_transform(lon, lat, z, q, crpix, cdelt, lon_pole,
+                                   inverse=True)
+
+
+class BaseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform):
+    def _map_transform(self, x, y, crpix, cdelt, lon_pole, inverse=False):
+        # We need to broadcast the arrays together so they are all the same shape
+        bx, by = np.broadcast_arrays(x, y, subok=True)
+        # Convert the z coordinate into an index to the lookup tables
+        yind = self.sanitize_index(by)
+
+        # Generate output arrays (ignore units for simplicity)
+        if isinstance(bx, u.Quantity):
+            x_out = np.empty_like(bx.value)
+            y_out = np.empty_like(by.value)
+        else:
+            x_out = np.empty_like(bx)
+            y_out = np.empty_like(by)
+
+        # We now loop over every unique value of y and compute the transform.
+        # This means we make the minimum number of calls possible to the transform.
+        for yyind in np.unique(yind):
+            # Scalar parameters are reshaped to be length one arrays by modeling
+            sct = self.transform_at_index(yyind, crpix[0], cdelt[0], lon_pole[0])
+
+            # Call this transform for all values of x, y where y == yind
+            mask = yind == yyind
+            if inverse:
+                # Note this isn't use as the inverse of this model uses the
+                # standard 2D inverse.
+                xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
+            else:
+                xx, yy = sct(bx[mask], by[mask])
+
+            if isinstance(xx, u.Quantity):
+                x_out[mask], y_out[mask] = xx.value, yy.value
+            else:
+                x_out[mask], y_out[mask] = xx, yy
+
+        # Put the units back
+        if isinstance(xx, u.Quantity):
+            x_out = x_out << xx.unit
+            y_out = y_out << yy.unit
+
+        return x_out, y_out
+
+
+class VaryingCelestialTransformSlit(BaseVaryingCelestialTransformSlit):
+    n_inputs = 2
+    n_outputs = 2
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("slity", "raster")
+        self.outputs = ("lon", "lat")
+
+        if len(self.table_shape) != 1:
+            raise ValueError("This model can only be constructed with a one dimensional lookup table.")
+
+    @property
+    def input_units(self):
+        return {"slity": u.pix, "raster": u.pix}
+
+    def evaluate(self, slity, raster, crpix, cdelt, lon_pole):
+        return self._map_transform(slity, raster, crpix, cdelt, lon_pole)
+
+    @property
+    def inverse(self):
+        ivct = InverseVaryingCelestialTransformSlit(crpix=self.crpix,
+                                                    cdelt=self.cdelt,
+                                                    lon_pole=self.lon_pole,
+                                                    pc_table=self.pc_table,
+                                                    crval_table=self.crval_table,
+                                                    projection=self.projection)
+        return ivct
+
+
+class InverseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform):
+    n_inputs = 3
+    n_outputs = 1
+
+    @property
+    def input_units(self):
+        return {"lon": u.deg, "lat": u.deg, "raster": u.pix}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("lon", "lat", "raster")
+        self.outputs = ("slit-y",)
+
+    def evaluate(self, lon, lat, y, crpix, cdelt, lon_pole, **kwargs):
+        return self._map_transform(lon, lat, y, crpix, cdelt, lon_pole,
+                                   inverse=True)[0]
+
+
+class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
+    n_inputs = 3
+    n_outputs = 2
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("slity", "raster", "repeat")
+        self.outputs = ("lon", "lat")
+
+        if len(self.table_shape) != 2:
+            raise ValueError("This model can only be constructed with a two dimensional lookup table.")
+
+    @property
+    def input_units(self):
+        return {"slity": u.pix, "raster": u.pix, "repeat": u.pix}
+
+    def evaluate(self, slity, raster, repeat, crpix, cdelt, lon_pole):
+        return self._map_transform(slity, raster, repeat, crpix, cdelt, lon_pole)
+
+    @property
+    def inverse(self):
+        ivct = InverseVaryingCelestialTransformSlit2D(crpix=self.crpix,
+                                                      cdelt=self.cdelt,
+                                                      lon_pole=self.lon_pole,
+                                                      pc_table=self.pc_table,
+                                                      crval_table=self.crval_table,
+                                                      projection=self.projection)
+        return ivct
+
+    def _map_transform(self, x, y, z, crpix, cdelt, lon_pole, inverse=False):
+        # We need to broadcast the arrays together so they are all the same shape
+        bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
+        # Convert the z coordinate into an index to the lookup tables
+        zind = self.sanitize_index(bz)
+        yind = self.sanitize_index(by)
+
+        # Generate output arrays (ignore units for simplicity)
+        if isinstance(bx, u.Quantity):
+            x_out = np.empty_like(bx.value)
+            y_out = np.empty_like(by.value)
+        else:
+            x_out = np.empty_like(bx)
+            y_out = np.empty_like(by)
+
+        # We now loop over every unique value of y and z and compute the transform.
+        # This means we make the minimum number of calls possible to the transform.
+        for yyind in np.unique(yind):
+            for zzind in np.unique(zind):
+                # Scalar parameters are reshaped to be length one arrays by modeling
+                sct = self.transform_at_index((zzind, yyind), crpix[0], cdelt[0], lon_pole[0])
+
+                # Call this transform for all values of x, y where z == zind
+                mask = np.logical_and(zind == zzind, yind == yyind)
+                if inverse:
+                    # Note this isn't use as the inverse of this model uses the
+                    # standard 2D inverse.
+                    xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
+                else:
+                    xx, yy = sct(bx[mask], by[mask])
+
+                if isinstance(xx, u.Quantity):
+                    x_out[mask], y_out[mask] = xx.value, yy.value
+                else:
+                    x_out[mask], y_out[mask] = xx, yy
+
+        # Put the units back
+        if isinstance(xx, u.Quantity):
+            x_out = x_out << xx.unit
+            y_out = y_out << yy.unit
+
+        return x_out, y_out
+
+
+class InverseVaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform2D):
+    n_inputs = 4
+    n_outputs = 1
+
+    @property
+    def input_units(self):
+        return {"lon": u.deg, "lat": u.deg, "raster": u.pix, "repeat": u.pix}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inputs = ("lon", "lat", "raster", "repeat")
+        self.outputs = ("slit-y",)
+
+    def evaluate(self, lon, lat, raster, repeat, crpix, cdelt, lon_pole, **kwargs):
+        return self._map_transform(lon, lat, raster, repeat, crpix, cdelt,
+                                   lon_pole, inverse=True)[0]
 
 
 class CoupledCompoundModel(CompoundModel):
@@ -394,7 +676,7 @@ class CoupledCompoundModel(CompoundModel):
         cleft[: sepleft.shape[0], : sepleft.shape[1]] = sepleft
 
         cright = np.zeros((noutp, sepright.shape[1]))
-        cright[-sepright.shape[0]:, -sepright.shape[1]:] = 1
+        cright[-sepright.shape[0]:, -sepright.shape[1]:] = sepright
 
         left_solo_end = self.left.n_inputs - self.shared_inputs
         right_solo_start = left_solo_end + self.shared_inputs
@@ -402,6 +684,52 @@ class CoupledCompoundModel(CompoundModel):
         matrix[:, :left_solo_end] = cleft[:, :left_solo_end]
         matrix[:, left_solo_end:right_solo_start] = np.logical_or(cleft[:, left_solo_end:],
                                                                   cright[:, :self.shared_inputs])
-        matrix[:, right_solo_start:] = cright[:, :right_solo_start]
+        matrix[:, right_solo_start:] = cright[:, self.shared_inputs:]
 
         return matrix
+
+
+def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quantity],
+                                            cdelt: Union[Iterable[float], u.Quantity],
+                                            pc_table: Union[ArrayLike, u.Quantity],
+                                            crval_table: Union[Iterable[float], u.Quantity],
+                                            lon_pole: Union[float, u.Quantity] = None,
+                                            projection: Model = m.Pix2Sky_TAN(),
+                                            inverse=False,
+                                            slit=False,
+                                            ) -> BaseVaryingCelestialTransform:
+    """
+    Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
+    """
+
+    table_shape, _, _ = BaseVaryingCelestialTransform._validate_table_shapes(pc_table,
+                                                                             crval_table)
+
+    if (table_d := len(table_shape)) not in (1, 2):
+        raise ValueError("Only one or two dimensional lookup tables are supported.")
+
+    if inverse:
+        cls = InverseVaryingCelestialTransform
+        if slit:
+            cls = InverseVaryingCelestialTransformSlit
+        if table_d == 2:
+            cls = InverseVaryingCelestialTransform2D
+            if slit:
+                cls = InverseVaryingCelestialTransformSlit2D
+    else:
+        cls = VaryingCelestialTransform
+        if slit:
+            cls = VaryingCelestialTransformSlit
+        if table_d == 2:
+            cls = VaryingCelestialTransform2D
+            if slit:
+                cls = VaryingCelestialTransformSlit2D
+
+    return cls(
+        crpix=crpix,
+        cdelt=cdelt,
+        crval_table=crval_table,
+        pc_table=pc_table,
+        lon_pole=lon_pole,
+        projection=projection
+    )
