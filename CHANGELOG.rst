@@ -1,3 +1,19 @@
+v1.0.0b6 (2022-03-30)v1.0.0b6 (2022-03-30)
+=====================
+
+Features
+--------
+
+- Implement models where the poiting varies along the second pixel axis (for
+  rastering slit spectrographs). (`#161 <https://github.com/DKISTDC/dkist/pull/161>`_)
+
+
+Bug Fixes
+---------
+
+- Fix behaviour of `VaryingCelestialTransform` when called with arrays of pixel or world coordinates. (`#160 <https://github.com/DKISTDC/dkist/pull/160>`_)
+
+
 v1.0.0b4 (2022-02-16)
 =====================
 

@@ -1,2 +1,0 @@
-Implement models where the poiting varies along the second pixel axis (for
-rastering slit spectrographs).
