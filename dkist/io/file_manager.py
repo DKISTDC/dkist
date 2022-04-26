@@ -6,7 +6,6 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
-from dkist.io.loaders import AstropyFITSLoader
 from dkist.net.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
                               start_transfer_from_file_list, watch_transfer_progress)
 from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
@@ -73,34 +72,6 @@ class BaseFileManager:
     Manage a collection of arrays in files and their conversion to a Dask Array.
     """
 
-    @classmethod
-    def from_tree(cls, node, ctx):
-        """
-        Deserializes this class from an asdf tree.
-        """
-        filepath = Path((ctx.uri or ".").replace("file:", ""))
-        base_path = filepath.parent
-
-        file_manager = cls(node['fileuris'],
-                           node['target'],
-                           node['datatype'],
-                           node['shape'],
-                           loader=AstropyFITSLoader,
-                           basepath=base_path)
-        return file_manager
-
-    @classmethod
-    def to_tree(cls, data, ctx):
-        """
-        Serializes this class to an asdf tree.
-        """
-        node = {}
-        node['fileuris'] = data._fileuris
-        node['target'] = data.target
-        node['datatype'] = data.dtype
-        node['shape'] = data.shape
-        return node
-
     def __init__(self, fileuris, target, dtype, shape, *, loader, basepath=None):
         shape = tuple(shape)
         self.shape = shape
@@ -114,7 +85,7 @@ class BaseFileManager:
         self._ndcube = None
 
         # Use the setter to convert to a Path
-        self.basepath = basepath
+        self.basepath = Path(basepath) if basepath is not None else None
 
         loader_array = np.empty_like(self._reference_array, dtype=object)
         for i, ele in enumerate(self._reference_array.flat):
@@ -153,7 +124,7 @@ class BaseFileManager:
         item = self._array_slice_to_reference_slice(item)
 
         # Apply slice as array, but then back to nested lists
-        uris = np.array(self.filenames)[item].tolist()
+        uris = np.array(self._fileuris)[item].tolist()
         if isinstance(uris, str):
             uris = [uris]
 
@@ -280,7 +251,7 @@ class FileManager(BaseFileManager):
                 "This file manager has no associated Dataset object, so the data can not be downloaded."
             )
 
-        inv = self._ndcube.meta
+        inv = self._ndcube.meta["inventory"]
 
         base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**inv))
         # TODO: Default path to the config file

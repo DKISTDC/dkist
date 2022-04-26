@@ -154,7 +154,8 @@ def test_apply_or_and(s):
     assert isinstance(s, (attr.AttrOr, attr.DataAttr, attr.AttrAnd))
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+          deadline=None)
 @given(dst.query_and())
 def test_search_query_and(mocked_client, query):
     res = mocked_client.search(query)
@@ -162,7 +163,8 @@ def test_search_query_and(mocked_client, query):
     assert len(res) == 1
 
 
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+          deadline=None)
 @given(dst.query_or_composite())
 def test_search_query_or(mocked_client, query):
     res = mocked_client.search(query)
@@ -198,7 +200,7 @@ def test_cant_handle_query(client, query):
 
 
 @no_vso
-@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture], deadline=None)
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client

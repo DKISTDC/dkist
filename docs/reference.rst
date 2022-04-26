@@ -23,3 +23,9 @@ Reference / API
 
 .. automodapi:: dkist.io.loaders
    :headings: #~
+
+.. automodapi:: dkist.wcs
+   :headings: ^#
+
+.. automodapi:: dkist.wcs.models
+   :headings: #~

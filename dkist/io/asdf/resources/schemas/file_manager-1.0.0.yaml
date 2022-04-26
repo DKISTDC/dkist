@@ -1,8 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "http://dkist.nso.edu/schemas/dkist/array_container-0.2.0"
-tag: "tag:dkist.nso.edu:dkist/array_container-0.2.0"
+id: "asdf://dkist.nso.edu/schemas/file_manager-1.0.0"
 
 title: |
   A multi-dimensional collection of ExternalArrayReference objects to be loaded as FITS files.

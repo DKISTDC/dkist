@@ -5,7 +5,6 @@ from importlib import resources
 from jsonschema.exceptions import ValidationError
 
 import asdf
-import astropy.table
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
@@ -92,7 +91,7 @@ class Dataset(NDCube):
     _file_manager = FileManagerDescriptor(default_type=FileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
-                 unit=None, copy=False, headers=None):
+                 unit=None, copy=False):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
@@ -110,14 +109,13 @@ class Dataset(NDCube):
                 raise ValueError("The pixel and array shape on the WCS object "
                                  "do not match the given array.")
 
+        if "headers" not in meta:
+            raise ValueError("The meta dict must contain the headers table.")
+        if "inventory" not in meta:
+            raise ValueError("The meta dict must contain the inventory record.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)
-
-        if headers is not None and not isinstance(headers, astropy.table.Table):
-            raise ValueError("The headers metadata key must be an Astropy Table instance.")
-
-        self._headers = headers
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
@@ -139,7 +137,14 @@ class Dataset(NDCube):
             so any modifications to the FITS files will not be reflected here.
 
         """
-        return self._headers
+        return self.meta["headers"]
+
+    @property
+    def quality_report(self):
+        """
+        Information regarding the quality of the observations.
+        """
+        return self.meta.get("quality", None)
 
     @property
     def files(self):

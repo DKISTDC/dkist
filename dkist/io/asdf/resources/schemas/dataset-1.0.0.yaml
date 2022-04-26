@@ -1,0 +1,49 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/dataset-1.0.0"
+
+title: |
+  A DKIST Level 1 Dataset object.
+description:
+  The container for a distributed dataset object.
+
+type: object
+properties:
+  data:
+    tag: "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
+
+  wcs:
+    description: The coordinate system for the complete dataset.
+    anyOf:
+      - tag: "tag:stsci.edu:gwcs/wcs-1.0.0"
+      - tag: "tag:stsci.edu:gwcs/wcs-1.1.0"
+
+  mask:
+    tag: "core/ndarray-1.0.0"
+
+  unit:
+    tag: "unit/unit-1.0.0"
+
+  meta:
+    description: Dataset metadata, describing the whole dataset.
+    type: object
+    properties:
+      headers:
+        description: A table of all the headers for the constituent files.
+        tag: "tag:astropy.org:astropy/table/table-1.0.0"
+
+      quality:
+        description: A copy of the quality report of these observations.
+        type: object
+
+      inventory:
+        description: A copy of the inventory record for this dataset.
+        type: object
+
+    required: [headers, inventory]
+    additionalProperties: true
+
+required: [data, wcs]
+additionalProperties: true
+...

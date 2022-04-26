@@ -1,3 +1,58 @@
+v1.0.0b6 (2022-03-30)v1.0.0b6 (2022-03-30)
+=====================
+
+Features
+--------
+
+- Implement models where the poiting varies along the second pixel axis (for
+  rastering slit spectrographs). (`#161 <https://github.com/DKISTDC/dkist/pull/161>`_)
+
+
+Bug Fixes
+---------
+
+- Fix behaviour of `VaryingCelestialTransform` when called with arrays of pixel or world coordinates. (`#160 <https://github.com/DKISTDC/dkist/pull/160>`_)
+
+
+v1.0.0b4 (2022-02-16)
+=====================
+
+Features
+--------
+
+- Implement Astropy models to support spatial transforms which change with
+  a thrid pixel axis. (`#148 <https://github.com/DKISTDC/dkist/pull/148>`_)
+- Add ASDF serialization for `VaryingCelestialTransform` and `CoupledCompoundModel`. (`#156 <https://github.com/DKISTDC/dkist/pull/156>`_)
+
+
+Bug Fixes
+---------
+
+- Fix asdf using old schema and tag versions when saving new files. (`#157 <https://github.com/DKISTDC/dkist/pull/157>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Migate to the asdf 2.8+ ``Converter`` interface, this bumps various
+  dependancies but should have no effect on reading or writing asdf files. (`#152 <https://github.com/DKISTDC/dkist/pull/152>`_)
+
+
+v1.0.0b3 (2021-11-30)
+=====================
+
+Features
+--------
+
+- The inventory record and the headers table are now both stored in the
+  ``Dataset.meta`` dict rather than headers being it's own attribute. This means
+  it is more likely to be carried through correctly when doing operations
+  designed for ``NDCube`` objects. (`#139 <https://github.com/DKISTDC/dkist/pull/139>`_)
+- Add support for tiled datasets in the spatial dimensions.
+  This adds a new class `dkist.TiledDataset` which holds a 2D grid of `dkist.Dataset`
+  objects, and associated asdf schemas to serialise them. (`#143 <https://github.com/DKISTDC/dkist/pull/143>`_)
+
+
 1.0.0b1 (2021-09-15)
 ====================
 

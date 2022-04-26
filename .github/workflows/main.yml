@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
+        - linux: py39
+        - macos: py38
+        - linux: py310-devdeps
+        - windows: py38-oldestdeps
+      coverage: 'codecov'
+
+  publish:
+    needs: [tests]
+    if: github.event_name != 'pull_request'
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
+    with:
+      test_extras: tests
+      test_command: pytest --pyargs dkist
+      upload_to_pypi: ${{ startsWith(github.event.ref, 'refs/tags/v') && !endsWith(github.event.ref, '.dev') }}
+    secrets:
+      pypi_token: ${{ secrets.PYPI_API_TOKEN }}

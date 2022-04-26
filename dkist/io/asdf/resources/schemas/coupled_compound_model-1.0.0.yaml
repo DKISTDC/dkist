@@ -1,0 +1,84 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/coupled_compound_model-1.0.0"
+title: >
+  Send axes to different subtransforms.
+description: |
+    This transform takes two models which share one or more inputs on the forward
+    transform, and where the left hand model's inverse is dependent on the
+    output of the right hand model's inverse output.
+
+    Take the following example with a time dependent celestial transform
+    (modelled as dependent upon the pixel coordinate for time rather than the
+    world coordinate).
+
+    The forward transform uses the "z" pixel dimension as input to both the
+    Celestial and Temporal models, this leads to the following transform in the
+    forward direction:
+
+    ```
+      :    x  y           z
+      :    │  │           │
+      :    │  │  ┌────────┤
+      :    │  │  │        │
+      :    ▼  ▼  ▼        ▼
+      :  ┌─────────┐  ┌────────┐
+      :  │Celestial│  │Temporal│
+      :  └─┬───┬───┘  └───┬────┘
+      :    │   │          │
+      :    │   │          │
+      :    │   │          │
+      :    ▼   ▼          ▼
+      :   lon lat       time
+    ```
+
+    The complexity is in the reverse transform, where the inverse Celestial
+    transform is also dependent upon the pixel coordinate z.
+    This means that the output of the inverse Temporal transform has to be
+    duplicated as an input to the Celestial transform's inverse.
+    This is achieved by the use of the ``Mapping`` models in
+    ``CoupledCompoundModel.inverse`` to create a multi-stage compound model
+    which duplicates the output of the right hand side model::
+
+    ```
+      :   lon lat       time
+      :    │   │         │
+      :    │   │         ▼
+      :    │   │     ┌─────────┐
+      :    │   │     │Temporal'│
+      :    │   │     └──┬──┬───┘
+      :    │   │    z   │  │
+      :    │   │  ┌─────┘  │
+      :    │   │  │        │
+      :    ▼   ▼  ▼        │
+      :  ┌──────────┐      │
+      :  │Celestial'│      │
+      :  └─┬───┬────┘      │
+      :    │   │           │
+      :    ▼   ▼           ▼
+      :    x   y           z
+    ```
+
+examples:
+  -
+    - A set of transforms
+    - |
+      !<asdf://dkist.nso.edu/tags/coupled_compound_model-1.0.0>
+        shared_inputs: 1
+        forward:
+          - !transform/shift-1.2.0
+            offset: 2.0
+          - !transform/shift-1.2.0
+            offset: 3.0
+allOf:
+  - $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
+  - properties:
+      forward:
+        type: array
+        items:
+          $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
+      shared_inputs:
+        type: number
+    required: [forward, shared_inputs]
+...
