@@ -9,9 +9,7 @@ from sunpy.net.base_client import QueryResponseRow
 
 from dkist.net.attrs import Dataset
 from dkist.net.client import DKISTClient
-from dkist.net.globus import start_transfer_from_file_list, watch_transfer_progress
-from dkist.net.globus.endpoints import (get_data_center_endpoint_id,
-                                        get_local_endpoint_id, get_transfer_client)
+from dkist.net.globus.transfer import _orchestrate_transfer_task
 
 __all__ = ['transfer_whole_dataset']
 
@@ -71,27 +69,18 @@ def transfer_whole_dataset(dataset: Union[str, QueryResponseRow],
     proposal_id = dataset["Primary Proposal ID"]
     bucket = dataset["Storage Bucket"]
 
-    if not destination_endpoint:
-        destination_endpoint = get_local_endpoint_id()
-
     destination_path = Path(path) / proposal_id
 
-    base_path = Path(conf.dataset_path.format(bucket=bucket,
-                                              primaryProposalId=proposal_id,
-                                              datasetId=dataset_id))
+    file_list = [Path(conf.dataset_path.format(
+        datasetId=dataset_id,
+        primaryProposalId=proposal_id,
+        bucket=bucket
+    ))]
 
-    task_id = start_transfer_from_file_list(get_data_center_endpoint_id(),
-                                            destination_endpoint,
-                                            destination_path,
-                                            [base_path])
-
-    tc = get_transfer_client()
-
-    if wait:
-        if progress:
-            watch_transfer_progress(task_id, tc,
-                                    verbose=progress == "verbose")
-        else:
-            tc.task_wait(task_id, timeout=1e6)
+    _orchestrate_transfer_task(file_list,
+                               recursive=True,
+                               destination_path=destination_path,
+                               progress=progress,
+                               wait=wait)
 
     return destination_path / dataset_id

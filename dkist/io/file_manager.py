@@ -7,9 +7,7 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.net import conf as net_conf
-from dkist.net.globus import start_transfer_from_file_list, watch_transfer_progress
-from dkist.net.globus.endpoints import (get_data_center_endpoint_id,
-                                        get_local_endpoint_id, get_transfer_client)
+from dkist.net.globus.transfer import _orchestrate_transfer_task
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -265,27 +263,20 @@ class FileManager(BaseFileManager):
         # TODO: Default path to the config file
         destination_path = Path(path) / inv['primaryProposalId'] / inv['datasetId']
 
+        # TODO: If we are transferring the whole dataset then we should use the
+        # directory not the list of all the files in it.
         file_list = [base_path / fn for fn in self.filenames]
         file_list.append(Path("/") / inv['bucket'] / inv['asdfObjectKey'])
 
         # TODO: Ascertain if the destination path is local better than this
-        is_local = False
-        if not destination_endpoint:
-            is_local = True
-            destination_endpoint = get_local_endpoint_id()
+        is_local = not destination_endpoint
 
-        task_id = start_transfer_from_file_list(get_data_center_endpoint_id(),
-                                                destination_endpoint, destination_path,
-                                                file_list)
-
-        tc = get_transfer_client()
-
-        if wait:
-            if progress:
-                watch_transfer_progress(task_id, tc, initial_n=len(file_list),
-                                        verbose=progress == "verbose")
-            else:
-                tc.task_wait(task_id, timeout=1e6)
+        _orchestrate_transfer_task(file_list,
+                                   recursive=False,
+                                   destination_path=destination_path,
+                                   destination_endpoint=destination_endpoint,
+                                   progress=progress,
+                                   wait=wait)
 
         if is_local:
             local_destination = destination_path.relative_to("/").expanduser()

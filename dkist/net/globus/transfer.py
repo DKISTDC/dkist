@@ -6,18 +6,21 @@ import json
 import time
 import pathlib
 import datetime
+from os import PathLike
+from typing import Union, Literal
 
 import globus_sdk
 from parfive.utils import in_notebook
 from tqdm import tqdm, tqdm_notebook
 
-from .endpoints import auto_activate_endpoint, get_endpoint_id, get_transfer_client
+from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
+                        get_endpoint_id, get_local_endpoint_id, get_transfer_client)
 
 __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
 
 
 def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, file_list,
-                                  src_base_path=None):
+                                  src_base_path=None, recursive=False):
     """
     Start a new transfer task for a list of files.
 
@@ -45,11 +48,23 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
         ``eggs/`` folder will be copied to ``dst_base_path``. By default only
         the filenames are kept, and none of the directories.
 
+    recursive : `bool` or `list` of `bool`, optional
+       If the recursive flag should be set when adding a file to the transfer.
+       This should be set if the element of ``file_list`` is a directory.
+       If you need to set this per-item in ``file_list`` it should be a `list`
+       of `bool` of equal length as ``file_list``.
+
     Returns
     -------
     `str`
         Task ID.
     """
+    if isinstance(recursive, bool):
+        recursive = [recursive] * len(file_list)
+    if len(recursive) != len(file_list):
+        raise ValueError(
+            "The length of recursive should equal the length of file_list when specified as a list."
+        )
 
     # Get a transfer client instance
     tc = get_transfer_client()
@@ -79,8 +94,8 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
             src_filepath = src_file.relative_to(src_base_path)
         dst_file_list.append(dst_base_path / src_filepath)
 
-    for src_file, dst_file in zip(src_file_list, dst_file_list):
-        transfer_manifest.add_item(str(src_file), str(dst_file), recursive=True)
+    for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
+        transfer_manifest.add_item(str(src_file), str(dst_file), recursive=rec)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 
@@ -243,3 +258,67 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
         progress.write("Cancelling Task")
         task = tfr_client.cancel_task(task_id)
         progress.close()
+
+
+def _orchestrate_transfer_task(file_list: list[PathLike],
+                               recursive: list[bool],
+                               destination_path: PathLike = "/~/",
+                               destination_endpoint: str = None,
+                               *,
+                               progress: Union[bool, Literal["verbose"]] = True,
+                               wait: bool = True):
+    """
+    Transfer the files given in file_list to the path on ``destination_endpoint``.
+
+    Parameters
+    ----------
+    file_list
+
+    recursive
+
+    destination_path
+
+    destination_endpoint
+        A unique specifier for a Globus endpoint. If `None` a local
+        endpoint will be used if it can be found, otherwise an error will
+        be raised. See `~dkist.net.globus.get_endpoint_id` for valid
+        endpoint specifiers.
+
+    progress
+        If `True` status information and a progress bar will be displayed
+        while waiting for the transfer to complete.
+        If ``progress="verbose"`` then all globus events generated during the
+        transfer will be shown (by default only error messages are shown.)
+
+    wait
+       If `False` then the function will return while the Globus transfer task
+       is still running. Setting ``wait=False`` implies ``progress=False``.
+
+    Returns
+    -------
+    destination_path
+        The path to the directory containing the dataset on the destination
+        endpoint.
+
+    """
+
+    if not destination_endpoint:
+        destination_endpoint = get_local_endpoint_id()
+
+    task_id = start_transfer_from_file_list(get_data_center_endpoint_id(),
+                                            destination_endpoint,
+                                            destination_path,
+                                            file_list,
+                                            recursive=recursive)
+
+    tc = get_transfer_client()
+
+    if wait:
+        if progress:
+            watch_transfer_progress(task_id,
+                                    tc,
+                                    verbose=progress == "verbose")
+        else:
+            tc.task_wait(task_id, timeout=1e6)
+
+    return destination_path
