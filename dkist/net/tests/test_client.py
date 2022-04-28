@@ -10,6 +10,7 @@ from sunpy.net import attrs as a
 from sunpy.net.base_client import QueryResponseRow
 from sunpy.tests.helpers import no_vso
 
+import dkist.net
 from dkist.net.client import DKISTDatasetClient, DKISTQueryResponseTable
 from dkist.net.tests import strategies as dst  # noqa
 
@@ -224,12 +225,10 @@ def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
                                   headers={"Content-Disposition": "attachment; filename=abcd.asdf"}
                               )
 
-    mocked_client._BASE_DOWNLOAD_URL = httpserver.url_for("/download")
-
     response = DKISTQueryResponseTable({'Dataset ID': ['abcd']})
-
-    downloader = parfive.Downloader()
-    mocked_client.fetch(response, downloader=downloader, path=tmpdir)
+    with dkist.net.conf.set_temp("download_endpoint", httpserver.url_for("/download")):
+        downloader = parfive.Downloader()
+        mocked_client.fetch(response, downloader=downloader, path=tmpdir)
 
     assert len(downloader.http_queue) == 1
 

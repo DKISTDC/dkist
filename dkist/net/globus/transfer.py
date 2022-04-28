@@ -114,8 +114,8 @@ def _process_task_events(task_id, prev_events, tfr_client):
     """
 
     # Convert all the events into a (key, value) tuple pair
-    events = set(map(lambda x: tuple(x.data.items()),
-                     tfr_client.task_event_list(task_id, None)))
+    events = set(map(lambda x: tuple(x.items()),
+                     tfr_client.task_event_list(task_id)))
     # Drop all events we have seen before
     new_events = events.difference(prev_events)
 
@@ -186,37 +186,60 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
     progress = get_progress_bar(unit="file",
                                 dynamic_ncols=True,
                                 total=initial_n)
-    while True:
-        (prev_events,
-         json_events,
-         message_events) = _process_task_events(task_id, prev_events, tfr_client)
 
-        if ('code', 'STARTED') not in prev_events and not started:
-            started = True
-            progress.write("PENDING: Starting Transfer")
+    try:
+        while True:
+            (prev_events,
+             json_events,
+             message_events) = _process_task_events(task_id, prev_events, tfr_client)
 
-        # Print status messages if verbose or if they are errors
-        for event in message_events:
-            if event['is_error'] or verbose:
-                progress.write(f"{event['code']}: {event['details']}")
+            if ('code', 'STARTED') not in prev_events and not started:
+                started = True
+                progress.write("PENDING: Starting Transfer")
 
-        # Extract and calculate the transfer speed from the event list
-        speed = (list(map(_get_speed, json_events)) or [None])[0]
-        speed = f"{speed} Mb/s" if speed else ""
-        if speed:
-            progress.set_postfix_str(speed)
+            # Print status messages if verbose or if they are errors
+            for event in message_events:
+                if event['is_error'] or verbose:
+                    progress.write(f"{event['code']}: {event['details']}")
 
-        # Get the status of the task to see how many files we have processed.
-        task = tfr_client.get_task(task_id)
-        status = task['status']
-        progress.total = task['files']
-        progress.update((task['files_skipped'] + task['files_transferred']) - progress.n)
+            for event in json_events:
+                # This block was coded off one example, as I can't find any
+                # documentation of the structure of events. This is why it's
+                # all very tolerant of missing keys etc.
+                if event["is_error"] or verbose:
+                    progress.write(f"{event.get('code', '')}: {event.get('description', '')}")
+                    details = event.get("details", {})
+                    if "error" in details and "body" in details["error"]:
+                        extra_message = details["error"]["body"]
+                        if "context" in details:
+                            context = details["context"][0]
+                            operation = context.get("operation", "")
+                            path = context.get("path", "")
+                            extra_message = f"{operation} | {path}".strip() + " | " + extra_message
+                        progress.write(extra_message)
 
-        # If the status of the task is not active we are finished.
-        if status != "ACTIVE":
-            progress.write(f"Task completed with {status} status.")
-            progress.close()
-            break
+            # Extract and calculate the transfer speed from the event list
+            speed = (list(map(_get_speed, json_events)) or [None])[0]
+            speed = f"{speed} Mb/s" if speed else ""
+            if speed:
+                progress.set_postfix_str(speed)
 
-        # Wait for next poll
-        time.sleep(poll_interval)
+            # Get the status of the task to see how many files we have processed.
+            task = tfr_client.get_task(task_id)
+            status = task['status']
+            progress.total = task['files']
+            progress.update((task['files_skipped'] + task['files_transferred']) - progress.n)
+
+            # If the status of the task is not active we are finished.
+            if status != "ACTIVE":
+                progress.write(f"Task completed with {status} status.")
+                progress.close()
+                break
+
+            # Wait for next poll
+            time.sleep(poll_interval)
+
+    except KeyboardInterrupt:
+        progress.write("Cancelling Task")
+        task = tfr_client.cancel_task(task_id)
+        progress.close()

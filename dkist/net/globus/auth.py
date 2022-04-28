@@ -6,6 +6,7 @@ Globus Auth Helpers.
 
 import json
 import stat
+import time
 import queue
 import functools
 import threading
@@ -211,6 +212,8 @@ def ensure_globus_authorized(func):
             if e.http_status == 400 and e.message == "invalid_grant":
                 print("Globus login has expired.")
                 get_refresh_token_authorizer(force_reauth=True)
+                # There appears to be a race condition here.
+                time.sleep(0.1)
                 return func(*args, **kwargs)
 
     return do_reauth

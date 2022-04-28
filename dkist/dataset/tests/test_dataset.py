@@ -10,10 +10,10 @@ import astropy.units as u
 import gwcs
 from astropy.tests.helper import assert_quantity_allclose
 
+from dkist import net
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.io import FileManager
-from dkist.net.globus import DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID
 
 
 @pytest.fixture
@@ -117,7 +117,7 @@ def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
 
 
-def test_download(mocker, dataset):
+def test_download(mocker, dataset, patch_get_datacenter_globus_id):
     mocker.patch("dkist.io.file_manager.watch_transfer_progress",
                  autospec=True)
     mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
@@ -126,14 +126,17 @@ def test_download(mocker, dataset):
                  autospec=True)
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
+    mocker.patch("dkist.io.file_manager.get_data_center_endpoint_id",
+                 return_value="patched-datacenter-endpoint-id",
+                 autospec=True)
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
 
-    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
+    start_mock.assert_called_once_with("patched-datacenter-endpoint-id",
                                        "mysecretendpoint",
                                        Path("/~/test_proposal/test_dataset"),
                                        file_list)
@@ -148,14 +151,17 @@ def test_download_no_progress(mocker, dataset):
                            autospec=True)
     start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
                               autospec=True, return_value="1234")
+    mocker.patch("dkist.io.file_manager.get_data_center_endpoint_id",
+                 return_value="patched-datacenter-endpoint-id",
+                 autospec=True)
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
+    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(progress=False)
 
-    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
+    start_mock.assert_called_once_with("patched-datacenter-endpoint-id",
                                        "mysecretendpoint",
                                        Path("/~/test_proposal/test_dataset"),
                                        file_list)

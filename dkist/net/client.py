@@ -23,7 +23,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
 from . import attrs as dattrs
 from .attr_walker import walker
 
-__all__ = ['DKISTQueryReponse', 'DKISTDatasetClient']
+__all__ = ["DKISTQueryResponseTable", "DKISTDatasetClient"]
 
 
 class DefaultMap(defaultdict):
@@ -111,7 +111,6 @@ class DKISTQueryResponseTable(QueryResponseTable):
 
         return results
 
-
     @classmethod
     def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTDatasetClient") -> "DKISTQueryResponseTable":
         """
@@ -134,24 +133,35 @@ class DKISTDatasetClient(BaseClient):
 
     .. note::
 
-        This class is not intended to be used directly. You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:fido_guide`.
+        This class is not intended to be used directly.
+        You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:fido_guide`.
     """
+    @property
+    def _dataset_search_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
 
-    _BASE_SEARCH_URL = os.environ.get("DKIST_DATASET_ENDPOINT", "https://api.dkistdc.nso.edu/datasets/v1")
-    _BASE_DOWNLOAD_URL = os.environ.get("DKIST_DOWNLOAD_ENDPOINT", "https://api.dkistdc.nso.edu/download")
+        return conf.dataset_endpoint + conf.dataset_search_path
+
+    @property
+    def _metadata_streamer_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
+
+        return conf.download_endpoint
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
         Search for datasets provided by the DKIST data centre.
         """
+
         query = attr.and_(*args)
         queries = walker.create(query)
 
         results = []
         for url_parameters in queries:
             query_string = urllib.parse.urlencode(url_parameters)
-
-            full_url = f"{self._BASE_SEARCH_URL}?{query_string}"
+            full_url = f"{self._dataset_search_url}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results += data["searchResults"]
@@ -159,7 +169,8 @@ class DKISTDatasetClient(BaseClient):
         return DKISTQueryResponseTable.from_results(results, client=self)
 
     @staticmethod
-    def _make_filename(path: os.PathLike, row: QueryResponseRow, resp: aiohttp.ClientResponse, url: str):
+    def _make_filename(path: os.PathLike, row: QueryResponseRow,
+                       resp: aiohttp.ClientResponse, url: str):
         """
         Generate a filename for a file based on the Content Disposition header.
         """
@@ -175,7 +186,9 @@ class DKISTDatasetClient(BaseClient):
         return str(path).format(file=name, **row.response_block_map)
 
     @convert_row_to_table
-    def fetch(self, query_results: QueryResponseTable, *, path: os.PathLike = None, downloader: parfive.Downloader, **kwargs):
+    def fetch(self, query_results: QueryResponseTable, *,
+              path: os.PathLike = None,
+              downloader: parfive.Downloader, **kwargs):
         """
         Fetch asdf files describing the datasets.
 
@@ -201,7 +214,7 @@ class DKISTDatasetClient(BaseClient):
             return
 
         for row in query_results:
-            url = f"{self._BASE_DOWNLOAD_URL}/asdf?datasetId={row['Dataset ID']}"
+            url = f"{self._metadata_streamer_url}/asdf?datasetId={row['Dataset ID']}"
             # Set max_splits here as the metadata streamer doesn't like accept-range at the moment.
             downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), max_splits=1)
 

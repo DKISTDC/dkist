@@ -6,9 +6,10 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
-from dkist.net.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                              start_transfer_from_file_list, watch_transfer_progress)
-from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.net import conf as net_conf
+from dkist.net.globus import start_transfer_from_file_list, watch_transfer_progress
+from dkist.net.globus.endpoints import (get_data_center_endpoint_id,
+                                        get_local_endpoint_id, get_transfer_client)
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -242,9 +243,10 @@ class FileManager(BaseFileManager):
             be raised. See `~dkist.net.globus.get_endpoint_id` for valid
             endpoint specifiers.
 
-        progress : `bool`, optional
+        progress : `bool` or `str`, optional
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
+           If ``progress="verbose"`` then all globus events will be printed during transfer.
         """
         if self._ndcube is None:
             raise ValueError(
@@ -253,7 +255,7 @@ class FileManager(BaseFileManager):
 
         inv = self._ndcube.meta["inventory"]
 
-        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**inv))
+        base_path = Path(net_conf.dataset_path.format(**inv))
         # TODO: Default path to the config file
         destination_path = Path(path) / inv['primaryProposalId'] / inv['datasetId']
 
@@ -266,16 +268,19 @@ class FileManager(BaseFileManager):
             is_local = True
             destination_endpoint = get_local_endpoint_id()
 
-        task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
+        task_id = start_transfer_from_file_list(get_data_center_endpoint_id(),
                                                 destination_endpoint, destination_path,
                                                 file_list)
 
         tc = get_transfer_client()
         if progress:
-            watch_transfer_progress(task_id, tc, initial_n=len(file_list))
+            watch_transfer_progress(task_id, tc, initial_n=len(file_list),
+                                    verbose=progress == "verbose")
         else:
             tc.task_wait(task_id, timeout=1e6)
 
         if is_local:
             local_destination = destination_path.relative_to("/").expanduser()
+            if local_destination.root == "":
+                local_destination = "/" / local_destination
             self.basepath = local_destination

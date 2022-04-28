@@ -1,14 +1,17 @@
 """
 Functions for interacting with globus endpoints.
 """
+import json
+import urllib
 import pathlib
 import webbrowser
+from functools import lru_cache
 
 import globus_sdk
 
 from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
-__all__ = ['get_endpoint_id', 'get_directory_listing']
+__all__ = ['get_data_center_endpoint_id', 'get_endpoint_id', 'get_directory_listing']
 
 
 def get_transfer_client(force_reauth=False):
@@ -51,6 +54,20 @@ def get_local_endpoint_id():
             "Can not find a local Globus Connect endpoint.")
 
     return endpoint_id
+
+
+@lru_cache(maxsize=None)
+def get_data_center_endpoint_id():
+    """
+    Query the data center for the current globus endpoint ID.
+
+    The endpoint ID is retrieved from the configured dataset searcher endpoint.
+    """
+    from dkist.net import conf
+
+    data = urllib.request.urlopen(conf.dataset_endpoint + conf.dataset_config_path)
+    data = json.loads(data.read())
+    return data["globusDataEndpointID"]
 
 
 @ensure_globus_authorized

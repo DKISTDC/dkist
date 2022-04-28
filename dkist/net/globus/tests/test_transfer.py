@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 from globus_sdk import GlobusHTTPResponse
+from globus_sdk.services.transfer.response.iterable import IterableTransferResponse
 
 from dkist.net.globus.transfer import (_get_speed, _process_task_events,
                                        start_transfer_from_file_list)
@@ -17,6 +18,7 @@ def mock_endpoints(mocker):
     return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
                         side_effect=id_mock)
 
+
 def json_to_response(json):
     response = mock.MagicMock()
     response.json = lambda: json
@@ -25,36 +27,45 @@ def json_to_response(json):
 
 @pytest.fixture
 def mock_task_event_list(mocker, transfer_client):
-    task_list = [
-        GlobusHTTPResponse(json_to_response({
-            'DATA_TYPE': 'event',
-            'code': 'STARTED',
-            'description': 'started',
-            'details':
-            '{\n  "type": "GridFTP Transfer", \n  "concurrency": 2, \n  "protocol": "Mode S"\n}',
-            'is_error': False,
-            'parent_task_id': None,
-            'time': '2019-05-16 10:13:26+00:00'
-        }), transfer_client),
-        GlobusHTTPResponse(json_to_response({
-            'DATA_TYPE': 'event',
-            'code': 'SUCCEEDED',
-            'description': 'succeeded',
-            'details': 'Scanned 100 file(s)',
-            'is_error': False,
-            'parent_task_id': None,
-            'time': '2019-05-16 10:13:24+00:00'
-        }), transfer_client),
-        GlobusHTTPResponse(json_to_response({
-            'DATA_TYPE': 'event',
-            'code': 'STARTED',
-            'description': 'started',
-            'details': 'Starting sync scan',
-            'is_error': False,
-            'parent_task_id': None,
-            'time': '2019-05-16 10:13:20+00:00'
-        }), transfer_client)
-    ]
+    mock_response = GlobusHTTPResponse(
+        json_to_response(
+            {
+                "DATA": [
+                    {
+                        'DATA_TYPE': 'event',
+                        'code': 'STARTED',
+                        'description': 'started',
+                        'details':
+                        '{\n  "type": "GridFTP Transfer", \n  "concurrency": 2, \n  "protocol": "Mode S"\n}',
+                        'is_error': False,
+                        'parent_task_id': None,
+                        'time': '2019-05-16 10:13:26+00:00'},
+                    {
+                        'DATA_TYPE': 'event',
+                        'code': 'SUCCEEDED',
+                        'description': 'succeeded',
+                        'details': 'Scanned 100 file(s)',
+                        'is_error': False,
+                        'parent_task_id': None,
+                        'time': '2019-05-16 10:13:24+00:00'},
+                    {
+                        'DATA_TYPE': 'event',
+                        'code': 'STARTED',
+                        'description': 'started',
+                        'details': 'Starting sync scan',
+                        'is_error': False,
+                        'parent_task_id': None,
+                        'time': '2019-05-16 10:13:20+00:00'},
+                ],
+                "DATA_TYPE": "event_list",
+                "limit": 10,
+                "offset": 0,
+                "total": 1
+            }
+        ),
+        client=True  # Not a client object
+    )
+    task_list = IterableTransferResponse(mock_response)
     return mocker.patch("globus_sdk.TransferClient.task_event_list",
                         return_value=task_list)
 
@@ -119,7 +130,7 @@ def test_process_event_list(transfer_client, mock_task_event_list):
 
 def test_process_event_list_message_only(transfer_client, mock_task_event_list):
     # Filter out the json event
-    prev_events = tuple(map(lambda x: tuple(x.data.items()),
+    prev_events = tuple(map(lambda x: tuple(x.items()),
                             mock_task_event_list.return_value))
     prev_events = set(prev_events[0:1])
 
