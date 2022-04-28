@@ -60,7 +60,7 @@ def mock_task_event_list(mocker, transfer_client):
                 "DATA_TYPE": "event_list",
                 "limit": 10,
                 "offset": 0,
-                "total": 1
+                "total": 3
             }
         ),
         client=True  # Not a client object

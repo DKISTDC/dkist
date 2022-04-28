@@ -117,7 +117,7 @@ def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
 
 
-def test_download(mocker, dataset, patch_get_datacenter_globus_id):
+def test_download(mocker, dataset):
     mocker.patch("dkist.io.file_manager.watch_transfer_progress",
                  autospec=True)
     mocker.patch("dkist.io.file_manager.get_local_endpoint_id",

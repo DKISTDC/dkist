@@ -23,13 +23,6 @@ from dkist.io.loaders import AstropyFITSLoader
 
 
 @pytest.fixture
-def patch_get_datacenter_globus_id(mocker):
-    mocker.patch("dkist.net.globus.endpoints.get_data_center_endpoint_id",
-                 return_value="patched-datacenter-endpoint-id",
-                 autospec=True)
-
-
-@pytest.fixture
 def array():
     shape = np.random.randint(10, 100, size=2)
     x = np.ones(shape) + 10
