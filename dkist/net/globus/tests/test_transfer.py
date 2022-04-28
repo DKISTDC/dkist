@@ -1,13 +1,13 @@
 import os
-import pathlib
+from pathlib import Path
 from unittest import mock
 
 import pytest
 from globus_sdk import GlobusHTTPResponse
 from globus_sdk.services.transfer.response.iterable import IterableTransferResponse
 
-from dkist.net.globus.transfer import (_get_speed, _process_task_events,
-                                       start_transfer_from_file_list)
+from dkist.net.globus.transfer import (_get_speed, _orchestrate_transfer_task,
+                                       _process_task_events, start_transfer_from_file_list)
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def test_start_transfer(mocker, transfer_client, mock_endpoints):
                                return_value={"task_id": "task_id"})
     mocker.patch("globus_sdk.TransferClient.get_submission_id",
                  return_value={'value': "wibble"})
-    file_list = list(map(pathlib.Path, ["/a/name.fits", "/a/name2.fits"]))
+    file_list = list(map(Path, ["/a/name.fits", "/a/name2.fits"]))
     start_transfer_from_file_list("a", "b", "/", file_list)
     calls = mock_endpoints.call_args_list
     assert calls[0][0][0] == "a"
@@ -92,7 +92,7 @@ def test_start_transfer(mocker, transfer_client, mock_endpoints):
 def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):
     submit_mock = mocker.patch("globus_sdk.TransferClient.submit_transfer",
                                return_value={"task_id": "task_id"})
-    file_list = list(map(pathlib.Path, ["/a/b/name.fits", "/a/b/name2.fits"]))
+    file_list = list(map(Path, ["/a/b/name.fits", "/a/b/name2.fits"]))
     start_transfer_from_file_list("a", "b", "/", file_list, "/a")
     calls = mock_endpoints.call_args_list
     assert calls[0][0][0] == "a"
@@ -160,3 +160,74 @@ def test_get_speed():
     assert speed is None
     speed = _get_speed({'code': "progress", "details": {"hello": "world"}})
     assert speed is None
+
+
+@pytest.fixture
+def orchestrate_mock(mocker):
+    mocker.patch("dkist.net.globus.transfer.watch_transfer_progress",
+                 autospec=True)
+    mocker.patch("dkist.net.globus.transfer.get_local_endpoint_id",
+                 autospec=True, return_value="mysecretendpoint")
+    mocker.patch("dkist.net.globus.transfer.get_transfer_client",
+                 autospec=True)
+    mocker.patch("dkist.net.globus.transfer.get_data_center_endpoint_id",
+                 return_value="patched-datacenter-endpoint-id",
+                 autospec=True)
+    yield mocker.patch("dkist.net.globus.transfer.start_transfer_from_file_list",
+                       autospec=True, return_value="1234")
+
+
+@pytest.fixture
+def tfr_file_list():
+    return ["file1.fits", "file2.fits"]
+
+
+def test_ochestrate_transfer(tfr_file_list, orchestrate_mock):
+    _orchestrate_transfer_task(tfr_file_list, recursive=False,
+                               destination_path=Path("/~/"))
+
+    orchestrate_mock.assert_called_once_with("patched-datacenter-endpoint-id",
+                                             "mysecretendpoint",
+                                             Path("/~/"),
+                                             tfr_file_list,
+                                             recursive=False)
+
+
+def test_orchestrate_transfer_no_progress(tfr_file_list, mocker, orchestrate_mock):
+    progress_mock = mocker.patch("dkist.net.globus.transfer.watch_transfer_progress",
+                                 autospec=True)
+    tc_mock = mocker.patch("dkist.net.globus.transfer.get_transfer_client",
+                           autospec=True)
+
+    _orchestrate_transfer_task(tfr_file_list, recursive=False,
+                               destination_path=Path("/~/"),
+                               progress=False)
+
+    orchestrate_mock.assert_called_once_with("patched-datacenter-endpoint-id",
+                                             "mysecretendpoint",
+                                             Path("/~/"),
+                                             tfr_file_list,
+                                             recursive=False)
+
+    progress_mock.assert_not_called()
+    tc_mock.return_value.task_wait.assert_called_once_with("1234", timeout=1e6)
+
+
+def test_orchestrate_transfer_no_wait(tfr_file_list, mocker, orchestrate_mock):
+    progress_mock = mocker.patch("dkist.net.globus.transfer.watch_transfer_progress",
+                                 autospec=True)
+    tc_mock = mocker.patch("dkist.net.globus.transfer.get_transfer_client",
+                           autospec=True)
+
+    _orchestrate_transfer_task(tfr_file_list, recursive=False,
+                               destination_path=Path("/~/"),
+                               wait=False)
+
+    orchestrate_mock.assert_called_once_with("patched-datacenter-endpoint-id",
+                                             "mysecretendpoint",
+                                             Path("/~/"),
+                                             tfr_file_list,
+                                             recursive=False)
+
+    progress_mock.assert_not_called()
+    tc_mock.return_value.task_wait.assert_not_called()

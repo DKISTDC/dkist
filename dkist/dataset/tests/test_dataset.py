@@ -117,54 +117,53 @@ def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
 
 
-def test_download(mocker, dataset):
-    mocker.patch("dkist.io.file_manager.watch_transfer_progress",
-                 autospec=True)
-    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
-                 autospec=True, return_value="mysecretendpoint")
-    mocker.patch("dkist.io.file_manager.get_transfer_client",
-                 autospec=True)
-    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
-                              autospec=True, return_value="1234")
-    mocker.patch("dkist.io.file_manager.get_data_center_endpoint_id",
-                 return_value="patched-datacenter-endpoint-id",
-                 autospec=True)
+@pytest.fixture
+def orchestrate_transfer_mock(mocker):
+    yield mocker.patch("dkist.io.file_manager._orchestrate_transfer_task",
+                       autospec=True)
 
+
+def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
 
-    start_mock.assert_called_once_with("patched-datacenter-endpoint-id",
-                                       "mysecretendpoint",
-                                       Path("/~/test_proposal/test_dataset"),
-                                       file_list)
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=False,
+        destination_path=Path('/~/test_proposal/test_dataset'),
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+    )
 
 
-def test_download_no_progress(mocker, dataset):
-    progress_mock = mocker.patch("dkist.io.file_manager.watch_transfer_progress",
-                                 autospec=True)
-    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
-                 autospec=True, return_value="mysecretendpoint")
-    tc_mock = mocker.patch("dkist.io.file_manager.get_transfer_client",
-                           autospec=True)
-    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
-                              autospec=True, return_value="1234")
-    mocker.patch("dkist.io.file_manager.get_data_center_endpoint_id",
-                 return_value="patched-datacenter-endpoint-id",
-                 autospec=True)
-
+@pytest.mark.parametrize("keywords", [
+    {"progress": True, "wait": True, "destination_endpoint": None},
+    {"progress": True, "wait": False, "destination_endpoint": None},
+    {"progress": False, "wait": True, "destination_endpoint": None},
+    {"progress": False, "wait": True, "destination_endpoint": "wibble"},
+])
+def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
+    """
+    Assert that keywords are passed through as expected
+    """
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
+
+    file_list = dataset.files.filenames + [
+        "/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(
+            **dataset.meta["inventory"]
+        )
+    ]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.files.download(progress=False)
+    dataset.files.download(**keywords)
 
-    start_mock.assert_called_once_with("patched-datacenter-endpoint-id",
-                                       "mysecretendpoint",
-                                       Path("/~/test_proposal/test_dataset"),
-                                       file_list)
-
-    progress_mock.assert_not_called()
-    tc_mock.return_value.task_wait.assert_called_once_with("1234", timeout=1e6)
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=False,
+        destination_path=Path('/~/test_proposal/test_dataset'),
+        **keywords
+    )

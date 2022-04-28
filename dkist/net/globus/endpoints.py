@@ -50,8 +50,7 @@ def get_local_endpoint_id():
     endpoint_id = local_endpoint.endpoint_id
 
     if not endpoint_id:
-        raise ConnectionError(
-            "Can not find a local Globus Connect endpoint.")
+        raise ConnectionError("Can not find a local Globus Connect endpoint.")
 
     return endpoint_id
 
