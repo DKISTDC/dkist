@@ -7,7 +7,7 @@ import time
 import pathlib
 import datetime
 from os import PathLike
-from typing import Union, Literal
+from typing import List, Union, Literal
 
 import globus_sdk
 from parfive.utils import in_notebook
@@ -260,8 +260,8 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
         progress.close()
 
 
-def _orchestrate_transfer_task(file_list: list[PathLike],
-                               recursive: list[bool],
+def _orchestrate_transfer_task(file_list: List[PathLike],
+                               recursive: List[bool],
                                destination_path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                *,
