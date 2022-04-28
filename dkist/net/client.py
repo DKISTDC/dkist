@@ -23,7 +23,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
 from . import attrs as dattrs
 from .attr_walker import walker
 
-__all__ = ["DKISTQueryResponseTable", "DKISTDatasetClient"]
+__all__ = ["DKISTQueryResponseTable", "DKISTClient"]
 
 
 class DefaultMap(defaultdict):
@@ -112,7 +112,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         return results
 
     @classmethod
-    def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTDatasetClient") -> "DKISTQueryResponseTable":
+    def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTClient") -> "DKISTQueryResponseTable":
         """
         Construct the results table from the API results.
         """
@@ -127,7 +127,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         return data
 
 
-class DKISTDatasetClient(BaseClient):
+class DKISTClient(BaseClient):
     """
     Search DKIST datasets and retrieve metadata files describing them.
 

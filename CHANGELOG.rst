@@ -100,7 +100,7 @@ Bug Fixes
 Features
 --------
 
-- Implement `DKISTDatasetClient.fetch` to download asdf files from the metadata
+- Implement `DKISTClient.fetch` to download asdf files from the metadata
   streamer service. (`#90 <https://github.com/DKISTDC/dkist/pull/90>`_)
 - Enable tests on Windows (`#95 <https://github.com/DKISTDC/dkist/pull/95>`_)
 - Added search bounding box functionality to DKIST client. (`#100 <https://github.com/DKISTDC/dkist/pull/100>`_)

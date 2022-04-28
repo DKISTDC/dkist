@@ -11,9 +11,10 @@ DKIST specific plugins for `sunpy.net` and download helpers.
 """
 import dkist.config as _config
 
-from .client import DKISTDatasetClient
+from .client import DKISTClient
+from .helpers import transfer_whole_dataset
 
-__all__ = ["DKISTDatasetClient", "conf"]
+__all__ = ["DKISTClient", "conf", "transfer_whole_dataset"]
 
 
 class Conf(_config.ConfigNamespace):
