@@ -227,7 +227,7 @@ class FileManager(BaseFileManager):
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
-    def download(self, path="/~/", destination_endpoint=None, progress=True):
+    def download(self, path="/~/", destination_endpoint=None, progress=True, wait=True):
         """
         Start a Globus file transfer for all files in this Dataset.
 
@@ -246,7 +246,13 @@ class FileManager(BaseFileManager):
         progress : `bool` or `str`, optional
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
-           If ``progress="verbose"`` then all globus events will be printed during transfer.
+            If ``progress="verbose"`` then all globus events generated during
+            the transfer will be shown (by default only error messages are
+            shown.)
+
+        wait : `bool`, optional
+            If `False` then the function will return while the Globus transfer task
+            is still running. Setting ``wait=False`` implies ``progress=False``.
         """
         if self._ndcube is None:
             raise ValueError(
@@ -273,11 +279,13 @@ class FileManager(BaseFileManager):
                                                 file_list)
 
         tc = get_transfer_client()
-        if progress:
-            watch_transfer_progress(task_id, tc, initial_n=len(file_list),
-                                    verbose=progress == "verbose")
-        else:
-            tc.task_wait(task_id, timeout=1e6)
+
+        if wait:
+            if progress:
+                watch_transfer_progress(task_id, tc, initial_n=len(file_list),
+                                        verbose=progress == "verbose")
+            else:
+                tc.task_wait(task_id, timeout=1e6)
 
         if is_local:
             local_destination = destination_path.relative_to("/").expanduser()

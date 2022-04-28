@@ -80,7 +80,7 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
         dst_file_list.append(dst_base_path / src_filepath)
 
     for src_file, dst_file in zip(src_file_list, dst_file_list):
-        transfer_manifest.add_item(str(src_file), str(dst_file))
+        transfer_manifest.add_item(str(src_file), str(dst_file), recursive=True)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 
