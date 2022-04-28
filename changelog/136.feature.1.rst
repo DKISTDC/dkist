@@ -1,0 +1,1 @@
+Use the new ``/datasets/v1/config`` endpoint to automatically retrieve the globus endpoint ID corresponding to the dataset searcher in use.
