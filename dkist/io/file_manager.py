@@ -152,7 +152,7 @@ class BaseFileManager:
 
     @basepath.setter
     def basepath(self, value):
-        self._basepath = Path(value) if value is not None else None
+        self._basepath = Path(value).expanduser() if value is not None else None
 
     @property
     def _loader_array(self):
