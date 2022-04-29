@@ -1,10 +1,10 @@
-v1.0.0b6 (2022-03-30)v1.0.0b6 (2022-03-30)
+v1.0.0b6 (2022-03-30)
 =====================
 
 Features
 --------
 
-- Implement models where the poiting varies along the second pixel axis (for
+- Implement models where the pointing varies along the second pixel axis (for
   rastering slit spectrographs). (`#161 <https://github.com/DKISTDC/dkist/pull/161>`_)
 
 

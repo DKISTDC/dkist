@@ -251,9 +251,9 @@ class FileManager(BaseFileManager):
         progress : `bool` or `str`, optional
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
-            If ``progress="verbose"`` then all globus events generated during
-            the transfer will be shown (by default only error messages are
-            shown.)
+           If ``progress="verbose"`` then all globus events generated during
+           the transfer will be shown (by default only error messages are
+           shown.)
 
         wait : `bool`, optional
             If `False` then the function will return while the Globus transfer task
