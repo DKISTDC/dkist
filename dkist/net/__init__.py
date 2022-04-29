@@ -1,13 +1,5 @@
 """
 DKIST specific plugins for `sunpy.net` and download helpers.
-
-.. warning::
-
-   Classes in this module should not be used directly, they should be used
-   through the `sunpy.net.Fido` and `sunpy.net.attrs.dkist` modules. The
-   classes in this module will be automatically registered with sunpy upon
-   importing this module with `import dkist.net`.
-
 """
 import dkist.config as _config
 
@@ -19,7 +11,7 @@ __all__ = ["DKISTClient", "conf", "transfer_whole_dataset"]
 
 class Conf(_config.ConfigNamespace):
     """
-    Configuration Parameters for the IO Package.
+    Configuration Parameters for the `dkist.net` Package.
     """
     dataset_endpoint = _config.ConfigItem("https://api.dkistdc.nso.edu/datasets/",
                                           "Base URL for dataset search.")
