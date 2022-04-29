@@ -80,6 +80,7 @@ def transfer_whole_dataset(dataset: Union[str, QueryResponseRow],
     _orchestrate_transfer_task(file_list,
                                recursive=True,
                                destination_path=destination_path,
+                               destination_endpoint=destination_endpoint,
                                progress=progress,
                                wait=wait)
 

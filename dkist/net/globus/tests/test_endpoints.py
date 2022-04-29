@@ -4,9 +4,11 @@ import pathlib
 import globus_sdk
 import pytest
 
+import dkist.net
 from dkist.data.test import rootdir
-from dkist.net.globus.endpoints import (get_directory_listing, get_endpoint_id,
-                                        get_local_endpoint_id, get_transfer_client)
+from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directory_listing,
+                                        get_endpoint_id, get_local_endpoint_id,
+                                        get_transfer_client)
 
 
 @pytest.fixture
@@ -128,3 +130,15 @@ def test_directory_listing(mocker, transfer_client, ls_response):
     ls = get_directory_listing("/", "1234")
     assert all([isinstance(a, pathlib.Path) for a in ls])
     assert len(ls) == 13
+
+
+def test_get_datacenter_endpoint_id(httpserver):
+    httpserver.expect_request("/datasets/v1/config",).respond_with_data(
+        json.dumps({"globusDataEndpointID": "example_endpoint_id"}),
+    )
+
+    with dkist.net.conf.set_temp("dataset_endpoint",
+                                 httpserver.url_for("/datasets/")):
+        endpoint_id = get_data_center_endpoint_id()
+
+    assert endpoint_id == "example_endpoint_id"
