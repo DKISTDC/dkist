@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from dkist.net.client import DKISTQueryResponseTable
 from dkist.net.helpers import transfer_whole_dataset
 
 
@@ -56,3 +57,33 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
+
+
+def test_transfer_from_table(orchestrate_transfer_mock, mocker):
+    res = DKISTQueryResponseTable(
+        {
+            "Dataset ID": ["A", "B"],
+            "Primary Proposal ID": ["pm_1_10", "pm_2_20"],
+            "Storage Bucket": ["data", "data"],
+        },
+    )
+
+    transfer_whole_dataset(res)
+
+    kwargs = {"progress": True, "wait": True, "destination_endpoint": None}
+    orchestrate_transfer_mock.assert_has_calls(
+        [
+            mocker.call(
+                [Path("/data/pm_1_10/A")],
+                recursive=True,
+                destination_path=Path('/~/pm_1_10'),
+                **kwargs
+            ),
+            mocker.call(
+                [Path("/data/pm_2_20/B")],
+                recursive=True,
+                destination_path=Path('/~/pm_2_20'),
+                **kwargs
+            ),
+        ]
+    )

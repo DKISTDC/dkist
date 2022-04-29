@@ -8,7 +8,7 @@ from pathlib import Path
 from sunpy.net.base_client import QueryResponseRow
 
 from dkist.net.attrs import Dataset
-from dkist.net.client import DKISTClient
+from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.globus.transfer import _orchestrate_transfer_task
 
 __all__ = ['transfer_whole_dataset']
@@ -21,7 +21,7 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     return DKISTClient().search(Dataset(dataset_id))
 
 
-def transfer_whole_dataset(dataset: Union[str, QueryResponseRow],
+def transfer_whole_dataset(dataset: Union[str, QueryResponseRow, DKISTQueryResponseTable],
                            path: PathLike = "/~/",
                            destination_endpoint: str = None,
                            progress: Union[bool, Literal["verbose"]] = True,
@@ -64,6 +64,14 @@ def transfer_whole_dataset(dataset: Union[str, QueryResponseRow],
 
     if isinstance(dataset, str):
         dataset = _get_dataset_inventory(dataset)[0]
+
+    if isinstance(dataset, DKISTQueryResponseTable) and len(dataset) > 1:
+        for record in dataset:
+            transfer_whole_dataset(record,
+                                   path=path,
+                                   destination_endpoint=destination_endpoint,
+                                   progress=progress,
+                                   wait=wait)
 
     dataset_id = dataset["Dataset ID"]
     proposal_id = dataset["Primary Proposal ID"]
