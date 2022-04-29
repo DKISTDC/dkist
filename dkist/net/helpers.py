@@ -14,7 +14,7 @@ from dkist.net.globus.transfer import _orchestrate_transfer_task
 __all__ = ['transfer_whole_dataset']
 
 
-def _get_dataset_inventory(dataset_id: str):
+def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     """
     Do a search for a single dataset id
     """

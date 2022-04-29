@@ -159,11 +159,14 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     ]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.files.download(**keywords)
+    dataset.files.download(path="/test/", **keywords)
 
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('/~/test_proposal/test_dataset'),
+        destination_path=Path('/test/test_proposal/test_dataset'),
         **keywords
     )
+
+    if not keywords["destination_endpoint"]:
+        assert dataset.files.basepath == Path("/test/test_proposal/test_dataset")
