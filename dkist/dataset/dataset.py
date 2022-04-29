@@ -190,7 +190,9 @@ class Dataset(NDCube):
             with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
                 with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                                lazy_load=False, copy_arrays=True) as ff:
-                    return ff.tree['dataset']
+                    ds = ff.tree['dataset']
+                    ds.files.basepath = base_path
+                    return ds
 
         except ValidationError as e:
             err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."

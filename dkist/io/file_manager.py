@@ -225,7 +225,7 @@ class FileManager(BaseFileManager):
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
-    def download(self, path="/~/", destination_endpoint=None, progress=True, wait=True):
+    def download(self, path=None, destination_endpoint=None, progress=True, wait=True):
         """
         Start a Globus file transfer for all files in this Dataset.
 
@@ -234,6 +234,13 @@ class FileManager(BaseFileManager):
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
             endpoint.
+            The default value is ``.basepath``, if this is None it will default
+            to ``/~/``.
+            It is possible to put placeholder strings in the path with any key
+            from the dataset inventory dictionary which can be accessed as
+            ``ds.meta['inventory']``, and example of this would be
+            ``path="~/dkist/{datasetId}"`` to save the files in a folder named
+            with the dataset ID being downloaded.
 
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
@@ -260,8 +267,9 @@ class FileManager(BaseFileManager):
         inv = self._ndcube.meta["inventory"]
 
         base_path = Path(net_conf.dataset_path.format(**inv))
-        # TODO: Default path to the config file
-        destination_path = Path(path) / inv['primaryProposalId'] / inv['datasetId']
+        destination_path = path or self.basepath or "/~/"
+        destination_path = Path(destination_path).as_posix()
+        destination_path = Path(destination_path.format(**inv))
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.

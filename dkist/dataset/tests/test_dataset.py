@@ -75,6 +75,7 @@ def test_load_from_directory():
     assert isinstance(ds.data, da.Array)
     assert isinstance(ds.wcs, gwcs.WCS)
     assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+    assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
 
 
 def test_from_directory_no_asdf(tmpdir):
