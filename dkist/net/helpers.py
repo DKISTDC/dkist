@@ -11,7 +11,7 @@ from dkist.net.attrs import Dataset
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.globus.transfer import _orchestrate_transfer_task
 
-__all__ = ['transfer_whole_dataset']
+__all__ = ["transfer_complete_datasets"]
 
 
 def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
@@ -21,11 +21,11 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     return DKISTClient().search(Dataset(dataset_id))
 
 
-def transfer_whole_dataset(dataset: Union[str, QueryResponseRow, DKISTQueryResponseTable],
-                           path: PathLike = "/~/",
-                           destination_endpoint: str = None,
-                           progress: Union[bool, Literal["verbose"]] = True,
-                           wait: bool = True):
+def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable],
+                               path: PathLike = "/~/",
+                               destination_endpoint: str = None,
+                               progress: Union[bool, Literal["verbose"]] = True,
+                               wait: bool = True):
     """
     Transfer a whole dataset to a path on a globus endpoint.
 
@@ -62,17 +62,19 @@ def transfer_whole_dataset(dataset: Union[str, QueryResponseRow, DKISTQueryRespo
     # Avoid circular import
     from dkist.net import conf
 
-    if isinstance(dataset, str):
-        dataset = _get_dataset_inventory(dataset)[0]
+    if isinstance(datasets, str):
+        datasets = _get_dataset_inventory(datasets)[0]
 
-    if isinstance(dataset, DKISTQueryResponseTable) and len(dataset) > 1:
-        for record in dataset:
-            transfer_whole_dataset(record,
-                                   path=path,
-                                   destination_endpoint=destination_endpoint,
-                                   progress=progress,
-                                   wait=wait)
+    if isinstance(datasets, DKISTQueryResponseTable) and len(datasets) > 1:
+        for record in datasets:
+            transfer_complete_datasets(record,
+                                       path=path,
+                                       destination_endpoint=destination_endpoint,
+                                       progress=progress,
+                                       wait=wait)
 
+    # At this point we only have one dataset
+    dataset = datasets
     dataset_id = dataset["Dataset ID"]
     proposal_id = dataset["Primary Proposal ID"]
     bucket = dataset["Storage Bucket"]

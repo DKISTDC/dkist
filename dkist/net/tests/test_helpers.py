@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from dkist.net.client import DKISTQueryResponseTable
-from dkist.net.helpers import transfer_whole_dataset
+from dkist.net.helpers import transfer_complete_datasets
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def orchestrate_transfer_mock(mocker):
     {"progress": False, "wait": True, "destination_endpoint": "wibble"},
 ])
 def test_download_default_keywords(orchestrate_transfer_mock, keywords):
-    transfer_whole_dataset(
+    transfer_complete_datasets(
         {
             "Dataset ID": "AAAA",
             "Primary Proposal ID": "pm_1_10",
@@ -45,7 +45,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
                                     "Storage Bucket": "data"
                                 }])
 
-    transfer_whole_dataset("AAAA")
+    transfer_complete_datasets("AAAA")
 
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
@@ -68,7 +68,7 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
         },
     )
 
-    transfer_whole_dataset(res)
+    transfer_complete_datasets(res)
 
     kwargs = {"progress": True, "wait": True, "destination_endpoint": None}
     orchestrate_transfer_mock.assert_has_calls(
