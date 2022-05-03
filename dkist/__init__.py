@@ -17,17 +17,12 @@ except DistributionNotFound:
 __all__ = ['TiledDataset', 'Dataset', 'system_info']
 
 
-def write_default_config():
+def write_default_config(overwrite=False):
     """
     Writes out the template configuration file for this version of dkist.
 
     This function will save a template config file for manual editing, if a
     config file already exits this will write a config file appended with the
     version number, to facilitate comparison of changes.
-
-    Returns
-    -------
-    filepath : `pathlib.Path` or `None`
-        The full path of the file written or `None` if no file was written.
     """
-    return _config.write_default_config("dkist", "dkist")
+    return _config.create_config_file("dkist", "dkist", overwrite=overwrite)

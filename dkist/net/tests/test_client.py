@@ -10,13 +10,14 @@ from sunpy.net import attrs as a
 from sunpy.net.base_client import QueryResponseRow
 from sunpy.tests.helpers import no_vso
 
-from dkist.net.client import DKISTDatasetClient, DKISTQueryResponseTable
+import dkist.net
+from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.tests import strategies as dst  # noqa
 
 
 @pytest.fixture
 def client():
-    return DKISTDatasetClient()
+    return DKISTClient()
 
 
 @pytest.mark.skip
@@ -101,11 +102,11 @@ def mocked_client(mocker, client, example_api_response):
 
 
 def test_query_response_from_results(empty_query_response, example_api_response, expected_table_keys):
-    dclient = DKISTDatasetClient()
+    dclient = DKISTClient()
     qr = DKISTQueryResponseTable.from_results(example_api_response["searchResults"], client=dclient)
 
     assert len(qr) == 1
-    assert isinstance(qr.client, DKISTDatasetClient)
+    assert isinstance(qr.client, DKISTClient)
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
     assert not set(qr.colnames).difference(expected_table_keys)
@@ -116,13 +117,13 @@ def test_query_response_from_results_unknown_field(empty_query_response, example
     """
     This test asserts that if the API starts returning new fields we don't error, they get passed though verbatim.
     """
-    dclient = DKISTDatasetClient()
+    dclient = DKISTClient()
     resp = example_api_response["searchResults"]
     resp[0].update({'spamEggs': 'Some Spam'})
     qr = DKISTQueryResponseTable.from_results(resp, client=dclient)
 
     assert len(qr) == 1
-    assert isinstance(qr.client, DKISTDatasetClient)
+    assert isinstance(qr.client, DKISTClient)
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
     assert set(qr.colnames).difference(expected_table_keys) == {'spamEggs'}
@@ -204,7 +205,7 @@ def test_cant_handle_query(client, query):
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client
-    mocked_search = mocker.patch('dkist.net.client.DKISTDatasetClient.search')
+    mocked_search = mocker.patch('dkist.net.client.DKISTClient.search')
     mocked_search.return_value = DKISTQueryResponseTable()
 
     Fido.search(query)
@@ -224,12 +225,10 @@ def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
                                   headers={"Content-Disposition": "attachment; filename=abcd.asdf"}
                               )
 
-    mocked_client._BASE_DOWNLOAD_URL = httpserver.url_for("/download")
-
     response = DKISTQueryResponseTable({'Dataset ID': ['abcd']})
-
-    downloader = parfive.Downloader()
-    mocked_client.fetch(response, downloader=downloader, path=tmpdir)
+    with dkist.net.conf.set_temp("download_endpoint", httpserver.url_for("/download")):
+        downloader = parfive.Downloader()
+        mocked_client.fetch(response, downloader=downloader, path=tmpdir)
 
     assert len(downloader.http_queue) == 1
 

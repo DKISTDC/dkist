@@ -6,9 +6,8 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
-from dkist.net.globus import (DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID,
-                              start_transfer_from_file_list, watch_transfer_progress)
-from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
+from dkist.net import conf as net_conf
+from dkist.net.globus.transfer import _orchestrate_transfer_task
 
 __all__ = ['SlicedFileManagerProxy', 'FileManager']
 
@@ -153,7 +152,7 @@ class BaseFileManager:
 
     @basepath.setter
     def basepath(self, value):
-        self._basepath = Path(value) if value is not None else None
+        self._basepath = Path(value).expanduser() if value is not None else None
 
     @property
     def _loader_array(self):
@@ -218,7 +217,15 @@ class BaseFileManager:
 
 
 class FileManager(BaseFileManager):
-    def download(self, path="/~/", destination_endpoint=None, progress=True):
+    """
+    Manage the collection of FITS files backing a `~dkist.Dataset`.
+
+    Each `~dkist.Dataset` object is backed by a number of FITS files, each holding a
+    slice of the total array. This class provides tools for inspecting and
+    retrieving these FITS files, as well as specifying where to load these
+    files from.
+    """
+    def download(self, path=None, destination_endpoint=None, progress=True, wait=True):
         """
         Start a Globus file transfer for all files in this Dataset.
 
@@ -227,6 +234,13 @@ class FileManager(BaseFileManager):
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
             endpoint.
+            The default value is ``.basepath``, if this is None it will default
+            to ``/~/``.
+            It is possible to put placeholder strings in the path with any key
+            from the dataset inventory dictionary which can be accessed as
+            ``ds.meta['inventory']``. An example of this would be
+            ``path="~/dkist/{datasetId}"`` to save the files in a folder named
+            with the dataset ID being downloaded.
 
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
@@ -234,9 +248,16 @@ class FileManager(BaseFileManager):
             be raised. See `~dkist.net.globus.get_endpoint_id` for valid
             endpoint specifiers.
 
-        progress : `bool`, optional
+        progress : `bool` or `str`, optional
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
+           If ``progress="verbose"`` then all globus events generated during
+           the transfer will be shown (by default only error messages are
+           shown.)
+
+        wait : `bool`, optional
+            If `False` then the function will return while the Globus transfer task
+            is still running. Setting ``wait=False`` implies ``progress=False``.
         """
         if self._ndcube is None:
             raise ValueError(
@@ -245,29 +266,30 @@ class FileManager(BaseFileManager):
 
         inv = self._ndcube.meta["inventory"]
 
-        base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**inv))
-        # TODO: Default path to the config file
-        destination_path = Path(path) / inv['primaryProposalId'] / inv['datasetId']
+        base_path = Path(net_conf.dataset_path.format(**inv))
+        destination_path = path or self.basepath or "/~/"
+        destination_path = Path(destination_path).as_posix()
+        destination_path = Path(destination_path.format(**inv))
 
+        # TODO: If we are transferring the whole dataset then we should use the
+        # directory not the list of all the files in it.
         file_list = [base_path / fn for fn in self.filenames]
         file_list.append(Path("/") / inv['bucket'] / inv['asdfObjectKey'])
+        file_list.append(Path("/") / inv['bucket'] / inv['browseMovieObjectKey'])
+        file_list.append(Path("/") / inv['bucket'] / inv['qualityReportObjectKey'])
 
         # TODO: Ascertain if the destination path is local better than this
-        is_local = False
-        if not destination_endpoint:
-            is_local = True
-            destination_endpoint = get_local_endpoint_id()
+        is_local = not destination_endpoint
 
-        task_id = start_transfer_from_file_list(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                                destination_endpoint, destination_path,
-                                                file_list)
-
-        tc = get_transfer_client()
-        if progress:
-            watch_transfer_progress(task_id, tc, initial_n=len(file_list))
-        else:
-            tc.task_wait(task_id, timeout=1e6)
+        _orchestrate_transfer_task(file_list,
+                                   recursive=False,
+                                   destination_path=destination_path,
+                                   destination_endpoint=destination_endpoint,
+                                   progress=progress,
+                                   wait=wait)
 
         if is_local:
             local_destination = destination_path.relative_to("/").expanduser()
+            if local_destination.root == "":
+                local_destination = "/" / local_destination
             self.basepath = local_destination

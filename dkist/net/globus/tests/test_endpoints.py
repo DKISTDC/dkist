@@ -4,27 +4,33 @@ import pathlib
 import globus_sdk
 import pytest
 
+import dkist.net
 from dkist.data.test import rootdir
-from dkist.net.globus.endpoints import (get_directory_listing, get_endpoint_id,
-                                        get_local_endpoint_id, get_transfer_client)
+from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directory_listing,
+                                        get_endpoint_id, get_local_endpoint_id,
+                                        get_transfer_client)
 
 
 @pytest.fixture
-def endpoint_search():
+def endpoint_search(mocker, transfer_client):
     with open(rootdir / "globus_search_response.json") as fd:
         data = json.load(fd)
 
-    data = [globus_sdk.response.GlobusResponse(d) for d in data][1:]
-    return data
+    responses = []
+    for d in data:
+        response = mocker.MagicMock()
+        response.json = lambda: d
+        responses.append(globus_sdk.response.GlobusHTTPResponse(response, transfer_client))
+    return responses
 
 
 @pytest.fixture
-def ls_response(mocker):
+def ls_response(mocker, transfer_client):
     with open(rootdir / "globus_operation_ls_response.json") as fd:
         data = json.load(fd)
 
-    resp = globus_sdk.transfer.response.IterableTransferResponse(mocker.MagicMock())
-    mocker.patch("globus_sdk.transfer.response.IterableTransferResponse.data",
+    resp = globus_sdk.services.transfer.response.iterable.IterableTransferResponse(mocker.MagicMock(), client=transfer_client)
+    mocker.patch("globus_sdk.services.transfer.response.iterable.IterableTransferResponse.data",
                  new_callable=mocker.PropertyMock(return_value=data))
 
     return resp
@@ -33,8 +39,8 @@ def ls_response(mocker):
 @pytest.fixture
 def mock_search(mocker):
     mocker.patch("globus_sdk.TransferClient.endpoint_search",
-                 return_value=globus_sdk.transfer.paging.PaginatedResource)
-    return mocker.patch("globus_sdk.transfer.paging.PaginatedResource.data",
+                 return_value=globus_sdk.services.transfer.response.iterable.IterableTransferResponse)
+    return mocker.patch("globus_sdk.services.transfer.response.iterable.IterableTransferResponse.data",
                         new_callable=mocker.PropertyMock)
 
 
@@ -71,7 +77,7 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     assert "Multiple" in str(exc.value)
 
     # Test just one result
-    mock_search.return_value = endpoint_search[0:1]
+    mock_search.return_value = endpoint_search[1:2]
     endpoint_id = get_endpoint_id(" ", transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
@@ -84,10 +90,10 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
 
 def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
     mocker.patch.object(transfer_client, "get_endpoint",
-                        mocker.Mock(return_value=globus_sdk.transfer.paging.PaginatedResource))
-    get_ep_mock = mocker.patch("globus_sdk.transfer.paging.PaginatedResource.data",
+                        mocker.Mock(return_value=globus_sdk.services.transfer.response.iterable.IterableTransferResponse))
+    get_ep_mock = mocker.patch("globus_sdk.services.transfer.response.iterable.IterableTransferResponse.data",
                                new_callable=mocker.PropertyMock)
-    get_ep_mock.return_value = endpoint_search[0:1]
+    get_ep_mock.return_value = endpoint_search[1:2]
 
     endpoint_id = get_endpoint_id('dd1ee92a-6d04-11e5-ba46-22000b92c6ec', transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
@@ -97,7 +103,7 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
     err = globus_sdk.TransferAPIError(mocker.MagicMock())
     mocker.patch("globus_sdk.TransferClient.get_endpoint",
                  side_effect=err)
-    mock_search.return_value = endpoint_search[0:1]
+    mock_search.return_value = endpoint_search[1:2]
 
     # Test Other transfer error
     with pytest.raises(globus_sdk.TransferAPIError):
@@ -124,3 +130,15 @@ def test_directory_listing(mocker, transfer_client, ls_response):
     ls = get_directory_listing("/", "1234")
     assert all([isinstance(a, pathlib.Path) for a in ls])
     assert len(ls) == 13
+
+
+def test_get_datacenter_endpoint_id(httpserver):
+    httpserver.expect_request("/datasets/v1/config",).respond_with_data(
+        json.dumps({"globusDataEndpointID": "example_endpoint_id"}),
+    )
+
+    with dkist.net.conf.set_temp("dataset_endpoint",
+                                 httpserver.url_for("/datasets/")):
+        endpoint_id = get_data_center_endpoint_id()
+
+    assert endpoint_id == "example_endpoint_id"

@@ -13,12 +13,12 @@ from sunpy.net import attrs as a
 from sunpy.net.attr import AttrAnd
 from sunpy.net.tests.strategies import TimeDelta, Times, time_attr
 
-from dkist.net import DKISTDatasetClient
+from dkist.net import DKISTClient
 from dkist.net.attr_walker import walker
 
 
 def _generate_from_register_values(attr_type):
-    possible_values = DKISTDatasetClient.register_values()[attr_type]
+    possible_values = DKISTClient.register_values()[attr_type]
     possible_values = list(map(lambda x: x[0], possible_values))
 
     return st.builds(attr_type, st.sampled_from(possible_values))
@@ -73,7 +73,7 @@ def _embargo_end(draw, time=Times(
     return a.dkist.EmbargoEndTime(t1, t2)
 
 
-for attr_type in DKISTDatasetClient.register_values():
+for attr_type in DKISTClient.register_values():
     st.register_type_strategy(attr_type, _generate_from_register_values)
 
 st.register_type_strategy(a.Time, time_attr())

@@ -10,10 +10,10 @@ import astropy.units as u
 import gwcs
 from astropy.tests.helper import assert_quantity_allclose
 
+from dkist import net
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.io import FileManager
-from dkist.net.globus import DKIST_DATA_CENTRE_DATASET_PATH, DKIST_DATA_CENTRE_ENDPOINT_ID
 
 
 @pytest.fixture
@@ -75,6 +75,7 @@ def test_load_from_directory():
     assert isinstance(ds.data, da.Array)
     assert isinstance(ds.wcs, gwcs.WCS)
     assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+    assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
 
 
 def test_from_directory_no_asdf(tmpdir):
@@ -117,48 +118,58 @@ def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
 
 
-def test_download(mocker, dataset):
-    mocker.patch("dkist.io.file_manager.watch_transfer_progress",
-                 autospec=True)
-    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
-                 autospec=True, return_value="mysecretendpoint")
-    mocker.patch("dkist.io.file_manager.get_transfer_client",
-                 autospec=True)
-    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
-                              autospec=True, return_value="1234")
+@pytest.fixture
+def orchestrate_transfer_mock(mocker):
+    yield mocker.patch("dkist.io.file_manager._orchestrate_transfer_task",
+                       autospec=True)
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
+
+def test_download_default_keywords(dataset, orchestrate_transfer_mock):
+    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
+    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
+                                           folder / "test_dataset.mp4",
+                                           folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
 
-    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                       "mysecretendpoint",
-                                       Path("/~/test_proposal/test_dataset"),
-                                       file_list)
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=False,
+        destination_path=Path('/~'),
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+    )
 
 
-def test_download_no_progress(mocker, dataset):
-    progress_mock = mocker.patch("dkist.io.file_manager.watch_transfer_progress",
-                                 autospec=True)
-    mocker.patch("dkist.io.file_manager.get_local_endpoint_id",
-                 autospec=True, return_value="mysecretendpoint")
-    tc_mock = mocker.patch("dkist.io.file_manager.get_transfer_client",
-                           autospec=True)
-    start_mock = mocker.patch("dkist.io.file_manager.start_transfer_from_file_list",
-                              autospec=True, return_value="1234")
+@pytest.mark.parametrize("keywords", [
+    {"progress": True, "wait": True, "destination_endpoint": None},
+    {"progress": True, "wait": False, "destination_endpoint": None},
+    {"progress": False, "wait": True, "destination_endpoint": None},
+    {"progress": False, "wait": True, "destination_endpoint": "wibble"},
+])
+def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
+    """
+    Assert that keywords are passed through as expected
+    """
+    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
 
-    base_path = Path(DKIST_DATA_CENTRE_DATASET_PATH.format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
+    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
+                                           folder / "test_dataset.mp4",
+                                           folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.files.download(progress=False)
+    dataset.files.download(path="/test/", **keywords)
 
-    start_mock.assert_called_once_with(DKIST_DATA_CENTRE_ENDPOINT_ID,
-                                       "mysecretendpoint",
-                                       Path("/~/test_proposal/test_dataset"),
-                                       file_list)
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=False,
+        destination_path=Path('/test'),
+        **keywords
+    )
 
-    progress_mock.assert_not_called()
-    tc_mock.return_value.task_wait.assert_called_once_with("1234", timeout=1e6)
+    if not keywords["destination_endpoint"]:
+        assert dataset.files.basepath == Path("/test/")

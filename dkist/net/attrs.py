@@ -1,5 +1,5 @@
 """
-Search attributes which are specific to the `dkist.net.DKISTDatasetClient`.
+Search attributes which are specific to the `dkist.net.DKISTClient`.
 
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """

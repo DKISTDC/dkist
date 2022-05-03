@@ -9,6 +9,7 @@ Reference / API
 .. automodapi:: dkist.net
    :headings: ^#
    :no-inheritance-diagram:
+   :include-all-objects:
 
 .. automodapi:: dkist.net.attrs
    :headings: #~

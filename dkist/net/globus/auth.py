@@ -16,7 +16,6 @@ from urllib.parse import parse_qs, urlparse
 
 import appdirs
 import globus_sdk
-import globus_sdk.auth.token_response
 
 CLIENT_ID = 'dd2d62af-0b44-4e2e-9454-1092c94b46b3'
 SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',
@@ -110,7 +109,7 @@ def save_auth_cache(auth_cache):
         The auth cache to save.
 
     """
-    if isinstance(auth_cache, globus_sdk.auth.token_response.OAuthTokenResponse):
+    if isinstance(auth_cache, globus_sdk.OAuthTokenResponse):
         auth_cache = auth_cache.by_resource_server
 
     cache_file = get_cache_file_path()

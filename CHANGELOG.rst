@@ -1,10 +1,10 @@
-v1.0.0b6 (2022-03-30)v1.0.0b6 (2022-03-30)
+v1.0.0b6 (2022-03-30)
 =====================
 
 Features
 --------
 
-- Implement models where the poiting varies along the second pixel axis (for
+- Implement models where the pointing varies along the second pixel axis (for
   rastering slit spectrographs). (`#161 <https://github.com/DKISTDC/dkist/pull/161>`_)
 
 
@@ -100,7 +100,7 @@ Bug Fixes
 Features
 --------
 
-- Implement `DKISTDatasetClient.fetch` to download asdf files from the metadata
+- Implement `DKISTClient.fetch` to download asdf files from the metadata
   streamer service. (`#90 <https://github.com/DKISTDC/dkist/pull/90>`_)
 - Enable tests on Windows (`#95 <https://github.com/DKISTDC/dkist/pull/95>`_)
 - Added search bounding box functionality to DKIST client. (`#100 <https://github.com/DKISTDC/dkist/pull/100>`_)
