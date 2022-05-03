@@ -275,6 +275,8 @@ class FileManager(BaseFileManager):
         # directory not the list of all the files in it.
         file_list = [base_path / fn for fn in self.filenames]
         file_list.append(Path("/") / inv['bucket'] / inv['asdfObjectKey'])
+        file_list.append(Path("/") / inv['bucket'] / inv['browseMovieObjectKey'])
+        file_list.append(Path("/") / inv['bucket'] / inv['qualityReportObjectKey'])
 
         # TODO: Ascertain if the destination path is local better than this
         is_local = not destination_endpoint
