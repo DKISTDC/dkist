@@ -49,8 +49,9 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
         the filenames are kept, and none of the directories.
 
     recursive : `bool` or `list` of `bool`, optional
-       If the recursive flag should be set when adding a file to the transfer.
-       This should be set if the element of ``file_list`` is a directory.
+       Controls if the path in ``file_list`` is added to the Globus task with
+       the recursive flag or not.
+       This should be `True` if the element of ``file_list`` is a directory.
        If you need to set this per-item in ``file_list`` it should be a `list`
        of `bool` of equal length as ``file_list``.
 
@@ -273,10 +274,16 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
     Parameters
     ----------
     file_list
+        The list of file paths on the source endpoint to transfer to the
+        ``destination_endpoint``.
 
     recursive
+       Controls if the path in ``file_list`` is added to the Globus task with
+       the recursive flag or not.
 
     destination_path
+        The path to the directory containing the dataset on the destination
+        endpoint.
 
     destination_endpoint
         A unique specifier for a Globus endpoint. If `None` a local
@@ -289,6 +296,7 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
         while waiting for the transfer to complete.
         If ``progress="verbose"`` then all globus events generated during the
         transfer will be shown (by default only error messages are shown.)
+        This keyword is only used if ``wait=True``.
 
     wait
        If `False` then the function will return while the Globus transfer task

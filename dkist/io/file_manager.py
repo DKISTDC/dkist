@@ -238,7 +238,7 @@ class FileManager(BaseFileManager):
             to ``/~/``.
             It is possible to put placeholder strings in the path with any key
             from the dataset inventory dictionary which can be accessed as
-            ``ds.meta['inventory']``, and example of this would be
+            ``ds.meta['inventory']``. An example of this would be
             ``path="~/dkist/{datasetId}"`` to save the files in a folder named
             with the dataset ID being downloaded.
 

@@ -27,14 +27,14 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                progress: Union[bool, Literal["verbose"]] = True,
                                wait: bool = True):
     """
-    Transfer a whole dataset to a path on a globus endpoint.
+    Transfer one or more complete datasets to a path on a globus endpoint.
 
     Parameters
     ----------
     dataset
         The dataset to transfer. This can either be a string dataset id, or it
-        can be a single row from a `.DKISTQueryResponseTable` as returned in a
-        call to ``Fido.search``.
+        can be a table or a row from the search results returned by a call to
+        ``Fido.search``.
 
     destination_endpoint
         A unique specifier for a Globus endpoint. If `None` a local
