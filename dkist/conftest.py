@@ -200,7 +200,9 @@ def dataset(array, identity_gwcs):
             'bucket': 'data',
             'datasetId': 'test_dataset',
             'primaryProposalId': 'test_proposal',
-            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf'
+            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf',
+            'browseMovieObjectKey': 'test_proposal/test_dataset/test_dataset.mp4',
+            'qualityReportObjectKey': 'test_proposal/test_dataset/test_dataset.pdf',
         },
         'headers': Table()
     }

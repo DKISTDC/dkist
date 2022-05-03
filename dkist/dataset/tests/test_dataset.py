@@ -126,7 +126,10 @@ def orchestrate_transfer_mock(mocker):
 
 def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + ["/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(**dataset.meta["inventory"])]
+    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
+                                           folder / "test_dataset.mp4",
+                                           folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
@@ -153,11 +156,10 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     """
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
 
-    file_list = dataset.files.filenames + [
-        "/{bucket}/{primaryProposalId}/{datasetId}/test_dataset.asdf".format(
-            **dataset.meta["inventory"]
-        )
-    ]
+    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
+    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
+                                           folder / "test_dataset.mp4",
+                                           folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(path="/test/", **keywords)
