@@ -74,6 +74,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'sphinx_autodoc_typehints',  # must be loaded after napoleon
     'sunpy.util.sphinx.doctest',
     'sunpy.util.sphinx.generate',
 ]
@@ -101,7 +102,6 @@ master_doc = 'index'
 # documents. Set to the "smart" one.
 default_role = 'obj'
 
-# Disable having a separate return type row
 napoleon_use_rtype = False
 
 # Disable google style docstrings
@@ -109,6 +109,11 @@ napoleon_google_docstring = False
 
 # Enable showing inherited members by default
 automodsumm_inherited_members = True
+
+# Type Hint Config
+typehints_fully_qualified = False
+typehints_use_rtype = napoleon_use_rtype
+typehints_defaults = "comma"
 
 # -- Options for intersphinx extension -----------------------------------------
 # Example configuration for intersphinx: refer to the Python standard library.

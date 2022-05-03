@@ -2,7 +2,7 @@
 Functions and classes for searching and downloading from the data center.
 """
 from os import PathLike
-from typing import Union, Literal
+from typing import List, Union, Literal
 from pathlib import Path
 
 from sunpy.net.base_client import QueryResponseRow
@@ -25,7 +25,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
-                               wait: bool = True):
+                               wait: bool = True) -> Union[List[str], str]:
     """
     Transfer one or more complete datasets to a path on a globus endpoint.
 
@@ -54,9 +54,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
 
     Returns
     -------
-    destination_path
-        The path to the directory containing the dataset on the destination
-        endpoint.
+    The path to the directory containing the dataset on the destination endpoint.
 
     """
     # Avoid circular import
@@ -66,12 +64,14 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
         datasets = _get_dataset_inventory(datasets)[0]
 
     if isinstance(datasets, DKISTQueryResponseTable) and len(datasets) > 1:
+        paths = []
         for record in datasets:
-            transfer_complete_datasets(record,
-                                       path=path,
-                                       destination_endpoint=destination_endpoint,
-                                       progress=progress,
-                                       wait=wait)
+            paths.append(transfer_complete_datasets(record,
+                                                    path=path,
+                                                    destination_endpoint=destination_endpoint,
+                                                    progress=progress,
+                                                    wait=wait))
+        return paths
 
     # At this point we only have one dataset
     dataset = datasets
