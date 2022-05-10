@@ -1,3 +1,20 @@
+v1.0.0b7 (2022-05-10)
+=====================
+
+Features
+--------
+
+- Use the new ``/datasets/v1/config`` endpoint to automatically retrieve the globus endpoint ID corresponding to the dataset searcher in use. (`#136 <https://github.com/DKISTDC/dkist/pull/136>`_)
+- Add a new function `dkist.net.transfer_complete_datasets` which takes a single row from a ``Fido`` search or a dataset ID and sets up a Globus transfer task for the complete dataset. (`#136 <https://github.com/DKISTDC/dkist/pull/136>`_)
+- Migrate to Globus SDK version 3+. Also use the config system to configure endpoints for dataset search and metadata download. (`#136 <https://github.com/DKISTDC/dkist/pull/136>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Rename ``dkist.net.DKISTDatasetClient`` to ``dkist.net.DKISTClient``. The only user facing change this has is to modify the key used when slicing the return from ``Fido.search``. (`#136 <https://github.com/DKISTDC/dkist/pull/136>`_)
+
+
 v1.0.0b6 (2022-03-30)
 =====================
 

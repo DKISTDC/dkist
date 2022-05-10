@@ -1,1 +1,0 @@
-Migrate to Globus SDK version 3+. Also use the config system to configure endpoints for dataset search and metadata download.

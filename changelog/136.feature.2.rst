@@ -1,1 +1,0 @@
-Add a new function `dkist.net.transfer_complete_datasets` which takes a single row from a ``Fido`` search or a dataset ID and sets up a Globus transfer task for the complete dataset.
