@@ -32,6 +32,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
         destination_path=Path('/~/pm_1_10'),
+        label_suffix="AAAA",
         **keywords
     )
 
@@ -54,6 +55,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
+        label_suffix="AAAA",
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
@@ -77,12 +79,14 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
                 destination_path=Path('/~/pm_1_10'),
+                label_suffix="A",
                 **kwargs
             ),
             mocker.call(
                 [Path("/data/pm_2_20/B")],
                 recursive=True,
                 destination_path=Path('/~/pm_2_20'),
+                label_suffix="B",
                 **kwargs
             ),
         ]

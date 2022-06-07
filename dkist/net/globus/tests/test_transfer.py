@@ -185,7 +185,7 @@ def tfr_file_list():
     return ["file1.fits", "file2.fits"]
 
 
-def test_ochestrate_transfer(tfr_file_list, orchestrate_mocks):
+def test_orchestrate_transfer(tfr_file_list, orchestrate_mocks):
     _orchestrate_transfer_task(tfr_file_list, recursive=False,
                                destination_path=Path("/~/"))
 
@@ -195,6 +195,7 @@ def test_ochestrate_transfer(tfr_file_list, orchestrate_mocks):
         Path("/~/"),
         tfr_file_list,
         recursive=False,
+        label_suffix=None,
     )
 
 
@@ -209,6 +210,7 @@ def test_orchestrate_transfer_no_progress(tfr_file_list, mocker, orchestrate_moc
         Path("/~/"),
         tfr_file_list,
         recursive=False,
+        label_suffix=None,
     )
 
     orchestrate_mocks.watch_transfer_progress.assert_not_called()
@@ -229,6 +231,7 @@ def test_orchestrate_transfer_no_wait(tfr_file_list, mocker, orchestrate_mocks):
         Path("/~/"),
         tfr_file_list,
         recursive=False,
+        label_suffix=None,
     )
 
     orchestrate_mocks.watch_transfer_progress.assert_not_called()

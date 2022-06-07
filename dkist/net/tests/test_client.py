@@ -228,7 +228,7 @@ def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
     response = DKISTQueryResponseTable({'Dataset ID': ['abcd']})
     with dkist.net.conf.set_temp("download_endpoint", httpserver.url_for("/download")):
         downloader = parfive.Downloader()
-        mocked_client.fetch(response, downloader=downloader, path=tmpdir)
+        mocked_client.fetch(response, downloader=downloader, path=tmpdir / "{file}")
 
     assert len(downloader.http_queue) == 1
 
