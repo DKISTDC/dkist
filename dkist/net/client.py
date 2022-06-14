@@ -4,7 +4,6 @@ import json
 import urllib.parse
 import urllib.request
 from typing import Any, List, Mapping, Iterable
-from pathlib import Path
 from functools import partial
 from collections import defaultdict
 
@@ -14,7 +13,6 @@ import parfive
 import astropy.units as u
 from astropy.table import TableAttribute
 from astropy.time import Time
-from sunpy import config
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
@@ -40,10 +38,12 @@ class DKISTQueryResponseTable(QueryResponseTable):
     """
 
     # Define some class properties to better format the results table.
+    # TODO: remove experimentDescription from this list, when we can limit the
+    # length of the field to something nicer
     hide_keys: List[str] = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
                             "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
                             "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
-                            "Preview URL"]
+                            "Preview URL", "Quality Report Filename", "Experiment Description"]
 
     # These keys are shown in the repr and str representations of this class.
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
@@ -85,6 +85,12 @@ class DKISTQueryResponseTable(QueryResponseTable):
         "updateDate": "Last Updated",
         "wavelengthMax": "Wavelength Max",
         "wavelengthMin": "Wavelength Min",
+        "hasSpectralAxis": "Has Spectral Axis",
+        "hasTemporalAxis": "Has Temporal Axis",
+        "averageDatasetSpectralSampling": "Average Spectral Sampling",
+        "averageDatasetSpatialSampling": "Average Spatial Sampling",
+        "averageDatasetTemporalSampling": "Average Temporal Sampling",
+        "qualityReportObjectKey": "Quality Report Filename",
     })
 
     @staticmethod
@@ -92,7 +98,8 @@ class DKISTQueryResponseTable(QueryResponseTable):
         times = ["Creation Date", "End Time", "Start Time", "Last Updated", "Embargo End Date"]
         units = {"Exposure Time": u.s, "Wavelength Min": u.nm,
                  "Wavelength Max": u.nm, "Dataset Size": u.Gibyte,
-                 "Filter Wavelengths": u.nm}
+                 "Filter Wavelengths": u.nm, "Average Spectral Sampling": u.nm,
+                 "Average Spatial Sampling": u.arcsec, "Average Temporal Sampling": u.s}
 
         for colname in times:
             if colname not in results.colnames:
@@ -201,15 +208,6 @@ class DKISTClient(BaseClient):
         downloader : `parfive.Downloader`
             The download manager to use.
         """
-        # This logic is being upstreamed into Fido hopefully in 2.1rc4
-        if path is None:
-            path = Path(config.get('downloads', 'download_dir')) / '{file}'  # pragma: no cover
-        elif isinstance(path, (str, os.PathLike)) and '{file}' not in str(path):
-            path = Path(path) / '{file}'  # pragma: no cover
-        else:
-            path = Path(path)  # pragma: no cover
-        path = path.expanduser()
-
         if not len(query_results):
             return
 

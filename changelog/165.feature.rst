@@ -1,0 +1,2 @@
+Support pretty formatting of new Dataset Inventory fields in Fido search
+results table.

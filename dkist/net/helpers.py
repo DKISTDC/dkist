@@ -5,7 +5,9 @@ from os import PathLike
 from typing import List, Union, Literal
 from pathlib import Path
 
+from astropy import table
 from sunpy.net.base_client import QueryResponseRow
+from sunpy.net.fido_factory import UnifiedResponse
 
 from dkist.net.attrs import Dataset
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
@@ -21,7 +23,7 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     return DKISTClient().search(Dataset(dataset_id))
 
 
-def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable],
+def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
@@ -49,12 +51,14 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
         transfer will be shown (by default only error messages are shown.)
 
     wait
-       If `False` then the function will return while the Globus transfer task
-       is still running. Setting ``wait=False`` implies ``progress=False``.
+       If `True` (the default) the function will wait for the Globus transfer
+       task to complete before processing the next dataset or returning from the
+       function. To run multiple dataset transfer tasks in parallel (one task per
+       dataset) specify ``wait=False``.
 
     Returns
     -------
-    The path to the directory containing the dataset on the destination endpoint.
+    The path to the directories containing the dataset(s) on the destination endpoint.
 
     """
     # Avoid circular import
@@ -62,6 +66,13 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
 
     if isinstance(datasets, str):
         datasets = _get_dataset_inventory(datasets)[0]
+
+    # If we have a UnifiedResponse object, it could contain one or more dkist tables.
+    # Stack them and then treat them like we were passed a single table with many rows.
+    if isinstance(datasets, UnifiedResponse):
+        datasets = datasets["dkist"]
+        if len(datasets) > 1:
+            datasets = table.vstack(datasets, metadata_conflicts="silent")
 
     if isinstance(datasets, DKISTQueryResponseTable) and len(datasets) > 1:
         paths = []
@@ -92,6 +103,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                destination_path=destination_path,
                                destination_endpoint=destination_endpoint,
                                progress=progress,
-                               wait=wait)
+                               wait=wait,
+                               label_suffix=dataset_id)
 
     return destination_path / dataset_id
