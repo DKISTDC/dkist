@@ -30,12 +30,12 @@ def absolute_ear():
 
 @pytest.fixture
 def relative_ac(relative_ear):
-    return FileManager([relative_ear.fileuri],
-                       relative_ear.target,
-                       relative_ear.dtype,
-                       relative_ear.shape,
-                       loader=AstropyFITSLoader,
-                       basepath=eitdir)
+    return FileManager.from_parts([relative_ear.fileuri],
+                                  relative_ear.target,
+                                  relative_ear.dtype,
+                                  relative_ear.shape,
+                                  loader=AstropyFITSLoader,
+                                  basepath=eitdir)
 
 
 @pytest.fixture
@@ -45,12 +45,12 @@ def relative_fl(relative_ac):
 
 @pytest.fixture
 def absolute_ac(absolute_ear):
-    return FileManager([absolute_ear.fileuri],
-                       absolute_ear.target,
-                       absolute_ear.dtype,
-                       absolute_ear.shape,
-                       loader=AstropyFITSLoader,
-                       basepath=eitdir)
+    return FileManager.from_parts([absolute_ear.fileuri],
+                                  absolute_ear.target,
+                                  absolute_ear.dtype,
+                                  absolute_ear.shape,
+                                  loader=AstropyFITSLoader,
+                                  basepath=eitdir)
 
 
 @pytest.fixture

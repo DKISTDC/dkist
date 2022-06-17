@@ -214,8 +214,8 @@ def dataset(array, identity_gwcs):
     assert ds.data is array
     assert ds.wcs is identity_gwcs
 
-    ds._file_manager = FileManager(['test1.fits'], 0, 'float', array.shape,
-                                   loader=AstropyFITSLoader)
+    ds._file_manager = FileManager.from_parts(['test1.fits'], 0, 'float', array.shape,
+                                              loader=AstropyFITSLoader)
 
     return ds
 

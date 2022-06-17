@@ -8,7 +8,6 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.file_manager import SlicedFileManagerProxy
 
 eitdir = Path(rootdir) / 'EIT'
 
