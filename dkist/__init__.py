@@ -5,7 +5,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 import astropy.config as _config
 
-# from .dataset import Dataset, TiledDataset  # noqa
+from .dataset import Dataset, TiledDataset  # noqa
 from .utils.sysinfo import system_info  # noqa
 
 try:

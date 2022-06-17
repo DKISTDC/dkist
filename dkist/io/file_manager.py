@@ -6,65 +6,8 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
-
-
-class FITSLoaderView:
-    __slots__ = ["parent", "parent_slice"]
-
-    def __init__(self, parent, aslice):
-        self.parent = parent
-        self.parent_slice = tuple(aslice)
-
-    def __getattr__(self, attr):
-        return getattr(self.parent, attr)
-
-    def __len__(self):
-        return self.reference_array[self.parent_slice].size
-
-    @property
-    def basepath(self):
-        """
-        The path all arrays generated from this ``FileManager`` use to read data from.
-        """
-        return self.parent.basepath
-
-    @basepath.setter
-    def basepath(self, value):
-        self.parent.basepath = value
-
-    @property
-    def reference_array(self):
-        """
-        An array of `asdf.ExternalArrayReference` objects.
-        """
-        return self._reference_array[self.parent_slice]
-
-    @property
-    def loader_array(self):
-        """
-        An array of `.BaseParent` objects.
-
-        These loader objects implement the minimal array-like interface for
-        conversion to a dask array.
-        """
-        return self._loader_array[self.parent_slice]
-
-    @property
-    def output_shape(self):
-        """
-        The final shape of the reconstructed data array.
-        """
-        return self._output_shape_from_ref_array(self.shape, self.reference_array)
-
-    def _generate_array(self):
-        """
-        Construct a `dask.array.Array` object from this set of references.
-
-        Each call to this method generates a new array, but all the loaders
-        still have a reference to this `~.FileManager` object, meaning changes
-        to this object will be reflected in the data loaded by the array.
-        """
-        return stack_loader_array(self.loader_array).reshape(self.output_shape)
+from dkist.net.helpers import _orchestrate_transfer_task
+from dkist.net import conf as net_conf
 
 
 class FITSLoader:
@@ -89,7 +32,7 @@ class FITSLoader:
         return self.reference_array.size
 
     def __eq__(self, other):
-        uri = self.filenames == other.filenames
+        uri = (self.reference_array == other.reference_array).all()
         target = self.target == other.target
         dtype = self.dtype == other.dtype
         shape = self.shape == other.shape
@@ -142,11 +85,90 @@ class FITSLoader:
         """
         return self._output_shape_from_ref_array(self.shape, self.reference_array)
 
+    @property
+    def _fileuris(self):
+        """
+        Numpy array of fileuris
+        """
+        return np.vectorize(lambda x: x.fileuri)(self.reference_array)
+
     def _to_ears(self, urilist):
         # This is separate to the property because it's recursive
         if isinstance(urilist, (list, tuple)):
             return list(map(self._to_ears, urilist))
         return ExternalArrayReference(urilist, self.target, self.dtype, self.shape)
+
+    def _generate_array(self):
+        """
+        Construct a `dask.array.Array` object from this set of references.
+
+        Each call to this method generates a new array, but all the loaders
+        still have a reference to this `~.FileManager` object, meaning changes
+        to this object will be reflected in the data loaded by the array.
+        """
+        return stack_loader_array(self.loader_array).reshape(self.output_shape)
+
+
+class FITSLoaderView:
+    __slots__ = ["parent", "parent_slice"]
+
+    def __init__(self, parent, aslice):
+        self.parent = parent
+        self.parent_slice = tuple(aslice)
+
+    def __getattr__(self, attr):
+        return getattr(self.parent, attr)
+
+    def __len__(self):
+        return self.reference_array.size
+
+    def __str__(self):
+        return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
+
+    def __repr__(self):
+        return f"{object.__repr__(self)}\n{self}"
+
+    @property
+    def basepath(self):
+        """
+        The path all arrays generated from this ``FileManager`` use to read data from.
+        """
+        return self.parent.basepath
+
+    @basepath.setter
+    def basepath(self, value):
+        self.parent.basepath = value
+
+    @property
+    def reference_array(self):
+        """
+        An array of `asdf.ExternalArrayReference` objects.
+        """
+        return np.array(self._reference_array[self.parent_slice])
+
+    @property
+    def loader_array(self):
+        """
+        An array of `.BaseParent` objects.
+
+        These loader objects implement the minimal array-like interface for
+        conversion to a dask array.
+        """
+        return np.array(self._loader_array[self.parent_slice])
+
+    @property
+    def output_shape(self):
+        """
+        The final shape of the reconstructed data array.
+        """
+        return self._output_shape_from_ref_array(self.shape, self.reference_array)
+
+    @property
+    def _fileuris(self):
+        """
+        Numpy array of fileuris
+        """
+        return np.vectorize(lambda x: x.fileuri)(self.reference_array)
 
     def _generate_array(self):
         """
@@ -171,9 +193,12 @@ class BaseFileManager:
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
 
+    def __eq__(self, other):
+        return self._fits_loader == other._fits_loader
+
     def __getitem__(self, item):
         item = sanitize_slices(item, self._fits_loader.reference_array.ndim)
-        return FITSLoaderView(self, item)
+        return type(self)(FITSLoaderView(self._fits_loader, item))
 
     def _array_slice_to_reference_slice(self, aslice):
         """
@@ -189,14 +214,8 @@ class BaseFileManager:
 
     def _slice_by_cube(self, item):
         item = self._array_slice_to_reference_slice(item)
-
-        # Apply slice as array, but then back to nested lists
-        uris = np.array(self._fileuris)[item].tolist()
-        if isinstance(uris, str):
-            uris = [uris]
-
-        return type(self)(uris, self.target, self.dtype, self.shape,
-                          loader=self._loader, basepath=self.basepath)
+        loader_view = FITSLoaderView(self._fits_loader, item)
+        return type(self)(loader_view)
 
     def _generate_array(self):
         return self._fits_loader._generate_array()
@@ -224,19 +243,7 @@ class BaseFileManager:
         """
         Return a list of file names referenced by this Array Container.
         """
-        names = []
-        for ear in self._fits_loader.reference_array.flat:
-            names.append(ear.fileuri)
-        return names
-
-    @property
-    def _fileuris(self):
-        """
-        Nested lists of filenames.
-
-        Note: this is not a flat list unlike `self.filenames`
-        """
-        return np.array(self.filenames).reshape(self._fits_loader.loader_array.shape).tolist()
+        return self._fits_loader._fileuris.flatten().tolist()
 
     @property
     def output_shape(self):

@@ -34,7 +34,7 @@ class FileManagerConverter(Converter):
 
     def to_yaml_tree(self, obj, tag, ctx):
         node = {}
-        node["fileuris"] = obj._fits_loader._fileuris
+        node["fileuris"] = obj._fits_loader._fileuris.tolist()
         node["target"] = obj._fits_loader.target
         node["datatype"] = obj._fits_loader.dtype
         node["shape"] = obj._fits_loader.shape
