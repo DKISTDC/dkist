@@ -6,8 +6,8 @@ from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
-from dkist.net.helpers import _orchestrate_transfer_task
 from dkist.net import conf as net_conf
+from dkist.net.helpers import _orchestrate_transfer_task
 
 
 class FITSLoader:
