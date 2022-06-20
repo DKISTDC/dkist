@@ -30,32 +30,32 @@ def absolute_ear():
 
 @pytest.fixture
 def relative_ac(relative_ear):
-    return FileManager([relative_ear.fileuri],
-                       relative_ear.target,
-                       relative_ear.dtype,
-                       relative_ear.shape,
-                       loader=AstropyFITSLoader,
-                       basepath=eitdir)
+    return FileManager.from_parts([relative_ear.fileuri],
+                                  relative_ear.target,
+                                  relative_ear.dtype,
+                                  relative_ear.shape,
+                                  loader=AstropyFITSLoader,
+                                  basepath=eitdir)
 
 
 @pytest.fixture
 def relative_fl(relative_ac):
-    return relative_ac._loader_array.flat[0]
+    return relative_ac._striped_external_array.loader_array.flat[0]
 
 
 @pytest.fixture
 def absolute_ac(absolute_ear):
-    return FileManager([absolute_ear.fileuri],
-                       absolute_ear.target,
-                       absolute_ear.dtype,
-                       absolute_ear.shape,
-                       loader=AstropyFITSLoader,
-                       basepath=eitdir)
+    return FileManager.from_parts([absolute_ear.fileuri],
+                                  absolute_ear.target,
+                                  absolute_ear.dtype,
+                                  absolute_ear.shape,
+                                  loader=AstropyFITSLoader,
+                                  basepath=eitdir)
 
 
 @pytest.fixture
 def absolute_fl(absolute_ac):
-    return absolute_ac._loader_array.flat[0]
+    return absolute_ac._striped_external_array.loader_array.flat[0]
 
 
 def test_construct(relative_fl, absolute_fl):

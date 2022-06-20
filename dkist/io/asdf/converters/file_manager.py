@@ -24,18 +24,18 @@ class FileManagerConverter(Converter):
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
 
-        file_manager = FileManager(node["fileuris"],
-                                   node["target"],
-                                   node["datatype"],
-                                   node["shape"],
-                                   loader=AstropyFITSLoader,
-                                   basepath=base_path)
+        file_manager = FileManager.from_parts(node["fileuris"],
+                                              node["target"],
+                                              node["datatype"],
+                                              node["shape"],
+                                              loader=AstropyFITSLoader,
+                                              basepath=base_path)
         return file_manager
 
     def to_yaml_tree(self, obj, tag, ctx):
         node = {}
-        node["fileuris"] = obj._fileuris
-        node["target"] = obj.target
-        node["datatype"] = obj.dtype
-        node["shape"] = obj.shape
+        node["fileuris"] = obj._striped_external_array._fileuris.tolist()
+        node["target"] = obj._striped_external_array.target
+        node["datatype"] = obj._striped_external_array.dtype
+        node["shape"] = obj._striped_external_array.shape
         return node

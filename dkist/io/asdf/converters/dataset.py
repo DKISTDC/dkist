@@ -13,7 +13,7 @@ class DatasetConverter(Converter):
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.dataset import Dataset
 
-        data = node["data"]._generate_array()
+        data = node["data"]._striped_external_array._generate_array()
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")

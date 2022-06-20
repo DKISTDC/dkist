@@ -25,8 +25,8 @@ def tagobj(request):
 
 @pytest.fixture
 def file_manager():
-    return FileManager(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
-                       loader=AstropyFITSLoader)
+    return FileManager.from_parts(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
+                                  loader=AstropyFITSLoader)
 
 
 def test_roundtrip_file_manager(file_manager):

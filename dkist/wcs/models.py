@@ -1,11 +1,11 @@
-from typing import Any, Union, Iterable
+from typing import Union, Iterable
 
 import numpy as np
 
 try:
     from numpy.typing import ArrrayLike  # NOQA
 except ImportError:
-    ArrayLike = Any
+    ArrayLike = Iterable
 
 import astropy.modeling.models as m
 import astropy.units as u
