@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.file_manager import FileManager, FITSLoader, FITSLoaderView
+from dkist.io.file_manager import FileManager, StripedExternalArray, StripedExternalArrayView
 
 eitdir = Path(rootdir) / 'EIT'
 
@@ -70,11 +70,11 @@ def test_collection_to_references(tmpdir, file_manager):
 
 
 def test_collection_getitem(tmpdir, file_manager):
-    assert isinstance(file_manager._fits_loader, FITSLoader)
+    assert isinstance(file_manager._fits_loader, StripedExternalArray)
     assert isinstance(file_manager[0], FileManager)
-    assert isinstance(file_manager[0]._fits_loader, FITSLoaderView)
+    assert isinstance(file_manager[0]._fits_loader, StripedExternalArrayView)
     assert isinstance(file_manager[1], FileManager)
-    assert isinstance(file_manager[1]._fits_loader, FITSLoaderView)
+    assert isinstance(file_manager[1]._fits_loader, StripedExternalArrayView)
     assert len(file_manager[0]._fits_loader) == len(file_manager[1]._fits_loader) == 1
 
 
@@ -146,3 +146,18 @@ def test_file_manager_direct_slice(eit_dataset):
 
     sub_file.basepath = "test2"
     assert sub_file.basepath == ds.files.basepath
+
+
+def test_reprs(file_manager):
+    assert str(len(file_manager)) in repr(file_manager)
+    assert str(file_manager.shape) in repr(file_manager)
+
+    sea = file_manager._striped_external_array
+    assert str(len(sea)) in repr(sea)
+    assert str(sea.shape) in repr(sea)
+
+    sliced_file_manager = file_manager[4:6]
+    sliced_sea = sliced_file_manager._striped_external_array
+    assert str(len(sliced_sea)) in repr(sliced_sea)
+    assert str(sliced_sea.shape) in repr(sliced_sea)
+    assert str(sea) in repr(sliced_sea)
