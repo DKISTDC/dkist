@@ -31,7 +31,7 @@ def externalarray(file_manager):
 
 def test_load_and_slicing(file_manager, externalarray):
     ext_shape = np.array(externalarray, dtype=object).shape
-    assert file_manager._fits_loader.loader_array.shape == ext_shape
+    assert file_manager._striped_external_array.loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
     array = file_manager._generate_array().compute()
@@ -41,7 +41,7 @@ def test_load_and_slicing(file_manager, externalarray):
 
     sliced_manager = file_manager[5:8]
     ext_shape = np.array(externalarray[5:8], dtype=object).shape
-    assert sliced_manager._fits_loader.loader_array.shape == ext_shape
+    assert sliced_manager._striped_external_array.loader_array.shape == ext_shape
     assert sliced_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
 
@@ -52,7 +52,7 @@ def test_filenames(file_manager, externalarray):
 
 def test_dask(file_manager, externalarray):
     ext_shape = np.array(externalarray, dtype=object).shape
-    assert file_manager._fits_loader.loader_array.shape == ext_shape
+    assert file_manager._striped_external_array.loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
     assert isinstance(file_manager._generate_array(), da.Array)
@@ -64,18 +64,18 @@ def test_collection_to_references(tmpdir, file_manager):
 
     for ear in ears:
         assert isinstance(ear, asdf.ExternalArrayReference)
-        assert ear.target == file_manager._fits_loader.target
-        assert ear.dtype == file_manager._fits_loader.dtype
-        assert ear.shape == file_manager._fits_loader.shape
+        assert ear.target == file_manager._striped_external_array.target
+        assert ear.dtype == file_manager._striped_external_array.dtype
+        assert ear.shape == file_manager._striped_external_array.shape
 
 
 def test_collection_getitem(tmpdir, file_manager):
-    assert isinstance(file_manager._fits_loader, StripedExternalArray)
+    assert isinstance(file_manager._striped_external_array, StripedExternalArray)
     assert isinstance(file_manager[0], FileManager)
-    assert isinstance(file_manager[0]._fits_loader, StripedExternalArrayView)
+    assert isinstance(file_manager[0]._striped_external_array, StripedExternalArrayView)
     assert isinstance(file_manager[1], FileManager)
-    assert isinstance(file_manager[1]._fits_loader, StripedExternalArrayView)
-    assert len(file_manager[0]._fits_loader) == len(file_manager[1]._fits_loader) == 1
+    assert isinstance(file_manager[1]._striped_external_array, StripedExternalArrayView)
+    assert len(file_manager[0]._striped_external_array) == len(file_manager[1]._striped_external_array) == 1
 
 
 def test_basepath_change(file_manager):

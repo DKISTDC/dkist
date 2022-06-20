@@ -40,7 +40,7 @@ def relative_ac(relative_ear):
 
 @pytest.fixture
 def relative_fl(relative_ac):
-    return relative_ac._fits_loader.loader_array.flat[0]
+    return relative_ac._striped_external_array.loader_array.flat[0]
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def absolute_ac(absolute_ear):
 
 @pytest.fixture
 def absolute_fl(absolute_ac):
-    return absolute_ac._fits_loader.loader_array.flat[0]
+    return absolute_ac._striped_external_array.loader_array.flat[0]
 
 
 def test_construct(relative_fl, absolute_fl):
