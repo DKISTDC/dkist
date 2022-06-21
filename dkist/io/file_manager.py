@@ -15,6 +15,7 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
+import abc
 from typing import Any, List, Tuple, Union, Iterable, Optional
 from pathlib import Path
 
@@ -24,7 +25,7 @@ import numpy as np
 try:
     from numpy.typing import DTypeLike, NDArray  # NOQA
 except ImportError:
-    NDArray = DTypeLike = Iterable
+    NDArray = DTypeLike = Iterable  # type: ignore
 
 from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
@@ -35,10 +36,23 @@ from dkist.net import conf as net_conf
 from dkist.net.helpers import _orchestrate_transfer_task
 
 
-class BaseStripedExternalArray:
+class BaseStripedExternalArray(abc.ABC):
     """
     Implements shared functionality between FITSLoader and FITSLoaderView.
     """
+    target: Any
+    dtype: DTypeLike
+    shape: Tuple[int]
+
+    @abc.abstractmethod
+    @property
+    def reference_array(self) -> NDArray[ExternalArrayReference]:
+        pass
+
+    @abc.abstractmethod
+    @property
+    def loader_array(self) -> NDArray[BaseFITSLoader]:
+        pass
 
     def __len__(self) -> int:
         return self.reference_array.size
@@ -52,13 +66,13 @@ class BaseStripedExternalArray:
         return all((uri, target, dtype, shape))
 
     @staticmethod
-    def _output_shape_from_ref_array(shape, reference_array) -> Tuple[int]:
+    def _output_shape_from_ref_array(shape: Tuple[int, ...], reference_array: NDArray) -> Tuple[int, ...]:
         # If the first dimension is one we are going to squash it.
         if shape[0] == 1:
             shape = shape[1:]
 
         if len(reference_array) == 1:
-            return shape
+            return tuple(shape)
         else:
             return tuple(list(reference_array.shape) + list(shape))
 
@@ -103,7 +117,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         self.dtype = dtype
         self.target = target
         self._loader = loader
-        self._basepath = None
+        self._basepath: Optional[os.PathLike] = None
         self.basepath = basepath  # Use the setter to convert to a Path
 
         self._reference_array = np.vectorize(
@@ -123,7 +137,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         return f"{object.__repr__(self)}\n{self}"
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Optional[os.PathLike]:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
@@ -164,9 +178,9 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     # class.
     __slots__ = ["parent", "parent_slice"]
 
-    def __init__(self, parent: StripedExternalArray, aslice: Union[tuple, slice, int]):
+    def __init__(self, parent: StripedExternalArray, sanitized_slice: Tuple[slice, int]):
         self.parent = parent
-        self.parent_slice = tuple(aslice)
+        self.parent_slice = tuple(sanitized_slice)
 
     def __getattr__(self, attr):
         return getattr(self.parent, attr)
