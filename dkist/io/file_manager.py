@@ -44,13 +44,13 @@ class BaseStripedExternalArray(abc.ABC):
     dtype: DTypeLike
     shape: Tuple[int]
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def reference_array(self) -> NDArray[ExternalArrayReference]:
         pass
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def loader_array(self) -> NDArray[BaseFITSLoader]:
         pass
 
