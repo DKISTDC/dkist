@@ -10,7 +10,6 @@ import astropy.units as u
 import gwcs
 from astropy.tests.helper import assert_quantity_allclose
 
-from dkist import net
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.io import FileManager
@@ -116,60 +115,3 @@ def test_file_manager():
 
 def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
-
-
-@pytest.fixture
-def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.io.file_manager._orchestrate_transfer_task",
-                       autospec=True)
-
-
-def test_download_default_keywords(dataset, orchestrate_transfer_mock):
-    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
-    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
-                                           folder / "test_dataset.mp4",
-                                           folder / "test_dataset.pdf"]
-    file_list = [base_path / fn for fn in file_list]
-
-    dataset.files.download()
-
-    orchestrate_transfer_mock.assert_called_once_with(
-        file_list,
-        recursive=False,
-        destination_path=Path('/~'),
-        destination_endpoint=None,
-        progress=True,
-        wait=True,
-    )
-
-
-@pytest.mark.parametrize("keywords", [
-    {"progress": True, "wait": True, "destination_endpoint": None},
-    {"progress": True, "wait": False, "destination_endpoint": None},
-    {"progress": False, "wait": True, "destination_endpoint": None},
-    {"progress": False, "wait": True, "destination_endpoint": "wibble"},
-])
-def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
-    """
-    Assert that keywords are passed through as expected
-    """
-    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
-
-    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
-                                           folder / "test_dataset.mp4",
-                                           folder / "test_dataset.pdf"]
-    file_list = [base_path / fn for fn in file_list]
-
-    dataset.files.download(path="/test/", **keywords)
-
-    orchestrate_transfer_mock.assert_called_once_with(
-        file_list,
-        recursive=False,
-        destination_path=Path('/test'),
-        **keywords
-    )
-
-    if not keywords["destination_endpoint"]:
-        assert dataset.files.basepath == Path("/test/")

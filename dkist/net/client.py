@@ -18,18 +18,12 @@ from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 
+from dkist.utils.inventory import INVENTORY_KEY_MAP
+
 from . import attrs as dattrs
 from .attr_walker import walker
 
 __all__ = ["DKISTQueryResponseTable", "DKISTClient"]
-
-
-class DefaultMap(defaultdict):
-    """
-    A tweak of default dict where the default value is the key that's missing.
-    """
-    def __missing__(self, key):
-        return key
 
 
 class DKISTQueryResponseTable(QueryResponseTable):
@@ -48,50 +42,6 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # These keys are shown in the repr and str representations of this class.
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
-    # Map the keys in the response to human friendly ones.
-    key_map: Mapping[str, str] = DefaultMap(None, {
-        "asdfObjectKey": "asdf Filename",
-        "boundingBox": "Bounding Box",
-        "browseMovieObjectKey": "Movie Filename",
-        "browseMovieUrl": "Preview URL",
-        "bucket": "Storage Bucket",
-        "contributingExperimentIds": "Experiment IDs",
-        "contributingProposalIds": "Proposal IDs",
-        "createDate": "Creation Date",
-        "datasetId": "Dataset ID",
-        "datasetSize": "Dataset Size",
-        "embargoEndDate": "Embargo End Date",
-        "endTime": "End Time",
-        "experimentDescription": "Experiment Description",
-        "exposureTime": "Exposure Time",
-        "filterWavelengths": "Filter Wavelengths",
-        "frameCount": "Number of Frames",
-        "hasAllStokes": "Full Stokes",
-        "instrumentName": "Instrument",
-        "isDownloadable": "Downloadable",
-        "isEmbargoed": "Embargoed",
-        "observables": "Observables",
-        "originalFrameCount": "Level 0 Frame count",
-        "primaryExperimentId": "Primary Experiment ID",
-        "primaryProposalId": "Primary Proposal ID",
-        "qualityAverageFriedParameter": "Average Fried Parameter",
-        "qualityAveragePolarimetricAccuracy": "Average Polarimetric Accuracy",
-        "recipeId": "Recipe ID",
-        "recipeInstanceId": "Recipie Instance ID",
-        "recipeRunId": "Recipie Run ID",
-        "startTime": "Start Time",
-        "stokesParameters": "Stokes Parameters",
-        "targetTypes": "Target Types",
-        "updateDate": "Last Updated",
-        "wavelengthMax": "Wavelength Max",
-        "wavelengthMin": "Wavelength Min",
-        "hasSpectralAxis": "Has Spectral Axis",
-        "hasTemporalAxis": "Has Temporal Axis",
-        "averageDatasetSpectralSampling": "Average Spectral Sampling",
-        "averageDatasetSpatialSampling": "Average Spatial Sampling",
-        "averageDatasetTemporalSampling": "Average Temporal Sampling",
-        "qualityReportObjectKey": "Quality Report Filename",
-    })
 
     @staticmethod
     def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
@@ -126,7 +76,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         new_results = defaultdict(list)
         for result in results:
             for key, value in result.items():
-                new_results[cls.key_map[key]].append(value)
+                new_results[INVENTORY_KEY_MAP[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
         data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
