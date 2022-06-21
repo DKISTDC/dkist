@@ -10,6 +10,7 @@ jobs:
     with:
       envs: |
         - linux: py39
+        - linux: mypy
         - macos: py38
         - linux: py310-devdeps
         - windows: py38-oldestdeps
