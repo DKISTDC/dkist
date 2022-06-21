@@ -1,0 +1,3 @@
+Unify path handling between `.FileManager.download` and `.DKISTClient.fetch`.
+This means that you can use the same path specification to download the ASDF
+files and the FITS files, using keys such as "Dataset ID".
