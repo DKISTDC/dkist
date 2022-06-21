@@ -82,7 +82,8 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                                     destination_endpoint=destination_endpoint,
                                                     progress=progress,
                                                     wait=wait))
-        return paths
+        # Why mypy is incapable of handling multiple return is beyond me
+        return paths  # type: ignore
 
     # At this point we only have one dataset
     dataset = datasets
