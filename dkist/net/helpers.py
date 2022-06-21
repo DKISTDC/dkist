@@ -24,10 +24,10 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
 
 
 def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
-                               path: PathLike = "/~/",
+                               path: PathLike = Path("/~/"),
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
-                               wait: bool = True) -> Union[List[str], str]:
+                               wait: bool = True) -> Union[List[PathLike], PathLike]:
     """
     Transfer one or more complete datasets to a path on a globus endpoint.
 

@@ -4,10 +4,10 @@ Functions and helpers for orchestrating and monitoring transfers using Globus.
 import copy
 import json
 import time
-import pathlib
 import datetime
 from os import PathLike
-from typing import List, Union, Literal
+from typing import Union, Literal, Iterable
+from pathlib import Path
 
 import globus_sdk
 from parfive.utils import in_notebook
@@ -87,7 +87,7 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
                                                 sync_level="checksum",
                                                 verify_checksum=True)
 
-    dst_base_path = pathlib.Path(dst_base_path)
+    dst_base_path = Path(dst_base_path)
     src_file_list = copy.copy(file_list)
     dst_file_list = []
     for src_file in src_file_list:
@@ -265,9 +265,9 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
         progress.close()
 
 
-def _orchestrate_transfer_task(file_list: List[PathLike],
-                               recursive: List[bool],
-                               destination_path: PathLike = "/~/",
+def _orchestrate_transfer_task(file_list: Iterable[PathLike],
+                               recursive: Union[bool, Iterable[bool]],
+                               destination_path: PathLike = Path("/~/"),
                                destination_endpoint: str = None,
                                *,
                                progress: Union[bool, Literal["verbose"]] = True,

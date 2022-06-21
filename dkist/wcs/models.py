@@ -3,9 +3,9 @@ from typing import Union, Iterable
 import numpy as np
 
 try:
-    from numpy.typing import ArrrayLike  # NOQA
+    from numpy.typing import ArrayLike  # NOQA
 except ImportError:
-    ArrayLike = Iterable
+    ArrayLike = Iterable  # type: ignore
 
 import astropy.modeling.models as m
 import astropy.units as u
