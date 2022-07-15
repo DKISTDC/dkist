@@ -13,6 +13,7 @@ from sunpy.tests.helpers import no_vso
 import dkist.net
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.tests import strategies as dst  # noqa
+from dkist.utils.inventory import INVENTORY_KEY_MAP
 
 
 @pytest.fixture
@@ -81,7 +82,7 @@ def example_api_response():
 
 @pytest.fixture
 def expected_table_keys():
-    translated_keys = set(DKISTQueryResponseTable.key_map.values())
+    translated_keys = set(INVENTORY_KEY_MAP.values())
     removed_keys = {'Wavelength Min', 'Wavelength Max'}
     added_keys = {'Wavelength'}
     expected_keys = translated_keys - removed_keys
@@ -110,7 +111,7 @@ def test_query_response_from_results(empty_query_response, example_api_response,
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
     assert not set(qr.colnames).difference(expected_table_keys)
-    assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
+    assert set(qr.colnames).isdisjoint(INVENTORY_KEY_MAP.keys())
 
 
 def test_query_response_from_results_unknown_field(empty_query_response, example_api_response, expected_table_keys):
@@ -127,7 +128,7 @@ def test_query_response_from_results_unknown_field(empty_query_response, example
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
     assert set(qr.colnames).difference(expected_table_keys) == {'spamEggs'}
-    assert set(qr.colnames).isdisjoint(DKISTQueryResponseTable.key_map.keys())
+    assert set(qr.colnames).isdisjoint(INVENTORY_KEY_MAP.keys())
 
 
 def test_length_0_qr(empty_query_response):

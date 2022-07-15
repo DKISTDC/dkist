@@ -33,6 +33,7 @@ from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
 from dkist.net import conf as net_conf
 from dkist.net.helpers import _orchestrate_transfer_task
+from dkist.utils.inventory import humanize_inventory
 
 
 class BaseStripedExternalArray:
@@ -328,6 +329,11 @@ class FileManager(BaseFileManager):
             ``ds.meta['inventory']``. An example of this would be
             ``path="~/dkist/{datasetId}"`` to save the files in a folder named
             with the dataset ID being downloaded.
+            If ``path`` is specified, and ``destination_endpoint`` is `None`
+            (i.e. you are downloading to a local Globus personal endpoint) this
+            method will set ``.basepath`` to the value of the ``path=``
+            argument, so that the array can be read from your transferred
+            files.
 
         destination_endpoint : `str`, optional
             A unique specifier for a Globus endpoint. If `None` a local
@@ -352,11 +358,12 @@ class FileManager(BaseFileManager):
             )
 
         inv = self._ndcube.meta["inventory"]
+        human_inv = humanize_inventory(inv)
 
         base_path = Path(net_conf.dataset_path.format(**inv))
         destination_path = path or self.basepath or "/~/"
         destination_path = Path(destination_path).as_posix()
-        destination_path = Path(destination_path.format(**inv))
+        destination_path = Path(destination_path.format(**human_inv))
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.
@@ -378,7 +385,7 @@ class FileManager(BaseFileManager):
         )
 
         if is_local:
-            local_destination = destination_path.relative_to("/").expanduser()
+            local_destination = destination_path.expanduser().relative_to("/")
             if local_destination.root == "":
                 local_destination = "/" / local_destination
             self.basepath = local_destination
