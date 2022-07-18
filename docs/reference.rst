@@ -25,6 +25,9 @@ Reference / API
 .. automodapi:: dkist.io.loaders
    :headings: #~
 
+.. automodapi:: dkist.processing.caveats
+   :headings: ^#
+
 .. automodapi:: dkist.wcs
    :headings: ^#
 

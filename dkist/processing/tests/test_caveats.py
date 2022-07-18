@@ -1,6 +1,14 @@
+import pytest
+
+from ndcube.wcs.wrappers.reordered_wcs import ReorderedLowLevelWCS
+
 from dkist.processing.caveats import swap_world_axes
 
 
-def test_swap_world_axes(dataset_4d):
-    new_ds = swap_world_axes(dataset_4d, 1, 2)
-    assert new_ds.wcs.world_axis_physical_types[1] == dataset_4d.wcs.world_axis_physical_types[2]
+@pytest.mark.parametrize("dataset", ("dataset_4d", "eit_dataset"), indirect=True)
+def test_swap_world_axes(dataset):
+    new_ds = swap_world_axes(dataset, 0, 1)
+    assert new_ds.wcs.world_axis_physical_types[0] == dataset.wcs.world_axis_physical_types[1]
+
+    assert new_ds.files is dataset.files
+    assert isinstance(new_ds.wcs.low_level_wcs, ReorderedLowLevelWCS)
