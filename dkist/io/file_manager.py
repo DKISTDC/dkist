@@ -385,8 +385,7 @@ class FileManager(BaseFileManager):
         )
 
         if is_local:
+            if str(destination_path).startswith("/~/"):
+                local_destination = Path(str(destination_path)[1:])
             local_destination = destination_path.expanduser()
-            local_destination = local_destination.relative_to(local_destination.drive).relative_to("/")
-            if local_destination.root == "":
-                local_destination = "/" / local_destination
             self.basepath = local_destination.absolute()
