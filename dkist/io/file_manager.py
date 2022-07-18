@@ -388,4 +388,4 @@ class FileManager(BaseFileManager):
             if str(destination_path).startswith("/~/"):
                 local_destination = Path(str(destination_path)[1:])
             local_destination = destination_path.expanduser()
-            self.basepath = local_destination.absolute()
+            self.basepath = local_destination
