@@ -47,6 +47,7 @@ def swap_world_axes(dataset: dkist.Dataset, axis1: int, axis2: int) -> dkist.Dat
                                 meta=dataset.meta,
                                 unit=dataset.unit,
                                 copy=False)
-    new_dataset._file_manager = dataset._file_manager
+    if dataset._file_manager is not None:
+        new_dataset._file_manager = dataset._file_manager
 
     return new_dataset
