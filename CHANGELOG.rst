@@ -1,3 +1,24 @@
+v1.0.0b8 (2022-07-18)
+=====================
+
+Features
+--------
+
+- Support passing a whole `~sunpy.net.fido_factory.UnifiedResponse` to
+  `dkist.net.transfer_complete_datasets`. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
+- Support pretty formatting of new Dataset Inventory fields in Fido search
+  results table. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
+
+
+Bug Fixes
+---------
+
+- Refactor `.FileManager` to correctly support slicing. (`#176 <https://github.com/DKISTDC/dkist/pull/176>`_)
+- Unify path handling between `.FileManager.download` and `.DKISTClient.fetch`.
+  This means that you can use the same path specification to download the ASDF
+  files and the FITS files, using keys such as "Dataset ID". (`#178 <https://github.com/DKISTDC/dkist/pull/178>`_)
+
+
 v1.0.0b7 (2022-05-10)
 =====================
 
