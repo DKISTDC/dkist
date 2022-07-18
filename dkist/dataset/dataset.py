@@ -163,7 +163,7 @@ class Dataset(NDCube):
         Construct a `~dkist.dataset.Dataset` from a directory containing one
         asdf file and a collection of FITS files.
         """
-        base_path = Path(directory)
+        base_path = Path(directory).expanduser()
         if not base_path.is_dir():
             raise ValueError("directory argument must be a directory")
         asdf_files = tuple(base_path.glob("*.asdf"))
@@ -184,7 +184,7 @@ class Dataset(NDCube):
         """
         Construct a dataset object from a filepath of a suitable asdf file.
         """
-        filepath = Path(filepath)
+        filepath = Path(filepath).expanduser()
         base_path = filepath.parent
         try:
             with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:

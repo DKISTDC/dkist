@@ -25,8 +25,8 @@ def dataset_info_str(ds):
     pixel_shape = wcs.pixel_shape or (None,) * wcs.pixel_n_dim
 
     # Find largest between header size and value length
-    if hasattr(wcs, "pixel_axes_names"):
-        pixel_axis_names = wcs.pixel_axes_names
+    if hasattr(wcs, "pixel_axis_names"):
+        pixel_axis_names = wcs.pixel_axis_names
     elif isinstance(wcs, gwcs.WCS):
         pixel_axis_names = wcs.input_frame.axes_names
     else:
