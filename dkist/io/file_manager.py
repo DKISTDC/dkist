@@ -385,7 +385,8 @@ class FileManager(BaseFileManager):
         )
 
         if is_local:
-            local_destination = destination_path.expanduser().relative_to("/")
+            local_destination = destination_path.expanduser()
+            local_destination = local_destination.relative_to(local_destination.drive).relative_to("/")
             if local_destination.root == "":
                 local_destination = "/" / local_destination
-            self.basepath = local_destination
+            self.basepath = local_destination.absolute()
