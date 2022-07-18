@@ -10,8 +10,8 @@ from os import PathLike
 from typing import List, Union, Literal
 
 import globus_sdk
-from parfive.utils import in_notebook
-from tqdm import tqdm, tqdm_notebook
+from tqdm.auto import tqdm
+from tqdm.notebook import tqdm as tqdm_notebook
 
 from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
                         get_endpoint_id, get_local_endpoint_id, get_transfer_client)
@@ -170,14 +170,13 @@ def get_progress_bar(*args, **kwargs):  # pragma: no cover
     """
     Return the correct tqdm instance.
     """
-    notebook = in_notebook()
+    notebook = tqdm is tqdm_notebook
     if not notebook:
         kwargs['bar_format'] = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]'
     else:
         # TODO: Both having this and not having it breaks things.
         kwargs['total'] = kwargs.get("total", 1e9) or 1e9
-    the_tqdm = tqdm if not in_notebook() else tqdm_notebook
-    return the_tqdm(*args, **kwargs)
+    return tqdm(*args, **kwargs)
 
 
 def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
