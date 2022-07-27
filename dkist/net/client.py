@@ -183,8 +183,7 @@ class DKISTClient(BaseClient):
 
         for x in query:
             if isinstance(x, a.Instrument):
-                # TODO: Obviously "inst" shouldn't be here, but it's in the test data.
-                if x.value.lower() not in ("inst", "vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
+                if x.value.lower() not in ("vbi", "vtf", "visp", "cryo-nirsp", "dl-nirsp"):
                     return False
 
             if isinstance(x, a.Physobs):

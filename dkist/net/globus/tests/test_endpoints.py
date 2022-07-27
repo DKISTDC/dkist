@@ -2,6 +2,7 @@ import json
 import pathlib
 
 import globus_sdk
+import globus_sdk.services.transfer
 import pytest
 
 import dkist.net
@@ -14,7 +15,7 @@ from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directo
 @pytest.fixture
 def endpoint_search(mocker, transfer_client):
     with open(rootdir / "globus_search_response.json") as fd:
-        data = json.load(fd)
+        data = {'DATA': json.load(fd)}
 
     responses = []
     for d in data:
