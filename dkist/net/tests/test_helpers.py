@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 import pytest
@@ -16,10 +17,11 @@ def orchestrate_transfer_mock(mocker):
 @pytest.mark.parametrize(
     "keywords",
     [
-        {"progress": True, "wait": True, "destination_endpoint": None},
-        {"progress": True, "wait": False, "destination_endpoint": None},
-        {"progress": False, "wait": True, "destination_endpoint": None},
-        {"progress": False, "wait": True, "destination_endpoint": "wibble"},
+        {"progress": True, "wait": True, "destination_endpoint": None, "label": None},
+        {"progress": True, "wait": False, "destination_endpoint": None, "label": None},
+        {"progress": False, "wait": True, "destination_endpoint": None, "label": None},
+        {"progress": False, "wait": True, "destination_endpoint": "wibble", "label": None},
+        {"progress": False, "wait": True, "destination_endpoint": None, "label": "fibble"},
     ],
 )
 def test_download_default_keywords(orchestrate_transfer_mock, keywords):
@@ -32,11 +34,12 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
         **keywords
     )
 
+    if keywords["label"] is None:
+        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H:%M')} AAAA"
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
         destination_path=Path("/~/pm_1_10"),
-        label_suffix="AAAA",
         **keywords
     )
 
@@ -63,7 +66,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label_suffix="AAAA",
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H:%M')} AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
@@ -78,23 +81,21 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
         },
     )
 
-    transfer_complete_datasets(res)
+    transfer_complete_datasets(res, label="fibble")
 
-    kwargs = {"progress": True, "wait": True, "destination_endpoint": None}
+    kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
     orchestrate_transfer_mock.assert_has_calls(
         [
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
                 destination_path=Path("/~/pm_1_10"),
-                label_suffix="A",
                 **kwargs
             ),
             mocker.call(
                 [Path("/data/pm_2_20/B")],
                 recursive=True,
                 destination_path=Path("/~/pm_2_20"),
-                label_suffix="B",
                 **kwargs
             ),
         ]
@@ -120,23 +121,21 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
     )
     res._list[0].client = res._list[1].client = DKISTClient()
 
-    transfer_complete_datasets(res)
+    transfer_complete_datasets(res, label="fibble")
 
-    kwargs = {"progress": True, "wait": True, "destination_endpoint": None}
+    kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
     orchestrate_transfer_mock.assert_has_calls(
         [
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
                 destination_path=Path("/~/pm_1_10"),
-                label_suffix="A",
                 **kwargs
             ),
             mocker.call(
                 [Path("/data/pm_2_20/B")],
                 recursive=True,
                 destination_path=Path("/~/pm_2_20"),
-                label_suffix="B",
                 **kwargs
             ),
         ]

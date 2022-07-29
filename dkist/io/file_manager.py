@@ -313,7 +313,7 @@ class FileManager(BaseFileManager):
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
 
-    def download(self, path=None, destination_endpoint=None, progress=True, wait=True):
+    def download(self, path=None, destination_endpoint=None, progress=True, wait=True, label=None):
         """
         Start a Globus file transfer for all files in this Dataset.
 
@@ -351,6 +351,9 @@ class FileManager(BaseFileManager):
         wait : `bool`, optional
             If `False` then the function will return while the Globus transfer task
             is still running. Setting ``wait=False`` implies ``progress=False``.
+
+        label : `str`
+            Label for the Globus transfer. If None then a default will be used.
         """
         if self._ndcube is None:
             raise ValueError(
@@ -382,6 +385,7 @@ class FileManager(BaseFileManager):
             destination_endpoint=destination_endpoint,
             progress=progress,
             wait=wait,
+            label=label
         )
 
         if is_local:

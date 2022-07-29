@@ -1,8 +1,9 @@
 """
 Functions and classes for searching and downloading from the data center.
 """
+import datetime
 from os import PathLike
-from typing import List, Union, Literal
+from typing import List, Union, Literal, Optional
 from pathlib import Path
 
 from astropy import table
@@ -27,7 +28,8 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
-                               wait: bool = True) -> Union[List[str], str]:
+                               wait: bool = True,
+                               label: Optional[str] = None) -> Union[List[str], str]:
     """
     Transfer one or more complete datasets to a path on a globus endpoint.
 
@@ -56,6 +58,9 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
        function. To run multiple dataset transfer tasks in parallel (one task per
        dataset) specify ``wait=False``.
 
+    label : `str`
+        Label for the Globus transfer. If None then a default will be used.
+
     Returns
     -------
     The path to the directories containing the dataset(s) on the destination endpoint.
@@ -81,7 +86,8 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                                     path=path,
                                                     destination_endpoint=destination_endpoint,
                                                     progress=progress,
-                                                    wait=wait))
+                                                    wait=wait,
+                                                    label=label))
         return paths
 
     # At this point we only have one dataset
@@ -98,12 +104,15 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
         bucket=bucket
     ))]
 
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    label = f"DKIST Python Tools - {now} {dataset_id}" if label is None else label
+
     _orchestrate_transfer_task(file_list,
                                recursive=True,
                                destination_path=destination_path,
                                destination_endpoint=destination_endpoint,
                                progress=progress,
                                wait=wait,
-                               label_suffix=dataset_id)
+                               label=label)
 
     return destination_path / dataset_id
