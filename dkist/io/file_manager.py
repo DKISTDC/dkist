@@ -353,7 +353,7 @@ class FileManager(BaseFileManager):
             is still running. Setting ``wait=False`` implies ``progress=False``.
 
         label : `str`
-            Label for the Globus transfer. If None then a default will be used.
+            Label for the Globus transfer. If `None` then a default will be used.
         """
         if self._ndcube is None:
             raise ValueError(

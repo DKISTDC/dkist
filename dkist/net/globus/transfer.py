@@ -307,7 +307,7 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
        is still running. Setting ``wait=False`` implies ``progress=False``.
 
     label : `str`
-       Label for the Globus transfer. If None then a default will be used.
+       Label for the Globus transfer. If `None` then a default will be used.
 
     Returns
     -------

@@ -59,7 +59,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
        dataset) specify ``wait=False``.
 
     label : `str`
-        Label for the Globus transfer. If None then a default will be used.
+        Label for the Globus transfer. If `None` then a default will be used.
 
     Returns
     -------
