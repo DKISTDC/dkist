@@ -20,7 +20,7 @@ __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
 
 
 def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, file_list,
-                                  src_base_path=None, recursive=False, label_suffix=None):
+                                  src_base_path=None, recursive=False, label=None):
     """
     Start a new transfer task for a list of files.
 
@@ -55,8 +55,8 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
        If you need to set this per-item in ``file_list`` it should be a `list`
        of `bool` of equal length as ``file_list``.
 
-    label_suffix : `str`
-       String to append to the transfer task label.
+    label : `str`
+       Label for the Globus transfer. If None then a default will be used.
 
     Returns
     -------
@@ -80,10 +80,10 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
     dst_endpoint = get_endpoint_id(dst_endpoint, tc)
     auto_activate_endpoint(dst_endpoint, tc)
 
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    label_suffix = f" {label_suffix}" if label_suffix is not None else ""
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    label = f"DKIST Python Tools - {now}" if label is None else label
     transfer_manifest = globus_sdk.TransferData(tc, src_endpoint, dst_endpoint,
-                                                label=f"DKIST Python Tools - {now}{label_suffix}",
+                                                label=label,
                                                 sync_level="checksum",
                                                 verify_checksum=True)
 
@@ -271,7 +271,7 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
                                *,
                                progress: Union[bool, Literal["verbose"]] = True,
                                wait: bool = True,
-                               label_suffix=None):
+                               label=None):
     """
     Transfer the files given in file_list to the path on ``destination_endpoint``.
 
@@ -306,8 +306,8 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
        If `False` then the function will return while the Globus transfer task
        is still running. Setting ``wait=False`` implies ``progress=False``.
 
-    label_suffix : `str`
-       String to append to the transfer task label.
+    label : `str`
+       Label for the Globus transfer. If `None` then a default will be used.
 
     Returns
     -------
@@ -325,7 +325,7 @@ def _orchestrate_transfer_task(file_list: List[PathLike],
                                             destination_path,
                                             file_list,
                                             recursive=recursive,
-                                            label_suffix=label_suffix)
+                                            label=label)
 
     tc = get_transfer_client()
 

@@ -1,0 +1,3 @@
+Add a ``label=`` kwarg to `.FileManager.download` and
+`.transfer_complete_datasets` allowing the user to completely customise the
+Globus transfer task label.

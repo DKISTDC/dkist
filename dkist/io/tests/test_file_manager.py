@@ -187,14 +187,16 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
+        label=None,
     )
 
 
 @pytest.mark.parametrize("keywords", [
-    {"progress": True, "wait": True, "destination_endpoint": None},
-    {"progress": True, "wait": False, "destination_endpoint": None},
-    {"progress": False, "wait": True, "destination_endpoint": None},
-    {"progress": False, "wait": True, "destination_endpoint": "wibble"},
+    {"progress": True, "wait": True, "destination_endpoint": None, "label": None},
+    {"progress": True, "wait": False, "destination_endpoint": None, "label": None},
+    {"progress": False, "wait": True, "destination_endpoint": None, "label": None},
+    {"progress": False, "wait": True, "destination_endpoint": "wibble", "label": None},
+    {"progress": False, "wait": True, "destination_endpoint": None, "label": "fibble"},
 ])
 def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     """
@@ -238,6 +240,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
+        label=None,
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
