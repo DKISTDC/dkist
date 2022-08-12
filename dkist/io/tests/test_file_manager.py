@@ -137,18 +137,6 @@ def test_file_manager_cube_slice(eit_dataset):
     # assert ds.files.basepath == Path("test1")
 
 
-@pytest.mark.skip
-def test_dummy_dimension():
-    import dkist
-    ds = dkist.Dataset.from_directory("~/dkist_data/BLQRA_fixed/")
-
-    sds = ds[0]
-
-    assert sds.files is not ds.files
-
-    assert len(sds.files) != len(ds.files)
-
-
 def test_file_manager_direct_slice(eit_dataset):
     """
     Assert that slicing the file_manager directly doesn't create a copy.
