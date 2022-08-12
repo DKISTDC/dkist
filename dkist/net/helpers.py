@@ -104,7 +104,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
         bucket=bucket
     ))]
 
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now} {dataset_id}" if label is None else label
 
     _orchestrate_transfer_task(file_list,
