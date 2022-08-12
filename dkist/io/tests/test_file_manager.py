@@ -113,6 +113,14 @@ def test_file_manager_cube_slice(eit_dataset):
     # Assert that we have copied the value of basepath
     assert ds.files.basepath == sds.files.basepath
 
+    sds = ds[0]
+
+    # Check that we haven't made a copy
+    assert ds.files is not sds.files
+
+    # Assert that we have copied the value of basepath
+    assert ds.files.basepath == sds.files.basepath
+
     # TODO: Decide on the desired behaviour here.
     ## Running sds.download() here would affect the parent cubes data, because
     ## the base paths are the same.
@@ -127,6 +135,18 @@ def test_file_manager_cube_slice(eit_dataset):
     # Correspondingly changing the base path on the sub cube shouldn't change the parent cube
     # sds.files.basepath = "test2"
     # assert ds.files.basepath == Path("test1")
+
+
+@pytest.mark.skip
+def test_dummy_dimension():
+    import dkist
+    ds = dkist.Dataset.from_directory("~/dkist_data/BLQRA_fixed/")
+
+    sds = ds[0]
+
+    assert sds.files is not ds.files
+
+    assert len(sds.files) != len(ds.files)
 
 
 def test_file_manager_direct_slice(eit_dataset):

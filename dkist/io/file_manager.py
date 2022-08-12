@@ -225,7 +225,7 @@ class BaseFileManager:
         return len(self._striped_external_array)
 
     def __str__(self) -> str:
-        return f"FileManager containing {len(self)} files with shape {self.shape}"
+        return f"FileManager containing {len(self)} files with each array having shape {self.shape}"
 
     def __repr__(self) -> str:
         return f"{object.__repr__(self)}\n{self}"
@@ -238,12 +238,13 @@ class BaseFileManager:
         """
         Convert a slice for the reconstructed array to a slice for the reference_array.
         """
-        shape = self._striped_external_array.shape
+        fits_array_shape = self._striped_external_array.shape
         aslice = list(sanitize_slices(aslice, len(self.output_shape)))
-        if shape[0] == 1:
-            # Insert a blank slice for the removed dimension
-            aslice.insert(len(shape) - 1, slice(None))
-        aslice = aslice[len(shape) :]
+        if fits_array_shape[0] == 1:
+            # Insert a blank slice for the dummy dimension
+            aslice.insert(len(fits_array_shape) - 1, slice(None))
+        # Now only use the dimensions of the slice not covered by the array axes
+        aslice = aslice[:-1*len(fits_array_shape)]
         return tuple(aslice)
 
     def _slice_by_cube(self, item):
@@ -372,8 +373,10 @@ class FileManager(BaseFileManager):
         # directory not the list of all the files in it.
         file_list = [base_path / fn for fn in self.filenames]
         file_list.append(Path("/") / inv["bucket"] / inv["asdfObjectKey"])
-        file_list.append(Path("/") / inv["bucket"] / inv["browseMovieObjectKey"])
-        file_list.append(Path("/") / inv["bucket"] / inv["qualityReportObjectKey"])
+        if inv["browseMovieObjectKey"]:
+            file_list.append(Path("/") / inv["bucket"] / inv["browseMovieObjectKey"])
+        if inv["qualityReportObjectKey"]:
+            file_list.append(Path("/") / inv["bucket"] / inv["qualityReportObjectKey"])
 
         # TODO: Ascertain if the destination path is local better than this
         is_local = not destination_endpoint
