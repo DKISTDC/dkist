@@ -1,0 +1,1 @@
+Successfully ask for re-authentication when Globus token is stale.
