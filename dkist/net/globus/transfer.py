@@ -80,7 +80,7 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
     dst_endpoint = get_endpoint_id(dst_endpoint, tc)
     auto_activate_endpoint(dst_endpoint, tc)
 
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
     transfer_manifest = globus_sdk.TransferData(tc, src_endpoint, dst_endpoint,
                                                 label=label,

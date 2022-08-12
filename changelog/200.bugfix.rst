@@ -1,0 +1,1 @@
+No more invalid characters in default Globus label name.

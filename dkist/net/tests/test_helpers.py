@@ -35,7 +35,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     )
 
     if keywords["label"] is None:
-        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H:%M')} AAAA"
+        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
@@ -66,7 +66,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H:%M')} AAAA"
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
