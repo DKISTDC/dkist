@@ -208,7 +208,7 @@ def ensure_globus_authorized(func):
         try:
             return func(*args, **kwargs)
         except globus_sdk.AuthAPIError as e:
-            if e.http_status == 400 and e.message == "invalid_grant":
+            if e.http_status == 400 and "invalid_grant" in e.message:
                 print("Globus login has expired.")
                 get_refresh_token_authorizer(force_reauth=True)
                 return func(*args, **kwargs)
