@@ -1,0 +1,1 @@
+Relocate definitions from `dkist.net.attrs` so that just the desired names can be imported into that namespace.
