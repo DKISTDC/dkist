@@ -70,7 +70,10 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
     from dkist.net import conf
 
     if isinstance(datasets, str):
-        datasets = _get_dataset_inventory(datasets)[0]
+        try:
+            datasets = _get_dataset_inventory(datasets)[0]
+        except IndexError as e:
+            raise IndexError(f"No results available for dataset {datasets}") from e
 
     # If we have a UnifiedResponse object, it could contain one or more dkist tables.
     # Stack them and then treat them like we were passed a single table with many rows.
