@@ -44,6 +44,17 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     )
 
 
+def test_transfer_unavailable_data(mocker):
+    get_inv_mock = mocker.patch(
+        "dkist.net.helpers._get_dataset_inventory",
+        autospec=True,
+        return_value=[],
+    )
+
+    with pytest.raises(IndexError):
+        transfer_complete_datasets("null")
+
+
 def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
     get_inv_mock = mocker.patch(
         "dkist.net.helpers._get_dataset_inventory",
