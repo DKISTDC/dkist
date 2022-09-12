@@ -1,0 +1,2581 @@
+#ASDF 1.0.0
+#ASDF_STANDARD 1.5.0
+%YAML 1.1
+%TAG ! tag:stsci.edu:asdf/
+--- !core/asdf-1.1.0
+asdf_library: !core/software-1.0.0 {author: The ASDF Developers, homepage: 'http://github.com/asdf-format/asdf',
+  name: asdf, version: 2.11.1}
+history:
+  extensions:
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/core/extensions/core-1.5.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.2.1}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/transform/extensions/transform-1.5.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.2.1}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://sunpy.org/extensions/sunpy-1.0.0
+    software: !core/software-1.0.0 {name: sunpy, version: 4.0.0}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension.BuiltinExtension
+    software: !core/software-1.0.0 {name: asdf, version: 2.11.1}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.0.0
+    software: !core/software-1.0.0 {name: gwcs, version: 0.18.2a1.dev4+g6ec3954.d20220429}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b9.dev4+gfdb77e4}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.2.1}
+dataset: !<asdf://dkist.nso.edu/tags/dataset-1.0.0>
+  data: !<asdf://dkist.nso.edu/tags/file_manager-1.0.0>
+    datatype: float64
+    fileuris: [0.fits, 1.fits, 2.fits]
+    shape: [1, 10, 25]
+    target: 0
+  meta:
+    headers: !<tag:astropy.org:astropy/table/table-1.0.0>
+      colnames: [SIMPLE, BITPIX, NAXIS, NAXIS1, NAXIS2, NAXIS3, ATMOS_R0, AO_LOCK,
+        AO_LOCKX, AO_LOCKY, WFSLOCKX, WFSLOCKY, LIMBRPOS, LIMBRATE, CAM_ID, CAMERA,
+        BITDEPTH, XPOSURE, TEXPOSUR, CAM_FPS, CHIPDIM1, CHIPDIM2, HWBIN1, HWBIN2,
+        SWBIN1, SWBIN2, NSUMEXP, SWNROI, SWROI1OX, SWROI1OY, SWROI1SX, SWROI1SY, SWROI2OX,
+        SWROI2OY, SWROI2SX, SWROI2SY, SWROI3OX, SWROI3OY, SWROI3SX, SWROI3SY, SWROI4OX,
+        SWROI4OY, SWROI4SX, SWROI4SY, HWNROI, HWROI1OX, HWROI1OY, HWROI1SX, HWROI1SY,
+        HWROI2OX, HWROI2OY, HWROI2SX, HWROI2SY, NBIN1, NBIN2, NBIN3, NBIN, FPABITPX,
+        DSETID, POINT_ID, FRAMEVOL, PROCTYPE, RRUNID, RECIPEID, RINSTID, AVG_INT,
+        RMS_INT, NOISE, EXTNAME, SOLARNET, OBS_HDU, FILENAME, CADENCE, CADMIN, CADMAX,
+        CADVAR, LEVEL, HEADVERS, HEAD_URL, INFO_URL, CALVERS, CAL_URL, DNAXIS, DNAXIS1,
+        DNAXIS2, DNAXIS3, DTYPE1, DTYPE2, DTYPE3, DPNAME1, DPNAME2, DPNAME3, DWNAME1,
+        DWNAME2, DWNAME3, DUNIT1, DUNIT2, DUNIT3, DAAXES, DEAXES, DINDEX3, LINEWAV,
+        WAVEBAND, WAVEUNIT, WAVEREF, WAVEMIN, WAVEMAX, FILE_ID, DKISTVER, OBSPR_ID,
+        EXPER_ID, PROP_ID, DSP_ID, IP_ID, OCS_CTRL, FIDO_CFG, DSHEALTH, DSPSREPS,
+        DSPSNUM, LIGHTLVL, BUNIT, BTYPE, DATE, DATE-BEG, DATE-END, TELAPSE, DATE-AVG,
+        TIMESYS, ORIGIN, TELESCOP, OBSRVTRY, NETWORK, INSTRUME, OBJECT, CHECKSUM,
+        DATASUM, GOS_STAT, LVL3STAT, LAMPSTAT, LVL2STAT, POLANGLE, LVL1STAT, RETANGLE,
+        LVL0STAT, APERTURE, LGOSSTAT, GOS_TEMP, POL_NOIS, POL_SENS, STOKES, DATAMIN,
+        DATAMAX, DATAMEAN, DATAMEDN, DATAP01, DATAP10, DATAP25, DATAP75, DATAP90,
+        DATAP95, DATAP98, DATAP99, DATARMS, DATAKURT, DATASKEW, WCSAXES, WCSAXESA,
+        WCSNAME, WCSNAMEA, CRPIX1, CRPIX2, CRPIX3, CRPIX1A, CRPIX2A, CRPIX3A, CRDATE1,
+        CRDATE2, CRDATE3, CRDATE1A, CRDATE2A, CRDATE3A, CRVAL1, CRVAL2, CRVAL3, CRVAL1A,
+        CRVAL2A, CRVAL3A, CDELT1, CDELT2, CDELT3, CDELT1A, CDELT2A, CDELT3A, CUNIT1,
+        CUNIT2, CUNIT3, CUNIT1A, CUNIT2A, CUNIT3A, CTYPE1, CTYPE2, CTYPE3, CTYPE1A,
+        CTYPE2A, CTYPE3A, PC1_1, PC1_2, PC1_3, PC2_1, PC2_2, PC2_3, PC3_1, PC3_2,
+        PC3_3, PC1_1A, PC1_2A, PC1_3A, PC2_1A, PC2_2A, PC2_3A, PC3_1A, PC3_2A, PC3_3A,
+        LONPOLE, LONPOLEA, LATPOLEA, TAZIMUTH, ELEV_ANG, TELTRACK, TELSCAN, TTBLANGL,
+        TTBLTRCK, DATEREF, OBSGEO-X, OBSGEO-Y, OBSGEO-Z, SPECSYS, SPECSYSA, VELOSYS,
+        VELOSYSA, ROTCOMP, OBS_VR, WCSVALID, VSPARMID, VSPARMPS, VSPARMFC, VSPFILT,
+        VSPFWVLN, VSPPOLMD, VSPMODID, VSPMOD, VSPEXPRT, VSPGRTID, VSPGRTCN, VSPGRTBA,
+        VSPGRTAN, VSPWID, VSPSLTSS, VSPSLTSV, VSPNSTP, VSPSTP, VSPTPOS, VSPMIRPS,
+        VSPSPOS, VSPNMAPS, VSPMAP, FLTFWHM, WFCLOCK, MATRIXID, AOLOOPP, AOLOOPI, FRMRATE,
+        FRMLOCK, TTLOOPP, TTLOOPI, WSSOURCE, WIND_SPD, WIND_DIR, WS_TEMP, WS_HUMID,
+        WS_DEWPT, WS_PRESS, SKYBRIGT]
+      columns:
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 0
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: SIMPLE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 1
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: BITPIX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 2
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NAXIS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 3
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NAXIS1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 4
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NAXIS2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 5
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NAXIS3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 6
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: ATMOS_R0
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 7
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: AO_LOCK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 8
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: AO_LOCKX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 9
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: AO_LOCKY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 10
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WFSLOCKX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 11
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WFSLOCKY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 12
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LIMBRPOS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 13
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LIMBRATE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 14
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CAM_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 15
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CAMERA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 16
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: BITDEPTH
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 17
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: XPOSURE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 18
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: TEXPOSUR
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 19
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CAM_FPS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 20
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: CHIPDIM1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 21
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: CHIPDIM2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 22
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWBIN1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 23
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWBIN2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 24
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWBIN1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 25
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWBIN2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 26
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NSUMEXP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 27
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWNROI
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 28
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI1OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 29
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI1OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 30
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI1SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 31
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI1SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 32
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI2OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 33
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI2OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 34
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI2SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 35
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI2SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 36
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI3OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 37
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI3OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 38
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI3SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 39
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI3SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 40
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI4OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 41
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI4OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 42
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI4SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 43
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: SWROI4SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 44
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWNROI
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 45
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI1OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 46
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI1OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 47
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI1SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 48
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI1SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 49
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI2OX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 50
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI2OY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 51
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI2SX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 52
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: HWROI2SY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 53
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NBIN1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 54
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NBIN2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 55
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NBIN3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 56
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: NBIN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 57
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: FPABITPX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 58
+          datatype: [ucs4, 5]
+          byteorder: little
+          shape: [3]
+        name: DSETID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 59
+          datatype: [ucs4, 5]
+          byteorder: little
+          shape: [3]
+        name: POINT_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 60
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: FRAMEVOL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 61
+          datatype: [ucs4, 2]
+          byteorder: little
+          shape: [3]
+        name: PROCTYPE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 62
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: RRUNID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 63
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: RECIPEID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 64
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: RINSTID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 65
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: AVG_INT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 66
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: RMS_INT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 67
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: NOISE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 68
+          datatype: [ucs4, 11]
+          byteorder: little
+          shape: [3]
+        name: EXTNAME
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 69
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: SOLARNET
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 70
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: OBS_HDU
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 71
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: FILENAME
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 72
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CADENCE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 73
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CADMIN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 74
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CADMAX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 75
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CADVAR
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 76
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: LEVEL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 77
+          datatype: [ucs4, 11]
+          byteorder: little
+          shape: [3]
+        name: HEADVERS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 78
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: HEAD_URL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 79
+          datatype: [ucs4, 28]
+          byteorder: little
+          shape: [3]
+        name: INFO_URL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 80
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CALVERS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 81
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CAL_URL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 82
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DNAXIS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 83
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DNAXIS1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 84
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DNAXIS2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 85
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DNAXIS3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 86
+          datatype: [ucs4, 8]
+          byteorder: little
+          shape: [3]
+        name: DTYPE1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 87
+          datatype: [ucs4, 7]
+          byteorder: little
+          shape: [3]
+        name: DTYPE2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 88
+          datatype: [ucs4, 7]
+          byteorder: little
+          shape: [3]
+        name: DTYPE3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 89
+          datatype: [ucs4, 10]
+          byteorder: little
+          shape: [3]
+        name: DPNAME1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 90
+          datatype: [ucs4, 13]
+          byteorder: little
+          shape: [3]
+        name: DPNAME2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 91
+          datatype: [ucs4, 15]
+          byteorder: little
+          shape: [3]
+        name: DPNAME3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 92
+          datatype: [ucs4, 10]
+          byteorder: little
+          shape: [3]
+        name: DWNAME1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 93
+          datatype: [ucs4, 24]
+          byteorder: little
+          shape: [3]
+        name: DWNAME2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 94
+          datatype: [ucs4, 25]
+          byteorder: little
+          shape: [3]
+        name: DWNAME3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 95
+          datatype: [ucs4, 2]
+          byteorder: little
+          shape: [3]
+        name: DUNIT1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 96
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: DUNIT2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 97
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: DUNIT3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 98
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DAAXES
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 99
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DEAXES
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 100
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DINDEX3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 101
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LINEWAV
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 102
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: WAVEBAND
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 103
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: WAVEUNIT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 104
+          datatype: [ucs4, 3]
+          byteorder: little
+          shape: [3]
+        name: WAVEREF
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 105
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WAVEMIN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 106
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WAVEMAX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 107
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: FILE_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 108
+          datatype: [ucs4, 33]
+          byteorder: little
+          shape: [3]
+        name: DKISTVER
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 109
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: OBSPR_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 110
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: EXPER_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 111
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: PROP_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 112
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: DSP_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 113
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: IP_ID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 114
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: OCS_CTRL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 115
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: FIDO_CFG
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 116
+          datatype: [ucs4, 4]
+          byteorder: little
+          shape: [3]
+        name: DSHEALTH
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 117
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DSPSREPS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 118
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: DSPSNUM
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 119
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LIGHTLVL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 120
+          datatype: [ucs4, 2]
+          byteorder: little
+          shape: [3]
+        name: BUNIT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 121
+          datatype: [ucs4, 10]
+          byteorder: little
+          shape: [3]
+        name: BTYPE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 122
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: DATE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 123
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: DATE-BEG
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 124
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: DATE-END
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 125
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: TELAPSE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 126
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: DATE-AVG
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 127
+          datatype: [ucs4, 3]
+          byteorder: little
+          shape: [3]
+        name: TIMESYS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 128
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: ORIGIN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 129
+          datatype: [ucs4, 32]
+          byteorder: little
+          shape: [3]
+        name: TELESCOP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 130
+          datatype: [ucs4, 40]
+          byteorder: little
+          shape: [3]
+        name: OBSRVTRY
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 131
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: NETWORK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 132
+          datatype: [ucs4, 4]
+          byteorder: little
+          shape: [3]
+        name: INSTRUME
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 133
+          datatype: [ucs4, 11]
+          byteorder: little
+          shape: [3]
+        name: OBJECT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 134
+          datatype: [ucs4, 16]
+          byteorder: little
+          shape: [3]
+        name: CHECKSUM
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 135
+          datatype: [ucs4, 10]
+          byteorder: little
+          shape: [3]
+        name: DATASUM
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 136
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: GOS_STAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 137
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: LVL3STAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 138
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: LAMPSTAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 139
+          datatype: [ucs4, 31]
+          byteorder: little
+          shape: [3]
+        name: LVL2STAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 140
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: POLANGLE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 141
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: LVL1STAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 142
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: RETANGLE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 143
+          datatype: [ucs4, 17]
+          byteorder: little
+          shape: [3]
+        name: LVL0STAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 144
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: APERTURE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 145
+          datatype: [ucs4, 9]
+          byteorder: little
+          shape: [3]
+        name: LGOSSTAT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 146
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: GOS_TEMP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 147
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: POL_NOIS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 148
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: POL_SENS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 149
+          datatype: [ucs4, 1]
+          byteorder: little
+          shape: [3]
+        name: STOKES
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 150
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAMIN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 151
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAMAX
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 152
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAMEAN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 153
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAMEDN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 154
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP01
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 155
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP10
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 156
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP25
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 157
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP75
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 158
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP90
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 159
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP95
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 160
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP98
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 161
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAP99
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 162
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATARMS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 163
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATAKURT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 164
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: DATASKEW
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 165
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: WCSAXES
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 166
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: WCSAXESA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 167
+          datatype: [ucs4, 25]
+          byteorder: little
+          shape: [3]
+        name: WCSNAME
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 168
+          datatype: [ucs4, 25]
+          byteorder: little
+          shape: [3]
+        name: WCSNAMEA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 169
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 170
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 171
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 172
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 173
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 174
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRPIX3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 175
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 176
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 177
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 178
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 179
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 180
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: CRDATE3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 181
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 182
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 183
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 184
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 185
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 186
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CRVAL3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 187
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 188
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 189
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 190
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 191
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 192
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: CDELT3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 193
+          datatype: [ucs4, 1]
+          byteorder: little
+          shape: [3]
+        name: CUNIT1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 194
+          datatype: [ucs4, 3]
+          byteorder: little
+          shape: [3]
+        name: CUNIT2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 195
+          datatype: [ucs4, 3]
+          byteorder: little
+          shape: [3]
+        name: CUNIT3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 196
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: CUNIT1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 197
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: CUNIT2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 198
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: CUNIT3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 199
+          datatype: [ucs4, 4]
+          byteorder: little
+          shape: [3]
+        name: CTYPE1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 200
+          datatype: [ucs4, 8]
+          byteorder: little
+          shape: [3]
+        name: CTYPE2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 201
+          datatype: [ucs4, 8]
+          byteorder: little
+          shape: [3]
+        name: CTYPE3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 202
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CTYPE1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 203
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CTYPE2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 204
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: CTYPE3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 205
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 206
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 207
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 208
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 209
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 210
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 211
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_1
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 212
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_2
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 213
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_3
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 214
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 215
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 216
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC1_3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 217
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 218
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 219
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC2_3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 220
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_1A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 221
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_2A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 222
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: PC3_3A
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 223
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LONPOLE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 224
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LONPOLEA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 225
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: LATPOLEA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 226
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: TAZIMUTH
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 227
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: ELEV_ANG
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 228
+          datatype: [ucs4, 39]
+          byteorder: little
+          shape: [3]
+        name: TELTRACK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 229
+          datatype: [ucs4, 6]
+          byteorder: little
+          shape: [3]
+        name: TELSCAN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 230
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: TTBLANGL
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 231
+          datatype: [ucs4, 27]
+          byteorder: little
+          shape: [3]
+        name: TTBLTRCK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 232
+          datatype: [ucs4, 26]
+          byteorder: little
+          shape: [3]
+        name: DATEREF
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 233
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: OBSGEO-X
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 234
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: OBSGEO-Y
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 235
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: OBSGEO-Z
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 236
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: SPECSYS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 237
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: SPECSYSA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 238
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: VELOSYS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 239
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: VELOSYSA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 240
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: ROTCOMP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 241
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: OBS_VR
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 242
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: WCSVALID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 243
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: VSPARMID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 244
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPARMPS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 245
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPARMFC
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 246
+          datatype: [ucs4, 14]
+          byteorder: little
+          shape: [3]
+        name: VSPFILT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 247
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPFWVLN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 248
+          datatype: [ucs4, 20]
+          byteorder: little
+          shape: [3]
+        name: VSPPOLMD
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 249
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: VSPMODID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 250
+          datatype: [ucs4, 10]
+          byteorder: little
+          shape: [3]
+        name: VSPMOD
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 251
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPEXPRT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 252
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: VSPGRTID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 253
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPGRTCN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 254
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPGRTBA
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 255
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPGRTAN
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 256
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPWID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 257
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPSLTSS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 258
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPSLTSV
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 259
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: VSPNSTP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 260
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: VSPSTP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 261
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPTPOS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 262
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPMIRPS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 263
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: VSPSPOS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 264
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: VSPNMAPS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 265
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: VSPMAP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 266
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: FLTFWHM
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 267
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: WFCLOCK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 268
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: MATRIXID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 269
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: AOLOOPP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 270
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: AOLOOPI
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 271
+          datatype: int64
+          byteorder: little
+          shape: [3]
+        name: FRMRATE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 272
+          datatype: bool8
+          byteorder: big
+          shape: [3]
+        name: FRMLOCK
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 273
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: TTLOOPP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 274
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: TTLOOPI
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 275
+          datatype: [ucs4, 30]
+          byteorder: little
+          shape: [3]
+        name: WSSOURCE
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 276
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WIND_SPD
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 277
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WIND_DIR
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 278
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WS_TEMP
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 279
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WS_HUMID
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 280
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WS_DEWPT
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 281
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: WS_PRESS
+      - !core/column-1.0.0
+        data: !core/ndarray-1.0.0
+          source: 282
+          datatype: float64
+          byteorder: little
+          shape: [3]
+        name: SKYBRIGT
+      qtable: false
+    inventory:
+      asdfObjectKey: 4UMZ6V9X4RCHEHQ8TN8TQ151GAEJWV/qVXjk/VISP_L1_20440315T082254_qVXjk.asdf
+      averageDatasetSpatialSampling: 0.0600000000000012
+      averageDatasetSpectralSampling: 0.009999999999999988
+      averageDatasetTemporalSampling: 10.000000000003162
+      boundingBox:
+      - [-0.030000000042286788, 0.05999999998906727]
+      - [0.09000000004938397, 1296000.0]
+      contributingExperimentIds: [MP8F54EVZDA9N6GA3PEZBCARWY0J9K]
+      contributingProposalIds: [4UMZ6V9X4RCHEHQ8TN8TQ151GAEJWV]
+      datasetId: qVXjk
+      dataset_size: 897.7620718556351
+      endTime: '2044-03-15T08:23:14.721377'
+      exposureTime: 306803.394904156
+      hasAllStokes: false
+      hasSpectralAxis: true
+      hasTemporalAxis: true
+      instrumentName: VISP
+      primaryExperimentId: MP8F54EVZDA9N6GA3PEZBCARWY0J9K
+      primaryProposalId: 4UMZ6V9X4RCHEHQ8TN8TQ151GAEJWV
+      qualityAverageFriedParameter: 519128.6381212175
+      qualityAveragePolarimetricAccuracy: 545691.6984711821
+      recipeId: 275455
+      recipeInstanceId: 605073
+      recipeRunId: 197553
+      startTime: '2044-03-15T08:22:54.721377'
+      stokesParameters: [I]
+      targetTypes: [quietcorona, coronalhole, prominence]
+      wavelengthMax: 500.2399999999999
+      wavelengthMin: 499.99999999999994
+  wcs: !<tag:stsci.edu:gwcs/wcs-1.0.0>
+    name: ''
+    steps:
+    - !<tag:stsci.edu:gwcs/step-1.0.0>
+      frame: !<tag:stsci.edu:gwcs/frame-1.0.0>
+        axes_names: [wavelength, slit position, raster position]
+        axes_order: [0, 1, 2]
+        axes_type: [PIXEL, PIXEL, PIXEL]
+        axis_physical_types: ['custom:PIXEL', 'custom:PIXEL', 'custom:PIXEL']
+        name: pixel
+        naxes: 3
+        unit: [!unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel]
+      transform: !transform/compose-1.2.0
+        forward:
+        - !transform/remap_axes-1.3.0
+          inputs: [x0, x1, x2]
+          mapping: [0, 1, 2, 2]
+          outputs: [x0, x1, x2, x3]
+        - !transform/concatenate-1.2.0
+          forward:
+          - !transform/linear1d-1.0.0
+            inputs: [x]
+            intercept: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 m, value: 5.0e-07}
+            outputs: [y]
+            slope: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 m.pixel**-1, value: 9.99999999999999e-12}
+          - !transform/concatenate-1.2.0
+            forward:
+            - !transform/compose-1.2.0
+              forward:
+              - !transform/compose-1.2.0
+                forward:
+                - !transform/compose-1.2.0
+                  forward:
+                  - !transform/compose-1.2.0
+                    forward:
+                    - !transform/concatenate-1.2.0
+                      forward:
+                      - !transform/shift-1.2.0
+                        inputs: [x]
+                        offset: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel,
+                          value: -0.0}
+                        outputs: [y]
+                      - !transform/shift-1.2.0
+                        inputs: [x]
+                        offset: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel,
+                          value: -0.5}
+                        outputs: [y]
+                      inputs: [x0, x1]
+                      outputs: [y0, y1]
+                    - !transform/concatenate-1.2.0
+                      forward:
+                      - !transform/multiplyscale-1.0.0
+                        factor: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg.pixel**-1,
+                          value: 1.6666666666667e-05}
+                        inputs: [x]
+                        outputs: [y]
+                      - !transform/multiplyscale-1.0.0
+                        factor: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg.pixel**-1,
+                          value: 1.6666666666667e-05}
+                        inputs: [x]
+                        outputs: [y]
+                      inputs: [x0, x1]
+                      outputs: [y0, y1]
+                    inputs: [x0, x1]
+                    outputs: [y0, y1]
+                  - !transform/affine-1.3.0
+                    inputs: [x, y]
+                    matrix: !unit/quantity-1.1.0
+                      unit: !unit/unit-1.0.0 deg
+                      value: !core/ndarray-1.0.0
+                        source: 283
+                        datatype: float64
+                        byteorder: little
+                        shape: [2, 2]
+                    outputs: [x, y]
+                    translation: !unit/quantity-1.1.0
+                      unit: !unit/unit-1.0.0 deg
+                      value: !core/ndarray-1.0.0
+                        source: 284
+                        datatype: float64
+                        byteorder: little
+                        shape: [2]
+                  inputs: [x0, x1]
+                  outputs: [x, y]
+                - !transform/gnomonic-1.2.0
+                  direction: pix2sky
+                  inputs: [x, y]
+                  outputs: [phi, theta]
+                inputs: [x0, x1]
+                outputs: [phi, theta]
+              - !transform/rotate3d-1.3.0
+                direction: native2celestial
+                inputs: [phi_N, theta_N]
+                outputs: [alpha_C, delta_C]
+                phi: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg, value: 0.0}
+                psi: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg, value: 180.0}
+                theta: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 deg, value: 0.0}
+              inputs: [x0, x1]
+              outputs: [alpha_C, delta_C]
+            - !transform/linear1d-1.0.0
+              inputs: [x]
+              intercept: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 s, value: 0.0}
+              outputs: [y]
+              slope: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 pixel**-1.s, value: 10.000000000003162}
+            inputs: [x0, x1, x]
+            outputs: [alpha_C, delta_C, y]
+          inputs: [x0, x01, x11, x1]
+          outputs: [y0, alpha_C1, delta_C1, y1]
+        inputs: [x0, x1, x2]
+        outputs: [y0, alpha_C1, delta_C1, y1]
+    - !<tag:stsci.edu:gwcs/step-1.0.0>
+      frame: !<tag:stsci.edu:gwcs/composite_frame-1.0.0>
+        frames:
+        - !<tag:stsci.edu:gwcs/spectral_frame-1.0.0>
+          axes_names: [wavelength]
+          axes_order: [0]
+          axis_physical_types: [em.wl]
+          name: wavelength
+          unit: [!unit/unit-1.0.0 nm]
+        - !<tag:stsci.edu:gwcs/celestial_frame-1.0.0>
+          axes_names: [helioprojective latitude, helioprojective longitude]
+          axes_order: [1, 2]
+          axis_physical_types: ['custom:pos.helioprojective.lat', 'custom:pos.helioprojective.lon']
+          name: helioprojective
+          reference_frame: !<tag:sunpy.org:sunpy/coordinates/frames/helioprojective-1.0.0>
+            frame_attributes:
+              obstime: !time/time-1.1.0 2044-03-15T08:22:54.721
+              rsun: !unit/quantity-1.1.0 {unit: !unit/unit-1.0.0 km, value: 695700.0}
+          unit: [!unit/unit-1.0.0 arcsec, !unit/unit-1.0.0 arcsec]
+        - !<tag:stsci.edu:gwcs/temporal_frame-1.0.0>
+          axes_names: [time]
+          axes_order: [3]
+          axis_physical_types: [time]
+          name: temporal
+          reference_frame: !time/time-1.1.0 2044-03-15T08:22:54.721
+          unit: [!unit/unit-1.0.0 s]
+        name: CompositeFrame
+      transform: null
+...
+”BLK 0                             #n~¡)ÜÒˇ
+.&é”BLK 0                             ƒƒ-Õ›Ê„V‰jÏª)¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ”BLK 0                             L÷¿‚<÷˘é´ dÙæF’¯                     ”BLK 0                             “nÛ	≈¯=¯p⁄˙î†#                     ”BLK 0                             £)Qö˜ô8^ﬁ8Ô≠cÜΩ
+       
+       
+       ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             q5§qªõè⁄˘´$ØØù‘AºÇTåAJ#Aj˛Î¶öè"A≤ÔÕAoZA”BLK 0                             ÈÄ/Ÿ4+vë%≈bŸ\ ”BLK 0                             ïZîyvå¥öÈ´ŒÔÄS›µ’E@ÍA?ß›,•ù!A å}I	ùA”BLK 0                             ,c¡ x≠µHòwÇlüëú7'ıWú(AÇ’‹«#A6√f@∏$A”BLK 0                             ˆ`Õ≠ñØÚMÄmñô‘kÔß
+uq˚Aƒ?Â-ın*ACtÊWÄÜA”BLK 0                             ∏ì…‘í"U/H/ åØ§ò>£ñW◊í,A ˆ"azA=êQ‹”,'A”BLK 0                             %&’‡ÇÈ£†˘688ﬁ∫È£+iÛ(A‚îπﬂù¯A1ÚÀ°œA”BLK 0                             ´WIS9·ïÊ:0m:+÷”cs,\vAË≥p∑åÊ˛@ƒÓo@C[Ó@”BLK 0              h      h      h< ∂˚=≈∂Œ·ø']‹ÎQ   A   0   C   G   Y   Z   Z   A   1   8   H   E   0   J   N   Q   B   X   4   U   V   U   F   7   K   0   I   B   6   S   K   6   2   K   6   2   7   D   H   7   T   E   5   0   B   6   3   U   I   F   L   A   P   6   1   H   W   9   N   X   I   H   2   O   N   3   Q   U   5   U   C   4   P   9   W   F   N   F   N   W   D   Q   J   S   I   F   L   7   Y   ”BLK 0              h      h      h∑≤bséªÜEBO"ÉÕK   W   1   T   B   Y   A   6   S   M   U   H   3   N   J   O   D   V   N   A   2   C   G   8   7   Z   1   B   8   U   I   E   W   I   3   F   I   M   P   Z   0   P   J   F   3   S   Z   H   R   V   S   H   8   B   C   0   N   S   C   W   G   G   M   4   I   0   8   K   X   I   O   7   5   O   Z   6   X   C   E   K   R   8   9   2   A   O   I   0   B   5   ”BLK 0                             n-3˘Kf+ƒØVBﬁjÆ˙$√	     ¥F     oÇ	     ”BLK 0                             ⁄èÎÌ‹F€n):¶+L¡aîÕπAÅπj·‡ˇ&A‰æøÕ˛)A”BLK 0                             EŸö™gUJ•$I‘¢/ô‹@Õ8,A1Ñ2≠˙ AèVﬂ∞**A”BLK 0                             ¯/Ë>s¡mÀäU‹ü≥xˇê∏{X7.A í£f¯O&Aí<K¨Êf&A”BLK 0                             +·1s¬”€Ô2◊HôÆgÇ     ?	     ´]     ”BLK 0                             ÷Ù2ªö2«ÓTıZüÎB>
+     ì›
+     ‘ø     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             T,∂î!6∆9âæJssÄ≠8;     J     êÓ
+     ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             ø  +*x.Ø≠eÏÙ¬Cqï%     |—     √T     ”BLK 0                             {/PxºﬁÉ⁄—zÔÌ}Ëπì     L÷     ˙)     ”BLK 0                             ﬁ¢#,˛Qj‚wˇÍüd<     ô£     ıü     ”BLK 0                             6¸f$IJG¶·“-|;fZº%     çé     ›ˆ     ”BLK 0                             ø‰‰MXì†–Ô˛˚<,–Xã^      ∏{     ˝9      ”BLK 0                             }DÕ]¡1˙Lüw5JE»     »     ï
+     ”BLK 0                             Ë•?BO5È|nEó@S∑     í$     ∞Ç     ”BLK 0                             ÷ydÖ†O…u¬wVn^´‡ˇΩ     ¬ë     ò     ”BLK 0                             ¸\Ö^&?/,Ç?˝ﬂ‘óø
+     Lf     §‹     ”BLK 0                             ù„Ö[‘∞7Áàãê'‰Aƒ“¨á     S     aS     ”BLK 0                             ¢Œó$‡ÕNŒˇ¨åñˆÒbŸ)     Ìé      ∞!     ”BLK 0                             ˚⁄.Éy>lü
+ùœÁé§{     'V     ﬂ;     ”BLK 0                             Í¯?
+‚ë˜	EÛÜêU†ã/
+     6ø	     âÇ     ”BLK 0                             ≤.∂RAåîE?Œûÿzò˛é[      é     ‚B     ”BLK 0                             Á£v„+ó'Ÿ•eãﬂdq
+i      π     £"	     ”BLK 0                             ±P:‰éﬁìMyZ’≥Íd+°     Ï‘     ∑|     ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             äÃæ6ìa<‹‰∫$¶û     Ïı     G^     ”BLK 0                             ˘sN/é÷cˆÔÇãB¡8∞     ú     Œô     ”BLK 0                             5∑ñá#ªÙöK˜Èº»9Ö‰Ìá     ‰     ‚Å     ”BLK 0                             πÅ~˜)!øfÏ|ò+}êœe
+     ëz     ;k     ”BLK 0                             ÌAM]x4ÌB°Åe^ªs“∏ëç     ;¿     ﬁ     ”BLK 0                             EÛyd∆{xáG[a∏˙ÔCﬂ     {C     "ì     ”BLK 0                             Ÿ5ÂòΩkTh∫\¸˛óùıø     4t     £F     ”BLK 0                             œiŒ!™]úG∂¯õ|≈ÿMâ     uﬂ     U0     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             B/+xx&Y{Br®éM:£Mç     HR     Ô•	     ”BLK 0               <       <       <®–È#)ÙVàºqæÿ–q   V   X   j   k   q   V   X   j   k   q   V   X   j   k   ”BLK 0               <       <       <®–È#)ÙVàºqæÿ–q   V   X   j   k   q   V   X   j   k   q   V   X   j   k   ”BLK 0                             ƒ ﬁCB8”YÕÖ£≥˝FıøL›[±˝@Á¢‹R¸≤#A˘Ú"ÎòﬁA”BLK 0                             ÖIbŒkãl*êËÜ]ï5LL   1   L   1   L   1   ”BLK 0                             πL-8“ó'uKkªˇt{±     ±     ±     ”BLK 0                             $=Hf¬vç®6X¡dp“!jˇ3     ˇ3     ˇ3     ”BLK 0                             ˛kY√¯e(Y‡œØ8–cøë;	     ë;	     ë;	     ”BLK 0                             ãKWÉ>.∆äÄ)Fò(£0@s™$A≥úxk4A©K…LÜ'A”BLK 0                             Åµ Ëÿu¸?ŒÚj≈ü˘¸©ë,.
+AAÔ÷xëQAƒBÉ>@)˚@”BLK 0                             ‚†¨+?≥¶H∏û˝õ•!´€´>¡ãÊ@Ü6W®Ö-Aπ%åƒ,!A”BLK 0               Ñ       Ñ       Ñ(
+˜∆Ä∆ü•hE–ºRO   B   S   E   R   V   A   T   I   O   N   O   B   S   E   R   V   A   T   I   O   N   O   B   S   E   R   V   A   T   I   O   N   ”BLK 0                             ⁄ ÀﬁÛ°¿˝{^0ß zˇ      ?      ?      ?”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0              h      h      h†≠0_Bﬁ"Icñ™-W   O   R   H   U   S   5   5   A   6   D   V   Q   I   1   Q   K   U   K   L   V   6   R   U   E   K   S   W   V   A   B   H   W   P   B   V   U   L   T   Y   Q   Q   D   A   Z   L   P   C   X   7   Y   G   4   J   0   F   3   7   N   3   Z   H   W   E   6   Z   S   J   O   W   M   7   P   Z   N   U   7   K   P   P   4   1   9   P   V   O   Y   G   9   B   ”BLK 0                             ≥_Ú"òdCúç,€ì¨´Í®U^ü∑íAoL}˝¸Ä$A‡2ºY(¥)A”BLK 0                             ÏŒ´¿ﬂÚîñ,∞‹ç∂i‹Ω›'A±2]¯¡”%A=Sé.W¬+A”BLK 0                             —‰†Ão
+kÛ≤©rüOxñ}k¥'&AöPH35†@jCˆA”BLK 0                             k-ıÔ≠Ón∂î8Ûﬂ6q(—zhX›¥AÔC+òZ.Aoˇ_GÉM A”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0               Ñ       Ñ       Ñå!G«ÈæráÛ˙Qº™Qp   r   e   -   r   e   l   e   a   s   e   p   r   e   -   r   e   l   e   a   s   e   p   r   e   -   r   e   l   e   a   s   e   ”BLK 0              h      h      hM‘ªÙóÒ7.Ä~€FéttU   1   W   0   V   S   7   W   C   J   E   K   X   M   U   8   Y   B   K   5   A   B   Y   1   H   B   K   G   S   7   3   K   W   3   6   1   G   E   J   V   Q   5   O   9   N   P   2   7   C   F   I   M   7   H   J   M   V   U   S   F   S   Y   7   2   2   7   0   P   J   8   O   P   O   U   C   X   E   3   8   C   2   0   L   1   A   H   1   I   9   N   ”BLK 0              P      P      Phƒä ﬁ|ÇÉ{U~∂üŒh   t   t   p   s   :   /   /   y   o   u   t   u   .   b   e   /   Y   d   d   w   k   M   J   G   1   J   o   h   t   t   p   s   :   /   /   y   o   u   t   u   .   b   e   /   Y   d   d   w   k   M   J   G   1   J   o   h   t   t   p   s   :   /   /   y   o   u   t   u   .   b   e   /   Y   d   d   w   k   M   J   G   1   J   o   ”BLK 0              h      h      hÔ.xë”¸Í≠`&S3ûˇ0   X   O   2   6   L   O   0   X   Y   5   P   4   M   L   7   8   S   0   R   D   Q   9   F   X   V   6   2   8   C   N   0   8   4   A   F   F   L   1   K   K   U   P   F   J   7   R   I   G   V   D   4   M   1   T   9   E   8   M   2   F   M   4   S   D   O   Y   4   N   G   3   B   P   P   6   T   T   4   T   V   Q   2   9   O   D   3   U   S   3   B   ”BLK 0              h      h      hû5M	ê‡˛‘@f⁄7“5   6   Q   F   J   J   Y   B   B   S   Z   6   3   9   G   M   P   Q   J   7   I   Y   4   8   K   R   U   T   E   P   W   9   I   M   T   R   L   6   B   G   5   B   N   Y   Z   N   Z   D   2   D   N   8   4   R   K   4   V   8   O   J   4   F   2   Y   T   W   E   W   4   Q   B   4   A   Z   A   T   3   5   7   I   U   D   G   Z   W   7   7   N   R   J   ”BLK 0                             L÷¿‚<÷˘é´ dÙæF’¯                     ”BLK 0                             “nÛ	≈¯=¯p⁄˙î†#                     ”BLK 0                             £)Qö˜ô8^ﬁ8Ô≠cÜΩ
+       
+       
+       ”BLK 0                             L÷¿‚<÷˘é´ dÙæF’¯                     ”BLK 0               `       `       `œ€ç~ˆ`ò›¥$•û)S   P   E   C   T   R   A   L   S   P   E   C   T   R   A   L   S   P   E   C   T   R   A   L   ”BLK 0               T       T       TÈÜSá¿˝òbt%$àl‰S   P   A   T   I   A   L   S   P   A   T   I   A   L   S   P   A   T   I   A   L   ”BLK 0               T       T       TÈÜSá¿˝òbt%$àl‰S   P   A   T   I   A   L   S   P   A   T   I   A   L   S   P   A   T   I   A   L   ”BLK 0               x       x       x óß«‘#\ …	:ü5w   a   v   e   l   e   n   g   t   h   w   a   v   e   l   e   n   g   t   h   w   a   v   e   l   e   n   g   t   h   ”BLK 0               ú       ú       úw8◊R}jÂß£
+µ `s   l   i   t       p   o   s   i   t   i   o   n   s   l   i   t       p   o   s   i   t   i   o   n   s   l   i   t       p   o   s   i   t   i   o   n   ”BLK 0               ¥       ¥       ¥kGÒn«º°UΩi€¨v¿pπr   a   s   t   e   r       p   o   s   i   t   i   o   n   r   a   s   t   e   r       p   o   s   i   t   i   o   n   r   a   s   t   e   r       p   o   s   i   t   i   o   n   ”BLK 0               x       x       x óß«‘#\ …	:ü5w   a   v   e   l   e   n   g   t   h   w   a   v   e   l   e   n   g   t   h   w   a   v   e   l   e   n   g   t   h   ”BLK 0                             .õq"π˛≥ceƒ$’«xÓh   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   a   t   i   t   u   d   e   h   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   a   t   i   t   u   d   e   h   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   a   t   i   t   u   d   e   ”BLK 0              ,      ,      ,K÷ÑÉ¨Ú«G´ˆ…ÿÓïœÒh   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   o   n   g   i   t   u   d   e   h   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   o   n   g   i   t   u   d   e   h   e   l   i   o   p   r   o   j   e   c   t   i   v   e       l   o   n   g   i   t   u   d   e   ”BLK 0                             !≤—GˆL•‰˝¸e÷`—En   m   n   m   n   m   ”BLK 0               H       H       HÜ±*t›öy˜n˙„{a   r   c   s   e   c   a   r   c   s   e   c   a   r   c   s   e   c   ”BLK 0               H       H       HÜ±*t›öy˜n˙„{a   r   c   s   e   c   a   r   c   s   e   c   a   r   c   s   e   c   ”BLK 0                             ˆ]√JS…á›Xf¬Æúe§                     ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0                             ™ï?˝@|—|ùF∆ÊØ/=                      ”BLK 0                             Âﬁ€°ÿÌh	ïlÍ—gä2     @@     @@     @@”BLK 0              h      h      hKÅxÑ≠Øbzßûïà5   Q   8   S   B   U   J   D   H   I   P   0   Q   J   9   A   A   G   5   2   4   X   R   5   A   4   F   K   0   3   9   Q   Q   O   U   G   9   0   N   H   8   L   P   A   Y   J   X   H   2   5   9   4   5   S   X   8   Z   9   F   3   8   Y   0   9   E   Y   T   Z   B   0   W   4   4   S   R   5   V   T   P   Q   9   A   K   4   Z   N   D   J   C   0   ”BLK 0                             ¡"+¨Ä ~«¢µ|Ù ˜ˇˇˇˇˇˇˇ˜ˇˇˇˇˇˇˇ˜ˇˇˇˇˇˇˇ”BLK 0               $       $       $¬?»ûW®®á˛TŒQøiz\A   i   r   A   i   r   A   i   r   ”BLK 0                             eŒ∏eï∆ôkMT≈©xvâ‡⁄+A´9öH{lAÉÃÄô÷V+A”BLK 0                             `rŸQ‘X9ÌÅdRáÓ˘ª˘Õ˜A±ô≈J:AX”FÚ÷)A”BLK 0              h      h      hy	§∫âÍï@-ƒ∆áFR   B   E   C   W   K   B   L   U   N   C   1   8   T   R   J   G   Z   Y   C   4   L   B   M   K   4   J   G   T   H   V   5   M   P   V   3   W   A   8   6   Z   Q   9   L   3   L   P   I   M   V   Y   3   P   A   Q   W   9   0   1   C   N   7   B   1   0   P   Y   H   P   F   A   A   X   T   D   X   G   8   L   P   U   I   U   1   2   O   B   R   Z   A   ”BLK 0              å      å      å#M≈Ôû¯ÆséÏ“≤ãS¬D   a   t   a       M   o   d   e   l       (   S   P   E   C   -   0   1   2   2   )       R   e   v   i   s   i   o   n       F   D   a   t   a       M   o   d   e   l       (   S   P   E   C   -   0   1   2   2   )       R   e   v   i   s   i   o   n       F   D   a   t   a       M   o   d   e   l       (   S   P   E   C   -   0   1   2   2   )       R   e   v   i   s   i   o   n       F   ”BLK 0              h      h      hPü”·X(cƒn≤[Õ°I   Q   D   B   N   5   L   8   N   N   Z   4   F   5   7   K   N   X   F   W   0   Z   7   N   9   0   F   8   9   Z   B   S   H   I   E   J   2   6   X   V   G   K   L   O   N   Q   O   3   Y   X   N   S   A   R   9   N   G   7   A   M   0   S   X   A   X   G   1   S   A   Y   Y   2   G   B   B   L   I   W   M   A   L   I   B   B   Y   U   G   Z   8   8   ”BLK 0              h      h      h≤øQÅ9∑Q!^ÿhÕ:ØM   P   8   F   5   4   E   V   Z   D   A   9   N   6   G   A   3   P   E   Z   B   C   A   R   W   Y   0   J   9   K   M   P   8   F   5   4   E   V   Z   D   A   9   N   6   G   A   3   P   E   Z   B   C   A   R   W   Y   0   J   9   K   M   P   8   F   5   4   E   V   Z   D   A   9   N   6   G   A   3   P   E   Z   B   C   A   R   W   Y   0   J   9   K   ”BLK 0              h      h      híç[+«:Á6yR†¯öÿ}4   U   M   Z   6   V   9   X   4   R   C   H   E   H   Q   8   T   N   8   T   Q   1   5   1   G   A   E   J   W   V   4   U   M   Z   6   V   9   X   4   R   C   H   E   H   Q   8   T   N   8   T   Q   1   5   1   G   A   E   J   W   V   4   U   M   Z   6   V   9   X   4   R   C   H   E   H   Q   8   T   N   8   T   Q   1   5   1   G   A   E   J   W   V   ”BLK 0              h      h      hÕR–!tz˛ƒ®»–4AÖÂA   F   D   K   0   O   8   2   J   N   S   0   X   J   Z   Z   U   4   U   F   R   W   F   U   2   T   J   W   H   W   V   7   M   2   F   H   8   X   6   6   7   O   M   9   K   W   S   4   X   P   G   D   L   0   5   P   R   N   Y   0   D   I   L   4   Z   F   I   Q   D   5   4   D   V   L   F   H   2   B   F   H   M   1   Y   Z   U   7   M   W   T   7   ”BLK 0              h      h      h◊üÙ‚ÿºË‡}¡‚±F÷Z   T   H   X   R   O   0   E   1   Y   M   P   P   V   X   9   3   2   R   6   U   A   4   A   B   H   6   B   D   H   A   V   E   0   J   W   E   V   H   D   9   J   B   3   8   J   U   F   U   9   R   0   L   S   3   W   H   C   D   1   M   J   L   Q   6   3   Q   B   B   K   Q   2   E   O   O   Q   8   I   J   B   U   Y   Y   J   7   1   I   O   Z   R   ”BLK 0               H       H       HS h¿1«PT=äÎfÊ^tM   a   n   u   a   l   A   u   t   o           M   a   n   u   a   l   ”BLK 0              h      h      húòg˚ÉK´(bó™ΩZ[xˇO   P   J   3   F   A   8   E   M   1   9   G   3   7   L   5   Y   3   H   D   3   K   H   D   L   9   A   E   V   O   7   7   R   W   X   8   G   Z   I   6   Z   A   Z   U   M   2   S   B   5   2   U   D   A   3   W   K   K   H   H   O   D   M   D   7   V   M   D   I   Y   R   M   Q   0   H   2   6   T   N   Q   I   I   0   K   R   B   J   8   O   K   J   ”BLK 0               0       0       0›AƒÿKIﬂmÍÇBG   o   o   d   G   o   o   d   G   o   o   d   ”BLK 0                             ∂QMúNÇ∆Ä∞†6ËáÉ˚3     vf     £…      ”BLK 0                             „ˆ'±Á<=¬_+íSkÎ¬±
+     Xç     8     ”BLK 0                             ¨v-Ïc»ı≠≈q€†=∫ ÏÇò=3AÇP{ü-^+ArBÏÑ◊A”BLK 0                             Úyûx€ÉM)Æ«€
+uéïc   t   c   t   c   t   ”BLK 0               x       x       xlMbsz`:@|@˝	S÷B€p   h   o   t   .   c   o   u   n   t   p   h   o   t   .   c   o   u   n   t   p   h   o   t   .   c   o   u   n   t   ”BLK 0              8      8      8‘¶v∞kùÇ2{	«Œ›ã2   0   2   2   -   0   9   -   1   2   T   1   5   :   4   3   :   3   5   .   4   5   3   4   4   2   2   0   2   2   -   0   9   -   1   2   T   1   5   :   4   3   :   3   6   .   0   3   2   7   8   5   2   0   2   2   -   0   9   -   1   2   T   1   5   :   4   3   :   3   6   .   1   7   0   0   6   2   ”BLK 0              8      8      8HÏìúz≠÷®^U)V952   0   4   4   -   0   3   -   1   5   T   0   8   :   2   2   :   5   4   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   0   4   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   1   4   .   2   2   1   3   7   7   ”BLK 0              8      8      8’(S$áb ™Æû*hQ|ç2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   2   :   5   5   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   0   5   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   1   5   .   2   2   1   3   7   7   ”BLK 0                             
+PØ·DŒGÒè˘<$ı´˙9                     ”BLK 0              8      8      8$Ç¯ôÜd™e∞Uñ˚Cƒ&2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   2   :   5   4   .   7   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   0   4   .   7   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   1   4   .   7   2   1   3   7   7   ”BLK 0               $       $       $Å1≠ XWÂƒU±Nr∑ÖOU   T   C   U   T   C   U   T   C   ”BLK 0              8      8      8r†@°îØ©Ap«Ñ?N   a   t   i   o   n   a   l       S   o   l   a   r       O   b   s   e   r   v   a   t   o   r   y   N   a   t   i   o   n   a   l       S   o   l   a   r       O   b   s   e   r   v   a   t   o   r   y   N   a   t   i   o   n   a   l       S   o   l   a   r       O   b   s   e   r   v   a   t   o   r   y   ”BLK 0              Ä      Ä      Ä∫ÓYæ˘´P@yBÓº)D   a   n   i   e   l       K   .       I   n   o   u   y   e       S   o   l   a   r       T   e   l   e   s   c   o   p   e   D   a   n   i   e   l       K   .       I   n   o   u   y   e       S   o   l   a   r       T   e   l   e   s   c   o   p   e   D   a   n   i   e   l       K   .       I   n   o   u   y   e       S   o   l   a   r       T   e   l   e   s   c   o   p   e   ”BLK 0              ‡      ‡      ‡Ì≈q]N∏Ÿ9‰πT{ÊèObH   a   l   e   a   k   a   l   a       H   i   g   h       A   l   t   i   t   u   d   e       O   b   s   e   r   v   a   t   o   r   y       S   i   t   e   H   a   l   e   a   k   a   l   a       H   i   g   h       A   l   t   i   t   u   d   e       O   b   s   e   r   v   a   t   o   r   y       S   i   t   e   H   a   l   e   a   k   a   l   a       H   i   g   h       A   l   t   i   t   u   d   e       O   b   s   e   r   v   a   t   o   r   y       S   i   t   e   ”BLK 0               l       l       lá™)1˛¬XÒzúS◊ŒπN   S   F   -   D   K   I   S   T   N   S   F   -   D   K   I   S   T   N   S   F   -   D   K   I   S   T   ”BLK 0               0       0       0ö”.∏ã„ëÖµ‰5V   I   S   P   V   I   S   P   V   I   S   P   ”BLK 0               Ñ       Ñ       Ñv¥üÑóá¬ÿ)Lëßı,πc   o   r   o   n   a   l   h   o   l   e   q   u   i   e   t   c   o   r   o   n   a   p   r   o   m   i   n   e   n   c   e       ”BLK 0               ¿       ¿       ¿ÃŸA9+≥ì@˘ó±{x”~U   d   B   U   V   a   A   S   U   a   A   S   U   a   A   S   n   f   2   f   p   e   0   c   n   e   0   c   n   e   0   c   S   9   A   H   V   8   4   F   S   8   A   F   S   8   3   F   ”BLK 0               x       x       xªRçœå@6”Íæ"<∑7   6   2   0   6   4   6   8   7       3   3   6   4   6   2   6   4   4   0   1   9   9   2   4   0   9   5   8   8   ”BLK 0               l       l       l¥C¨l,]rK8T*KÎØm'u   n   d   e   f   i   n   e   d   o   p   e   n                       o   p   e   n                       ”BLK 0               l       l       làw#3®˚«_˝–t|œYc   l   e   a   r                   u   n   d   e   f   i   n   e   d   c   l   e   a   r                   ”BLK 0               l       l       l¥ac˘ˇ!ø‡∫9GDe¥ému   n   d   e   f   i   n   e   d   n   o   n   e                       o   f   f                           ”BLK 0              t      t      tÜûâmƒ"VØ”I‹ßÄc   l   e   a   r                                                                                                           N   a   n   o   -   I   m   p   r   i   n   t       L   i   t   h   .       F   S       P   o   l   a   r   i   z   e   r   S   a   p   p   h   i   r   e       P   o   l   a   r   i   z   e   r                                                       ”BLK 0              h      h      hΩL¿Aú◊W+LÊ„$p´D   H   O   D   4   Z   Y   3   N   5   V   I   4   B   5   5   M   Z   Q   N   F   G   4   8   H   Y   S   H   8   C   C   8   X   5   C   M   O   S   E   9   6   1   U   C   P   1   K   Y   W   H   W   H   A   E   I   P   G   0   9   C   7   O   T   C   4   1   4   5   0   L   J   3   6   W   C   J   6   D   B   N   Y   U   J   Q   M   X   U   S   0   9   ”BLK 0               l       l       lG≥ıH˘‚!
+’<˙#u   n   d   e   f   i   n   e   d   S   i   O   2       O   C           c   l   e   a   r                   ”BLK 0              h      h      hLóƒQ∏}&>ïqgJ_4   Z   T   3   V   K   Z   O   8   9   0   M   V   G   K   H   7   J   O   W   T   Y   C   C   4   C   1   A   4   R   J   3   I   Q   3   X   5   U   8   1   2   S   8   R   F   C   Y   A   2   9   O   C   V   9   O   N   T   I   W   N   O   D   X   P   I   L   K   6   H   4   T   S   X   1   R   7   O   B   F   W   Y   0   7   I   J   X   B   G   U   P   ”BLK 0               Ã       Ã       Ã˚bE\Ñ®ŸbVl <A   F   R   e   s   T   a   r   g   e   t                           D   a   r   k   S   h   u   t   t   e   r                           P   i   n   h   o   l   e       (   i   n   v   e   r   s   e   )   ”BLK 0               l       l       lú<˛MBÕÃØùz	käÁxt   r   a   c   k   i   n   g       0   .   5   m   m                   u   n   d   e   f   i   n   e   d   ”BLK 0               l       l       l·)»îâ´Liå‚”}˝Uc   l   o   s   e   d               c   l   o   s   e   d               u   n   d   e   f   i   n   e   d   ”BLK 0                             MÄ•B“>§K¯U5—_∞0Ñºè+•ÍR¿ÔKÏõãb0¿r∑∫nÂr@”BLK 0                             òm‹ç’úk/øbÄO
+;éDO"A‰p™3ΩAA∏}—∑@!A”BLK 0                             =Ú¬NÅ$%ìa¸Ô‡·|x†ìë’°∑ A™√î
+AÛ∫Á%A”BLK 0                             ﬁbÎZkoTﬂå∏oëí1.I   I   I   ”BLK 0                             HR3w›≈kÕõÜU◊˜Ä˝À¡πy?˝g€
+q∫:?ÄAqtƒÆò?”BLK 0                             w∆ffÒd;Eù‹˚é˚jé{1QˆÔ?T¸ªÓÔ?‚√˜ïyùÔ?”BLK 0                             Pµﬂ‘¨Rïﬁ#áà≈◊e≤é¡eÔﬂ?];ïU‡?uÓb˜•ﬂ?”BLK 0                             ¨:±…G’⁄ŒÃÑj˛Öd<nUÛ%›?PNŸ∑i‡?cñ.πÃ‹?”BLK 0                             ˙w8N˜=5—±ÃÔ©Á√;£åiãÓ˝ãÉ?Ó?–Bôô?‹àlEzÇ?”BLK 0                             ‘æ¯+µòÔä†ã)rf§äáiàÚf∏?≠gabâá∏?∆/Bó∆±?”BLK 0                             ≈ÔRÀ„k*l«ÏŒ`®˝˙_`‘?l7ız´”?ñD∞"ÃfÃ?”BLK 0                             —ñÎ†l ˘æ)Öq`%ª®¯fÏî·nÁ?úÎ™J˛Ê?h–‹ŒÂ‹Ë?”BLK 0                             ÜËå„⁄9ÿ÷r˝ñ„ñ”ÏΩ°U◊Ï?€ÈÏúÏ?©òrŒ*+Ì?”BLK 0                             †r©π¶g∞¸<0Í›GO:0‚IfÌ?Ú!$≈±ØÌ?±%«†Ó?”BLK 0                             ü—pdt?=W¸£{ñY±äÄ‰XHÔ?tîrc5Ô?c—ì$ÇÓ?”BLK 0                             ‹6Ëı¥Íì XRhrŒ*L?g™™Ô?˜q*BrÔ?©M%çŒÔ?”BLK 0                             m¸`üÑ7Ò£˝äK
+1ï4 ƒÏ}C“?ÿ{`B{È“?á]g‡Ø“?”BLK 0                             ¶¶ßëçEfdÁ4>±Ú8ô”%lÂŸÚø(c˛yõ„Ûø¬ÌÒm	Ûø”BLK 0                             &MÓ'Cék¶Kmë≤MòÍÀ∫3í¥¨∫øpÌíÜ©?±x=#5ø”BLK 0                             L÷¿‚<÷˘é´ dÙæF’¯                     ”BLK 0                             Ze<=≠!Ì@aí^H                     ”BLK 0              ,      ,      ,]s„-¢ˇ‚êLU5µ¨ÆÖH   e   l   i   o   p   r   o   j   e   c   t   i   v   e   -   c   a   r   t   e   s   i   a   n   H   e   l   i   o   p   r   o   j   e   c   t   i   v   e   -   c   a   r   t   e   s   i   a   n   H   e   l   i   o   p   r   o   j   e   c   t   i   v   e   -   c   a   r   t   e   s   i   a   n   ”BLK 0              ,      ,      ,ó]ú{ªHLnπª=z°?õE   q   u   a   t   o   r   i   a   l       e   q   u   i   n   o   x       J   2   0   0   0       E   q   u   a   t   o   r   i   a   l       e   q   u   i   n   o   x       J   2   0   0   0       H   e   l   i   o   p   r   o   j   e   c   t   i   v   e   -   c   a   r   t   e   s   i   a   n   ”BLK 0                             ÃD#~Xà\˝◊ù†é0~§      @      @      @”BLK 0                             ÎƒÖ¯l`M{Inq`5àk      ‡?      ‡?      ‡?”BLK 0                             J˛Oá™ù»d"u              ø       ¿”BLK 0                             29=Iàp·Qé¡!öã‚£ÅPƒ-,!AãC¶RA«DØ¢A”BLK 0                             vÔ∑–`§yí◊/‚√£‚ëIë+„!AÆÅ∆Ûzt@≥r¨7†ÿA”BLK 0                             ‡Œp<æÕPåJ
+—c#x83t™¡*AÌ≠äõwÃA mõE,A”BLK 0              8      8      8ëŸP †Ñ∞#ıëË:2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   ”BLK 0              8      8      8ëŸP †Ñ∞#ıëË:2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   ”BLK 0              8      8      8ëŸP †Ñ∞#ıëË:2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   2   0   5   7   -   1   1   -   0   4   T   1   2   :   5   1   :   5   6   .   8   8   7   4   4   2   ”BLK 0              8      8      8>≠n∂ÌeÂ¸
+sáí§<2   0   5   3   -   0   9   -   2   5   T   2   0   :   5   3   :   2   3   .   6   6   3   3   0   6   2   0   4   6   -   1   1   -   2   3   T   1   9   :   1   8   :   2   5   .   2   2   4   8   2   8   2   0   2   5   -   0   6   -   0   1   T   1   2   :   0   3   :   4   7   .   3   0   4   5   5   2   ”BLK 0              8      8      8ö™¯Ô~ñº§ ‚#•û˛õï2   0   4   7   -   1   0   -   2   8   T   1   1   :   5   4   :   4   1   .   3   0   0   2   7   0   2   0   4   8   -   1   0   -   0   6   T   0   7   :   3   9   :   5   9   .   2   2   4   8   7   6   2   0   5   8   -   0   6   -   0   1   T   1   0   :   4   3   :   2   5   .   5   9   4   4   0   4   ”BLK 0              8      8      8€âÑxGQÏç"± _2   0   4   9   -   1   2   -   1   1   T   0   8   :   4   7   :   1   5   .   1   6   6   6   1   2   2   0   2   0   -   0   5   -   2   4   T   1   1   :   5   5   :   4   8   .   3   1   5   2   8   7   2   0   4   2   -   1   0   -   0   2   T   0   6   :   4   3   :   1   0   .   4   5   4   1   3   0   ”BLK 0                             érÈ≥Œ˘eÊÛ∑Ò®Ë“Ö>çÌµ†˜∆†>çÌµ†˜∆†>çÌµ†˜∆†>”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             
+˝KD©w∏ÏÉe˜6÷ˆ¢ﬁ÷^b¸A„ù∆áÊ A∑tza.)A”BLK 0                             X–qıÆÏ¸óöõa»RßPOÒAÈ√$ÏómAë'˛G Í"A”BLK 0                             º˚I=à_“GÿÖƒˆ.`ª¶fß»πÜ
+"A[ªª¶øë!A‡GÀCÊA”BLK 0                             «˚eˇçáiñ:DCJ“m~åèdy·˝•=èdy·˝•=èdy·˝•=”BLK 0                             ïMÔïÈ˝s‚I.ﬂHºÄÇΩúÏyÒ>ÄÇΩúÏyÒ>ÄÇΩúÏyÒ>”BLK 0                             ïMÔïÈ˝s‚I.ﬂHºÄÇΩúÏyÒ>ÄÇΩúÏyÒ>ÄÇΩúÏyÒ>”BLK 0                             +s+ÌC˝âÉpo‘W˜⁄L±zìõ“F!A±∂&%#Aªﬂn)A”BLK 0                             Æ6∂©kéwG‘ˆD}w™W ¸Ûå£-Aﬂáaˇ´'A⁄EéâÊA”BLK 0                             >Ó£_˘<ﬂ|≠kÆÏŸG"„ô WK© Aúiv›n÷AY”‹ÔmGA”BLK 0                             CxSÉêWáT5<ÑÑ©’ëm   m   m   ”BLK 0               $       $       $uà ÃÙ ©uﬂ|Œ∞»d   e   g   d   e   g   d   e   g   ”BLK 0               $       $       $uà ÃÙ ©uﬂ|Œ∞»d   e   g   d   e   g   d   e   g   ”BLK 0               H       H       HÜ±*t›öy˜n˙„{a   r   c   s   e   c   a   r   c   s   e   c   a   r   c   s   e   c   ”BLK 0               H       H       HUhßH∫Ü‡∏3≠∞d   e   g               a   r   c   s   e   c   m                       ”BLK 0               H       H       HÜ±*t›öy˜n˙„{a   r   c   s   e   c   a   r   c   s   e   c   a   r   c   s   e   c   ”BLK 0               0       0       0¢mÑ/2N&§ÆQRBÏW   A   V   E   W   A   V   E   W   A   V   E   ”BLK 0               `       `       `„ŸÄA…µµ¯À8`R5H   P   L   T   -   T   A   N   H   P   L   T   -   T   A   N   H   P   L   T   -   T   A   N   ”BLK 0               `       `       `,>›çıƒ‰BµyI˛Ωœ£H   P   L   N   -   T   A   N   H   P   L   N   -   T   A   N   H   P   L   N   -   T   A   N   ”BLK 0              h      h      hù{ZwüB¶ók±.⁄MË9   R   V   3   G   S   U   S   H   N   5   T   B   Y   8   T   8   L   X   D   B   X   D   L   S   V   G   2   E   T   X   V   N   T   T   Q   5   S   H   H   L   J   I   4   0   5   H   P   N   N   0   Y   S   L   H   N   5   U   Z   T   X   I   9   Q   5   Y   1   U   6   0   8   G   S   3   O   F   L   T   V   9   5   2   1   W   7   Y   J   2   8   9   ”BLK 0              h      h      hùÒÅv)^`vcv˛–!J   M   2   S   C   U   N   M   P   B   C   B   E   W   W   L   Q   5   U   Q   B   L   R   H   D   D   O   M   F   O   H   1   U   U   S   4   W   X   O   7   R   B   D   Q   Y   D   J   J   9   Z   F   U   7   O   S   3   D   C   C   Y   H   T   Z   3   E   V   E   9   0   1   T   Y   R   L   R   E   1   3   N   N   B   K   Y   U   E   D   T   G   I   B   ”BLK 0              h      h      h@´Ë¨cÌ∫˚ã∆èëÜ*¬Z   M   A   W   V   G   5   5   C   Z   0   C   U   K   E   R   K   3   Q   R   2   H   E   8   J   J   U   2   H   6   E   7   F   W   K   6   3   Z   M   G   O   5   D   1   I   C   V   7   L   J   Q   L   M   8   H   7   9   2   N   T   F   S   5   N   V   S   3   U   9   7   1   J   4   8   N   F   C   U   C   C   E   5   S   4   H   L   J   Z   A   S   ”BLK 0                             ⁄ ÀﬁÛ°¿˝{^0ß zˇ      ?      ?      ?”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             ⁄ ÀﬁÛ°¿˝{^0ß zˇ      ?      ?      ?”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             Åˇ∆‡F«Øò…Ê¬2£˛
+                        ”BLK 0                             ⁄ ÀﬁÛ°¿˝{^0ß zˇ      ?      ?      ?”BLK 0                             vπ◊8≠ä4úëX¨Æy8$_ÅA∞ÒW/˙S A*#4ƒ‘!A”BLK 0                             &™)4¿ÏIÿ‘u%C≥≥?ã6Û’A›N´°ç$A“jÂáL(A”BLK 0                             ŸÙP	Q”ıá©Hõ°†ÈÑ
+v®Î*A±∑óñ&A˘ü†Œ´-A”BLK 0                             Åoä*Ù›4í·∂ıòDÅÜ?h‡@ûöë∑è∆ A;b1≠H.A”BLK 0                             AN¢eÖıÊ[V‘„àu˘JÕ¬†µIn4 Aà√üAòAÄøÕro-A”BLK 0                             jÔ"ø!≤\¨¡ˆzí~DM+g41:(AUØ†ÀÓm-A! ¬6f1A”BLK 0                             x•^ñ|„r¶o_CÀ‚D»â5√√¢JAπeï^€A?L1]◊éˇ@”BLK 0                             ¶”BM\RˆJ∑@sÇ¿e«’—êY∆)A=^@éMu%ACÈ$Ïô‡@”BLK 0                             °	FˇùbóÌtdpØG2îÕïC&A9ºóú7kAñBmÈÀ&A”BLK 0                             qÎm”aú+[Ö∫"◊§     Äf@     Äf@     Äf@”BLK 0                             P +çÃ>˙‘§æ˝◊’wW´üb$1A“ëÉÕDºÒ@Üí; πA”BLK 0                             V“¥<§É)9]“;Œ«EÄ2π«(Ø#AMv-ñ@AF2/Ãƒã(A”BLK 0                             mßñuÈ∫ôQ«jôYFhMÚ¸AÌÄAÒÃ«1'Aaò@Cm: A”BLK 0                             /tC«anæH@æB≤—zº∑*I¶)AhnÎ†€+AW»Zù(A”BLK 0              ‘      ‘      ‘o7cïçü◊É}ªn jﬁÖîF   i   x   e   d       S   o   l   a   r       R   o   t   a   t   i   o   n       T   r   a   c   k   i   n   g                                           S   t   a   n   d   a   r   d       D   i   f   f   e   r   e   n   t   i   a   l       R   o   t   a   t   i   o   n       T   r   a   c   k   i   n   g   S   t   a   n   d   a   r   d       D   i   f   f   e   r   e   n   t   i   a   l       R   o   t   a   t   i   o   n       T   r   a   c   k   i   n   g   ”BLK 0               H       H       Hê{˚Óå,≈ä‹§cÜ |/R   a   n   d   o   m   S   p   i   r   a   l   R   a   s   t   e   r   ”BLK 0                             ˇp{ÓÊ:-
+ì∆%’;é◊·ıF]ûA®'K‹¡;
+Aw„ŒÈ.&A”BLK 0              D      D      D¶3∏@Ñú®§´®àø{˛j(   s   t   e   p   p   e   d   )       p   a   r   a   l   l   a   c   t   i   c                           f   i   x   e   d       a   n   g   l   e       o   n       s   u   n                                       f   i   x   e   d       d   i   f   f   e   r   e   n   c   e   -   a   n   g   l   e       b   t   w   n   ”BLK 0              8      8      8HÏìúz≠÷®^U)V952   0   4   4   -   0   3   -   1   5   T   0   8   :   2   2   :   5   4   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   0   4   .   2   2   1   3   7   7   2   0   4   4   -   0   3   -   1   5   T   0   8   :   2   3   :   1   4   .   2   2   1   3   7   7   ”BLK 0                             ’Ã
+kBT’¢L∂>$ÛqPÔŸT¡$ÛqPÔŸT¡$ÛqPÔŸT¡”BLK 0                             1µ‚E{çÂUIIÏÄz˘«äc^XB¡«äc^XB¡«äc^XB¡”BLK 0                             W	bô˜·sáÿv$ü*õ ”üÒ*AA ”üÒ*AA ”üÒ*AA”BLK 0              h      h      hiˇo\ÚTö_Ú‰ã53øZ1   O   3   8   N   H   X   T   X   L   8   J   M   M   6   B   0   I   Q   0   1   2   0   I   I   2   J   7   9   M   V   C   0   N   S   6   4   G   Q   2   5   O   G   D   Y   H   E   S   I   4   F   3   Q   G   L   2   D   N   Z   Y   3   V   3   4   E   9   Z   C   A   X   D   G   3   D   G   C   J   8   K   7   D   5   W   Q   U   N   K   C   E   W   ”BLK 0              h      h      hÉTÎ¥‰êâPã˛O˘ÚıŒﬁS   2   6   W   I   M   1   F   G   8   H   M   X   H   T   I   7   W   V   J   I   D   J   9   U   O   L   R   N   4   5   K   2   8   U   V   V   R   G   F   A   P   F   L   W   C   P   G   0   9   2   Z   M   G   Z   2   2   X   T   8   G   A   9   K   5   D   V   O   3   Y   Q   G   V   6   0   6   M   O   P   T   G   W   U   Z   O   I   Y   2   1   U   ”BLK 0                             i>ö¯M=¸«d [‹^.   ”BLK 0                             i>ö¯M=¸«d [‹^.   ”BLK 0                             }	^#,uƒ:ZRˆÍ|ìı     öı     Ø-     ”BLK 0                             ùÓ˛˝w‡Î! .Ü\"/H·z‹‰?—"€˘˝‹‰?ònÉ˜›‰?”BLK 0                             i>ö¯M=¸«d [‹^.   ”BLK 0                             -∞az&≤ﬁ∑πWùóDI                     ”BLK 0                             õÿÅ"±†]ãÔì<ß—˝æ/&Á¿ó∑zj¿hi:0∞¿”BLK 0                             `A"ˆC5õÑFW»¨'zôÁ¯ü2®AÙs¬*|ÊÔ@¸õ$mSö&A”BLK 0               ®       ®       ®¨Œ7êé™ë6¥PÍçF   F   0   1   -   5   2   0   _   1   5   -   2   5   F   F   0   1   -   4   2   0   _   1   0   -   2   5   F   F   0   1   -   8   1   9   _   4   4   -   2   5   ”BLK 0                             Pæ	M&Rj@F¡ˇ_?™Ò“MblÉ@ÖÎQ∏ŒÄ@É¿ °ErÑ@”BLK 0                             ù!p≈`¶k˘(L»_ôÊÅp   o   l   c   a   l                                                           d   a   r   k   _   i   n   t   e   n   s   i   t   y                           o   b   s   e   r   v   e   _   p   o   l   a   r   i   m   e   t   r   i   c   ”BLK 0              h      h      h+%b\/Ùûx©@‘áˆ¿A   A   9   L   V   I   A   C   3   R   J   F   0   7   Y   C   B   H   U   X   W   S   Y   X   9   3   I   1   W   G   M   R   N   8   Q   5   9   9   Q   M   O   G   X   J   N   K   Y   V   L   A   E   7   D   P   F   Y   K   Z   0   S   4   S   N   0   W   Q   R   W   F   F   E   L   3   D   V   N   D   R   9   E   M   J   D   S   J   V   8   0   E   0   ”BLK 0               x       x       xÓ”ÑMüî>∑Â∂tAK_V´d   i   s   c   r   e   t   e           c   o   n   t   i   n   u   o   u   s   d   i   s   c   r   e   t   e           ”BLK 0                             ˛2CBHÛãjMA—‹Vˇ˝ü´-Ó#Aÿ©0Eû,A§Iÿ|A”BLK 0              h      h      h>ß›V|£‚¸c∆ùXºPV   P   S   Z   D   Z   R   F   O   Q   M   Z   W   8   6   0   5   C   M   M   2   K   0   E   M   Y   P   C   U   F   8   Z   V   V   Y   0   I   6   G   Z   V   R   D   Y   5   O   X   G   4   7   C   9   1   0   F   G   U   H   M   S   T   T   E   K   Q   H   J   5   0   G   M   A   I   U   Y   7   3   E   J   C   Q   M   E   Q   V   K   2   X   D   8   ”BLK 0                             ∂ºkd°}®¢ˇ&ﬂ¡±GBﬂEõ˝˜å"A¸≥À&—µA}ø‘®¯'A”BLK 0                             hVƒ°˘¨ı´ò†	ÍÚ˝ÔåÔZqÒ#A:Ä±9*A#=âˆ6YÒ@”BLK 0                             Ê‰åÈëp§≥ùè‰¢ô=ª£ˇ@√Òò¢ﬁ‰‡@/'o¯@”BLK 0                             Ú+v}|iy∆ˆ¡ˆ”€lBœf’Ájª?À°E∂Û˝§?Bœf’ÁjÀ?”BLK 0                             O5("w$Ó*4¨ËaT5?πAÓGìåÔ›-A(zÿÆß™-A”BLK 0                             “ˆ‚Èê›Y‹˛}7Ùπ(\£¯·+A∆H+Ä¶ AŒã∞øKLÛ@”BLK 0                             §*>LíâI‚Ω∞5 k˛≈À     &:     ~     ”BLK 0                             ˇ≠2µ_∑¥'L=»*»:·
+     ˙√     Ã¨     ”BLK 0                             ºöG‡öÙû}[y‚àÀä±]ÖA0	¶ áAÅ‡äWQA”BLK 0                             J‘Œ$«&#±ﬁ'T3gÏñmdµ«‰A€≠„Ø¶A[RD©≥z.A”BLK 0                             …∏°Ì\Ù¡`<≠ﬁ!‚πK-L"}S±Ú(A¥0Ø∑)A√gˆ√R(A”BLK 0                             ‹ŸM»ôA⁄∂áç4SPÓy     ‹     ∞‘     ”BLK 0                             =Ÿ”HÁÿk®˛|87˝Íc;     Ïa     •ç     ”BLK 0                              ¶Ÿ+¥	Q2p˝Fˆ∑4•Æ÷®]Z,A,8ÁÆı˜#Aàb&ª»%A”BLK 0                             Aè'ñÂoà%)ÿædÓ–  ”BLK 0              h      h      hÊ@=ÉŸŸ;÷÷{4˚æGI   9   8   U   I   G   0   U   B   J   Y   5   L   2   3   L   O   S   F   X   X   4   5   F   U   V   A   N   S   S   1   3   V   X   D   K   T   C   Q   0   A   D   M   2   V   U   G   B   V   Q   C   T   H   K   9   O   G   Z   S   S   P   9   C   T   B   K   3   6   Z   R   P   2   3   T   7   8   H   9   B   E   I   R   6   2   T   5   O   6   H   D   ”BLK 0                             TÆËrUu|ıM˜©J#˛_’I%AjÿÏñ3z)A.k	BrY'A”BLK 0                             }h*v'1Ö™V„&ÿ’\8{Av"A_=¯
+@A9:?<_-™@”BLK 0                             J@–[Ç¥b>}˝kêúÈHßˆ     V3     ¥;     ”BLK 0                             Aè'ñÂoà%)ÿædÓ–  ”BLK 0                             løﬁÜh·1/–æ±vΩpkúû£¶¶CAw¨Oæ‰ûA˙œ¯F]-A”BLK 0                             ∑u'÷ÅÕd¨ü»IàíG3BÔ\!AwñŒ∏=ò#A'>–ÜG†"A”BLK 0              h      h      h|ÍßÃ&Ó∆ˆqœ}≥lCY   I   Q   V   G   8   3   R   B   7   L   5   2   1   1   5   O   3   P   A   X   Q   7   M   Z   8   T   W   W   S   S   D   3   T   9   Q   V   D   1   E   D   U   W   P   Y   E   4   1   G   1   C   6   Z   P   O   M   1   B   9   T   A   2   X   X   L   Z   1   8   N   C   5   0   K   O   2   0   T   1   5   Z   K   9   J   E   8   V   M   F   D   G   ”BLK 0                             ,ﬁAN~v^ •πÓjBUÛ∞~Ú…i6#AT±LÏ Aw@Ïîëd%A”BLK 0                             Í√∂ˇd¥•qÅõ©’ö     ‡p@                ”BLK 0                             ÇJcI∏∆ÆœŒ•≥*ÆO%ÍÇ¬$Aé~úÈ'Ad¬^É9g.A”BLK 0                             âƒ+T'`ø© ÆJı—Uîû~’ö!,A2ujOßØ&A˙"|-«Z!A”BLK 0                             ∏¿R:…	ﬂ9g]ÆUSá±Ó;©Á∂AÑ$ÖÊA(°ä-⁄%(A”BLK 0                             ]™œìÄ¸›`Ì˜O^XÛaü¡A‡ßKÚ‹ë!A¬ƒ˛¥-A”BLK 0                             Ø78ñC\b°d;Ãöeï <]A…˜˝F°_ı@"oB“ A”BLK 0                                vªÆ˜Êå#ø…h      ?                      ?”BLK 0                             JÁ6‰K˘øy“u.#H•                #ASDF BLOCK INDEX
+%YAML 1.1
+---
+- 63936
+- 63993
+- 64071
+- 64149
+- 64227
+- 64305
+- 64383
+- 64461
+- 64518
+- 64596
+- 64674
+- 64752
+- 64830
+- 64908
+- 64986
+- 65400
+- 65814
+- 65892
+- 65970
+- 66048
+- 66126
+- 66204
+- 66282
+- 66360
+- 66438
+- 66516
+- 66594
+- 66672
+- 66750
+- 66828
+- 66906
+- 66984
+- 67062
+- 67140
+- 67218
+- 67296
+- 67374
+- 67452
+- 67530
+- 67608
+- 67686
+- 67764
+- 67842
+- 67920
+- 67998
+- 68076
+- 68154
+- 68232
+- 68310
+- 68388
+- 68466
+- 68544
+- 68622
+- 68700
+- 68778
+- 68856
+- 68934
+- 69012
+- 69090
+- 69204
+- 69318
+- 69396
+- 69474
+- 69552
+- 69630
+- 69708
+- 69786
+- 69864
+- 69942
+- 70128
+- 70206
+- 70284
+- 70698
+- 70776
+- 70854
+- 70932
+- 71010
+- 71088
+- 71274
+- 71688
+- 72078
+- 72492
+- 72906
+- 72984
+- 73062
+- 73140
+- 73218
+- 73368
+- 73506
+- 73644
+- 73818
+- 74028
+- 74262
+- 74436
+- 74778
+- 75132
+- 75210
+- 75336
+- 75462
+- 75540
+- 75618
+- 75696
+- 75774
+- 76188
+- 76266
+- 76356
+- 76434
+- 76512
+- 76926
+- 77376
+- 77790
+- 78204
+- 78618
+- 79032
+- 79446
+- 79572
+- 79986
+- 80088
+- 80166
+- 80244
+- 80322
+- 80400
+- 80574
+- 80940
+- 81306
+- 81672
+- 81750
+- 82116
+- 82206
+- 82572
+- 83010
+- 83544
+- 83706
+- 83808
+- 83994
+- 84240
+- 84414
+- 84576
+- 84738
+- 84900
+- 85326
+- 85740
+- 85902
+- 86316
+- 86574
+- 86736
+- 86898
+- 86976
+- 87054
+- 87132
+- 87198
+- 87276
+- 87354
+- 87432
+- 87510
+- 87588
+- 87666
+- 87744
+- 87822
+- 87900
+- 87978
+- 88056
+- 88134
+- 88212
+- 88290
+- 88368
+- 88446
+- 88524
+- 88878
+- 89232
+- 89310
+- 89388
+- 89466
+- 89544
+- 89622
+- 89700
+- 90066
+- 90432
+- 90798
+- 91164
+- 91530
+- 91896
+- 91974
+- 92052
+- 92130
+- 92208
+- 92286
+- 92364
+- 92442
+- 92520
+- 92598
+- 92676
+- 92754
+- 92832
+- 92898
+- 92988
+- 93078
+- 93204
+- 93330
+- 93456
+- 93558
+- 93708
+- 93858
+- 94272
+- 94686
+- 95100
+- 95178
+- 95256
+- 95334
+- 95412
+- 95490
+- 95568
+- 95646
+- 95724
+- 95802
+- 95880
+- 95958
+- 96036
+- 96114
+- 96192
+- 96270
+- 96348
+- 96426
+- 96504
+- 96582
+- 96660
+- 96738
+- 96816
+- 96894
+- 97416
+- 97542
+- 97620
+- 97998
+- 98364
+- 98442
+- 98520
+- 98598
+- 99012
+- 99426
+- 99483
+- 99540
+- 99618
+- 99696
+- 99753
+- 99831
+- 99909
+- 99987
+- 100209
+- 100287
+- 100581
+- 100995
+- 101169
+- 101247
+- 101661
+- 101739
+- 101817
+- 101895
+- 101973
+- 102051
+- 102129
+- 102207
+- 102285
+- 102363
+- 102441
+- 102519
+- 102597
+- 102675
+- 102753
+- 102810
+- 103224
+- 103302
+- 103380
+- 103458
+- 103515
+- 103593
+- 103671
+- 104085
+- 104163
+- 104241
+- 104319
+- 104397
+- 104475
+- 104553
+- 104631
+- 104717
+...

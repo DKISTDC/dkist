@@ -252,3 +252,15 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
+
+
+def test_length_one_first_array_axis(small_visp_dataset):
+    all_files = small_visp_dataset.files.filenames
+
+    assert len(all_files) == 3
+
+    assert len(small_visp_dataset[0:2].files.filenames) == 2
+
+    assert len(small_visp_dataset[0].files.filenames) == 1
+
+    assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
