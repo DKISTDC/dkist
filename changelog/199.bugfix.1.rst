@@ -1,0 +1,2 @@
+Fix a bug where ``FileManager.download`` would fail if there was not an
+asdf file or quality report PDF in inventory.

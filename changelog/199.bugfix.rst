@@ -1,0 +1,2 @@
+Fix an issue with slicing a dataset where the slicing wouldn't work correctly
+if the first axis of the data array has length one.
