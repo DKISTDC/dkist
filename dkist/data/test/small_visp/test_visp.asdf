@@ -25,11 +25,11 @@ history:
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.0.0
-    software: !core/software-1.0.0 {name: gwcs, version: 0.18.2a1.dev4+g6ec3954.d20220429}
+    software: !core/software-1.0.0 {name: gwcs, version: 0.18.2a1}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
-    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b9.dev4+gfdb77e4}
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b10}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
