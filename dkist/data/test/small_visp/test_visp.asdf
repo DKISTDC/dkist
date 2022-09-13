@@ -29,7 +29,7 @@ history:
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
-    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b10}
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.0b8}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
