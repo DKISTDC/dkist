@@ -113,6 +113,14 @@ def test_file_manager_cube_slice(eit_dataset):
     # Assert that we have copied the value of basepath
     assert ds.files.basepath == sds.files.basepath
 
+    sds = ds[0]
+
+    # Check that we haven't made a copy
+    assert ds.files is not sds.files
+
+    # Assert that we have copied the value of basepath
+    assert ds.files.basepath == sds.files.basepath
+
     # TODO: Decide on the desired behaviour here.
     ## Running sds.download() here would affect the parent cubes data, because
     ## the base paths are the same.
@@ -244,3 +252,15 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
+
+
+def test_length_one_first_array_axis(small_visp_dataset):
+    all_files = small_visp_dataset.files.filenames
+
+    assert len(all_files) == 3
+
+    assert len(small_visp_dataset[0:2].files.filenames) == 2
+
+    assert len(small_visp_dataset[0].files.filenames) == 1
+
+    assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
