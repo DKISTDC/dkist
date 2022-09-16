@@ -22,7 +22,7 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     Do a search for a single dataset id
     """
     results = DKISTClient().search(Dataset(dataset_id))
-    if len(results) == 1:
+    if len(results) == 0:
         raise IndexError(f"No results available for dataset {dataset_id}")
 
     return results
