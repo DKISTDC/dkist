@@ -21,7 +21,11 @@ def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
     """
     Do a search for a single dataset id
     """
-    return DKISTClient().search(Dataset(dataset_id))
+    results = DKISTClient().search(Dataset(dataset_id))
+    if len(results) == 1:
+        raise IndexError(f"No results available for dataset {dataset_id}")
+
+    return results
 
 
 def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
@@ -70,10 +74,7 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
     from dkist.net import conf
 
     if isinstance(datasets, str):
-        try:
-            datasets = _get_dataset_inventory(datasets)[0]
-        except IndexError as e:
-            raise IndexError(f"No results available for dataset {datasets}") from e
+        datasets = _get_dataset_inventory(datasets)[0]
 
     # If we have a UnifiedResponse object, it could contain one or more dkist tables.
     # Stack them and then treat them like we were passed a single table with many rows.

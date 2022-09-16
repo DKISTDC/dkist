@@ -46,7 +46,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
 
 def test_transfer_unavailable_data(mocker):
     get_inv_mock = mocker.patch(
-        "dkist.net.helpers._get_dataset_inventory",
+        "dkist.net.client.DKISTClient.search",
         autospec=True,
         return_value=[],
     )
