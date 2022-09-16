@@ -51,7 +51,7 @@ def test_transfer_unavailable_data(mocker):
         return_value=[],
     )
 
-    with pytest.raises(IndexError):
+    with pytest.raises(ValueError):
         transfer_complete_datasets("null")
 
 
