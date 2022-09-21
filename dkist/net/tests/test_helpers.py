@@ -51,7 +51,7 @@ def test_transfer_unavailable_data(mocker):
         return_value=[],
     )
 
-    with pytest.raises(ValueError, "No results available for dataset"):
+    with pytest.raises(ValueError, match="No results available for dataset"):
         transfer_complete_datasets("null")
 
 
