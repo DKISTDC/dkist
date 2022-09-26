@@ -124,6 +124,9 @@ Once we have loaded the dataset, if we wish to transfer all the FITS files a sin
 If this is the first time you have run this method, or your authentication has expired, a login page should open in your webbrowser to authenticate with the Globus system.
 By default this call will download all the FITS files to the current value of ``ds.files.basepath``, i.e. by default in the same directory as the loaded ASDF file.
 You can override this behaviour by using the ``path=`` keyword argument.
+The path argument can contain keys which will be replaced by the corresponding values in the dataset's metadata.
+For example, setting `path="~/data/dkist/{Instrument}/"` will download all files and save them in separate folders named for the value of the `instrumentName` keyword in the header.
+A full list of the available keys can be found in :ref:`interpolation-keys`.
 
 The real power of using ``download()`` however, is that you don't have to transfer the FITS files for the frames you do not wish to study (yet).
 For instance, imagine the situation where you wish to first inspect the Stokes I profile to asses the viability of the data for your analysis, using this download method you can do this and your transfer will take about a quarter of the time.
