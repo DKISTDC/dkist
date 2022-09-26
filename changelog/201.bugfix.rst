@@ -1,1 +1,1 @@
-Relocate definitions from `dkist.net.attrs` so that just the desired names can be imported into that namespace.
+Hide extraneous names in `dkist.net.attrs` with underscores so they don't get imported when using that module.
