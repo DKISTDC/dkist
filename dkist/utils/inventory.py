@@ -60,6 +60,21 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
 })
 
 
+def path_format_keys():
+    header_names, human_names = INVENTORY_KEY_MAP.keys(), INVENTORY_KEY_MAP.values()
+    header_names = [f"{h}" for h in header_names]
+    human_names = [f"{h}" for h in human_names]
+    w = [max([len(str(h)) for h in header_names]), max([len(str(h)) for h in human_names])]
+
+    table = "\n".join([f"{header:<{w[0]+1}}{human:<{w[1]+1}}" for header, human in zip(header_names, human_names)])
+    table = f"{'':=<{w[0]}} {'':=<{w[1]}}\n" + table
+    table = f"{'Metadata keyword':<{w[0]}} {'Path key':<{w[1]}}\n" + table
+    table = f"{'':=<{w[0]}} {'':=<{w[1]}}\n" + table
+    table = table + f"\n{'':=<{w[0]}} {'':=<{w[1]}}"
+
+    return table
+
+
 def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
     """
     Convert an inventory dict to have human readable keys.
