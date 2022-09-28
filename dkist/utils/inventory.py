@@ -86,6 +86,14 @@ def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
     return humanized_inventory
 
 
+def sanitize_inventory(inv):
+    # Putting this here because of cirvular imports
+    from ..net.client import DKISTQueryResponseTable as Table
+
+    t = Table.from_results([inv], client=None)
+    return t[0].response_block_map
+
+
 def dehumanize_inventory(humanized_inventory: Dict[str, str]) -> Dict[str, str]:
     """
     Convert a human readable inventory dict back to the original keys.

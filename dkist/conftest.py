@@ -203,6 +203,8 @@ def dataset(array, identity_gwcs):
             'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf',
             'browseMovieObjectKey': 'test_proposal/test_dataset/test_dataset.mp4',
             'qualityReportObjectKey': 'test_proposal/test_dataset/test_dataset.pdf',
+            'wavelengthMin': 0,
+            'wavelengthMax': 0,
         },
         'headers': Table()
     }

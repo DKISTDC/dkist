@@ -33,7 +33,7 @@ from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
 from dkist.net import conf as net_conf
 from dkist.net.helpers import _orchestrate_transfer_task
-from dkist.utils.inventory import humanize_inventory
+from dkist.utils.inventory import humanize_inventory, sanitize_inventory
 
 
 class BaseStripedExternalArray:
@@ -362,7 +362,7 @@ class FileManager(BaseFileManager):
             )
 
         inv = self._ndcube.meta["inventory"]
-        human_inv = humanize_inventory(inv)
+        human_inv = sanitize_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
         destination_path = path or self.basepath or "/~/"
