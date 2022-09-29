@@ -1,8 +1,12 @@
 """
 Functions for working with dataset inventory.
 """
+import re
+import string
 from typing import Dict
 from collections import defaultdict
+
+from astropy.table import Table
 
 __all__ = ['dehumanize_inventory', 'humanize_inventory', 'INVENTORY_KEY_MAP']
 
@@ -60,19 +64,24 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
 })
 
 
+def _key_clean(key):
+    key = re.sub('[%s]' % re.escape(string.punctuation), '_', key)
+    key = key.replace(' ', '_')
+    key = ''.join(char for char in key
+                    if char.isidentifier() or char.isnumeric())
+    return key.lower()
+
+
 def path_format_keys():
-    header_names, human_names = INVENTORY_KEY_MAP.keys(), INVENTORY_KEY_MAP.values()
-    header_names = [f"{h}" for h in header_names]
-    human_names = [f"{h}" for h in human_names]
-    w = [max([len(str(h)) for h in header_names]), max([len(str(h)) for h in human_names])]
+    """
+    Return a list of all valid keys for path formatting.
+    """
+    return tuple(map(_key_clean, INVENTORY_KEY_MAP.values()))
 
-    table = "\n".join([f"{header:<{w[0]+1}}{human:<{w[1]+1}}" for header, human in zip(header_names, human_names)])
-    table = f"{'':=<{w[0]}} {'':=<{w[1]}}\n" + table
-    table = f"{'Metadata keyword':<{w[0]}} {'Path key':<{w[1]}}\n" + table
-    table = f"{'':=<{w[0]}} {'':=<{w[1]}}\n" + table
-    table = table + f"\n{'':=<{w[0]}} {'':=<{w[1]}}"
 
-    return table
+def _path_format_table():
+    t = Table({'Inventory Keyword': list(INVENTORY_KEY_MAP.keys()), 'Path Key': path_format_keys()})
+    return '\n'.join(t.pformat(max_lines=-1, html=True))
 
 
 def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
@@ -86,11 +95,14 @@ def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
     return humanized_inventory
 
 
-def sanitize_inventory(inv):
-    # Putting this here because of cirvular imports
+def path_format_inventory(human_inv):
+    """
+    Given a single humanized inventory record return a dict for formatting paths.
+    """
+    # Putting this here because of circular imports
     from ..net.client import DKISTQueryResponseTable as Table
 
-    t = Table.from_results([inv], client=None)
+    t = Table.from_results([human_inv], client=None)
     return t[0].response_block_map
 
 

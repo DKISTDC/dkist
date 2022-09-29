@@ -199,6 +199,12 @@ This would take the values for the dataset ID and instrument name from either th
 
 Here is a full list of the metadata keywords available for this purpose and their corresponding path interpolation keys:
 
-.. program-output:: python -c "from dkist.utils.inventory import path_format_keys; print(path_format_keys())"
+.. generate:: html
 
-This list can be accessed using the function ``dkist.utils.inventory.path_format_keys()``.
+    from dkist.utils.inventory import _path_format_table
+    print(_path_format_table())
+
+The complete list of keys can be accessed using the function ``dkist.utils.inventory.path_format_keys()``::
+
+  >>> from dkist.utils.inventory import path_format_keys
+  >>> path_format_keys()

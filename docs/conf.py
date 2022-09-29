@@ -77,7 +77,6 @@ extensions = [
     'sphinx_autodoc_typehints',  # must be loaded after napoleon
     'sunpy.util.sphinx.doctest',
     'sunpy.util.sphinx.generate',
-    'sphinxcontrib.programoutput',
 ]
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']

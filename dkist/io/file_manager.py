@@ -33,7 +33,7 @@ from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
 from dkist.net import conf as net_conf
 from dkist.net.helpers import _orchestrate_transfer_task
-from dkist.utils.inventory import humanize_inventory, sanitize_inventory
+from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 
 class BaseStripedExternalArray:
@@ -362,12 +362,12 @@ class FileManager(BaseFileManager):
             )
 
         inv = self._ndcube.meta["inventory"]
-        human_inv = sanitize_inventory(humanize_inventory(inv))
+        path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
         destination_path = path or self.basepath or "/~/"
         destination_path = Path(destination_path).as_posix()
-        destination_path = Path(destination_path.format(**human_inv))
+        destination_path = Path(destination_path.format(**path_inv))
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.
