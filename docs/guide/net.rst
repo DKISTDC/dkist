@@ -125,7 +125,7 @@ If this is the first time you have run this method, or your authentication has e
 By default this call will download all the FITS files to the current value of ``ds.files.basepath``, i.e. by default in the same directory as the loaded ASDF file.
 You can override this behaviour by using the ``path=`` keyword argument.
 The path argument can contain keys which will be replaced by the corresponding values in the dataset's metadata.
-For example, setting `path="~/data/dkist/{Instrument}/"` will download all files and save them in separate folders named for the value of the `instrumentName` keyword in the header.
+For example, setting `path="~/data/dkist/{instrument}/"` will download all files and save them in separate folders named for the instrument.
 A full list of the available keys can be found in :ref:`interpolation-keys`.
 
 The real power of using ``download()`` however, is that you don't have to transfer the FITS files for the frames you do not wish to study (yet).
@@ -192,10 +192,10 @@ Finally, if you know the dataset ID of a dataset you wish to download, you can j
 Path interpolation keys
 -----------------------
 
-When downloading DKIST data with ``ds.files.download()``, the ``path=`` keyword argument can be used to specify the target folder for the download.
+When downloading DKIST data with ``ds.files.download()`` or ``Fido.fetch(), the ``path=`` keyword argument can be used to specify the target folder for the download.
 This path can include keys corresponding to metadata entries, and those values are then used to complete the download path.
-For example, to download a dataset into its own folder named with the dataset ID, with separate subfolders for each instrument in the dataset, you could set ``path="~/data/dkist/{Dataset ID}/{Instrument}/"``.
-This would take the values for the ``datasetID`` and ``instrumentName`` metadata keywords in the dataset and insert them into the path string.
+For example, to download a dataset into its own folder named with the dataset ID, with separate subfolders for each instrument in the dataset, you could set ``path="~/data/dkist/{dataset_id}/{instrument}/"``.
+This would take the values for the dataset ID and instrument name from either the ASDF file or the search results.
 
 Here is a full list of the metadata keywords available for this purpose and their corresponding path interpolation keys:
 
