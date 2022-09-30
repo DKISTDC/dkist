@@ -167,8 +167,7 @@ class DKISTClient(BaseClient):
 
         for row in query_results:
             url = f"{self._metadata_streamer_url}/asdf?datasetId={row['Dataset ID']}"
-            # Set max_splits here as the metadata streamer doesn't like accept-range at the moment.
-            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), max_splits=1)
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:
