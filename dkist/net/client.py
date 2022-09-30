@@ -8,6 +8,7 @@ from functools import partial
 from collections import defaultdict
 
 import aiohttp
+import numpy as np
 import parfive
 
 import astropy.units as u
@@ -60,6 +61,9 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
+            none_values = results[colname] == None
+            if any(none_values):
+                results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
 
         if results:
@@ -163,8 +167,7 @@ class DKISTClient(BaseClient):
 
         for row in query_results:
             url = f"{self._metadata_streamer_url}/asdf?datasetId={row['Dataset ID']}"
-            # Set max_splits here as the metadata streamer doesn't like accept-range at the moment.
-            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), max_splits=1)
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:

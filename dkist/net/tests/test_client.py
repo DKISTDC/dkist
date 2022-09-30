@@ -75,6 +75,7 @@ def example_api_response():
                 "embargoEndDate": "2020-02-28T17:05:53.330Z",
                 "browseMovieUrl": "string",
                 "isDownloadable": True,
+                "averageDatasetSpectralSampling": None  # Some fields are optional
             }
         ],
     }
