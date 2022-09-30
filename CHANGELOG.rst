@@ -1,3 +1,27 @@
+1.0.0b9 (2022-09-30)
+====================
+
+Features
+--------
+
+- Add a ``label=`` kwarg to `.FileManager.download` and
+  `.transfer_complete_datasets` allowing the user to completely customise the
+  Globus transfer task label. (`#193 <https://github.com/DKISTDC/dkist/pull/193>`_)
+
+
+Bug Fixes
+---------
+
+- Successfully ask for re-authentication when Globus token is stale. (`#197 <https://github.com/DKISTDC/dkist/pull/197>`_)
+- Fix a bug where ``FileManager.download`` would fail if there was not an
+  asdf file or quality report PDF in inventory. (`#199 <https://github.com/DKISTDC/dkist/pull/199>`_)
+- Fix an issue with slicing a dataset where the slicing wouldn't work correctly
+  if the first axis of the data array has length one. (`#199 <https://github.com/DKISTDC/dkist/pull/199>`_)
+- No more invalid characters in default Globus label name. (`#200 <https://github.com/DKISTDC/dkist/pull/200>`_)
+- Hide extraneous names in `dkist.net.attrs` with underscores so they don't get imported when using that module. (`#201 <https://github.com/DKISTDC/dkist/pull/201>`_)
+- Catch empty return value from data search in `transfer_complete_datasets` and raise a ValueError telling the user what's happening. (`#204 <https://github.com/DKISTDC/dkist/pull/204>`_)
+
+
 v1.0.0b8 (2022-07-18)
 =====================
 

@@ -1,1 +1,0 @@
-Catch empty return value from data search in `transfer_complete_datasets` and raise a ValueError telling the user what's happening.
