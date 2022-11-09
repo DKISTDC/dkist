@@ -72,15 +72,15 @@ def _key_clean(key):
     return key.lower()
 
 
-def path_format_keys():
+def path_format_keys(keymap):
     """
     Return a list of all valid keys for path formatting.
     """
-    return tuple(map(_key_clean, INVENTORY_KEY_MAP.values()))
+    return tuple(map(_key_clean, keymap.values()))
 
 
-def _path_format_table():
-    t = Table({'Inventory Keyword': list(INVENTORY_KEY_MAP.keys()), 'Path Key': path_format_keys()})
+def _path_format_table(keymap=INVENTORY_KEY_MAP):
+    t = Table({'Inventory Keyword': list(keymap.keys()), 'Path Key': path_format_keys(keymap)})
     return '\n'.join(t.pformat(max_lines=-1, html=True))
 
 
