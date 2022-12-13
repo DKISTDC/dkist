@@ -184,6 +184,7 @@ class Dataset(NDCube):
         """
         Construct a dataset object from a filepath of a suitable asdf file.
         """
+        from dkist.dataset import TiledDataset
         filepath = Path(filepath).expanduser()
         base_path = filepath.parent
         try:
@@ -191,7 +192,11 @@ class Dataset(NDCube):
                 with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                                lazy_load=False, copy_arrays=True) as ff:
                     ds = ff.tree['dataset']
-                    ds.files.basepath = base_path
+                    if isinstance(ds, TiledDataset):
+                        for sub in ds.flat:
+                            sub.files.basepath = base_path
+                    else:
+                        ds.files.basepath = base_path
                     return ds
 
         except ValidationError as e:
