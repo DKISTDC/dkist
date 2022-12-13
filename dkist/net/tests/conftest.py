@@ -48,4 +48,6 @@ def api_param_names():
         da.SpectralSampling: ('averageDatasetSpectralSamplingMin', 'averageDatasetSpectralSamplingMax'),
         da.SpatialSampling: ('averageDatasetSpatialSamplingMin', 'averageDatasetSpatialSamplingMax'),
         da.TemporalSampling: ('averageDatasetTemporalSamplingMin', 'averageDatasetTemporalSamplingMax'),
+        da.Page: ('pageNumber',),
+        da.PageSize: ('pageSize',),
     }
