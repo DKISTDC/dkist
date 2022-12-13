@@ -82,7 +82,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         total_available_results = 0
         new_results = defaultdict(list)
         for response in responses:
-            total_available_results += response['recordCount']
+            total_available_results += response.get('recordCount', 0)
             for result in response["searchResults"]:
                 for key, value in result.items():
                     new_results[INVENTORY_KEY_MAP[key]].append(value)
