@@ -239,7 +239,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
                                            folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.files.download(path="~/{Dataset ID}")
+    dataset.files.download(path="~/{dataset_id}")
 
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
