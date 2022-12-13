@@ -1,3 +1,25 @@
+v1.0.0b10 (2022-12-13)
+======================
+
+Features
+--------
+
+- Add ability to page through the DKIST results and affect the page size. (`#212 <https://github.com/DKISTDC/dkist/pull/212>`_)
+
+
+Bug Fixes
+---------
+
+- Fix bugs in testing caused by the release of ``pytest 7.2.0``. (`#210 <https://github.com/DKISTDC/dkist/pull/210>`_)
+- Make loading a mosaiced VBI dataset work with `Dataset.from_asdf`. (`#213 <https://github.com/DKISTDC/dkist/pull/213>`_)
+
+
+Improved Documentation
+----------------------
+
+- Add documentation for available path interpolation keys. (`#207 <https://github.com/DKISTDC/dkist/pull/207>`_)
+
+
 1.0.0b9 (2022-09-30)
 ====================
 
