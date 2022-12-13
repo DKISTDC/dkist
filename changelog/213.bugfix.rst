@@ -1,0 +1,1 @@
+Make loading a mosaiced VBI dataset work with `Dataset.from_asdf`.
