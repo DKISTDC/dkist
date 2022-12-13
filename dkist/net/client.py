@@ -4,6 +4,7 @@ import json
 import urllib.parse
 import urllib.request
 from typing import Any, List, Mapping, Iterable
+from textwrap import dedent
 from functools import partial
 from collections import defaultdict
 
@@ -43,6 +44,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # These keys are shown in the repr and str representations of this class.
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
+    total_available_results = TableAttribute(default=0)
 
     @staticmethod
     def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
@@ -73,19 +75,32 @@ class DKISTQueryResponseTable(QueryResponseTable):
         return results
 
     @classmethod
-    def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTClient") -> "DKISTQueryResponseTable":
+    def from_results(cls, responses: Iterable[Mapping[str, Any]], *, client: "DKISTClient") -> "DKISTQueryResponseTable":
         """
         Construct the results table from the API results.
         """
+        total_available_results = 0
         new_results = defaultdict(list)
-        for result in results:
-            for key, value in result.items():
-                new_results[INVENTORY_KEY_MAP[key]].append(value)
+        for response in responses:
+            total_available_results += response['recordCount']
+            for result in response["searchResults"]:
+                for key, value in result.items():
+                    new_results[INVENTORY_KEY_MAP[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
         data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
+        data.total_available_results = total_available_results
 
         return data
+
+    def __str__(self):
+        super_str = super().__str__()
+        if self.total_available_results != 0 and self.total_available_results != len(self):
+            return dedent(f"""
+            Showing {len(self)} of {self.total_available_results} available results.
+            Use a.dkist.Page(2) to show the next page of results.\n
+            """) + super_str
+        return super_str
 
 
 class DKISTClient(BaseClient):
@@ -128,7 +143,7 @@ class DKISTClient(BaseClient):
             full_url = f"{self._dataset_search_url}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
-            results += data["searchResults"]
+            results.append(data)
 
         return DKISTQueryResponseTable.from_results(results, client=self)
 
