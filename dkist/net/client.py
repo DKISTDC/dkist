@@ -115,12 +115,15 @@ class DKISTClient(BaseClient):
         """
         Search for datasets provided by the DKIST data centre.
         """
+        from dkist.net import conf
 
         query = attr.and_(*args)
         queries = walker.create(query)
 
         results = []
         for url_parameters in queries:
+            if 'pageSize' not in url_parameters:
+                url_parameters.update({'pageSize': conf.default_page_size})
             query_string = urllib.parse.urlencode(url_parameters)
             full_url = f"{self._dataset_search_url}?{query_string}"
             data = urllib.request.urlopen(full_url)
