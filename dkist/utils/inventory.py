@@ -102,7 +102,7 @@ def path_format_inventory(human_inv):
     # Putting this here because of circular imports
     from ..net.client import DKISTQueryResponseTable as Table
 
-    t = Table.from_results([human_inv], client=None)
+    t = Table.from_results([{"searchResults": [human_inv]}], client=None)
     return t[0].response_block_map
 
 

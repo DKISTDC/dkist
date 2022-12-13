@@ -13,6 +13,7 @@ class Conf(_config.ConfigNamespace):
     """
     Configuration Parameters for the `dkist.net` Package.
     """
+    default_page_size = _config.ConfigItem(300, "Default number of datasets to return in search results.")
     dataset_endpoint = _config.ConfigItem("https://api.dkistdc.nso.edu/datasets/",
                                           "Base URL for dataset search.")
     download_endpoint = _config.ConfigItem("https://api.dkistdc.nso.edu/download",

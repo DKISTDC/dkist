@@ -11,7 +11,7 @@ from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
 
-__all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
+__all__ = ['PageSize', 'Page', 'Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
@@ -19,6 +19,30 @@ __all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
 
 
 # SimpleAttrs
+
+class PageSize(_SimpleAttr):
+    """
+    The number of search results to return.
+
+    Parameters
+    ----------
+    page_size: `int`
+    """
+    def __init__(self, page_size: int):
+        super().__init__(page_size)
+
+
+class Page(_SimpleAttr):
+    """
+    The page of results to show
+
+    Parameters
+    ----------
+    page: `int`
+    """
+    def __init__(self, page: int):
+        super().__init__(page)
+
 
 # datasetIds [array]
 class Dataset(_SimpleAttr):

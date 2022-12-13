@@ -84,6 +84,16 @@ def _(wlk, attr, params):
 
 
 # DKIST Attrs
+@walker.add_applier(PageSize)
+def _(wlk, attr, params):
+    return params.update({'pageSize': attr.value})
+
+
+@walker.add_applier(Page)
+def _(wlk, attr, params):
+    return params.update({'pageNumber': attr.value})
+
+
 @walker.add_applier(Dataset)
 def _(wlk, attr, params):
     return params.update({'datasetIds': attr.value})
