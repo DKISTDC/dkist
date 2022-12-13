@@ -102,6 +102,17 @@ class DKISTQueryResponseTable(QueryResponseTable):
             """) + super_str
         return super_str
 
+    def _repr_html_(self):
+        super_html = super()._repr_html_()
+        if self.total_available_results != 0 and self.total_available_results != len(self):
+            return dedent(f"""
+            <p>
+            Showing {len(self)} of {self.total_available_results} available results.
+            Use <code>a.dkist.Page(2)</code> to show the next page of results.\n
+            </p>
+            """) + super_html
+        return super_html
+
 
 class DKISTClient(BaseClient):
     """
