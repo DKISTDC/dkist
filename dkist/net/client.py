@@ -98,7 +98,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         if self.total_available_results != 0 and self.total_available_results != len(self):
             return dedent(f"""
             Showing {len(self)} of {self.total_available_results} available results.
-            Use a.dkist.Page(2) to show the next page of results.\n
+            Use a.dkist.Page(2) to show the second page of results.\n
             """) + super_str
         return super_str
 
@@ -108,7 +108,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
             return dedent(f"""
             <p>
             Showing {len(self)} of {self.total_available_results} available results.
-            Use <code>a.dkist.Page(2)</code> to show the next page of results.\n
+            Use <code>a.dkist.Page(2)</code> to show the second page of results.\n
             </p>
             """) + super_html
         return super_html
