@@ -188,7 +188,7 @@ class Dataset(NDCube):
         filepath = Path(filepath).expanduser()
         base_path = filepath.parent
         try:
-            with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+            with resources.as_file(resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
                 with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                                lazy_load=False, copy_arrays=True) as ff:
                     ds = ff.tree['dataset']

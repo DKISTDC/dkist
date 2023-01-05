@@ -101,7 +101,7 @@ def test_asdf_tags(dataset, tmp_path):
                          indirect=True)
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
     tree = {'dataset': tagobj}
-    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+    with resources.as_file(resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to(Path(tmpdir / "test.asdf"))
 
@@ -115,7 +115,7 @@ def test_read_all_schema_versions(asdf_file):
     This test validates that we can successfully read a full and valid Dataset
     object from files with all versions of the dataset schema.
     """
-    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+    with resources.as_file(resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
         with asdf.open(asdf_file) as afile:
             dataset = afile["dataset"]
             dataset.files.basepath = rootdir / "EIT"

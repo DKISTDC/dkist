@@ -1,5 +1,4 @@
 import os
-import cgi
 import json
 import urllib.parse
 import urllib.request
@@ -19,6 +18,7 @@ from sunpy.net import attr
 from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
+from sunpy.util.net import parse_header
 
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
@@ -170,7 +170,7 @@ class DKISTClient(BaseClient):
         if resp:
             cdheader = resp.headers.get("Content-Disposition", None)
             if cdheader:
-                _, params = cgi.parse_header(cdheader)
+                _, params = parse_header(cdheader)
                 name = params.get('filename', "")
 
         return str(path).format(file=name, **row.response_block_map)
