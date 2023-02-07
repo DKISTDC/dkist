@@ -10,7 +10,7 @@ jobs:
     with:
       envs: |
         - linux: py39
-        - macos: py38
+        - macos: py311
         - linux: py310-devdeps
         - windows: py38-oldestdeps
       coverage: 'codecov'
