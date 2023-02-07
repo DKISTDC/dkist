@@ -16,7 +16,9 @@ properties:
     items:
       type: array
       items:
-        tag: "asdf://dkist.nso.edu/tags/dataset-1.0.0"
+        anyOf:
+          - tag: "asdf://dkist.nso.edu/tags/dataset-1.0.0"
+          - tag: "asdf://dkist.nso.edu/tags/dataset-1.0.1"
   inventory:
     description: A copy of the inventory record for this dataset.
     type: object
