@@ -117,7 +117,7 @@ def test_save_dataset_with_file_schema(tagobj, tmpdir):
                              rootdir / "eit_dataset_0.2.0.asdf",
                              rootdir / "eit_dataset_0.3.0.asdf",
                              rootdir / "eit_dataset_1.0.0.asdf",
-                             rootdir / "eit_dataset_1.0.1.asdf",
+                             rootdir / "eit_dataset_1.1.0.asdf",
                          ])
 def test_read_all_schema_versions(asdf_file):
     """

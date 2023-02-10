@@ -16,7 +16,7 @@ properties:
       - $ref: "asdf://dkist.nso.edu/schemas/dataset-0.2.0"
       - $ref: "asdf://dkist.nso.edu/schemas/dataset-0.3.0"
       - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.0.0"
-      - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.0.1"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.1.0"
       - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-0.1.0"
       - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.0.0"
 
