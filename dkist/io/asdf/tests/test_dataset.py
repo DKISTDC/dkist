@@ -112,10 +112,13 @@ def test_save_dataset_with_file_schema(tagobj, tmpdir):
 
 
 @pytest.mark.parametrize("asdf_file",
-                         [rootdir / "eit_dataset_0.1.0.asdf",
-                          rootdir / "eit_dataset_0.2.0.asdf",
-                          rootdir / "eit_dataset_0.3.0.asdf",
-                          rootdir / "eit_dataset_1.0.0.asdf"])
+                         [
+                             rootdir / "eit_dataset_0.1.0.asdf",
+                             rootdir / "eit_dataset_0.2.0.asdf",
+                             rootdir / "eit_dataset_0.3.0.asdf",
+                             rootdir / "eit_dataset_1.0.0.asdf",
+                             rootdir / "eit_dataset_1.0.1.asdf",
+                         ])
 def test_read_all_schema_versions(asdf_file):
     """
     This test validates that we can successfully read a full and valid Dataset
