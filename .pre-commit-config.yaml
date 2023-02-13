@@ -6,13 +6,14 @@ repos:
       - id: check-ast
       - id: debug-statements
       - id: check-added-large-files
+        args: ['--maxkb=750']
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*fits"
+        exclude: ".*(.fits|.asdf)"
       - id: mixed-line-ending
         files: ".*.py"
       - id: end-of-file-fixer
-        exclude: ".*fits"
+        exclude: ".*(.fits|.asdf)"
       - id: flake8
         additional_dependencies: [flake8-docstrings]
         args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
