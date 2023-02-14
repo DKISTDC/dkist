@@ -12,10 +12,6 @@ history:
     software: !core/software-1.0.0 {name: asdf, version: 2.14.3}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://asdf-format.org/core/extensions/core-1.5.0
-    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.3.0}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
     software: !core/software-1.0.0 {name: asdf-astropy, version: 0.3.0}
   - !core/extension_metadata-1.0.0
@@ -28,6 +24,10 @@ history:
     software: !core/software-1.0.0 {name: dkist, version: 1.0.0b10.dev10+g5493c6f}
   - !core/extension_metadata-1.0.0
     extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/core/extensions/core-1.5.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.3.0}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://asdf-format.org/transform/extensions/transform-1.5.0
     software: !core/software-1.0.0 {name: asdf-astropy, version: 0.3.0}
   - !core/extension_metadata-1.0.0
@@ -38,7 +38,7 @@ history:
     extension_class: asdf.extension._manifest.ManifestExtension
     extension_uri: asdf://asdf-format.org/astronomy/coordinates/extensions/coordinates-1.0.0
     software: !core/software-1.0.0 {name: asdf-astropy, version: 0.3.0}
-dataset: !<asdf://dkist.nso.edu/tags/dataset-1.0.0>
+dataset: !<asdf://dkist.nso.edu/tags/dataset-1.1.0>
   data: !<asdf://dkist.nso.edu/tags/file_manager-1.0.0>
     datatype: float64
     fileuris: [efz20040301.000010_s.fits, efz20040301.020010_s.fits, efz20040301.030011_s.fits,
