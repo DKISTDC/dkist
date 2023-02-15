@@ -1,1 +1,0 @@
-Fix bugs in testing caused by the release of ``pytest 7.2.0``.

@@ -1,3 +1,27 @@
+1.0.0b11 (2023-02-15)
+=====================
+
+Features
+--------
+
+- Add ability to page through the DKIST results and affect the page size. (`#212 <https://github.com/DKISTDC/dkist/pull/212>`_)
+- Fix, and make requried, the unit property on a dataset in ASDF files. (`#221 <https://github.com/DKISTDC/dkist/pull/221>`_)
+
+
+Bug Fixes
+---------
+
+- Fix bugs in testing caused by the release of ``pytest 7.2.0``. (`#210 <https://github.com/DKISTDC/dkist/pull/210>`_)
+- Make loading a mosaiced VBI dataset work with `Dataset.from_asdf`. (`#213 <https://github.com/DKISTDC/dkist/pull/213>`_)
+- Add support for Python 3.11 (`#218 <https://github.com/DKISTDC/dkist/pull/218>`_)
+
+
+Improved Documentation
+----------------------
+
+- Add documentation for available path interpolation keys. (`#207 <https://github.com/DKISTDC/dkist/pull/207>`_)
+
+
 1.0.0b9 (2022-09-30)
 ====================
 
