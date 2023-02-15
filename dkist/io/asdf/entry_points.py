@@ -44,6 +44,8 @@ def get_extensions():
     dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
     wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter()]
     return [
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0",
+                                   converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
                                    converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0",

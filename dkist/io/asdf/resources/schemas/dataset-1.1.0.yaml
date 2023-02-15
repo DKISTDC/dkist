@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "asdf://dkist.nso.edu/schemas/dataset-1.0.0"
+id: "asdf://dkist.nso.edu/schemas/dataset-1.1.0"
 
 title: |
   A DKIST Level 1 Dataset object.
@@ -20,12 +20,10 @@ properties:
       - tag: "tag:stsci.edu:gwcs/wcs-1.1.0"
 
   mask:
-    tag: "core/ndarray-1.0.0"
+    tag: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
 
   unit:
-    anyOf:
-      - tag: "unit/unit-1.0.0"
-      - tag: "tag:stsci.edu:asdf/unit/unit-1.0.0"
+    tag: "tag:stsci.edu:asdf/unit/unit-1.0.0"
 
   meta:
     description: Dataset metadata, describing the whole dataset.
@@ -46,6 +44,6 @@ properties:
     required: [headers, inventory]
     additionalProperties: true
 
-required: [data, wcs]
+required: [data, wcs, unit]
 additionalProperties: true
 ...
