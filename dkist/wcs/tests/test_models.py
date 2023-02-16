@@ -371,3 +371,17 @@ def test_vct_slit2d_unitless():
     world = vct_slit(*pixel)
     ipixel = vct_slit.inverse(*world, 0, 0)
     assert u.allclose(ipixel, pixel[0], atol=1e-5)
+
+
+def test_ravel_model():
+    shape = (20, 5)
+    ravel = Ravel(shape)
+
+    assert ravel(15, 3) == 78
+
+
+def test_unravel_model():
+    shape = (20, 5)
+    unravel = Unravel(shape)
+
+    assert unravel(78) == (15, 3)
