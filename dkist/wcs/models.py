@@ -1,20 +1,21 @@
-from typing import Union, Iterable
+from typing import Iterable, Union
 
+import astropy.modeling.models as m
+import astropy.units as u
 import numpy as np
+from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 try:
     from numpy.typing import ArrrayLike  # NOQA
 except ImportError:
     ArrayLike = Iterable
 
-import astropy.modeling.models as m
-import astropy.units as u
-from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
            'VaryingCelestialTransform',
-           'BaseVaryingCelestialTransform']
+           'BaseVaryingCelestialTransform',
+           'RavelModel']
 
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
@@ -733,3 +734,41 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
         lon_pole=lon_pole,
         projection=projection
     )
+
+
+class Ravel(Model):
+    array_shape = (0, 0)
+    n_inputs = 2
+    n_outputs = 1
+
+    def __init__(self, array_shape, **kwargs):
+        super().__init__(**kwargs)
+
+        self.array_shape = array_shape
+
+    def evaluate(self, *inputs):
+        return (inputs[0] * self.array_shape[1]) + inputs[1]
+
+    @property
+    def inverse(self):
+        unravel = unravel_model()
+        return unravel(self.array_shape)
+
+
+class Unravel(Model):
+    array_shape = (0, 0)
+    n_inputs = 1
+    n_outputs = 2
+
+    def __init__(self, array_shape, **kwargs):
+        super().__init__(**kwargs)
+
+        self.array_shape = array_shape
+
+    def evaluate(self, input_):
+        return (input_ // self.array_shape[1], input_ % self.array_shape[1])
+
+    @property
+    def inverse(self):
+        ravel = ravel_model()
+        return ravel(self.array_shape)
