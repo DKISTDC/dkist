@@ -751,8 +751,7 @@ class Ravel(Model):
 
     @property
     def inverse(self):
-        unravel = unravel_model()
-        return unravel(self.array_shape)
+        return Unravel(self.array_shape)
 
 
 class Unravel(Model):
@@ -770,5 +769,4 @@ class Unravel(Model):
 
     @property
     def inverse(self):
-        ravel = ravel_model()
-        return ravel(self.array_shape)
+        return Ravel(self.array_shape)
