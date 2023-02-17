@@ -6,9 +6,9 @@ import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
-from dkist.wcs.models import (VaryingCelestialTransform, VaryingCelestialTransform2D,
-                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
-                              generate_celestial_transform,
+from dkist.wcs.models import (Ravel, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
+                              VaryingCelestialTransformSlit2D, generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
 
@@ -379,9 +379,6 @@ def test_ravel_model():
 
     assert ravel(15, 3) == 78
 
+    assert ravel.inverse(78) == (15, 3)
 
-def test_unravel_model():
-    shape = (20, 5)
-    unravel = Unravel(shape)
-
-    assert unravel(78) == (15, 3)
+    assert ravel.inverse.inverse(15, 3) == 78
