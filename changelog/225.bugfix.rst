@@ -1,0 +1,2 @@
+Unit for ``lon_pole`` was set to the spatial unit of the input parameters within `~dkist.wcs.models.generate_celestial_transform`.
+It is now fixed to always be degrees.
