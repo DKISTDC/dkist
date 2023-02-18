@@ -46,6 +46,19 @@ def test_generate_celestial_unitless():
     assert u.allclose(shift1.offset, 0)
 
 
+def test_varying_transform_no_lon_pole_unit():
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+    # Without a lon_pole passed, the transform was originally setting
+    # the unit for it to be the same as crval, which is wrong.
+    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                    cdelt=(1, 1) * u.arcsec/u.pix,
+                                    crval_table=(0, 0) * u.arcsec,
+                                    pc_table=varying_matrix_lt,
+                                    )
+    trans5 = vct.transform_at_index(5)
+    assert isinstance(trans5, CompoundModel)
+    assert u.allclose(trans5.right.lon_pole, 180 * u.deg)
+
 def test_varying_transform_pc():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
 
