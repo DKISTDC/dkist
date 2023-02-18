@@ -57,7 +57,8 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
     if lon_pole is None:
         lon_pole = 180
     if spatial_unit is not None:
-        lon_pole = u.Quantity(lon_pole, unit=spatial_unit)
+        # Lon pole should always have the units of degrees
+        lon_pole = u.Quantity(lon_pole, unit=u.degrees)
 
     # Make translation unitful if all parameters have units
     translation = (0, 0)
