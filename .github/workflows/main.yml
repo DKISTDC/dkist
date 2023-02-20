@@ -17,9 +17,13 @@ jobs:
         - linux: py311
         - windows: py310
         - macos: py39
+        - linux: build_docs
+          pytest: false
+          libraries:
+            apt:
+              - graphviz
         - macos: py310-devdeps
         - windows: py38-oldestdeps
-        - linux: py311-build_docs
 
   publish:
     needs: [tests]
