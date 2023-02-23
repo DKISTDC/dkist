@@ -5,6 +5,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
+from astropy.modeling.models import Tabular1D
 
 from dkist.wcs.models import (Ravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
@@ -373,12 +374,39 @@ def test_vct_slit2d_unitless():
     assert u.allclose(ipixel, pixel[0], atol=1e-5)
 
 
-def test_ravel_model():
-    shape = (20, 5)
-    ravel = Ravel(shape)
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+def test_ravel_model(array_shape):
+    ravel = Ravel(array_shape)
 
-    assert ravel(15, 3) == 78
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = np.random.random() * (array_shape[0]-1), np.random.random() * array_shape[1]
+        expected_val = ((round(x) * array_shape[1]) + y)
+        assert ravel(x, y) == expected_val
+        assert np.allclose(ravel.inverse(expected_val), (round(x), y))
+        assert ravel.inverse.inverse(x, y) == expected_val
 
-    assert ravel.inverse(78) == (15, 3)
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+def test_raveled_tabular1d(array_shape):
+    print(array_shape)
+    values = np.arange(100)
 
-    assert ravel.inverse.inverse(15, 3) == 78
+    ravel = Ravel(array_shape)
+    tabular = Tabular1D(values,
+                        values*u.nm,
+                        bounds_error=False,
+                        fill_value=np.nan,
+                        method="linear")
+
+    raveled_tab = ravel | tabular
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = (np.random.random() * (array_shape[0]-1),
+                np.random.random() * (array_shape[1]-1))
+        expected_val = ((round(x) * array_shape[1]) + y) * u.nm
+        assert raveled_tab(x, y) == expected_val
+        assert np.allclose(raveled_tab.inverse(expected_val), (round(x), y))
+        assert raveled_tab.inverse.inverse(x, y) == expected_val

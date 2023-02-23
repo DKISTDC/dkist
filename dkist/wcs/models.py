@@ -15,7 +15,7 @@ __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
            'VaryingCelestialTransform',
            'BaseVaryingCelestialTransform',
-           'RavelModel']
+           'Ravel']
 
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
