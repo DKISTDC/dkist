@@ -747,7 +747,7 @@ class Ravel(Model):
         self.array_shape = array_shape
 
     def evaluate(self, *inputs):
-        return (inputs[0] * self.array_shape[1]) + inputs[1]
+        return (np.round(inputs[0]) * self.array_shape[1]) + inputs[1]
 
     @property
     def inverse(self):
