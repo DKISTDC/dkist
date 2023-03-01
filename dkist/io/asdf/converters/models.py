@@ -115,3 +115,23 @@ class CoupledCompoundConverter(TransformConverterBase):
                                      shared_inputs=node["shared_inputs"])
 
         return model
+
+
+class RavelModel(TransformConverterBase):
+    """
+    ASDF serialization support for Ravel
+    """
+
+    tags  = [
+        "asdf://dkist.nso.edu/tags/ravel_model-1.0.0.yaml"
+    ]
+
+    types = ["dkist.wcs.models.Ravel"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        return {"array_shape": self.array_shape}
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import Ravel
+
+        return Ravel(node["array_shape"])
