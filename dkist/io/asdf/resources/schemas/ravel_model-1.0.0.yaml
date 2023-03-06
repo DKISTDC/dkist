@@ -10,5 +10,5 @@ description:
 type: object
 properties:
   array_shape:
-    type: tuple
+    type: array
   required: array_shape
