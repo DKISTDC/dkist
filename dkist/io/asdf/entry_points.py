@@ -50,6 +50,8 @@ def get_extensions():
                                    converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.1.0",
                                    converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0",
+                                   converters=wcs_converters),
         # This manifest handles all pre-refactor tags
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0",
                                    converters=dkist_converters,
