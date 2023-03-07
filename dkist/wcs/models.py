@@ -1,8 +1,9 @@
 from typing import Iterable, Union
 
+import numpy as np
+
 import astropy.modeling.models as m
 import astropy.units as u
-import numpy as np
 from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 try:
