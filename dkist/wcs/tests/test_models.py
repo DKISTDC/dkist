@@ -387,6 +387,7 @@ def test_ravel_model(array_shape):
         assert np.allclose(ravel.inverse(expected_val), (round(x), y))
         assert ravel.inverse.inverse(x, y) == expected_val
 
+
 @pytest.mark.parametrize("array_shape",
                          [(i, 100 // i) for i in range(2, 21)])
 def test_raveled_tabular1d(array_shape):
