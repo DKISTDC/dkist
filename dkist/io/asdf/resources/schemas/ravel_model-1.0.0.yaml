@@ -11,4 +11,4 @@ type: object
 properties:
   array_shape:
     type: array
-required: array_shape
+required: [array_shape]
