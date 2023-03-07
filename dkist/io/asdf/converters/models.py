@@ -129,7 +129,7 @@ class RavelModel(TransformConverterBase):
     types = ["dkist.wcs.models.Ravel"]
 
     def to_yaml_tree_transform(self, model, tag, ctx):
-        return {"array_shape": self.array_shape}
+        return {"array_shape": model.array_shape}
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import Ravel
