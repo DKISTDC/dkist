@@ -391,7 +391,6 @@ def test_ravel_model(array_shape):
 @pytest.mark.parametrize("array_shape",
                          [(i, 100 // i) for i in range(2, 21)])
 def test_raveled_tabular1d(array_shape):
-    print(array_shape)
     values = np.arange(100)
 
     ravel = Ravel(array_shape)
