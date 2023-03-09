@@ -117,7 +117,7 @@ class CoupledCompoundConverter(TransformConverterBase):
         return model
 
 
-class RavelModel(TransformConverterBase):
+class RavelConverter(TransformConverterBase):
     """
     ASDF serialization support for Ravel
     """

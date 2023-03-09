@@ -1,4 +1,4 @@
 from .dataset import DatasetConverter
 from .file_manager import FileManagerConverter
-from .models import CoupledCompoundConverter, VaryingCelestialConverter
+from .models import CoupledCompoundConverter, VaryingCelestialConverter, RavelConverter
 from .tiled_dataset import TiledDatasetConverter

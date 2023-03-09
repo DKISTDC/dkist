@@ -13,7 +13,7 @@ else:
 
 from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
                                       FileManagerConverter, TiledDatasetConverter,
-                                      VaryingCelestialConverter)
+                                      VaryingCelestialConverter, RavelConverter)
 
 
 def get_resource_mappings():
@@ -42,7 +42,7 @@ def get_extensions():
     Get the list of extensions.
     """
     dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
-    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter()]
+    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0",
                                    converters=dkist_converters),
