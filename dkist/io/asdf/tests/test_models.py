@@ -9,9 +9,9 @@ from astropy.modeling import CompoundModel
 from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
                               InverseVaryingCelestialTransform2D,
                               InverseVaryingCelestialTransformSlit,
-                              InverseVaryingCelestialTransformSlit2D, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
-                              VaryingCelestialTransformSlit2D, Ravel, Unravel)
+                              InverseVaryingCelestialTransformSlit2D, Ravel, Unravel,
+                              VaryingCelestialTransform, VaryingCelestialTransform2D,
+                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D)
 
 
 def test_roundtrip_vct():

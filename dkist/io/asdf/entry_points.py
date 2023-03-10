@@ -6,14 +6,15 @@ import sys
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
+from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
+                                      FileManagerConverter, RavelConverter, TiledDatasetConverter,
+                                      VaryingCelestialConverter)
+
 if sys.version_info < (3, 9):
     import importlib_resources
 else:
     import importlib.resources as importlib_resources
 
-from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
-                                      FileManagerConverter, TiledDatasetConverter,
-                                      VaryingCelestialConverter, RavelConverter)
 
 
 def get_resource_mappings():
