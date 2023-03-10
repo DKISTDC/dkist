@@ -123,7 +123,7 @@ class RavelConverter(TransformConverterBase):
     """
 
     tags  = [
-        "asdf://dkist.nso.edu/tags/ravel_model-1.0.0.yaml"
+        "asdf://dkist.nso.edu/tags/ravel_model-1.0.0"
     ]
 
     types = ["dkist.wcs.models.Ravel"]

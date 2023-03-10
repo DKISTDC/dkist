@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "asdf://dkist.nso.edu/schemas/ravel-model-1.0.0"
+id: "asdf://dkist.nso.edu/schemas/ravel_model-1.0.0"
 
 title: A model to flatten 2D indices into 1D
 description:
