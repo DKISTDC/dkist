@@ -745,7 +745,7 @@ class Ravel(Model):
     def __init__(self, array_shape, **kwargs):
         super().__init__(**kwargs)
 
-        self.array_shape = array_shape
+        self.array_shape = tuple(array_shape)
 
     def evaluate(self, *inputs):
         return (np.round(inputs[0]) * self.array_shape[1]) + inputs[1]
