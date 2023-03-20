@@ -740,6 +740,7 @@ class Ravel(Model):
     array_shape = (0, 0)
     n_inputs = 2
     n_outputs = 1
+    _separable = False
 
     def __init__(self, array_shape, **kwargs):
         super().__init__(**kwargs)
