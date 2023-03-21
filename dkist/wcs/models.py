@@ -767,6 +767,7 @@ class Unravel(Model):
     array_shape = (0, 0)
     n_inputs = 1
     n_outputs = 2
+    _separable = False
 
     def __init__(self, array_shape, order='C', **kwargs):
         super().__init__(**kwargs)
