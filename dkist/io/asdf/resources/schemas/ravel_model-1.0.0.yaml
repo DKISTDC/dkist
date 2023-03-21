@@ -11,4 +11,6 @@ type: object
 properties:
   array_shape:
     type: array
-required: [array_shape]
+  order:
+    type: string
+required: [array_shape, order]

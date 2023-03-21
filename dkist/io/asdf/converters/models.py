@@ -129,9 +129,9 @@ class RavelConverter(TransformConverterBase):
     types = ["dkist.wcs.models.Ravel"]
 
     def to_yaml_tree_transform(self, model, tag, ctx):
-        return {"array_shape": model.array_shape}
+        return {"array_shape": model.array_shape, "order": model.order}
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import Ravel
 
-        return Ravel(node["array_shape"])
+        return Ravel(node["array_shape"], order=node["order"])

@@ -742,17 +742,25 @@ class Ravel(Model):
     n_outputs = 1
     _separable = False
 
-    def __init__(self, array_shape, **kwargs):
+    def __init__(self, array_shape, order='C', **kwargs):
         super().__init__(**kwargs)
 
         self.array_shape = tuple(array_shape)
+        self.order = order  # TODO: Validate order is either C or F
 
     def evaluate(self, *inputs):
-        return (np.round(inputs[0]) * self.array_shape[1]) + inputs[1]
+        ravel_shape = self.array_shape[1]
+        if self.order == 'F':
+            inputs = inputs[::-1]
+            ravel_shape = self.array_shape[0]
+        return (np.round(inputs[0]) * ravel_shape) + inputs[1]
 
     @property
     def inverse(self):
-        return Unravel(self.array_shape)
+        return Unravel(self.array_shape, order=self.order)
+
+    def __repr__(self):
+        return f"<Ravel(array_shape={self.array_shape}, order={self.order})>"
 
 
 class Unravel(Model):
@@ -760,14 +768,19 @@ class Unravel(Model):
     n_inputs = 1
     n_outputs = 2
 
-    def __init__(self, array_shape, **kwargs):
+    def __init__(self, array_shape, order='C', **kwargs):
         super().__init__(**kwargs)
 
         self.array_shape = array_shape
+        self.order = order  # TODO: Validate order is either C or F
 
     def evaluate(self, input_):
-        return (input_ // self.array_shape[1], input_ % self.array_shape[1])
+        i = 1 if self.order == 'C' else 0
+        return (input_ // self.array_shape[i], input_ % self.array_shape[i])
 
     @property
     def inverse(self):
         return Ravel(self.array_shape)
+
+    def __repr__(self):
+        return f"<Unravel(array_shape={self.array_shape}, order={self.order})>"
