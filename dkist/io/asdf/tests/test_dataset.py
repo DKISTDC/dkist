@@ -49,8 +49,8 @@ def assert_dataset_equal(new, old):
     new.meta["headers"] = new_headers
     assert old.wcs.name == new.wcs.name
     assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
-    ac_new = new.files.external_array_references
-    ac_old = old.files.external_array_references
+    ac_new = new.files.fileuri_array
+    ac_old = old.files.fileuri_array
     assert ac_new == ac_old
     assert old.unit == new.unit
     assert old.mask == new.mask

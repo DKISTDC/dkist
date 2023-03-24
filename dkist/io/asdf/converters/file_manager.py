@@ -28,14 +28,17 @@ class FileManagerConverter(Converter):
                                               node["target"],
                                               node["datatype"],
                                               node["shape"],
+                                              chunksize=node.get("chunksize", None),
                                               loader=AstropyFITSLoader,
                                               basepath=base_path)
         return file_manager
 
     def to_yaml_tree(self, obj, tag, ctx):
         node = {}
-        node["fileuris"] = obj._striped_external_array._fileuris.tolist()
+        node["fileuris"] = obj._striped_external_array.fileuri_array.tolist()
         node["target"] = obj._striped_external_array.target
         node["datatype"] = obj._striped_external_array.dtype
         node["shape"] = obj._striped_external_array.shape
+        if chunksize := obj._striped_external_array.chunksize is not None:
+            node["chunksize"] = chunksize
         return node
