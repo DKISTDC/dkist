@@ -410,3 +410,18 @@ def test_raveled_tabular1d(array_shape):
         assert raveled_tab(x, y) == expected_val
         assert np.allclose(raveled_tab.inverse(expected_val), (round(x), y))
         assert raveled_tab.inverse.inverse(x, y) == expected_val
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+@pytest.mark.parametrize("order", ["C", "F"])
+def test_ravel_ordering(array_shape, order):
+    ravel = Ravel(array_shape, order=order)
+
+    values = np.arange(array_shape[0]*array_shape[1]).reshape(array_shape, order=order)
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = (np.random.randint((array_shape[0]-1)),
+                np.random.randint((array_shape[1]-1)))
+        assert ravel(x, y) == values[x, y]
