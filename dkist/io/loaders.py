@@ -54,7 +54,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         self.target = target
         self.array_container = array_container
         self.ndim = len(self.shape)
-        self.size = np.product(self.shape)
+        self.size = np.prod(self.shape)
 
     def __repr__(self):
         return self.__str__()
