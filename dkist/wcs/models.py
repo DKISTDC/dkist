@@ -14,7 +14,8 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
            'VaryingCelestialTransform',
-           'BaseVaryingCelestialTransform']
+           'BaseVaryingCelestialTransform',
+           'Ravel']
 
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
@@ -733,3 +734,58 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
         lon_pole=lon_pole,
         projection=projection
     )
+
+
+class Ravel(Model):
+    array_shape = (0, 0)
+    n_inputs = 2
+    n_outputs = 1
+    _separable = False
+
+    def __init__(self, array_shape, order='C', **kwargs):
+        super().__init__(**kwargs)
+
+        self.array_shape = tuple(array_shape)
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
+
+    def evaluate(self, *inputs):
+        ravel_shape = self.array_shape[1]
+        if self.order == 'F':
+            inputs = inputs[::-1]
+            ravel_shape = self.array_shape[0]
+        return (np.round(inputs[0]) * ravel_shape) + inputs[1]
+
+    @property
+    def inverse(self):
+        return Unravel(self.array_shape, order=self.order)
+
+    def __repr__(self):
+        return f"<Ravel(array_shape={self.array_shape}, order={self.order})>"
+
+
+class Unravel(Model):
+    array_shape = (0, 0)
+    n_inputs = 1
+    n_outputs = 2
+    _separable = False
+
+    def __init__(self, array_shape, order='C', **kwargs):
+        super().__init__(**kwargs)
+
+        self.array_shape = array_shape
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
+
+    def evaluate(self, input_):
+        i = 1 if self.order == 'C' else 0
+        return (input_ // self.array_shape[i], input_ % self.array_shape[i])
+
+    @property
+    def inverse(self):
+        return Ravel(self.array_shape)
+
+    def __repr__(self):
+        return f"<Unravel(array_shape={self.array_shape}, order={self.order})>"

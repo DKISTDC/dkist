@@ -9,9 +9,9 @@ from astropy.modeling import CompoundModel
 from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
                               InverseVaryingCelestialTransform2D,
                               InverseVaryingCelestialTransformSlit,
-                              InverseVaryingCelestialTransformSlit2D, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
-                              VaryingCelestialTransformSlit2D)
+                              InverseVaryingCelestialTransformSlit2D, Ravel, Unravel,
+                              VaryingCelestialTransform, VaryingCelestialTransform2D,
+                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D)
 
 
 def test_roundtrip_vct():
@@ -122,3 +122,13 @@ def test_coupled_compound_model_nested():
 
     assert ccm.n_inputs == new.n_inputs
     assert ccm.inputs == new.inputs
+
+
+def test_ravel_model():
+    ravel = Ravel((10, 10))
+    new = roundtrip_object(ravel)
+
+    assert isinstance(new, Ravel)
+    assert isinstance(new.inverse, Unravel)
+
+    assert new.array_shape == ravel.array_shape
