@@ -24,8 +24,9 @@ from dkist.io.loaders import AstropyFITSLoader
 
 @pytest.fixture
 def array():
-    shape = np.random.randint(10, 100, size=2)
-    x = np.ones(shape) + 10
+    shape = 2**np.random.randint(2, 7, size=2)
+    x = np.ones(np.prod(shape)) + 10
+    x = x.reshape(shape)
     return da.from_array(x, tuple(shape))
 
 
