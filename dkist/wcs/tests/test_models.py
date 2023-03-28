@@ -425,3 +425,14 @@ def test_ravel_ordering(array_shape, order):
         x, y = (np.random.randint((array_shape[0]-1)),
                 np.random.randint((array_shape[1]-1)))
         assert ravel(x, y) == values[x, y]
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+@pytest.mark.parametrize("order", ["C", "F"])
+def test_ravel_repr(array_shape, order):
+    ravel = Ravel(array_shape, order=order)
+    unravel = ravel.inverse
+
+    assert str(array_shape) in repr(ravel) and order in repr(ravel)
+    assert str(array_shape) in repr(unravel) and order in repr(unravel)
