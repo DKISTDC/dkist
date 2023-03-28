@@ -746,7 +746,9 @@ class Ravel(Model):
         super().__init__(**kwargs)
 
         self.array_shape = tuple(array_shape)
-        self.order = order  # TODO: Validate order is either C or F
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
 
     def evaluate(self, *inputs):
         ravel_shape = self.array_shape[1]
@@ -773,7 +775,9 @@ class Unravel(Model):
         super().__init__(**kwargs)
 
         self.array_shape = array_shape
-        self.order = order  # TODO: Validate order is either C or F
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
 
     def evaluate(self, input_):
         i = 1 if self.order == 'C' else 0
