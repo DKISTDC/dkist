@@ -230,3 +230,6 @@ figure_test_images*
 
 # Release script
 .github_cache
+
+## Visual Studio Code
+.vscode
