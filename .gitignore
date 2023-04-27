@@ -197,12 +197,7 @@ $RECYCLE.BIN/
 *.lnk
 
 ### VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+.vscode/
 
 # Local History for Visual Studio Code
 .history/
@@ -230,6 +225,3 @@ figure_test_images*
 
 # Release script
 .github_cache
-
-## Visual Studio Code
-.vscode
