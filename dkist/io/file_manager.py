@@ -20,6 +20,7 @@ from pathlib import Path
 
 import dask.array
 import numpy as np
+from parfive import Downloader
 
 try:
     from numpy.typing import DTypeLike, NDArray  # NOQA
@@ -314,6 +315,69 @@ class FileManager(BaseFileManager):
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
 
+    @property
+    def _metadata_streamer_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
+
+        return conf.download_endpoint
+
+    def quality_report(self, path=None, overwrite=None):
+        """
+        Download the quality report PDF.
+
+        Parameters
+        ----------
+        path: `str` or `pathlib.Path`
+            The destination path to save the file to. See
+            `parfive.Downloader.simple_download` for details.
+            The default path is ``.basepath``, if ``.basepath`` is None it will
+            default to `~/`.
+        overwrite: `bool`
+            Set to `True` to overwrite file if it already exists. See
+            `parfive.Downloader.simple_download` for details.
+
+        Returns
+        -------
+        results: `parfive.Results`
+            A `~parfive.Results` obejct containing the filepath of the
+            downloaded file if the download was successful, and any errors if it
+            was not.
+        """
+        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
+        if path is None and self.basepath:
+            path = self.basepath
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
+
+    def preview_movie(self, path=None, overwrite=None):
+        """
+        Download the preview movie.
+
+        Parameters
+        ----------
+        path: `str` or `pathlib.Path`
+            The destination path to save the file to. See
+            `parfive.Downloader.simple_download` for details.
+            The default path is ``.basepath``, if ``.basepath`` is None it will
+            default to `~/`.
+        overwrite: `bool`
+            Set to `True` to overwrite file if it already exists. See
+            `parfive.Downloader.simple_download` for details.
+
+        Returns
+        -------
+        results: `parfive.Results`
+            A `~parfive.Results` obejct containing the filepath of the
+            downloaded file if the download was successful, and any errors if it
+            was not.
+        """
+        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
+        if path is None and self.basepath:
+            path = self.basepath
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
+
     def download(self, path=None, destination_endpoint=None, progress=True, wait=True, label=None):
         """
         Start a Globus file transfer for all files in this Dataset.
@@ -323,8 +387,8 @@ class FileManager(BaseFileManager):
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
             endpoint.
-            The default value is ``.basepath``, if this is None it will default
-            to ``/~/``.
+            The default value is ``.basepath``, if ``.basepath`` is None it will
+            default to ``/~/``.
             It is possible to put placeholder strings in the path with any key
             from the dataset inventory dictionary which can be accessed as
             ``ds.meta['inventory']``. An example of this would be

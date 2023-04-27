@@ -6,14 +6,15 @@ import sys
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
+from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
+                                      FileManagerConverter, RavelConverter, TiledDatasetConverter,
+                                      VaryingCelestialConverter)
+
 if sys.version_info < (3, 9):
     import importlib_resources
 else:
     import importlib.resources as importlib_resources
 
-from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
-                                      FileManagerConverter, TiledDatasetConverter,
-                                      VaryingCelestialConverter)
 
 
 def get_resource_mappings():
@@ -42,12 +43,14 @@ def get_extensions():
     Get the list of extensions.
     """
     dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
-    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter()]
+    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0",
                                    converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
                                    converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.1.0",
+                                   converters=wcs_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0",
                                    converters=wcs_converters),
         # This manifest handles all pre-refactor tags

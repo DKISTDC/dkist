@@ -5,8 +5,9 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
+from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import (VaryingCelestialTransform, VaryingCelestialTransform2D,
+from dkist.wcs.models import (Ravel, VaryingCelestialTransform, VaryingCelestialTransform2D,
                               VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
                               generate_celestial_transform,
                               varying_celestial_transform_from_tables)
@@ -384,3 +385,67 @@ def test_vct_slit2d_unitless():
     world = vct_slit(*pixel)
     ipixel = vct_slit.inverse(*world, 0, 0)
     assert u.allclose(ipixel, pixel[0], atol=1e-5)
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+def test_ravel_model(array_shape):
+    ravel = Ravel(array_shape)
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = np.random.random() * (array_shape[0]-1), np.random.random() * array_shape[1]
+        expected_val = ((round(x) * array_shape[1]) + y)
+        assert ravel(x, y) == expected_val
+        assert np.allclose(ravel.inverse(expected_val), (round(x), y))
+        assert ravel.inverse.inverse(x, y) == expected_val
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+def test_raveled_tabular1d(array_shape):
+    values = np.arange(100)
+
+    ravel = Ravel(array_shape)
+    tabular = Tabular1D(values,
+                        values*u.nm,
+                        bounds_error=False,
+                        fill_value=np.nan,
+                        method="linear")
+
+    raveled_tab = ravel | tabular
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = (np.random.random() * (array_shape[0]-1),
+                np.random.random() * (array_shape[1]-1))
+        expected_val = ((round(x) * array_shape[1]) + y) * u.nm
+        assert raveled_tab(x, y) == expected_val
+        assert np.allclose(raveled_tab.inverse(expected_val), (round(x), y))
+        assert raveled_tab.inverse.inverse(x, y) == expected_val
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+@pytest.mark.parametrize("order", ["C", "F"])
+def test_ravel_ordering(array_shape, order):
+    ravel = Ravel(array_shape, order=order)
+
+    values = np.arange(array_shape[0]*array_shape[1]).reshape(array_shape, order=order)
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = (np.random.randint((array_shape[0]-1)),
+                np.random.randint((array_shape[1]-1)))
+        assert ravel(x, y) == values[x, y]
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
+@pytest.mark.parametrize("order", ["C", "F"])
+def test_ravel_repr(array_shape, order):
+    ravel = Ravel(array_shape, order=order)
+    unravel = ravel.inverse
+
+    assert str(array_shape) in repr(ravel) and order in repr(ravel)
+    assert str(array_shape) in repr(unravel) and order in repr(unravel)
