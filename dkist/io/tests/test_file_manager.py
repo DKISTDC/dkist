@@ -264,3 +264,47 @@ def test_length_one_first_array_axis(small_visp_dataset):
     assert len(small_visp_dataset[0].files.filenames) == 1
 
     assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
+
+
+@pytest.mark.parametrize("kwargs", (
+    {},
+    {"path": "~/", "overwrite": True}
+))
+def test_download_quality(mocker, small_visp_dataset, kwargs):
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    from dkist.net import conf
+
+    small_visp_dataset.files.quality_report(**kwargs)
+
+    # Insert the expected default kwargs
+    if kwargs.get("path") is None:
+        kwargs["path"] = small_visp_dataset.files.basepath
+    if "overwrite" not in kwargs:
+        kwargs["overwrite"] = None
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/quality?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+        **kwargs
+    )
+
+
+@pytest.mark.parametrize("kwargs", (
+    {},
+    {"path": "~/", "overwrite": True}
+))
+def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    from dkist.net import conf
+
+    small_visp_dataset.files.preview_movie(**kwargs)
+
+    # Insert the expected default kwargs
+    if kwargs.get("path") is None:
+        kwargs["path"] = small_visp_dataset.files.basepath
+    if "overwrite" not in kwargs:
+        kwargs["overwrite"] = None
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/movie?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+        **kwargs
+    )
