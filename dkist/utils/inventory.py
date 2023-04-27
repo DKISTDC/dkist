@@ -61,6 +61,19 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
         "averageDatasetSpatialSampling": "Average Spatial Sampling",
         "averageDatasetTemporalSampling": "Average Temporal Sampling",
         "qualityReportObjectKey": "Quality Report Filename",
+        "inputDatasetParametersPartId": "Input Dataset Parameters Part ID",
+        "inputDatasetObserveFramesPartId": "Input Dataset Observe Frames Part ID",
+        "inputDatasetCalibrationFramesPartId": "Input Dataset Calibration Frames Part ID",
+        "highLevelSoftwareVersion": "Summit Software Version",
+        "workflowName": "Calibration Workflow Name",
+        "workflowVersion": "Calibration Workflow Version",
+        "headerDataUnitCreationDate": "HDU Creation Date",
+        "observingProgramExecutionId": "Observing Program Execution ID",
+        "instrumentProgramExecutionId": "Instrument Program Execution ID",
+        "headerVersion": "Header Specification Version",
+        "headerDocumentationUrl": "Header Documentation URL",
+        "infoUrl": "Info URL",
+        "calibrationDocumentationUrl": "Calibration Documentation URL"
 })
 
 
