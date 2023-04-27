@@ -178,7 +178,7 @@ class Dataset(NDCube):
         elif len(asdf_files) > 1:
             raise NotImplementedError("Multiple asdf files found in this "
                                       "directory. Use from_asdf to specify which "
-                                      "one to use.") # pragma: no cover
+                                      "one to use.")  # pragma: no cover
 
         asdf_file = asdf_files[0]
 
