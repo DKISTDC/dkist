@@ -6,7 +6,7 @@ import numpy as np
 __all__ = ['stack_loader_array']
 
 
-def stack_loader_array(loader_array):
+def stack_loader_array(loader_array, chunksize):
     """
     Stack a loader array along each of its dimensions.
 
@@ -20,15 +20,18 @@ def stack_loader_array(loader_array):
     -------
     array : `dask.array.Array`
     """
+    # If the chunksize sin't specified then use the whole array shape
+    chunksize = chunksize or loader_array.flat[0].shape
+
     if len(loader_array.shape) == 1:
-        return da.stack(loader_to_dask(loader_array))
+        return da.stack(loader_to_dask(loader_array, chunksize))
     stacks = []
     for i in range(loader_array.shape[0]):
-        stacks.append(stack_loader_array(loader_array[i]))
+        stacks.append(stack_loader_array(loader_array[i], chunksize))
     return da.stack(stacks)
 
 
-def loader_to_dask(loader_array):
+def loader_to_dask(loader_array, chunksize):
     """
     Map a call to `dask.array.from_array` onto all the elements in ``loader_array``.
 
@@ -44,6 +47,6 @@ def loader_to_dask(loader_array):
     # trying to auto calculate it by reading from the actual array on disk.
     meta = np.zeros((0,), dtype=loader_array[0].dtype)
 
-    to_array = partial(da.from_array, meta=meta)
+    to_array = partial(da.from_array, meta=meta, chunks=chunksize)
 
     return map(to_array, loader_array)

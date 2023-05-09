@@ -1,0 +1,2 @@
+Internal improvements to how the data are loaded from the collection of FITS files.
+This should have no user facing effects, but provides a foundation for future performance work.
