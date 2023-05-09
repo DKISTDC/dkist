@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from unittest.mock import call
 
 if sys.version_info < (3, 9):
     import importlib_resources
@@ -162,6 +161,10 @@ def wrap_object(mocker):
 
 
 def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
+    # Import this here to prevent hitting https://bugs.python.org/issue35753 on Python <3.10
+    # Importing call is enough to trigger a doctest error
+    from unittest.mock import call
+
     chunksize = (32, 16)
     with asdf.open(eit_dataset_asdf_path) as tree:
         dataset = tree["dataset"]
