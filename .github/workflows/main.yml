@@ -1,8 +1,17 @@
 name: CI
 
 on:
-  - push
-  - pull_request
+  # Allow manual runs through the web UI
+  workflow_dispatch:
+  push:
+  pull_request:
+  schedule:
+    #        ┌───────── minute (0 - 59)
+    #        │ ┌───────── hour (0 - 23)
+    #        │ │ ┌───────── day of the month (1 - 31)
+    #        │ │ │ ┌───────── month (1 - 12 or JAN-DEC)
+    #        │ │ │ │ ┌───────── day of the week (0 - 6 or SUN-SAT)
+    - cron: '0 9 * * 1'  # Every Monday at 0900 UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,8 +31,8 @@ jobs:
           libraries:
             apt:
               - graphviz
-        - macos: py310-devdeps
-        - windows: py38-oldestdeps
+        - linux: py311-devdeps
+        - linux: py38-oldestdeps
 
   publish:
     needs: [tests]
@@ -35,3 +44,16 @@ jobs:
       upload_to_pypi: ${{ startsWith(github.event.ref, 'refs/tags/v') && !endsWith(github.event.ref, '.dev') }}
     secrets:
       pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+
+  notify:
+    if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
+    needs: [tests, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Cadair/matrix-notify-action@main
+        with:
+          matrix_token: ${{ secrets.matrix_access_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          homeserver: ${{ secrets.matrix_homeserver }}
+          roomid: '!RehafayCrAiXbzVpXI:openastronomy.org'
+          ignore_pattern: '.*Load.*'
