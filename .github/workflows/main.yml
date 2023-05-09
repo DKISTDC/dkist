@@ -4,21 +4,31 @@ on:
   - push
   - pull_request
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      envs: |
-        - linux: py39
-        - macos: py311
-        - linux: py310-devdeps
-        - windows: py38-oldestdeps
       coverage: 'codecov'
+      envs: |
+        - linux: py311
+        - windows: py310
+        - macos: py39
+        - linux: build_docs
+          pytest: false
+          libraries:
+            apt:
+              - graphviz
+        - macos: py310-devdeps
+        - windows: py38-oldestdeps
 
   publish:
     needs: [tests]
     if: github.event_name != 'pull_request'
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
       test_extras: tests
       test_command: pytest --pyargs dkist

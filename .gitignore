@@ -196,8 +196,14 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-### VScode: https://raw.githubusercontent.com/github/gitignore/master/Global/VisualStudioCode.gitignore
-.vscode/*
+### VSCode
+.vscode/
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
 
 ### Extra Python Items and SunPy Specific
 .hypothesis
@@ -214,7 +220,7 @@ examples/**/*.asdf
 # This is incase you run the figure tests
 figure_test_images*
 
-### Pycharm(?)
+### Pycharm
 .idea
 
 # Release script
