@@ -46,7 +46,7 @@ jobs:
       pypi_token: ${{ secrets.PYPI_API_TOKEN }}
 
   notify:
-    if: always() && github.event_name != 'pull_request'
+    if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
     needs: [tests, publish]
     runs-on: ubuntu-latest
     steps:
