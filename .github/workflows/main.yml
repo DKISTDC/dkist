@@ -32,7 +32,7 @@ jobs:
             apt:
               - graphviz
         - linux: py311-devdeps
-        - linux: py38-oldestdeps
+        - linux: py39-oldestdeps
 
   publish:
     needs: [tests]

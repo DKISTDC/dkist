@@ -1,11 +1,6 @@
-import sys
+import importlib.resources as importlib_resources
 from pathlib import Path
 from textwrap import dedent
-
-if sys.version_info < (3, 9):
-    import importlib_resources
-else:
-    import importlib.resources as importlib_resources
 
 from jsonschema.exceptions import ValidationError
 

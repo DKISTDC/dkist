@@ -1,0 +1,1 @@
+Drop support for Python 3.8 in line with `NEP 29 <https://numpy.org/neps/nep-0029-deprecation_policy.html>_`.

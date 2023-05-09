@@ -1,10 +1,5 @@
-import sys
+import importlib.resources as importlib_resources
 from pathlib import Path
-
-if sys.version_info < (3, 9):
-    import importlib_resources
-else:
-    import importlib.resources as importlib_resources
 
 import numpy as np
 import pytest
