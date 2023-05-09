@@ -651,8 +651,7 @@ class CoupledCompoundModel(CompoundModel):
         left_inverse = self.left.inverse
         right_inverse = self.right.inverse
 
-        total_inputs = self.n_outputs
-        n_left_only_inputs = total_inputs - self.shared_inputs
+        n_left_only_inputs = self.left.n_inputs - self.shared_inputs
 
         # Pass through arguments to the left model unchanged while computing the right output
         mapping = list(range(n_left_only_inputs))
@@ -741,20 +740,34 @@ class Ravel(Model):
     n_inputs = 2
     n_outputs = 1
     _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def input_units(self):
+        return {'x': u.pix, 'y': u.pix}
+
+    @property
+    def return_units(self):
+        return {'x': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
         super().__init__(**kwargs)
 
-        self.array_shape = tuple(array_shape)
+        array_shape = u.Quantity(array_shape)
+        if array_shape.unit is u.one:
+            array_shape = u.Quantity(array_shape.value, unit=u.pix)
+        self.array_shape = array_shape
+
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
         self.order = order
 
     def evaluate(self, *inputs):
-        ravel_shape = self.array_shape[1]
+        array_shape = self.array_shape.value
+        ravel_shape = array_shape[1]
         if self.order == 'F':
             inputs = inputs[::-1]
-            ravel_shape = self.array_shape[0]
+            ravel_shape = array_shape[0]
         return (np.round(inputs[0]) * ravel_shape) + inputs[1]
 
     @property
@@ -770,6 +783,16 @@ class Unravel(Model):
     n_inputs = 1
     n_outputs = 2
     _separable = False
+    _input_units_allow_dimensionless = True
+
+
+    @property
+    def input_units(self):
+        return {'x': u.pix}
+
+    @property
+    def return_units(self):
+        return {'x': u.pix, 'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
         super().__init__(**kwargs)
@@ -780,8 +803,16 @@ class Unravel(Model):
         self.order = order
 
     def evaluate(self, input_):
+        input_ = u.Quantity(input_)
+        input_unit = input_.unit
+        array_shape = self.array_shape.to_value(input_unit)
+        input_ = input_.value
+
         i = 1 if self.order == 'C' else 0
-        return (input_ // self.array_shape[i], input_ % self.array_shape[i])
+        result = (input_ // array_shape[i], input_ % array_shape[i])
+        if input_unit is not u.one:
+            return (result[0] * input_unit, result[1] * input_unit)
+        return result
 
     @property
     def inverse(self):

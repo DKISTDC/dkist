@@ -390,6 +390,20 @@ def test_ravel_model(array_shape):
 
 @pytest.mark.parametrize("array_shape",
                          [(i, 100 // i) for i in range(2, 21)])
+def test_ravel_model_units(array_shape):
+    ravel = Ravel(array_shape*u.pix)
+
+    # Make 10 attempts with random numbers
+    for _ in range(10):
+        x, y = np.random.random() * (array_shape[0]-1), np.random.random() * array_shape[1]
+        expected_val = ((round(x) * array_shape[1]) + y)
+        assert u.allclose(ravel(x*u.pix, y*u.pix), expected_val*u.pix)
+        assert u.allclose(ravel.inverse(expected_val*u.pix), (round(x)*u.pix, y*u.pix))
+        assert ravel.inverse.inverse(x*u.pix, y*u.pix) == expected_val*u.pix
+
+
+@pytest.mark.parametrize("array_shape",
+                         [(i, 100 // i) for i in range(2, 21)])
 def test_raveled_tabular1d(array_shape):
     values = np.arange(100)
 
@@ -410,6 +424,24 @@ def test_raveled_tabular1d(array_shape):
         assert raveled_tab(x, y) == expected_val
         assert np.allclose(raveled_tab.inverse(expected_val), (round(x), y))
         assert raveled_tab.inverse.inverse(x, y) == expected_val
+
+
+def test_raveled_tabular1d_units():
+    values = np.arange(100)
+
+    ravel = Ravel((10, 10)*u.pix)
+    tabular = Tabular1D(values*u.pix,
+                        values*u.nm,
+                        bounds_error=False,
+                        fill_value=np.nan,
+                        method="nearest")
+
+    raveled_tab = ravel | tabular
+
+    world = raveled_tab(0*u.pix, 0*u.pix)
+    assert u.allclose(world, 0*u.nm)
+    pixel = raveled_tab.inverse(world)
+    assert u.allclose(pixel, [0, 0]*u.pix)
 
 
 @pytest.mark.parametrize("array_shape",
