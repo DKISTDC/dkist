@@ -36,10 +36,36 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # Define some class properties to better format the results table.
     # TODO: remove experimentDescription from this list, when we can limit the
     # length of the field to something nicer
-    hide_keys: List[str] = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
-                            "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
-                            "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
-                            "Preview URL", "Quality Report Filename", "Experiment Description"]
+    hide_keys: List[str] = [
+        "Storage Bucket",
+        "Full Stokes",
+        "asdf Filename",
+        "Recipe Instance ID",
+        "Recipe Run ID",
+        "Recipe ID",
+        "Movie Filename",
+        "Level 0 Frame count",
+        "Creation Date",
+        "Last Updated",
+        "Experiment IDs",
+        "Proposal IDs",
+        "Preview URL",
+        "Quality Report Filename",
+        "Experiment Description",
+        "Input Dataset Parameters Part ID",
+        "Input Dataset Observe Frames Part ID",
+        "Input Dataset Calibration Frames Part ID",
+        "Summit Software Version",
+        "Calibration Workflow Name",
+        "Calibration Workflow Version",
+        "HDU Creation Date",
+        "Observing Program Execution ID",
+        "Instrument Program Execution ID",
+        "Header Specification Version",
+        "Header Documentation URL",
+        "Info URL",
+        "Calibration Documentation URL",
+    ]
 
     # These keys are shown in the repr and str representations of this class.
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
