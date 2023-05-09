@@ -126,20 +126,20 @@ intersphinx_mapping = {
         (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
     ),
     "scipy": (
-        "https://docs.scipy.org/doc/scipy/reference/",
+        "https://docs.scipy.org/doc/scipy/",
         (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
     ),
     "matplotlib": (
-        "https://matplotlib.org/",
+        "https://matplotlib.org/stable/",
         (None, "http://www.astropy.org/astropy-data/intersphinx/matplotlib.inv"),
     ),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
-    "sunpy": ('http://docs.sunpy.org/en/latest/', None),
-    "ndcube": ('http://docs.sunpy.org/projects/ndcube/en/latest/', None),
-    "gwcs": ('http://gwcs.readthedocs.io/en/latest/', None),
-    "asdf": ('http://asdf.readthedocs.io/en/latest/', None),
-    "dask": ('http://dask.pydata.org/en/latest/', None),
+    "sunpy": ('https://docs.sunpy.org/en/stable/', None),
+    "ndcube": ('https://docs.sunpy.org/projects/ndcube/en/latest/', None),
+    "gwcs": ('https://gwcs.readthedocs.io/en/latest/', None),
+    "asdf": ('https://asdf.readthedocs.io/en/latest/', None),
+    "dask": ('https://dask.pydata.org/en/latest/', None),
 }
 
 # -- Options for HTML output ---------------------------------------------------
