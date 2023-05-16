@@ -1,3 +1,29 @@
+1.0.0b12 (2023-05-16)
+=====================
+
+Features
+--------
+
+- Drop support for Python 3.8 in line with `NEP 29 <https://numpy.org/neps/nep-0029-deprecation_policy.html>_`. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
+- Add new methods `.FileManager.quality_report()` and `.FileManager.preview_movie()` to download the quality report and preview movie. These are accessed as ``Dataset.files.quality_report`` and ``Dataset.files.preview_movie``. (`#235 <https://github.com/DKISTDC/dkist/pull/235>`_)
+
+
+Bug Fixes
+---------
+
+- Unit for ``lon_pole`` was set to the spatial unit of the input parameters within `~dkist.wcs.models.VaryingCelestialTransform`.
+  It is now fixed to always be degrees. (`#225 <https://github.com/DKISTDC/dkist/pull/225>`_)
+- Add a new model to take a 2D index and return the corresponding correct index for a 1D array, and the inverse model for the reverse operation.
+  To be used as a compound with Tabular1D so that it looks like a Tabular2D but the compound model can still be inverted. (`#227 <https://github.com/DKISTDC/dkist/pull/227>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Internal improvements to how the data are loaded from the collection of FITS files.
+  This should have no user facing effects, but provides a foundation for future performance work. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
+
+
 1.0.0b11 (2023-02-15)
 =====================
 

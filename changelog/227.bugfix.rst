@@ -1,2 +1,0 @@
-Add a new model to take a 2D index and return the corresponding correct index for a 1D array, and the inverse model for the reverse operation.
-To be used as a compound with Tabular1D so that it looks like a Tabular2D but the compound model can still be inverted.
