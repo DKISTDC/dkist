@@ -1,0 +1,1 @@
+Add support for passing a list of dataset IDs as strings to `dkist.net.transfer_complete_datasets`.

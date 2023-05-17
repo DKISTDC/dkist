@@ -1,0 +1,1 @@
+Fix searching for Globus endpoints with SDK 3
