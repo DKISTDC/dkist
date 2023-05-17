@@ -113,6 +113,54 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
     )
 
 
+def test_transfer_from_length_one_table(orchestrate_transfer_mock, mocker):
+    res = DKISTQueryResponseTable(
+        {
+            "Dataset ID": ["A"],
+            "Primary Proposal ID": ["pm_1_10"],
+            "Storage Bucket": ["data"],
+        },
+    )
+
+    transfer_complete_datasets(res, label="fibble")
+
+    kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
+    orchestrate_transfer_mock.assert_has_calls(
+        [
+            mocker.call(
+                [Path("/data/pm_1_10/A")],
+                recursive=True,
+                destination_path=Path("/~/pm_1_10"),
+                **kwargs
+            ),
+        ]
+    )
+
+
+def test_transfer_from_row(orchestrate_transfer_mock, mocker):
+    res = DKISTQueryResponseTable(
+        {
+            "Dataset ID": ["A"],
+            "Primary Proposal ID": ["pm_1_10"],
+            "Storage Bucket": ["data"],
+        },
+    )
+
+    transfer_complete_datasets(res[0], label="fibble")
+
+    kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
+    orchestrate_transfer_mock.assert_has_calls(
+        [
+            mocker.call(
+                [Path("/data/pm_1_10/A")],
+                recursive=True,
+                destination_path=Path("/~/pm_1_10"),
+                **kwargs
+            ),
+        ]
+    )
+
+
 def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
     res = UnifiedResponse(
         DKISTQueryResponseTable(

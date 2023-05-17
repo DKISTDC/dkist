@@ -94,7 +94,11 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                                     label=label))
         return paths
 
-    # At this point we only have one dataset
+    # ensure a length one table is a row
+    if len(datasets) == 1:
+        datasets = datasets[0]
+
+    # At this point we only have one dataset, and it should be a row not a table
     dataset = datasets
     dataset_id = dataset["Dataset ID"]
     proposal_id = dataset["Primary Proposal ID"]
