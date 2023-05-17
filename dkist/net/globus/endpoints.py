@@ -104,7 +104,7 @@ def get_endpoint_id(endpoint, tfr_client):
     if not tr:
         tr = tfr_client.endpoint_search(endpoint)
 
-    responses = tr.data
+    responses = tr.data["DATA"]
 
     if len(responses) > 1:
         display_names = [a['display_name'] for a in responses]
