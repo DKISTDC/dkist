@@ -26,11 +26,13 @@ def orchestrate_transfer_mock(mocker):
 )
 def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     transfer_complete_datasets(
-        {
-            "Dataset ID": "AAAA",
-            "Primary Proposal ID": "pm_1_10",
-            "Storage Bucket": "data",
-        },
+        DKISTQueryResponseTable([
+            {
+                "Dataset ID": "AAAA",
+                "Primary Proposal ID": "pm_1_10",
+                "Storage Bucket": "data",
+            }
+        ]),
         **keywords
     )
 
@@ -59,13 +61,13 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
     get_inv_mock = mocker.patch(
         "dkist.net.helpers._get_dataset_inventory",
         autospec=True,
-        return_value=[
+        return_value=DKISTQueryResponseTable([
             {
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
             }
-        ],
+        ]),
     )
 
     transfer_complete_datasets("AAAA")
