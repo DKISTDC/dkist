@@ -58,7 +58,8 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
     if lon_pole is None:
         lon_pole = 180
     if spatial_unit is not None:
-        lon_pole = u.Quantity(lon_pole, unit=spatial_unit)
+        # Lon pole should always have the units of degrees
+        lon_pole = u.Quantity(lon_pole, unit=u.deg)
 
     # Make translation unitful if all parameters have units
     translation = (0, 0)
@@ -651,18 +652,20 @@ class CoupledCompoundModel(CompoundModel):
         left_inverse = self.left.inverse
         right_inverse = self.right.inverse
 
-        n_left_only_inputs = self.left.n_inputs - self.shared_inputs
+        n_left_only_inputs = left_inverse.n_inputs - self.shared_inputs
+        n_right_only_inputs = right_inverse.n_outputs - self.shared_inputs
 
-        # Pass through arguments to the left model unchanged while computing the right output
+        # left only inputs are pass thru
         mapping = list(range(n_left_only_inputs))
-        step1 = m.Mapping(mapping) & right_inverse
-
-        # Now pass through the right outputs unchanged while also feeding them into the left model
-
-        # This mapping duplicates the output of the right inverse to be fed
-        # into the left and also out unmodified at the end of the transform
-        inter_mapping = mapping + list(range(max(mapping) + 1, max(mapping) + 1 + right_inverse.n_outputs)) * 2
-        step2 = m.Mapping(inter_mapping) | (left_inverse & m.Identity(right_inverse.n_outputs))
+        # step1 passes through the left-only inputs and inverts the right only inputs
+        step1 = m.Mapping(tuple(mapping)) & right_inverse
+        # next we remap the output of step 1 and replicate the shared outputs
+        shared_start = max(mapping) + 1
+        shared = list(range(shared_start, shared_start + self.shared_inputs)) * 2
+        right_start = max(shared) + 1
+        right = list(range(right_start, right_start + n_right_only_inputs))
+        inter_mapping = mapping + shared + right
+        step2 = m.Mapping(tuple(inter_mapping)) | (left_inverse & m.Identity(right_inverse.n_outputs))
 
         return step1 | step2
 

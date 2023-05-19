@@ -1,9 +1,4 @@
-import sys
-
-if sys.version_info < (3, 9):
-    import importlib_resources
-else:
-    import importlib.resources as importlib_resources
+import importlib.resources as importlib_resources
 
 import asdf
 

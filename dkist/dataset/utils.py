@@ -102,3 +102,22 @@ def dataset_info_str(ds):
 
     # Make sure we get rid of the extra whitespace at the end of some lines
     return '\n'.join([l.rstrip() for l in s.splitlines()])
+
+
+def pp_matrix(wcs):
+    """
+    A small helper function to print a correlation matrix with labels
+
+    Parameters
+    ----------
+    wcs : `BaseHighLevelWCS` or `BaseLowLevelWCS`
+    """
+    slen = np.max([len(l) for l in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
+    mstr = wcs.axis_correlation_matrix.astype(f"<U{slen}")
+    mstr = np.insert(mstr, 0, wcs.pixel_axis_names, axis=0)
+    world = [''] + list(wcs.world_axis_names)
+    mstr = np.insert(mstr, 0, world, axis=1)
+    for i, col in enumerate(mstr.T):
+        wid = np.max([len(a) for a in col])
+        mstr[:, i] = np.char.rjust(col, wid)
+    print(np.array_str(mstr, max_line_width=1000))

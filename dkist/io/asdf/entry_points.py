@@ -1,7 +1,7 @@
 """
 This file contains the entry points for asdf.
 """
-import sys
+import importlib.resources as importlib_resources
 
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
@@ -9,12 +9,6 @@ from asdf.resource import DirectoryResourceMapping
 from dkist.io.asdf.converters import (CoupledCompoundConverter, DatasetConverter,
                                       FileManagerConverter, RavelConverter, TiledDatasetConverter,
                                       VaryingCelestialConverter)
-
-if sys.version_info < (3, 9):
-    import importlib_resources
-else:
-    import importlib.resources as importlib_resources
-
 
 
 def get_resource_mappings():

@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+    rev: v4.4.0
     hooks:
       - id: check-yaml
       - id: check-ast
@@ -14,14 +14,16 @@ repos:
         files: ".*.py"
       - id: end-of-file-fixer
         exclude: ".*(.fits|.asdf)"
-      - id: flake8
-        additional_dependencies: [flake8-docstrings]
-        args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
+  -  repo: https://github.com/pycqa/flake8
+     rev: 6.0.0
+     hooks:
+       - id: flake8
+         additional_dependencies: [flake8-docstrings]
+         args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
         additional_dependencies: [toml]
-
 ci:
   autofix_prs: false

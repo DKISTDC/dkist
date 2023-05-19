@@ -1,1 +1,0 @@
-Add new methods `.FileManager.quality_report()` and `.FileManager.preview_movie()` to download the quality report and preview movie. These are accessed as ``Dataset.files.quality_report`` and ``Dataset.files.preview_movie``.

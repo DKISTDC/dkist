@@ -70,7 +70,7 @@ def test_construct(relative_fl, absolute_fl):
 
 
 def test_array(absolute_fl):
-    a = absolute_fl.fits_array
+    a = absolute_fl.data
     assert isinstance(a, np.ndarray)
 
     for contain in ("efz20040301.000010_s.fits", str(absolute_fl.shape), absolute_fl.dtype):
@@ -83,14 +83,8 @@ def test_nan(relative_ac, tmpdir):
     array = relative_ac._generate_array()
     assert_allclose(array[10:20, :], np.nan)
 
-
-def test_np_array(absolute_fl):
-    narr = np.array(absolute_fl)
-    assert_allclose(narr, absolute_fl.fits_array)
-    assert narr is not absolute_fl.fits_array
-
 def test_slicing(absolute_fl):
     aslice = np.s_[10:20, 10:20]
     sarr = absolute_fl[aslice]
 
-    assert_allclose(sarr, absolute_fl.fits_array[aslice])
+    assert_allclose(sarr, absolute_fl.data[aslice])

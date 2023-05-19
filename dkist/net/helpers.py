@@ -3,10 +3,11 @@ Functions and classes for searching and downloading from the data center.
 """
 import datetime
 from os import PathLike
-from typing import List, Union, Literal, Optional
+from typing import List, Union, Literal, Iterable, Optional
 from pathlib import Path
 
 from astropy import table
+from sunpy.net.attr import or_
 from sunpy.net.base_client import QueryResponseRow
 from sunpy.net.fido_factory import UnifiedResponse
 
@@ -17,18 +18,21 @@ from dkist.net.globus.transfer import _orchestrate_transfer_task
 __all__ = ["transfer_complete_datasets"]
 
 
-def _get_dataset_inventory(dataset_id: str):  # pragma: no cover
+def _get_dataset_inventory(dataset_id: Union[str, Iterable[str]]) -> DKISTQueryResponseTable:  # pragma: no cover
     """
     Do a search for a single dataset id
     """
-    results = DKISTClient().search(Dataset(dataset_id))
+    if isinstance(dataset_id, str):
+        search = Dataset(dataset_id)
+    else:
+        search = or_(*[Dataset(d) for d in dataset_id])
+    results = DKISTClient().search(search)
     if len(results) == 0:
         raise ValueError(f"No results available for dataset {dataset_id}")
-
     return results
 
 
-def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
+def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
@@ -73,17 +77,26 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
     # Avoid circular import
     from dkist.net import conf
 
-    if isinstance(datasets, str):
-        datasets = _get_dataset_inventory(datasets)[0]
+    if isinstance(datasets, (DKISTQueryResponseTable, QueryResponseRow)):
+        # These we don't have to pre-process
+        pass
 
-    # If we have a UnifiedResponse object, it could contain one or more dkist tables.
-    # Stack them and then treat them like we were passed a single table with many rows.
-    if isinstance(datasets, UnifiedResponse):
+    elif isinstance(datasets, UnifiedResponse):
+        # If we have a UnifiedResponse object, it could contain one or more dkist tables.
+        # Stack them and then treat them like we were passed a single table with many rows.
         datasets = datasets["dkist"]
         if len(datasets) > 1:
             datasets = table.vstack(datasets, metadata_conflicts="silent")
 
-    if isinstance(datasets, DKISTQueryResponseTable) and len(datasets) > 1:
+    elif isinstance(datasets, str) or all((isinstance(d, str) for d in datasets)):
+        # If we are passed just dataset IDs as strings search for them to get the inventory records
+        datasets = _get_dataset_inventory(datasets)
+
+    else:
+        # Anything else, error
+        raise TypeError(f"{type(datasets)} is of an unknown type, it should be search results or one or more dataset IDs.")
+
+    if not isinstance(datasets, QueryResponseRow) and len(datasets) > 1:
         paths = []
         for record in datasets:
             paths.append(transfer_complete_datasets(record,
@@ -94,7 +107,11 @@ def transfer_complete_datasets(datasets: Union[str, QueryResponseRow, DKISTQuery
                                                     label=label))
         return paths
 
-    # At this point we only have one dataset
+    # ensure a length one table is a row
+    if len(datasets) == 1:
+        datasets = datasets[0]
+
+    # At this point we only have one dataset, and it should be a row not a table
     dataset = datasets
     dataset_id = dataset["Dataset ID"]
     proposal_id = dataset["Primary Proposal ID"]
