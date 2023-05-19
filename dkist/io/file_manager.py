@@ -203,6 +203,8 @@ class StripedExternalArrayView(BaseStripedExternalArray):
 
 
 class BaseFileManager:
+    __slots__ = ["_striped_external_array"]
+
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
         fits_loader = StripedExternalArray(
@@ -304,6 +306,7 @@ class FileManager(BaseFileManager):
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
+    __slots__ = ["_ndcube"]
 
     def __init__(self, fits_loader: StripedExternalArray):
         super().__init__(fits_loader)
