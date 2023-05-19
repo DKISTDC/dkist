@@ -1,1 +1,0 @@
-Fixes bug in the inverse property of CoupledCompoundModel by correcting the various mappings in the inverse.

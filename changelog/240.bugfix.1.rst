@@ -1,1 +1,0 @@
-Fix errors with some types of input in `dkist.net.transfer_complete_datasets`.
