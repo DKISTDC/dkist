@@ -669,7 +669,6 @@ class CoupledCompoundModel(CompoundModel):
 
         return step1 | step2
 
-
     def _calculate_separability_matrix(self):
         sepleft = separable._separable(self.left)
         sepright = separable._separable(self.right)
