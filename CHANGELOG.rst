@@ -1,3 +1,20 @@
+1.0.0b13 (2023-05-19)
+=====================
+
+Features
+--------
+
+- Add support for passing a list of dataset IDs as strings to `dkist.net.transfer_complete_datasets`. (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+
+
+Bug Fixes
+---------
+
+- Fix errors with some types of input in `dkist.net.transfer_complete_datasets`. (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+- Fix searching for Globus endpoints with SDK 3 (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+- Fixes bug in the inverse property of CoupledCompoundModel by correcting the various mappings in the inverse. (`#242 <https://github.com/DKISTDC/dkist/pull/242>`_)
+
+
 1.0.0b12 (2023-05-16)
 =====================
 

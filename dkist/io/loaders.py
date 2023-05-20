@@ -93,6 +93,7 @@ class AstropyFITSLoader(BaseFITSLoader):
 
     def __getitem__(self, slc):
         if not self.absolute_uri.exists():
+            _LOGGER.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
             return da.from_delayed(delayed(np.broadcast_to)(np.nan, self.shape) * np.nan,
