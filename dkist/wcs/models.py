@@ -739,12 +739,22 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
 
 
 class Ravel(Model):
-    array_shape = (0, 0)
-    n_inputs = 2
+    n_inputs = None
     n_outputs = 1
     _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def input_units(self):
+        return {'x': u.pix}
+
+    @property
+    def return_units(self):
+        return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
+        # n_inputs is a class attribute, but it is unknown until run-time
+        self.__class__.n_inputs = len(array_shape)
         super().__init__(**kwargs)
 
         self.array_shape = tuple(array_shape)
@@ -753,27 +763,56 @@ class Ravel(Model):
         self.order = order
 
     def evaluate(self, *inputs):
-        ravel_shape = self.array_shape[1]
-        if self.order == 'F':
-            inputs = inputs[::-1]
-            ravel_shape = self.array_shape[0]
-        return (np.round(inputs[0]) * ravel_shape) + inputs[1]
+        # If we have units, then all values must have units, hence test for existence only on the first one.
+        # Also, assume all units are the same.
+        if hasattr(inputs[0], "unit"):
+            input_units = inputs[0].unit
+            input_values = [item[0].value for item in inputs]
+        else:
+            input_units = None
+            input_values = [item[0] for item in inputs]
+        # round the index values, but clip them if they exceed the array bounds
+        # the bounds are one lass than the shape dimension value
+        array_bounds = tuple(np.array(self.array_shape) - 1)
+        # array_bounds = [item - 1 for item in self.array_shape]
+        rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds)
+        result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
+        index = 0 if self.order == "F" else -1
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        fraction = input_values[index] - rounded_inputs[index]
+        result += fraction
+        # Put the units back if they were there...
+        if input_units is not None:
+            result = result * input_units
+            # result = np.array([u.Quantity(item, unit=input_units) for item in result])
+        else:
+            result = np.array([result])
+        return result
 
     @property
     def inverse(self):
         return Unravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Ravel(array_shape={self.array_shape}, order={self.order})>"
+        return f"<Ravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
 
 
 class Unravel(Model):
-    array_shape = (0, 0)
     n_inputs = 1
-    n_outputs = 2
+    n_outputs = None
     _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def input_units(self):
+        return {'x': u.pix}
+
+    @property
+    def return_units(self):
+        return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
+        self.__class__.n_outputs = len(array_shape)
         super().__init__(**kwargs)
 
         self.array_shape = array_shape
@@ -782,12 +821,28 @@ class Unravel(Model):
         self.order = order
 
     def evaluate(self, input_):
-        i = 1 if self.order == 'C' else 0
-        return (input_ // self.array_shape[i], input_ % self.array_shape[i])
+        if hasattr(input_, "unit"):
+            input_unit = input_.unit
+            input_value = input_.value
+        else:
+            input_unit = None
+            input_value = input_
+        result = list(np.unravel_index(int(input_value), self.array_shape, order=self.order))
+        result = [np.array([float(item)]) for item in result]
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        index = 0 if self.order == "F" else -1
+        fraction = input_value % 1
+        result[index] += fraction
+        if input_unit is not None:
+            result = result * input_unit
+            # result = np.array([u.Quantity(item, unit=input_unit) for item in result])
+        return result
+
 
     @property
     def inverse(self):
-        return Ravel(self.array_shape)
+        return Ravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Unravel(array_shape={self.array_shape}, order={self.order})>"
+        return f"<Unravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
+
