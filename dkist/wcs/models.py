@@ -822,11 +822,11 @@ class Unravel(Model):
 
     def evaluate(self, input_):
         if hasattr(input_, "unit"):
-            input_unit = input_.unit
-            input_value = input_.value
+            input_unit = input_[0].unit
+            input_value = input_[0].value
         else:
             input_unit = None
-            input_value = input_
+            input_value = input_[0]
         result = list(np.unravel_index(int(input_value), self.array_shape, order=self.order))
         result = [np.array([float(item)]) for item in result]
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
@@ -845,4 +845,3 @@ class Unravel(Model):
 
     def __repr__(self):
         return f"<Unravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
-
