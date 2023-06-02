@@ -805,11 +805,11 @@ class Unravel(Model):
 
     @property
     def input_units(self):
-        return {'foo_1': u.pix}
+        return {'x': u.pix}
 
     @property
     def return_units(self):
-        return {'foo_2': u.pix}
+        return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
         self.__class__.n_outputs = len(array_shape)
@@ -845,4 +845,3 @@ class Unravel(Model):
 
     def __repr__(self):
         return f"<Unravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
-
