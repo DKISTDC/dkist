@@ -739,10 +739,13 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
 
 
 class Ravel(Model):
-    n_inputs = None
     n_outputs = 1
     _separable = False
     _input_units_allow_dimensionless = True
+
+    @property
+    def n_inputs(self):
+        return len(self.array_shape)
 
     @property
     def input_units(self):
@@ -753,28 +756,25 @@ class Ravel(Model):
         return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
-        # n_inputs is a class attribute, but it is unknown until run-time
-        self.__class__.n_inputs = len(array_shape)
-        super().__init__(**kwargs)
-
         self.array_shape = tuple(array_shape)
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
         self.order = order
+        super().__init__(**kwargs)
+
 
     def evaluate(self, *inputs):
         # If we have units, then all values must have units, hence test for existence only on the first one.
         # Also, assume all units are the same.
         if hasattr(inputs[0], "unit"):
             input_units = inputs[0].unit
-            input_values = [item[0].value for item in inputs]
+            input_values = [item[0].to_value(u.pix) for item in inputs]
         else:
             input_units = None
             input_values = [item[0] for item in inputs]
         # round the index values, but clip them if they exceed the array bounds
         # the bounds are one lass than the shape dimension value
         array_bounds = tuple(np.array(self.array_shape) - 1)
-        # array_bounds = [item - 1 for item in self.array_shape]
         rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds)
         result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
         index = 0 if self.order == "F" else -1
@@ -784,7 +784,6 @@ class Ravel(Model):
         # Put the units back if they were there...
         if input_units is not None:
             result = result * input_units
-            # result = np.array([u.Quantity(item, unit=input_units) for item in result])
         else:
             result = np.array([result])
         return result
@@ -794,14 +793,17 @@ class Ravel(Model):
         return Unravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Ravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
+        return f"<{self.__class__.__qualname__}(array_shape={self.array_shape}, order=\"{self.order}\")>"
 
 
 class Unravel(Model):
     n_inputs = 1
-    n_outputs = None
     _separable = False
     _input_units_allow_dimensionless = True
+
+    @property
+    def n_outputs(self):
+        return len(self.array_shape)
 
     @property
     def input_units(self):
@@ -812,13 +814,12 @@ class Unravel(Model):
         return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
-        self.__class__.n_outputs = len(array_shape)
-        super().__init__(**kwargs)
-
         self.array_shape = array_shape
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
         self.order = order
+        super().__init__(**kwargs)
+
 
     def evaluate(self, input_):
         if hasattr(input_, "unit"):
@@ -835,7 +836,6 @@ class Unravel(Model):
         result[index] += fraction
         if input_unit is not None:
             result = result * input_unit
-            # result = np.array([u.Quantity(item, unit=input_unit) for item in result])
         return result
 
 
@@ -844,4 +844,4 @@ class Unravel(Model):
         return Ravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Unravel(array_shape={self.array_shape}, order=\"{self.order}\")>"
+        return f"<{self.__class__.__qualname__}(array_shape={self.array_shape}, order=\"{self.order}\")>"
