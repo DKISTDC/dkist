@@ -7,9 +7,9 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import (Ravel, VaryingCelestialTransform, VaryingCelestialTransform2D,
-                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
-                              generate_celestial_transform,
+from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
+                              VaryingCelestialTransformSlit2D, generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
 
@@ -509,3 +509,18 @@ def test_ravel_repr(ndim, order):
     unravel = ravel.inverse
     assert str(array_shape) in repr(ravel) and order in repr(ravel)
     assert str(array_shape) in repr(unravel) and order in repr(unravel)
+
+
+@pytest.mark.parametrize("array_shape", [(0, 1), (1, 0), (1,)])
+@pytest.mark.parametrize("ravel", [Ravel, Unravel])
+def test_ravel_bad_array_shape(array_shape, ravel):
+    with pytest.raises(ValueError) as e:
+        ravel(array_shape)
+
+@pytest.mark.parametrize("order", ["A", "B"])
+@pytest.mark.parametrize("ravel", [Ravel, Unravel])
+def test_ravel_bad_order(order, ravel):
+    array_shape=(2, 2, 2)
+    with pytest.raises(ValueError) as e:
+        if order not in ["C", "F"]:
+            ravel(array_shape, order)

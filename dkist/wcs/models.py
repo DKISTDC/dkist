@@ -756,6 +756,8 @@ class Ravel(Model):
         return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = tuple(array_shape)
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
@@ -773,7 +775,7 @@ class Ravel(Model):
             input_units = None
             input_values = [item[0] for item in inputs]
         # round the index values, but clip them if they exceed the array bounds
-        # the bounds are one lass than the shape dimension value
+        # the bounds are one less than the shape dimension value
         array_bounds = tuple(np.array(self.array_shape) - 1)
         rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds)
         result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
@@ -814,6 +816,8 @@ class Unravel(Model):
         return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = array_shape
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
