@@ -793,7 +793,7 @@ class Ravel(Model):
         return Unravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<{self.__class__.__qualname__}(array_shape={self.array_shape}, order=\"{self.order}\")>"
+        return f'<{self.__class__.__qualname__}(array_shape={self.array_shape}, order="{self.order}")>'
 
 
 class Unravel(Model):
