@@ -522,5 +522,4 @@ def test_ravel_bad_array_shape(array_shape, ravel):
 def test_ravel_bad_order(order, ravel):
     array_shape=(2, 2, 2)
     with pytest.raises(ValueError) as e:
-        if order not in ["C", "F"]:
-            ravel(array_shape, order)
+        ravel(array_shape, order)
