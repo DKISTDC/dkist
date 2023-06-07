@@ -136,8 +136,8 @@ def _(wlk, attr, params):
 
 @walker.add_applier(FriedParameter)
 def _(wlk, attr, params):
-    return params.update({'qualityAverageFriedParameterMin': attr.min,
-                          'qualityAverageFriedParameterMax': attr.max})
+    return params.update({'qualityAverageFriedParameterMin': attr.min.to_value(u.cm),
+                          'qualityAverageFriedParameterMax': attr.max.to_value(u.cm)})
 
 
 @walker.add_applier(PolarimetricAccuracy)
