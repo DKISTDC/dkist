@@ -26,7 +26,7 @@ Getting Help
 ------------
 
 * Stuck with understanding DKIST data or accessing your observations? Visit the `DKIST Help Desk <https://nso.atlassian.net/servicedesk/customer/portals>`__.
-* Want to chat to people about the DKIST user tools? Join our `community chat room <https://openastronomy.element.io/#/room/#dki-solar-telescope:openastronomy.org>`__.
+* Want to chat to people about the DKIST user tools? Join our `community chat room <https://app.element.io/#/room/#dki-solar-telescope:openastronomy.org>`__.
 * Have a great example you want to share or questions about using DKIST data with other packages? Try the `OpenAstronomy Discourse Forum <https://community.openastronomy.org>`__.
 * Found a bug or have a feature request? Open an issue on `the issue tracker <https://github.com/DKISTDC/dkist/issues/new/choose>`__.
 
