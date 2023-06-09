@@ -64,8 +64,7 @@ def _(wlk, attr, params):
 
 @walker.add_applier(Wavelength)
 def _(wlk, attr, params):
-    return params.update({'wavelengthMinMin': attr.min.to_value(u.nm),
-                          'wavelengthMaxMax': attr.max.to_value(u.nm)})
+    return params.update({'wavelengthRanges': [attr.min.to_value(u.nm), attr.max.to_value(u.nm)]})
 
 
 @walker.add_applier(Physobs)
