@@ -105,9 +105,12 @@ def test_get_refresh_token_authorizer(mocker):
 
 
 def test_ensure_auth_decorator(mocker):
-    error = globus_sdk.AuthAPIError(mocker.MagicMock())
-    mocker.patch.object(error, "http_status", 400)
-    mocker.patch.object(error, "message", '{"error":"invalid_grant"}')
+    mock_response = mocker.MagicMock()
+    mock_response.status_code = 400
+    mock_response.text = '{"error": "invalid_grant"}'
+    mock_response.json = mocker.Mock(return_value=json.loads(mock_response.text))
+    mock_response.headers = {"Content-Type": "application/json"}
+    error = globus_sdk.AuthAPIError(mock_response)
     reauth = mocker.patch("dkist.net.globus.auth.get_refresh_token_authorizer")
 
     called = [False]
