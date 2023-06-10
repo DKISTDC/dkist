@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from numpy.random import default_rng
 
 import astropy.modeling.models as m
 import astropy.units as u
@@ -390,8 +391,10 @@ def test_vct_slit2d_unitless():
 def _evaluate_ravel(array_shape, inputs, order="C"):
     """Evaluate the ravel computation using brute force for comparison with numpy result."""
     # NB: This method does not work with units...
-    array_shape = np.array(array_shape)
-    array_bounds = array_shape - 1
+    array_bounds = (array_shape - 1)
+    # This if test is to handle multidimensional inputs properly
+    if len(inputs.shape) > 1:
+        array_bounds = array_bounds[:, np.newaxis]
     rounded_inputs = np.clip(np.rint(inputs).astype(int), None, array_bounds)
     if order == "F":
         array_shape = array_shape[::-1]
@@ -403,17 +406,21 @@ def _evaluate_ravel(array_shape, inputs, order="C"):
 
 
 def _evaluate_unravel(array_shape, index, order="C"):
-    """Evaluate the ravel computation using brute force for comparison with numpy result."""
+    """Evaluate the reverse ravel computation using brute force for comparison with numpy result."""
     # NB: This method does not work with units...
-    array_shape = np.array(array_shape)
     if order == "F":
         array_shape = array_shape[::-1]
     offsets = np.cumprod(array_shape[1:][::-1])[::-1]
     curr_offset = index
-    indices = np.zeros_like(array_shape, dtype=float)
+    # This if test is to handle multidimensional inputs properly
+    if isinstance(index, np.ndarray):
+        output_shape = tuple([len(array_shape), len(index)])
+    else:
+        output_shape = len(array_shape)
+    indices = np.zeros(output_shape, dtype=float)
     for i, offset in enumerate(offsets):
-        indices[i] = curr_offset // offset
-        curr_offset = curr_offset % offset
+        indices[i] = np.floor_divide(curr_offset, offset)
+        curr_offset = np.remainder(curr_offset, offset)
     indices[-1] = curr_offset
     if order == "F":
         indices = indices[::-1]
@@ -421,15 +428,24 @@ def _evaluate_unravel(array_shape, index, order="C"):
 
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_ravel_model(ndim, has_units):
-    array_shape = np.random.randint(1, 20, ndim)
-    array_bounds = tuple(np.array(array_shape) - 1)
+@pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
+def test_ravel_model(ndim, has_units, input_type):
+    rng = default_rng()
+    array_shape = rng.integers(1, 21, ndim)
+    array_bounds = array_shape - 1
     order = "C"
     ravel = Ravel(array_shape, order=order)
     units = u.pix
+    if input_type == "array":
+        # adding the new axis onto array_bounds makes broadcasting work below
+        array_bounds = array_bounds[:, np.newaxis]
+        # use 5 as an arbitrary number of inputs
+        random_number_shape = len(array_shape), 5
+    else:
+        random_number_shape = len(array_shape)
     # Make 10 attempts with random numbers
     for _ in range(10):
-        random_numbers = np.random.random(len(array_shape))
+        random_numbers = rng.random(random_number_shape)
         raw_inputs = random_numbers * array_bounds
         if has_units:
             inputs = raw_inputs * units
@@ -441,18 +457,20 @@ def test_ravel_model(ndim, has_units):
         expected_unravel = _evaluate_unravel(array_shape, expected_ravel, order)
         round_trip = ravel.inverse.inverse(*inputs)
         if has_units:
-            assert ravel_value == expected_ravel * units
+            assert np.allclose(ravel_value, expected_ravel * units)
             assert np.allclose(unraveled_values, expected_unravel * units)
-            assert round_trip == expected_ravel * units
+            assert np.allclose(round_trip, expected_ravel * units)
         else:
-            assert ravel_value == expected_ravel
+            assert np.allclose(ravel_value, expected_ravel)
             assert np.allclose(unraveled_values, expected_unravel)
-            assert round_trip == expected_ravel
+            assert np.allclose(round_trip, expected_ravel)
 
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_raveled_tabular1d(ndim, has_units):
-    array_shape = np.random.randint(1, 20, ndim)
+@pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
+def test_raveled_tabular1d(ndim, has_units, input_type):
+    rng = default_rng()
+    array_shape = rng.integers(1, 21, ndim)
     array_bounds = array_shape - 1
     ravel = Ravel(array_shape)
     nelem = np.prod(array_shape)
@@ -461,42 +479,48 @@ def test_raveled_tabular1d(ndim, has_units):
     if has_units:
         values *= units
     lut_values = values
-    tabular = Tabular1D(values,
-                        lut_values,
-                        bounds_error=False,
-                        fill_value=np.nan,
-                        method="linear")
+    tabular = Tabular1D(
+        values, lut_values, bounds_error=False, fill_value=np.nan, method="linear"
+    )
     raveled_tab = ravel | tabular
+    if input_type == "array":
+        # adding the new axis onto array_bounds makes broadcasting work below
+        array_bounds = array_bounds[:, np.newaxis]
+        # use 5 as an arbitrary number of inputs
+        random_number_shape = len(array_shape), 5
+    else:
+        random_number_shape = len(array_shape)
     # Make 10 attempts with random numbers
     for _ in range(10):
-        random_numbers = np.random.random(len(array_shape))
+        random_numbers = rng.random(random_number_shape)
         raw_inputs = random_numbers * array_bounds
         if has_units:
-            inputs = raw_inputs * units
+            inputs = tuple(raw_inputs * units)
         else:
-            inputs = raw_inputs
+            inputs = tuple(raw_inputs)
         expected_ravel = _evaluate_ravel(array_shape, raw_inputs)
         expected_unravel = _evaluate_unravel(array_shape, expected_ravel)
         if has_units:
-            assert raveled_tab(*inputs) == expected_ravel * units
+            assert np.allclose(raveled_tab(*inputs), expected_ravel * units)
             assert np.allclose(raveled_tab.inverse(expected_ravel * units), expected_unravel * units)
-            assert raveled_tab.inverse.inverse(*inputs) == expected_ravel * units
+            assert np.allclose(raveled_tab.inverse.inverse(*inputs), expected_ravel * units)
         else:
-            assert raveled_tab(*inputs) == expected_ravel
+            assert np.allclose(raveled_tab(*inputs), expected_ravel)
             assert np.allclose(raveled_tab.inverse(expected_ravel), expected_unravel)
-            assert raveled_tab.inverse.inverse(*inputs) == expected_ravel
+            assert np.allclose(raveled_tab.inverse.inverse(*inputs), expected_ravel)
 
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_ordering(ndim, order):
-    array_shape = np.random.randint(2, 20, ndim)
+    rng = default_rng()
+    array_shape = rng.integers(2, 21, ndim)
     array_bounds = tuple(np.array(array_shape) - 1)
     ravel = Ravel(array_shape, order=order)
     nelem = np.prod(array_shape)
     values = np.arange(nelem).reshape(array_shape, order=order)
     # Make 10 attempts with random numbers
     for _ in range(10):
-        inputs = np.random.randint(0, array_bounds, len(array_shape))
+        inputs = rng.integers(0, array_bounds, len(array_shape))
         ravel_value = ravel(*inputs)
         assert int(ravel_value) == values[tuple(inputs)]
 
@@ -504,7 +528,8 @@ def test_ravel_ordering(ndim, order):
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_repr(ndim, order):
-    array_shape = tuple(np.random.randint(1, 20, ndim))
+    rng = default_rng()
+    array_shape = tuple(rng.integers(1, 21, ndim))
     ravel = Ravel(array_shape, order=order)
     unravel = ravel.inverse
     assert str(array_shape) in repr(ravel) and order in repr(ravel)
