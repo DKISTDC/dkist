@@ -739,55 +739,151 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
 
 
 class Ravel(Model):
-    array_shape = (0, 0)
-    n_inputs = 2
     n_outputs = 1
     _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def n_inputs(self):
+        return len(self.array_shape)
+
+    @property
+    def inputs(self):
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, value):
+        self._inputs = value
+
+    @property
+    def input_units(self):
+        return {f'x{idx}': u.pix for idx in range(self.n_inputs)}
+
+    @property
+    def outputs(self):
+        return self._outputs
+
+    @outputs.setter
+    def outputs(self, value):
+        self._outputs = value
+
+    @property
+    def return_units(self):
+        return {'y': u.pix}
 
     def __init__(self, array_shape, order='C', **kwargs):
-        super().__init__(**kwargs)
-
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = tuple(array_shape)
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
         self.order = order
+        super().__init__(**kwargs)
+        # super dunder init sets inputs and outputs to default values so set what we want here
+        self.inputs = tuple([f'x{idx}' for idx in range(self.n_inputs)])
+        self.outputs = 'y',
 
-    def evaluate(self, *inputs):
-        ravel_shape = self.array_shape[1]
-        if self.order == 'F':
-            inputs = inputs[::-1]
-            ravel_shape = self.array_shape[0]
-        return (np.round(inputs[0]) * ravel_shape) + inputs[1]
+    def evaluate(self, *inputs_):
+        """Evaluate the forward ravel for a given tuple of pixel values."""
+        if hasattr(inputs_[0], "unit"):
+            has_units = True
+            input_values = [item.to_value(u.pix) for item in inputs_]
+        else:
+            has_units = False
+            input_values = inputs_
+        # round the index values, but clip them if they exceed the array bounds
+        # the bounds are one less than the shape dimension value
+        array_bounds = np.array(self.array_shape) - 1
+        rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds[:, np.newaxis])
+        result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
+        index = 0 if self.order == "F" else -1
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        fraction = input_values[index] - rounded_inputs[index]
+        result += fraction
+        # Put the units back if they were there...
+        if has_units:
+            result = result * u.pix
+        else:
+            result = np.array([result])
+        return result
 
     @property
     def inverse(self):
         return Unravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Ravel(array_shape={self.array_shape}, order={self.order})>"
+        return f'<{self.__class__.__qualname__}(array_shape={self.array_shape}, order="{self.order}")>'
 
 
 class Unravel(Model):
-    array_shape = (0, 0)
     n_inputs = 1
-    n_outputs = 2
     _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def inputs(self):
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, value):
+        self._inputs = value
+
+    @property
+    def input_units(self):
+        return {'x': u.pix}
+
+    @property
+    def n_outputs(self):
+        return len(self.array_shape)
+
+    @property
+    def outputs(self):
+        return self._outputs
+
+    @outputs.setter
+    def outputs(self, value):
+        self._outputs = value
+
+    @property
+    def return_units(self):
+        return {f'y{idx}': u.pix for idx in range(self.n_outputs)}
 
     def __init__(self, array_shape, order='C', **kwargs):
-        super().__init__(**kwargs)
-
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = array_shape
         if order not in ("C", "F"):
             raise ValueError("order kwarg must be one of 'C' or 'F'")
         self.order = order
+        super().__init__(**kwargs)
+        # super dunder init sets inputs and outputs to default values so set what we want here
+        self.inputs = 'x',
+        self.outputs = tuple([f'y{idx}' for idx in range(self.n_outputs)])
 
     def evaluate(self, input_):
-        i = 1 if self.order == 'C' else 0
-        return (input_ // self.array_shape[i], input_ % self.array_shape[i])
+        """Evaluate the reverse ravel (unravel) for a given pixel value."""
+        if hasattr(input_, "unit"):
+            has_units = True
+            input_value = [item.to_value(u.pix) for item in input_]
+            input_value_int = [int(item) for item in input_value]
+        else:
+            has_units = False
+            input_value = input_
+            input_value_int = [int(item) for item in input_]
+
+        result = list(np.unravel_index(input_value_int, self.array_shape, order=self.order))
+        result = [item.astype(float) for item in result]
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        index = 0 if self.order == "F" else -1
+        fraction = np.remainder(input_value, 1)
+        result[index] += fraction
+        if has_units:
+            result = result * u.pix
+        return result
 
     @property
     def inverse(self):
-        return Ravel(self.array_shape)
+        return Ravel(self.array_shape, order=self.order)
 
     def __repr__(self):
-        return f"<Unravel(array_shape={self.array_shape}, order={self.order})>"
+        return f'<{self.__class__.__qualname__}(array_shape={self.array_shape}, order="{self.order}")>'

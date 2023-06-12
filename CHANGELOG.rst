@@ -1,3 +1,12 @@
+1.0.0b14 (2023-06-12)
+=====================
+
+Features
+--------
+
+- Adds support to Ravel for N-dimensional data. (`#249 <https://github.com/DKISTDC/dkist/pull/249>`_)
+
+
 1.0.0b13 (2023-05-19)
 =====================
 
