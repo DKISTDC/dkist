@@ -2,16 +2,10 @@
 The DKIST package aims to help you search, obtain and use DKIST data as part of your Python software.
 """
 from pkg_resources import DistributionNotFound, get_distribution
-# net not available
 
 import astropy.config as _config
-# net not available
-import pdb; pdb.set_trace()
 
 from .dataset import Dataset, TiledDataset  # noqa
-# net available
-import pdb
-pdb.set_trace()
 from .utils.sysinfo import system_info  # noqa
 
 try:

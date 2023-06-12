@@ -11,7 +11,6 @@ import numpy as np
 
 from astropy.table import vstack
 
-# net not available
 from .dataset import Dataset
 
 __all__ = ['TiledDataset']
@@ -127,5 +126,3 @@ class TiledDataset(Collection):
 
     # TODO: def plot()
     # TODO: def regrid()
-
-# net not available
