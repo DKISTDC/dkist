@@ -30,7 +30,7 @@ def api_param_names():
     return {
         a.Time: ('startTimeMin', 'endTimeMax'),
         a.Instrument: ('instrumentNames',),
-        a.Wavelength: ('wavelengthMinMin', 'wavelengthMaxMax'),
+        a.Wavelength: ('wavelengthRanges',),
         a.Physobs: ('hasAllStokes',),
         a.Provider: tuple(),
         da.Dataset: ('datasetIds',),
