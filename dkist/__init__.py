@@ -6,6 +6,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 import astropy.config as _config
 # net not available
+import pdb; pdb.set_trace()
 
 from .dataset import Dataset, TiledDataset  # noqa
 # net available
