@@ -15,7 +15,9 @@ __all__ = ['PageSize', 'Page', 'Dataset', 'WavelengthBand', 'Embargoed', 'Observ
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
-           'SpectralSampling', 'SpatialSampling', 'TemporalSampling']
+           'SpectralSampling', 'SpatialSampling', 'TemporalSampling', 'SoftwareVersion',
+           'WorkflowName', 'WorkflowVersion', 'ObservingProgram', 'InstrumentProgram',
+           'HeaderVersion']
 
 
 # SimpleAttrs
@@ -356,3 +358,27 @@ class TemporalSampling(_Range):
 
     def collides(self, other):
         return isinstance(other, self.__class__)
+
+
+class SoftwareVersion(_Range):
+    pass
+
+
+class WorkflowName(_SimpleAttr):
+    pass
+
+
+class WorkflowVersion(_Range):
+    pass
+
+
+class ObservingProgram(_SimpleAttr):
+    pass
+
+
+class InstrumentProgram(_SimpleAttr):
+    pass
+
+
+class HeaderVersion(_Range):
+    pass
