@@ -157,6 +157,8 @@ class Embargoed(_SimpleAttr):
         A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed: bool):
+        if isinstance(is_embargoed, str) and is_embargoed.lower() == "false":
+            is_embargoed = False
         super().__init__(bool(is_embargoed))
 
 
