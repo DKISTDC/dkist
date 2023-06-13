@@ -97,6 +97,13 @@ def test_walker_single(all_attrs_classes, api_param_names):
         at = all_attrs_classes(bottom_left=bottom_left)
         api_param_names[all_attrs_classes] = ('rectangleContainingBoundingBox',)
 
+    elif issubclass(all_attrs_classes, da.Embargoed):
+        assert not all_attrs_classes(False)
+        assert all_attrs_classes(True)
+        assert not all_attrs_classes("False")
+        assert all_attrs_classes("True")
+        assert not all_attrs_classes.false
+        assert all_attrs_classes.true
 
     if not at:
         pytest.skip(f"Not testing {all_attrs_classes!r}")
