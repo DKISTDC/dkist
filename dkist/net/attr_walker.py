@@ -198,8 +198,39 @@ def _(wlk, attr, params):
     Provider is used by client _can_handle_query and not the API.
     """
 
+
 @walker.add_applier(Level)
 def _(wlk, attr, params):
     """
     Level is used by client _can_handle_query and not the API.
     """
+
+
+@walker.add_applier(SoftwareVersion)
+def _(wlk, attr, params):
+    return params.update({'highLevelSoftwareVersion': attr.value})
+
+
+@walker.add_applier(WorkflowName)
+def _(wlk, attr, params):
+    return params.update({'workflowName': attr.value})
+
+
+@walker.add_applier(WorkflowVersion)
+def _(wlk, attr, params):
+    return params.update({'workflowVersion': attr.value})
+
+
+@walker.add_applier(ObservingProgram)
+def _(wlk, attr, params):
+    return params.update({'observingProgramExecutionId': attr.value})
+
+
+@walker.add_applier(InstrumentProgram)
+def _(wlk, attr, params):
+    return params.update({'instrumentProgramExecutionId': attr.value})
+
+
+@walker.add_applier(HeaderVersion)
+def _(wlk, attr, params):
+    return params.update({'headerVersion': attr.value})
