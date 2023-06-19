@@ -17,7 +17,7 @@ Searching for DKIST Datasets with Fido
    Download of FITS files is not provided through the ``Fido`` interface.
    As is described below, FITS files can be downloaded for some or all of a dataset after reading the ASDF file.
 
-As is descibed in :ref:`sunpy:fido_guide`, searches through ``Fido`` use "attrs" which specify the search criteria.
+As is descibed in :ref:`sunpy:sunpy-tutorial-acquiring-data-index`, searches through ``Fido`` use "attrs" which specify the search criteria.
 A single search can match one or more data providers, for example it is possible to search for DKIST data and data provided by the VSO simultaneously.
 In this guide we will focus on searches only for DKIST data through using the client provided in `dkist.net`.
 
