@@ -147,7 +147,7 @@ class DKISTClient(BaseClient):
     .. note::
 
         This class is not intended to be used directly.
-        You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:fido_guide`.
+        You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:sunpy-tutorial-acquiring-data-index`.
     """
     @property
     def _dataset_search_url(self):
