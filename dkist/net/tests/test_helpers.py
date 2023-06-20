@@ -265,3 +265,34 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
             ),
         ]
     )
+
+
+def test_transfer_path_interpolation(orchestrate_transfer_mock, mocker):
+    get_inv_mock = mocker.patch(
+        "dkist.net.helpers._get_dataset_inventory",
+        autospec=True,
+        return_value=DKISTQueryResponseTable([
+            {
+                "Dataset ID": "AAAA",
+                "Primary Proposal ID": "pm_1_10",
+                "Storage Bucket": "data",
+                'Wavelength Max': 856,
+                'Wavelength Min': 854,
+                "Instrument": "HIT",  # Highly Imaginary Telescope
+            }
+        ]),
+    )
+
+    transfer_complete_datasets("AAAA", path="{instrument}/{dataset_id}")
+
+    orchestrate_transfer_mock.assert_called_once_with(
+        [Path("/data/pm_1_10/AAAA")],
+        recursive=True,
+        destination_path=Path("HIT/AAAA"),
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
+    )
+
+    get_inv_mock.assert_called_once_with("AAAA")
