@@ -417,6 +417,7 @@ class FileManager(BaseFileManager):
         label : `str`
             Label for the Globus transfer. If `None` then a default will be used.
         """
+        # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
         from dkist.net import conf as net_conf
         from dkist.net.helpers import _orchestrate_transfer_task
 
