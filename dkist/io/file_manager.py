@@ -31,8 +31,6 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
-from dkist.net import conf as net_conf
-from dkist.net.helpers import _orchestrate_transfer_task
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 
@@ -419,6 +417,10 @@ class FileManager(BaseFileManager):
         label : `str`
             Label for the Globus transfer. If `None` then a default will be used.
         """
+        # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
+        from dkist.net import conf as net_conf
+        from dkist.net.helpers import _orchestrate_transfer_task
+
         if self._ndcube is None:
             raise ValueError(
                 "This file manager has no associated Dataset object, so the data can not be downloaded."

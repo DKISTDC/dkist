@@ -72,6 +72,9 @@ def test_walker_single(all_attrs_classes, api_param_names):
     elif issubclass(all_attrs_classes, da.TemporalSampling):
         at = all_attrs_classes(temporalmin= 1 * u.s, temporalmax= 500 * u.s)
 
+    elif issubclass(all_attrs_classes, da.Embargoed):
+        at = all_attrs_classes(True)
+
     elif issubclass(all_attrs_classes, attr.SimpleAttr):
         at = all_attrs_classes("stokes_parameters")
 
@@ -96,7 +99,6 @@ def test_walker_single(all_attrs_classes, api_param_names):
                                   obstime='2021-01-02T12:34:56')
         at = all_attrs_classes(bottom_left=bottom_left)
         api_param_names[all_attrs_classes] = ('rectangleContainingBoundingBox',)
-
 
     if not at:
         pytest.skip(f"Not testing {all_attrs_classes!r}")

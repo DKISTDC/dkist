@@ -176,11 +176,13 @@ class DKISTClient(BaseClient):
         for url_parameters in queries:
             if 'pageSize' not in url_parameters:
                 url_parameters.update({'pageSize': conf.default_page_size})
-            query_string = urllib.parse.urlencode(url_parameters)
+            # TODO make this accept and concatenate multiple wavebands in a search
+            query_string = urllib.parse.urlencode(url_parameters, doseq=True)
             full_url = f"{self._dataset_search_url}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results.append(data)
+
 
         return DKISTQueryResponseTable.from_results(results, client=self)
 

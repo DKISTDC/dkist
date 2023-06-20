@@ -64,8 +64,7 @@ def _(wlk, attr, params):
 
 @walker.add_applier(Wavelength)
 def _(wlk, attr, params):
-    return params.update({'wavelengthMinMin': attr.min.to_value(u.nm),
-                          'wavelengthMaxMax': attr.max.to_value(u.nm)})
+    return params.update({'wavelengthRanges': [attr.min.to_value(u.nm), attr.max.to_value(u.nm)]})
 
 
 @walker.add_applier(Physobs)
@@ -136,8 +135,8 @@ def _(wlk, attr, params):
 
 @walker.add_applier(FriedParameter)
 def _(wlk, attr, params):
-    return params.update({'qualityAverageFriedParameterMin': attr.min,
-                          'qualityAverageFriedParameterMax': attr.max})
+    return params.update({'qualityAverageFriedParameterMin': attr.min.to_value(u.cm),
+                          'qualityAverageFriedParameterMax': attr.max.to_value(u.cm)})
 
 
 @walker.add_applier(PolarimetricAccuracy)
@@ -199,8 +198,39 @@ def _(wlk, attr, params):
     Provider is used by client _can_handle_query and not the API.
     """
 
+
 @walker.add_applier(Level)
 def _(wlk, attr, params):
     """
     Level is used by client _can_handle_query and not the API.
     """
+
+
+@walker.add_applier(SummitSoftwareVersion)
+def _(wlk, attr, params):
+    return params.update({'highLevelSoftwareVersion': attr.value})
+
+
+@walker.add_applier(WorkflowName)
+def _(wlk, attr, params):
+    return params.update({'workflowName': attr.value})
+
+
+@walker.add_applier(WorkflowVersion)
+def _(wlk, attr, params):
+    return params.update({'workflowVersion': attr.value})
+
+
+@walker.add_applier(ObservingProgramExecutionID)
+def _(wlk, attr, params):
+    return params.update({'observingProgramExecutionId': attr.value})
+
+
+@walker.add_applier(InstrumentProgramExecutionID)
+def _(wlk, attr, params):
+    return params.update({'instrumentProgramExecutionId': attr.value})
+
+
+@walker.add_applier(HeaderVersion)
+def _(wlk, attr, params):
+    return params.update({'headerVersion': attr.value})

@@ -15,7 +15,9 @@ __all__ = ['PageSize', 'Page', 'Dataset', 'WavelengthBand', 'Embargoed', 'Observ
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
-           'SpectralSampling', 'SpatialSampling', 'TemporalSampling']
+           'SpectralSampling', 'SpatialSampling', 'TemporalSampling', 'SummitSoftwareVersion',
+           'WorkflowName', 'WorkflowVersion', 'ObservingProgramExecutionID',
+           'InstrumentProgramExecutionID', 'HeaderVersion']
 
 
 # SimpleAttrs
@@ -157,7 +159,16 @@ class Embargoed(_SimpleAttr):
         A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed: bool):
-        super().__init__(bool(is_embargoed))
+        if isinstance(is_embargoed, str):
+            if is_embargoed.lower() == "false":
+                is_embargoed = False
+            elif is_embargoed.lower() == "true":
+                is_embargoed = True
+            else:
+                raise ValueError("is_embargoed must be either True or False")
+        elif not isinstance(is_embargoed, bool):
+            raise ValueError("is_embargoed must be either True or False")
+        super().__init__(is_embargoed)
 
 
 # Range Attrs
@@ -356,3 +367,84 @@ class TemporalSampling(_Range):
 
     def collides(self, other):
         return isinstance(other, self.__class__)
+
+
+# highLevelSoftwareVersion
+class SummitSoftwareVersion(_SimpleAttr):
+    """
+    Version of the software used to record the data at the summit.
+
+    Parameters
+    ----------
+    version : `str`
+        Version of the software to search for.
+    """
+    def __init__(self, version: str):
+        super().__init__(version)
+
+
+# workflowName
+class WorkflowName(_SimpleAttr):
+    """
+    Name of the calibrarion workflow used.
+
+    Parameters
+    ----------
+    workflow_name : `str`
+        Name of the workflow.
+    """
+    def __init__(self, workflow_name: str):
+        super().__init__(workflow_name)
+
+
+# workflowVersion
+class WorkflowVersion(_SimpleAttr):
+    """
+    Version of the calibration workflow used.
+
+    Parameters
+    ----------
+    workflow : `str`
+        Version of the workflow.
+    """
+    def __init__(self, workflow: str):
+        super().__init__(workflow)
+
+
+# observingProgramExecutionId
+class ObservingProgramExecutionID(_SimpleAttr):
+    """
+    Execution ID of the Observing Program.
+
+    Parameters
+    ----------
+    obs_program : `str`
+    """
+    def __init__(self, obs_program: str):
+        super().__init__(obs_program)
+
+
+# instrumentProgramExecutionId
+class InstrumentProgramExecutionID(_SimpleAttr):
+    """
+    Execution ID of the Instrument Program
+
+    Parameters
+    ----------
+    instr_program : `str`
+    """
+    def __init__(self, instr_program: str):
+        super().__init__(instr_program)
+
+
+# headerVersion
+class HeaderVersion(_SimpleAttr):
+    """
+    Header Specification Version
+
+    Parameters
+    ----------
+    version : `str`
+    """
+    def __init__(self, version: str):
+        super().__init__(version)

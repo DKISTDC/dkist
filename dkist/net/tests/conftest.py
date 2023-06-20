@@ -30,7 +30,7 @@ def api_param_names():
     return {
         a.Time: ('startTimeMin', 'endTimeMax'),
         a.Instrument: ('instrumentNames',),
-        a.Wavelength: ('wavelengthMinMin', 'wavelengthMaxMax'),
+        a.Wavelength: ('wavelengthRanges',),
         a.Physobs: ('hasAllStokes',),
         a.Provider: tuple(),
         da.Dataset: ('datasetIds',),
@@ -50,4 +50,10 @@ def api_param_names():
         da.TemporalSampling: ('averageDatasetTemporalSamplingMin', 'averageDatasetTemporalSamplingMax'),
         da.Page: ('pageNumber',),
         da.PageSize: ('pageSize',),
+        da.SummitSoftwareVersion: ('highLevelSoftwareVersion',),
+        da.WorkflowName: ('workflowName',),
+        da.WorkflowVersion: ('workflowVersion',),
+        da.ObservingProgramExecutionID: ('observingProgramExecutionId',),
+        da.InstrumentProgramExecutionID: ('instrumentProgramExecutionId',),
+        da.HeaderVersion: ('headerVersion',),
     }
