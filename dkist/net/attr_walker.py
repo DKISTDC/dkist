@@ -206,7 +206,7 @@ def _(wlk, attr, params):
     """
 
 
-@walker.add_applier(SoftwareVersion)
+@walker.add_applier(SummitSoftwareVersion)
 def _(wlk, attr, params):
     return params.update({'highLevelSoftwareVersion': attr.value})
 
@@ -221,12 +221,12 @@ def _(wlk, attr, params):
     return params.update({'workflowVersion': attr.value})
 
 
-@walker.add_applier(ObservingProgram)
+@walker.add_applier(ObservingProgramExecutionID)
 def _(wlk, attr, params):
     return params.update({'observingProgramExecutionId': attr.value})
 
 
-@walker.add_applier(InstrumentProgram)
+@walker.add_applier(InstrumentProgramExecutionID)
 def _(wlk, attr, params):
     return params.update({'instrumentProgramExecutionId': attr.value})
 

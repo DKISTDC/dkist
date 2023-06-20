@@ -50,10 +50,10 @@ def api_param_names():
         da.TemporalSampling: ('averageDatasetTemporalSamplingMin', 'averageDatasetTemporalSamplingMax'),
         da.Page: ('pageNumber',),
         da.PageSize: ('pageSize',),
-        da.SoftwareVersion: ('highLevelSoftwareVersion',),
+        da.SummitSoftwareVersion: ('highLevelSoftwareVersion',),
         da.WorkflowName: ('workflowName',),
         da.WorkflowVersion: ('workflowVersion',),
-        da.ObservingProgram: ('observingProgramExecutionId',),
-        da.InstrumentProgram: ('instrumentProgramExecutionId',),
+        da.ObservingProgramExecutionID: ('observingProgramExecutionId',),
+        da.InstrumentProgramExecutionID: ('instrumentProgramExecutionId',),
         da.HeaderVersion: ('headerVersion',),
     }
