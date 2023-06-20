@@ -14,6 +14,7 @@ from sunpy.net.fido_factory import UnifiedResponse
 from dkist.net.attrs import Dataset
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.globus.transfer import _orchestrate_transfer_task
+from dkist.utils.inventory import path_format_inventory
 
 __all__ = ["transfer_complete_datasets"]
 
@@ -117,7 +118,8 @@ def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponse
     proposal_id = dataset["Primary Proposal ID"]
     bucket = dataset["Storage Bucket"]
 
-    destination_path = Path(path) / proposal_id
+    path_inv = path_format_inventory(dict(dataset))
+    destination_path = Path(path.format(**path_inv))
 
     file_list = [Path(conf.dataset_path.format(
         datasetId=dataset_id,
