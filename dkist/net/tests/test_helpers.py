@@ -31,6 +31,8 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
+                'Wavelength Max': 856,
+                'Wavelength Min': 854,
             }
         ]),
         **keywords
@@ -41,7 +43,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
-        destination_path=Path("/~/pm_1_10"),
+        destination_path=Path("/~"),
         **keywords
     )
 
@@ -66,6 +68,8 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
+                'Wavelength Max': 856,
+                'Wavelength Min': 854,
             }
         ]),
     )
@@ -75,7 +79,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
-        destination_path=Path("/~/pm_1_10"),
+        destination_path=Path("/~"),
         destination_endpoint=None,
         progress=True,
         wait=True,
@@ -94,11 +98,15 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
+                'Wavelength Max': 856,
+                'Wavelength Min': 854,
             },
             {
                 "Dataset ID": "BBBB",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
+                'Wavelength Max': 856,
+                'Wavelength Min': 854,
             }
         ]),
     )
@@ -110,7 +118,7 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
             mocker.call(
                 [Path("/data/pm_1_10/AAAA")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 destination_endpoint=None,
                 progress=True,
                 wait=True,
@@ -119,7 +127,7 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
             mocker.call(
                 [Path("/data/pm_1_10/BBBB")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 destination_endpoint=None,
                 progress=True,
                 wait=True,
@@ -137,6 +145,8 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A", "B"],
             "Primary Proposal ID": ["pm_1_10", "pm_2_20"],
             "Storage Bucket": ["data", "data"],
+            'Wavelength Max': [856, 856],
+            'Wavelength Min': [854, 854],
         },
     )
 
@@ -148,13 +158,13 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
             mocker.call(
                 [Path("/data/pm_2_20/B")],
                 recursive=True,
-                destination_path=Path("/~/pm_2_20"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
         ]
@@ -167,6 +177,8 @@ def test_transfer_from_length_one_table(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A"],
             "Primary Proposal ID": ["pm_1_10"],
             "Storage Bucket": ["data"],
+            'Wavelength Max': [856],
+            'Wavelength Min': [854],
         },
     )
 
@@ -178,7 +190,7 @@ def test_transfer_from_length_one_table(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
         ]
@@ -191,6 +203,8 @@ def test_transfer_from_row(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A"],
             "Primary Proposal ID": ["pm_1_10"],
             "Storage Bucket": ["data"],
+            'Wavelength Max': [856],
+            'Wavelength Min': [854],
         },
     )
 
@@ -202,7 +216,7 @@ def test_transfer_from_row(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
         ]
@@ -216,6 +230,8 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
                 "Dataset ID": ["A"],
                 "Primary Proposal ID": ["pm_1_10"],
                 "Storage Bucket": ["data"],
+            'Wavelength Max': [856],
+            'Wavelength Min': [854],
             },
         ),
         DKISTQueryResponseTable(
@@ -223,6 +239,8 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
                 "Dataset ID": ["B"],
                 "Primary Proposal ID": ["pm_2_20"],
                 "Storage Bucket": ["data"],
+            'Wavelength Max': [856],
+            'Wavelength Min': [854],
             },
         ),
     )
@@ -236,13 +254,13 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~/pm_1_10"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
             mocker.call(
                 [Path("/data/pm_2_20/B")],
                 recursive=True,
-                destination_path=Path("/~/pm_2_20"),
+                destination_path=Path("/~"),
                 **kwargs
             ),
         ]
