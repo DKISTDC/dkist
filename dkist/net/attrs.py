@@ -15,9 +15,9 @@ __all__ = ['PageSize', 'Page', 'Dataset', 'WavelengthBand', 'Embargoed', 'Observ
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
-           'SpectralSampling', 'SpatialSampling', 'TemporalSampling', 'SoftwareVersion',
-           'WorkflowName', 'WorkflowVersion', 'ObservingProgram', 'InstrumentProgram',
-           'HeaderVersion']
+           'SpectralSampling', 'SpatialSampling', 'TemporalSampling', 'SummitSoftwareVersion',
+           'WorkflowName', 'WorkflowVersion', 'ObservingProgramExecutionID',
+           'InstrumentProgramExecutionID', 'HeaderVersion']
 
 
 # SimpleAttrs
@@ -361,7 +361,7 @@ class TemporalSampling(_Range):
 
 
 # highLevelSoftwareVersion
-class SoftwareVersion(_SimpleAttr):
+class SummitSoftwareVersion(_SimpleAttr):
     """
     Version of the software used to record the data at the summit.
 
@@ -403,7 +403,7 @@ class WorkflowVersion(_SimpleAttr):
 
 
 # observingProgramExecutionId
-class ObservingProgram(_SimpleAttr):
+class ObservingProgramExecutionID(_SimpleAttr):
     """
     Execution ID of the Observing Program.
 
@@ -416,7 +416,7 @@ class ObservingProgram(_SimpleAttr):
 
 
 # instrumentProgramExecutionId
-class InstrumentProgram(_SimpleAttr):
+class InstrumentProgramExecutionID(_SimpleAttr):
     """
     Execution ID of the Instrument Program
 
