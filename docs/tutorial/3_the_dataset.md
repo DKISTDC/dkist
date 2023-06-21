@@ -53,7 +53,7 @@ files = Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}")
 files
 ```
 
-Remember, that the file we have downloaded is a single ASDF file, **not** the whole dataset.
+Remember that the file we have downloaded is a single ASDF file, **not** the whole dataset.
 We can use this file to construct the `Dataset`:
 
 ```{code-cell} ipython
@@ -88,7 +88,7 @@ Before we jump into using the `Dataset` class we need to clarify some definition
 
 ### Coordinates, Arrays, Pixels, oh my!
 
-An key aspect of the `Dataset` is that it is coordinate aware.
+A key aspect of the `Dataset` is that it is coordinate aware.
 That is, it is able to map between array indices and physical dimensions.
 This means that you can easily convert from a position in the array to a location defined by physical coordinates.
 
@@ -110,7 +110,7 @@ for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.dimensions):
     print(f"{name}: {length}")
 ```
 
-These axes map onto world axes via the axis correlation matrix we saw in the first session:
+These axes map onto world axes via the axis correlation matrix we saw in the first section:
 ```{code-cell} python
 ds.wcs.axis_correlation_matrix
 ```
@@ -149,6 +149,8 @@ Finally, it's possible to get all the axis coordinates along one or more axes:
 This might eat all your <del>cat</del> RAM.
 
 The algorithm used to calculate these coordinates in ndcube isn't as memory efficient as it could be, and when working with the large multi-dimensional DKIST data you can really notice it!
+
+This will be improved in later versions of the `dkist` package.
 ```
 
 ```{code-cell} python
