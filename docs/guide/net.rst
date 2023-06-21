@@ -35,7 +35,7 @@ An example search is:
    import dkist
    import dkist.net
 
-   results = Fido.search(a.Instrument("VBI"), a.Time("2022-01-01", "2022-01-02"))
+   results = Fido.search(a.Instrument("VBI"), a.Time("2022-06-02", "2022-06-03"))
    results
 
 This search would match any datasets taken by the VBI instrument on the 1st January 2022.
@@ -45,7 +45,7 @@ It is also possible to use the ``|`` (or) operator to specify multiple criteria,
 
 .. code-block:: python
 
-   results = Fido.search(a.Time("2022-01-01", "2022-01-02"),
+   results = Fido.search(a.Time("2022-06-01", "2022-06-03"),
                          a.Instrument("VBI") | a.Instrument("VISP"))
    results
 
@@ -62,6 +62,7 @@ Once you have identified one or more datasets of interest, you can download the 
 
 .. code-block:: python
 
+   results = Fido.search(a.dkist.Dataset("AYDEW"))
    files = Fido.fetch(results)
 
 This will return a list-like object which contains one or more filepaths to the downloaded ASDF files.
@@ -116,6 +117,8 @@ For example:
    It is possible to use the `dkist` package to orchestrate transfers to remote endpoints or other more complex arrangements by specifying the ``destination_endpoint=`` keyword argument to all these functions.
 
 Once we have loaded the dataset, if we wish to transfer all the FITS files a single call to `~dkist.io.FileManager.download` will initiate the transfer:
+
+.. skip: start
 
 .. code-block:: python
 
@@ -186,6 +189,8 @@ Finally, if you know the dataset ID of a dataset you wish to download, you can j
 .. code-block:: python
 
     transfer_complete_datasets("AAAAA")
+
+.. skip: end
 
 .. _interpolation-keys:
 
