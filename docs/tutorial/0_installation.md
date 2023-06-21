@@ -10,15 +10,14 @@ jupytext:
 
 # Installation and Setup
 
-This workshop is a code-along style workshop.
-For this to work we will need some software installed on your laptops:
-
+This tutorial will take you through the basics of using the DKIST Python Tools.
+To be able to follow along with the examples you will first need to install some software:
 
 ## Globus
 
 To download DKIST data you need [Globus Connect Personal (GCP)](https://www.globus.org/globus-connect-personal), and a Globus account.
 
-Please install GCP and have it ready to use during the workshop.
+You will need to install GCP and have it running before you can download any data from DKIST.
 The [DKIST Help Desk](https://nso.atlassian.net/servicedesk/customer/portal/3/article/247694160) has some pages to help with this.
 
 ## Python
@@ -96,81 +95,8 @@ conda install -c conda-forge dkist jupyter
 
 ### Installing `dkist` with pip
 
-If you know what you are doing and have Python installed without conda, please make a clean virtual environment and run:
+If you know what you are doing and have Python installed without conda, make a clean virtual environment and run:
 
 ```{code-block} bash
 pip install dkist jupyter
 ```
-
-## Getting the Workshop Materials
-
-The next step is to get the [Jupyter Notebooks](https://jupyter-notebook.readthedocs.io/en/latest/) we will be using for the workshop.
-We have published these notebooks in the [DKISTDC/NSO-Python-Workshop](https://github.com/DKISTDC/NSO-Python-Workshop) GitHub repository.
-To get them you need to have [git](https://git-scm.com/) installed.
-
-::::{tab-set}
-
-:::{tab-item} Install git and download
-If you don't have git already, then you can install it with conda.
-First make sure you are in the correct conda environment:
-
-```{code-block} console
-conda activate dkist-workshop
-```
-
-then install git:
-```{code-block} console
-conda install git
-```
-
-Next, ensure you are in the parent directory to where you want to download the notebooks, for example:
-
-```{code-block} console
-cd ~
-```
-
-then download the git repository:
-
-```{code-block} console
-git clone https://github.com/DKISTDC/NSO-Python-Workshop.git
-```
-
-This should have made a directory called `NSO-Python-Workshop`
-
-:::
-
-:::{tab-item} I already have git
-
-Ensure you are in the correct directory and run:
-
-```{code-block} console
-git clone https://github.com/DKISTDC/NSO-Python-Workshop.git
-```
-:::
-
-:::{tab-item} I give up, git hates me
-You can download a zip file [here](https://github.com/DKISTDC/NSO-Python-Workshop/archive/refs/heads/main.zip) but you won't be able to fetch any updates or the final versions of the notebooks.
-:::
-::::
-
-## Running Juypter Notebook
-
-The last step to get you up and running is to start the Jupyter Notebook server.
-
-Firstly, make sure you are in the `NSO-Python-Workshop` directory, for example:
-
-```{code-block} console
-cd ~/NSO-Python-Workshop
-```
-
-then run:
-
-```{code-block} console
-jupyter notebook
-```
-
-This should pop open a web page in your browser which will give you an interactive Python session, which looks something like this:
-
-![](./notebook.png)
-
-click on the `index.ipynb` file to load it and get started.

@@ -15,10 +15,10 @@ kernelspec:
 
 Before we progress to searching for DKIST data we need to cover some functionality of the [SunPy](https://sunpy.org) and [Astropy](https://astropy.org) packages.
 These two packages, amongst a few others, are the core components of the DKIST tools.
-In this session we shall only quickly cover the functionality of SunPy and Astropy we need for the rest of the workshop.
+In this section we shall only quickly cover the functionality of SunPy and Astropy we need for the rest of the tutorial.
 There are many other parts of these packages which are useful when working with DKIST data, which you should explore.
 
-As we covered in the introduction, Python is a modular language; Astropy provides fundamental functionality for a lot of different types of astronomy.
+Python is a modular language; Astropy provides fundamental functionality for a lot of different types of astronomy.
 In this section we shall cover the following parts of Astropy:
 
 * Units
@@ -166,9 +166,9 @@ spc = SpectralCoord(586.3 * u.nm, target=hpc2, observer=get_earth(time=hpc2.obst
 spc
 ```
 
-We can show the full details of the spectral coord (working around a [bug in astropy](https://github.com/astropy/astropy/issues/14758)):
+We can show the full details of the spectral coord:
 ```{code-cell} python
-print(repr(spc))
+spc
 ```
 
 ## World Coordinate System

@@ -13,7 +13,7 @@ kernelspec:
 ---
 # Searching for DKIST Datasets
 
-In this session we will cover how to search for DKIST datasets available at the DKIST Data Center.
+In this section we will cover how to search for DKIST datasets available at the DKIST Data Center.
 In DKIST data parlance, a "dataset" is the smallest unit of data that is searchable from the data centre, and represents a single observation from a single instrument at a single pass band.
 
 Each dataset comprises a number of different files:
@@ -162,14 +162,14 @@ Fido.fetch(vbi[0], path="/data/mypath/")
 
 This will download the ASDF file as `/data/mypath/filename.asdf`.
 
-With the nature of DKIST data being a large number of files - FITS + ASDF for a whole dataset - we probably want to keep each dataset in it's own folder.
+With the nature of DKIST data being a large number of files - FITS + ASDF for a whole dataset - we probably want to keep each dataset in its own folder.
 `Fido` makes this easy by allowing you to provide a path template rather than a specific path.
 To see the list of parameters we can use in these path templates we can run:
 ```{code-cell} python
 vbi.path_format_keys()
 ```
 
-So if we want to put each of our ASDF files in a directory named with the Dataset ID and Instrument we can do:
+So if we want to put each of several ASDF files in a directory named with the Dataset ID and Instrument we can do:
 
 ```{code-cell} python
 Fido.fetch(vbi[:5], path="~/sunpy/data/{instrument}/{dataset_id}/")

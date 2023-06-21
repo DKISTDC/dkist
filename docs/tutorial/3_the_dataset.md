@@ -15,7 +15,7 @@ kernelspec:
 # The `Dataset` Class
 
 As previously discussed we know that a "DKIST dataset" is comprised of many files, including an ASDF and many FITS files.
-The user tools represent all these files with the {obj}`dkist.Dataset` class.
+The Python tools represent all these files with the {obj}`dkist.Dataset` class.
 
 A `Dataset` class is constructed from the ASDF file for that dataset.
 This ASDF file contains the following information:
