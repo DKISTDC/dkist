@@ -139,10 +139,10 @@ This will download the ASDF file to the sunpy default data directory `~/sunpy/da
 A simple example of specifying the path is:
 
 ```{code-block} python
-Fido.fetch(vbi[0], path="/data/mypath/")
+Fido.fetch(vbi[0], path="data/mypath/")
 ```
 
-This will download the ASDF file as `/data/mypath/filename.asdf`.
+This will download the ASDF file as `data/mypath/filename.asdf`.
 
 With the nature of DKIST data being a large number of files - FITS + ASDF for a whole dataset - we probably want to keep each dataset in its own folder.
 `Fido` makes this easy by allowing you to provide a path template rather than a specific path.
