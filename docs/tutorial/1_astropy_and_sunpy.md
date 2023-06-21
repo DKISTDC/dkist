@@ -31,28 +31,28 @@ Astropy provides a subpackage {obj}`astropy.units` which provides tools for asso
 This lets you do mathematical operations on these arrays while propagating the units.
 
 To get started we import `astropy.units`; because we are going to be using this a lot, we import it as `u`.
-```{code-cell} python
+```{code-block} python
 import astropy.units as u
 ```
 
 Now we can access various units as such:
-```{code-cell} python
+```{code-block} python
 u.m
 ```
 
-```{code-cell} python
+```{code-block} python
 u.kg
 ```
 
 We can now attach a unit to a number:
-```{code-cell} python
+```{code-block} python
 length = 10 * u.m
 length
 ```
 
 We can also compose multiple quantities (a number with a unit):
 
-```{code-cell} python
+```{code-block} python
 
 speed = length / (30 * u.min)
 speed
@@ -60,7 +60,7 @@ speed
 
 Using the `.to()` method on a `u.Quantity` object lets you convert a quantity to a different unit.
 
-```{code-cell} python
+```{code-block} python
 speed.to(u.km/u.h)
 ```
 
@@ -68,16 +68,13 @@ speed.to(u.km/u.h)
 
 Some conversions are not done by a conversion factor as between miles and kilometers – for example converting between wavelength and frequency:
 
-```{code-cell} python
----
-tags: [raises-exception]
----
+```{code-block} python
 (656.281 * u.nm).to(u.Hz)  # Fails because they are not compatible
 ```
 
 However we can make use of a spectral *equivalency* to indicate the link between the units:
 
-```{code-cell} python
+```{code-block} python
 (656.281 * u.nm).to(u.Hz, equivalencies=u.spectral())
 ```
 
@@ -85,10 +82,10 @@ However we can make use of a spectral *equivalency* to indicate the link between
 
 The `astropy.constants` sub-package provides a set of physical constants which are compatible with the units/quantities framework:
 
-```{code-cell} python
+```{code-block} python
 from astropy.constants import M_sun, c
 ```
-```{code-cell} python
+```{code-block} python
 E = M_sun * c ** 2
 E.to(u.J)
 ```
@@ -107,14 +104,14 @@ Currently, {obj}`astropy.coordinates` supports:
 SunPy provides extensions to the Astropy coordinate system to represent common solar physics frames.
 So to use the sunpy coordinates we have to first import {obj}`sunpy.coordinates` which registers them with astropy.
 
-```{code-cell} python
+```{code-block} python
 import sunpy.coordinates
 from astropy.coordinates import SkyCoord
 ```
 
 We can now create a `SkyCoord` object representing a point on the Sun:
 
-```{code-cell} python
+```{code-block} python
 SkyCoord(10*u.arcsec, 20*u.arcsec, frame="helioprojective")
 ```
 
@@ -122,7 +119,7 @@ This is the most minimal version of this coordinate frame, however, it isn't ver
 This is because helioprojective is an observer centred coordinate frame, so we need to know where in inertial space the observer is.
 One way of doing this is to say the observer is on Earth at a specific time:
 
-```{code-cell} python
+```{code-block} python
 hpc1 = SkyCoord(10*u.arcsec, 20*u.arcsec, frame="helioprojective",
                 obstime="2023-05-21T04:00:00", observer="earth")
 hpc1
@@ -130,7 +127,7 @@ hpc1
 
 This coordinate can now be converted to other frames, such as heliographic coordinates:
 
-```{code-cell} python
+```{code-block} python
 hpc1.transform_to("heliographic_stonyhurst")
 ```
 
@@ -149,25 +146,25 @@ There are few things to notice about the difference between these two `SkyCoord`
 Use of `SpectralCoord` with solar data is still experimental so not all features may work, or be accurate.
 ```
 
-```{code-cell} python
+```{code-block} python
 from astropy.coordinates import SpectralCoord
 from sunpy.coordinates import get_earth
 ```
 
 `SpectralCoord` does not automatically make the HPC coordinate 3D, but wants the distance, so we do it explicitally:
 
-```{code-cell} python
+```{code-block} python
 hpc2 = hpc1.make_3d()
 ```
 
 Now we can construct our spectral coordinate with both a target and an observer
-```{code-cell} python
+```{code-block} python
 spc = SpectralCoord(586.3 * u.nm, target=hpc2, observer=get_earth(time=hpc2.obstime))
 spc
 ```
 
 We can show the full details of the spectral coord:
-```{code-cell} python
+```{code-block} python
 spc
 ```
 
@@ -177,28 +174,25 @@ One of the other core components of the ecosystem provided by Astropy is the {ob
 When loading a FITS file with complete (and standard-compliant) WCS metadata we can create an `astropy.wcs.WCS` object.
 For this example we will use a single VISP frame.
 
-```{code-cell} python
+```{code-block} python
 import sunpy.coordinates
 ```
 
 To read this FITS file we will use {obj}`astropy.io.fits`.
 
-```{code-cell} python
+```{code-block} python
 from astropy.io import fits
 
 hdu_list = fits.open("../data/VISP_2022_10_24T19_47_33_218_00630205_I_BEOGN_L1.fits")
 ```
 
 We can now access the header of the second HDU (the one containing the data):
-```{code-cell} python
----
-tags: [output_scroll]
----
+```{code-block} python
 hdu_list[1].header
 ```
 
 Using this header we can create a `astropy.wcs.WCS` object:
-```{code-cell} python
+```{code-block} python
 from astropy.wcs import WCS
 
 wcs = WCS(hdu_list[1].header)
@@ -207,7 +201,7 @@ wcs
 
 This WCS object allows us to convert between pixel and world coordinates, for example:
 
-```{code-cell} python
+```{code-block} python
 wcs.pixel_to_world(1024, 400, 1)
 ```
 
@@ -215,24 +209,24 @@ This call returns a {obj}`astropy.coordinates.SkyCoord` object (which needs sunp
 
 We can also convert between pixel and plain numbers:
 
-```{code-cell} python
+```{code-block} python
 wcs.pixel_to_world_values(1024, 400, 1)
 ```
 
 The units for these values are given by:
 
-```{code-cell} python
+```{code-block} python
 wcs.world_axis_units
 ```
 
 The WCS also has information about what the world axes represent:
 
-```{code-cell} python
+```{code-block} python
 wcs.world_axis_physical_types
 ```
 We can also inspect the correlation between the world axes and pixel axes:
 
-```{code-cell} python
+```{code-block} python
 wcs.axis_correlation_matrix
 ```
 

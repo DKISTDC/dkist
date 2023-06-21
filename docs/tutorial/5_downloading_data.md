@@ -77,10 +77,7 @@ Now that we've been over the basic concepts of how data downloads work in Globus
 For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
 First let's reload the VBI dataset we were using before.
 
-```{code-cell} ipython
----
-tags: [keep-inputs]
----
+```{code-block} python
 import dkist
 import dkist.net
 from sunpy.net import Fido, attrs as a
@@ -91,7 +88,7 @@ ds = dkist.Dataset.from_directory("~/sunpy/data/VBI/BLKGA")[0, 0]
 
 As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the dataset even before downloading any.
 
-```{code-cell} ipython
+```{code-block} python
 print(ds.files)
 print(ds.files.filenames)
 ```
@@ -100,11 +97,11 @@ The `files` attribute has a `download()` method that we will use for downloading
 In order to speed up this demonstration a bit, we will just download the first file.
 To do this we can slice the dataset so that we're only accessing the portion of the data saved in the first file, paying attention to the chunking information in the `Dataset`:
 
-```{code-cell} ipython
+```{code-block} python
 ds
 ```
 
-```{code-cell} ipython
+```{code-block} python
 ds[0].files.download()
 ds[0].plot()
 ```
@@ -114,10 +111,7 @@ Since the `download()` method set up the transfer through globus, you can check 
 We can change the download location of the files using the `path` argument.
 But remember that whatever path you specify must be accessible by Globus Connect Personal.
 
-```{code-cell} ipython
----
-tags: [skip-execution]
----
+```{code-block} python
 ds[0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail
 ```
 
@@ -125,10 +119,7 @@ The `path` keyword will replace placeholders in the path in the same way as we s
 Any key in the dataset inventory (`ds.meta['inventory']`) can be used for this.
 So for example:
 
-```{code-cell} ipython
----
-tags: [skip-execution]
----
+```{code-block} python
 ds[0].files.download(path="~/sunpy/data/{dataset_id}")
 ```
 
@@ -136,20 +127,14 @@ would save the file to `~/sunpy/data/BLKGA/VBI_2022_06_02T17_22_50_173_00486136_
 
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-block} python
 ds.files.download()
 ```
 
 Alternatively, the user tools offer another function which can also be used to download a full dataset.
 The `transfer_complete_datasets()` function can take a Fido search results object and download full datasets:
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-block} python
 results = Fido.search(a.Instrument("VBI"), a.Time("2022-06-03 17:00", "2022-06-03 18:00"))
 dkist.net.transfer_complete_datasets(results["dkist"][0])
 ```
@@ -159,10 +144,7 @@ Notice that we have to specify `results["dkist"]` here, because `transfer_comple
 We can also download many datasets at once.
 For example if we have a proposal ID that we want to download all the data for we could run:
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-block} python
 results = Fido.search(a.dkist.Proposal("pid_1_123"))
 dkist.net.transfer_complete_datasets(results)
 ```
@@ -172,10 +154,7 @@ This will iterate over the results and download each dataset in turn, with a pro
 Of course, if this is a dataset you already know you will want to download all of - for example if it's your own observation - then you may not need to find it through Fido first.
 Fortunately, `transfer_complete_datasets()`, also lets you specify a dataset or datasets for which to download all files, by passing the dataset IDs.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-block} python
 dkist.net.transfer_complete_datasets('BLKGA')
 ```
 
@@ -190,10 +169,7 @@ Setting `wait=False` will also skip the wait at the end of each dataset if downl
 To demonstrate this, let's grab some data for the next session, which will be on visualisation.
 We will want a multi-dimensional dataset, so let's use the VISP one we looked at in the last session.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-block} python
 ds = dkist.Dataset.from_directory("~/sunpy/data/VISP/AGLKO")
 ds.files.download(wait=False, progress=False)
 ```
