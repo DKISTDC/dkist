@@ -72,6 +72,7 @@ Slicing works the same way for the `~dkist.Dataset` object as it does for `~ndcu
 The only thing which is specific to the `~dkist.Dataset` class is the interaction between the slicing syntax and the `~dkist.Dataset.files` property.
 
 When you slice a dataset the new, smaller, dataset has a new `~dkist.Dataset.files` object which is unrelated to the one of the larger parent `~dkist.Dataset`.
+.. skip: start
 This means that if you slice the dataset::
 
   >>> ds = dkist.Dataset.from_asdf(myfilename)
@@ -85,3 +86,5 @@ The data will be available for the smaller dataset and not the larger one, as on
 To set the parent dataset to use the same basepath as the post-download smaller dataset you have to run::
 
   >>> ds.files.basepath = small_ds.files.basepath
+
+.. skip: end
