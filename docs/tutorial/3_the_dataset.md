@@ -31,10 +31,7 @@ If a `Dataset` object is created from just the ASDF file, without access to the 
 There are a two ways to construct a `Dataset`: by providing a path to an ASDF file or by providing a directory containing an ASDF file.
 Here we shall first fetch an ASDF file with Fido and then pass it to `Dataset.from_asdf`:
 
-```{code-cell} ipython
----
-tags: [keep-inputs]
----
+```{code-block} python
 from astropy.time import Time
 
 import dkist
@@ -42,13 +39,13 @@ import dkist.net
 from sunpy.net import Fido, attrs as a
 ```
 
-```{code-cell} ipython
+```{code-block} python
 # Create DKIST Fido client instance
 res = Fido.search(a.dkist.Dataset('AYDEW'))
 
 res
 ```
-```{code-cell} ipython
+```{code-block} python
 files = Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}")
 files
 ```
@@ -56,7 +53,7 @@ files
 Remember, that the file we have downloaded is a single ASDF file, **not** the whole dataset.
 We can use this file to construct the `Dataset`:
 
-```{code-cell} ipython
+```{code-block} python
 ds = dkist.Dataset.from_asdf(files[0])
 ```
 
@@ -65,7 +62,7 @@ This may sound unhelpful but we'll see how it can be very powerful.
 
 First let's have a look at the basic representation of the `Dataset`.
 
-```{code-cell} ipython
+```{code-block} python
 ds
 ```
 
@@ -93,41 +90,41 @@ That is, it is able to map between array indices and physical dimensions.
 This means that you can easily convert from a position in the array to a location defined by physical coordinates.
 
 The first thing we can inspect about our dataset is the dimensionality of the underlying array.
-```{code-cell} python
+```{code-block} python
 ds.dimensions
 ```
 
 These are the **array** dimensions.
 We can get the corresponding **pixel** axis names with:
 
-```{code-cell} python
+```{code-block} python
 ds.wcs.pixel_axis_names
 ```
 
 note how these are reversed from one another, we can print them together with:
-```{code-cell} python
+```{code-block} python
 for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.dimensions):
     print(f"{name}: {length}")
 ```
 
 These axes map onto world axes via the axis correlation matrix we saw in the first session:
-```{code-cell} python
+```{code-block} python
 ds.wcs.axis_correlation_matrix
 ```
 
 We can get a list of the world axes which correspond to each array axis with:
-```{code-cell} python
+```{code-block} python
 ds.array_axis_physical_types
 ```
 
 Finally, as we saw in the first session, we can convert between pixel or array coordinates and world coordinates:
 
-```{code-cell} ipython
+```{code-block} python
 # Convert array indices to world (physical) coordinates
 ds.wcs.array_index_to_world(0, 10, 20, 30)
 ```
 
-```{code-cell} ipython
+```{code-block} python
 # Convert pixel coords to world coords
 world = ds.wcs.pixel_to_world(30, 20, 10, 0)
 world
@@ -135,11 +132,11 @@ world
 
 and we can also do the reverse:
 
-```{code-cell} python
+```{code-block} python
 ds.wcs.world_to_pixel(*world)
 ```
 
-```{code-cell} python
+```{code-block} python
 ds.wcs.world_to_array_index(*world)
 ```
 
@@ -151,17 +148,11 @@ This might eat all your <del>cat</del> RAM.
 The algorithm used to calculate these coordinates in ndcube isn't as memory efficient as it could be, and when working with the large multi-dimensional DKIST data you can really notice it!
 ```
 
-```{code-cell} python
----
-tags: [output_scroll]
----
+```{code-block} python
 ds.axis_world_coords()
 ```
 
-```{code-cell} python
----
-tags: [output_scroll]
----
+```{code-block} python
 ds.axis_world_coords('time')
 ```
 
@@ -171,7 +162,7 @@ Another useful feature of the `Dataset` class, which it inherits from `NDCube` i
 
 For example, to extract the Stokes I component of the dataset we would do:
 
-```{code-cell} python
+```{code-block} python
 ds[0]
 ```
 
@@ -179,13 +170,13 @@ This is because the Stokes axis is the first array axis, and the "I" profile is 
 
 Note how we have dropped a world coordinate; this information is preserved in the `.global_coords` attribute, which contains the coordinate information which applies to the whole dataset:
 
-```{code-cell} python
+```{code-block} python
 ds[0].global_coords
 ```
 
 We can also slice out a section of an axis of the dataset:
 
-```{code-cell} python
+```{code-block} python
 ds[:, 100:200, :, :]
 ```
 
@@ -204,7 +195,7 @@ This kind of tiled data cannot be stored in a single `Dataset` object.
 There is therefore a wrapper object called `TiledDataset`, which is essentially an array of `Dataset` objects.
 Let's demonstrate this with a VBI dataset.
 
-```{code-cell} python
+```{code-block} python
 res = Fido.search(a.dkist.Dataset('BLKGA'))
 files = Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}")
 tds = dkist.Dataset.from_asdf(files[0])
@@ -213,7 +204,7 @@ tds
 
 To access the individual tiles, we can then index this normally to get back the `Dataset` objects.
 
-```{code-cell} ipython
+```{code-block} python
 ds = tds[0, 0]
 ds
 ```

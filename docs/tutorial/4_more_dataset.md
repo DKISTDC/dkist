@@ -17,10 +17,7 @@ kernelspec:
 Firstly we need to re-create our dataset object from the last notebook.
 Remember it was a `TiledDataset` so we will index it to just get the first `Dataset` object.
 
-```{code-cell} ipython
----
-tags: [keep-inputs]
----
+```{code-block} python
 import dkist
 import dkist.net
 from sunpy.net import Fido, attrs as a
@@ -42,26 +39,20 @@ This means that all the metadata about each file is accessible using only the AS
 (It also means any changes you make to the headers in the headers table won't be reflected in the FITS files.)
 These headers are stored as a table in the `headers` attribute of the `Dataset`.
 
-```{code-cell} ipython
----
-tags: [output_scroll]
----
+```{code-block} python
 ds.headers
 ```
 
 Since the headers are stored as a table, it is straightforward to inspect a keyword for all files at once.
 For example, to see the time of every frame in the dataset:
 
-```{code-cell} ipython
----
-tags: [output_scroll]
----
+```{code-block} python
 ds.headers['DATE-AVG']
 ```
 
 Or we can look at one or more rows (i.e.: files) by slicing the table.
 
-```{code-cell} ipython
+```{code-block} python
 ds.headers[:5]
 ```
 
@@ -74,7 +65,7 @@ For example, we might want to inspect the seeing conditions and plot the Fried p
 First, if you're not familiar with all of the keywords in the header, they can be checked in the documentation.
 Helpfully, `Dataset` provides some additional metadata which includes a link to that documentation:
 
-```{code-cell} ipython
+```{code-block} python
 ds.meta['inventory']['headerDocumentationUrl']
 ```
 
@@ -82,7 +73,7 @@ If you follow this link and then click on "Level One FITS Specification" you wil
 Using this we can find that the Fried parameter is stored with the keyword `"ATMOS_R0"`.
 Then it's trivial to plot this information:
 
-```{code-cell} ipython
+```{code-block} python
 import matplotlib.pyplot as plt
 
 plt.plot(ds.headers['ATMOS_R0'])
@@ -91,7 +82,7 @@ plt.show()
 
 Or we can use multiple columns from the headers to compare information or look at related values.
 
-```{code-cell} python
+```{code-block} python
 import astropy.units as u
 
 plt.scatter(ds.headers["CRVAL1"], ds.headers["CRVAL2"])
@@ -101,20 +92,20 @@ plt.scatter(ds.headers["CRVAL1"], ds.headers["CRVAL2"])
 
 `Dataset` tracks information about the individual files that make up the datset in the `files` attribute.
 
-```{code-cell} ipython
+```{code-block} python
 ds.files
 ```
 
 This tells us that our (19, 4096, 4096) data array is stored as 19 files, each containing an array of (4096, 4096).
 Since the filenames are automatically generated from observation metadata, the `files` attribute can also track those before we even download the data.
 
-```{code-cell} ipython
+```{code-block} python
 ds.files.filenames
 ```
 
 `Dataset` also knows the base path of the data - the path where the data is (or will be) saved.
 
-```{code-cell} ipython
+```{code-block} python
 ds.files.basepath
 ```
 
@@ -126,21 +117,21 @@ We have mentioned a few times already that we can reduce the size of a data down
 However, there is an important point to note about this, which is that you need to keep in mind how the data are stored across the dataset's files.
 For this example let's use a larger and more complicated dataset.
 
-```{code-cell} ipython
+```{code-block} python
 ds = dkist.Dataset.from_asdf(
     Fido.fetch(Fido.search(a.dkist.Dataset('AGLKO')),
         path="~/sunpy/data/{instrument}/{dataset_id}")[0])
 ds
 ```
 
-```{code-cell} ipython
+```{code-block} python
 ds.files
 ```
 
 So in this case we can see that each FITS file contains effectively a 2D image - a single raster scan at one polarisation state - and that we have many of these files to make a full 4D dataset.
 What this means is that if we look at a subset of the scan steps or polarisation states, we will reduce the number of files across which the array is stored.
 
-```{code-cell} ipython
+```{code-block} python
 ds[0]
 ```
 
@@ -149,17 +140,17 @@ Because we're looking at a single polarisation state, that axis and the correspo
 
 Going back to the `files` attribute, we can see that we do indeed have fewer files for this subset of the data.
 
-```{code-cell} ipython
+```{code-block} python
 ds[0].files
 ```
 
 However, if we decide we want to look at a single wavelength, we are taking a row of pixels from every single file.
 So although we reduce the dimensions of the array, we are not reducing the number of files we need to reference - and therefore download.
 
-```{code-cell} ipython
+```{code-block} python
 ds[:, :, 500, :].data.shape
 ```
-```{code-cell} ipython
+```{code-block} python
 ds[:, :, 500, :].files
 ```
 ## Downloading the quality report and preview movie
@@ -169,7 +160,7 @@ This is accessible through the `Dataset`'s `quality_report()` method, which will
 This uses parfive underneath, which is the same library `Fido` uses, so it will return the same kind of `results` object.
 If the download has been successful, this can be treated as a list of filenames.
 
-```{code-cell} ipython
+```{code-block} python
 qr = ds.files.quality_report()
 qr
 ```
@@ -180,7 +171,7 @@ This method takes the optional arguments `path` and `overwrite`.
 Similarly, each dataset also has a short preview movie showing the data.
 This can be downloaded in exactly the same way as the quality report but using the `preview_movie()` method:
 
-```{code-cell} ipython
+```{code-block} python
 pm = ds.files.preview_movie()
 pm
 ```
