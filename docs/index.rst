@@ -8,6 +8,7 @@ The DKIST Python tools provide a package (`dkist`) which aims to help you search
   :hidden:
 
   self
+  tutorial/index
   guide/index
   reference
   whatsnew/index

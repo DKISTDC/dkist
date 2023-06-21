@@ -77,7 +77,10 @@ extensions = [
     'sphinx_autodoc_typehints',  # must be loaded after napoleon
     'sunpy.util.sphinx.doctest',
     'sunpy.util.sphinx.generate',
+    'sphinx_design',
+    'myst_parser',
 ]
+myst_enable_extensions = ["colon_fence"]
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
 
