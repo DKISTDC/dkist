@@ -102,7 +102,7 @@ ds
 ```
 
 ```{code-block} python
-ds[0].files.download()
+ds[0].files.download() # doctest: +SKIP
 ds[0].plot()
 ```
 The default download directory used by `donwload()` is in the same folder as the ASDF file we loaded, so in this case `~/sunpy/data/VBI/BLKGA`.
@@ -112,7 +112,7 @@ We can change the download location of the files using the `path` argument.
 But remember that whatever path you specify must be accessible by Globus Connect Personal.
 
 ```{code-block} python
-ds[0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail
+ds[0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail # doctest: +SKIP
 ```
 
 The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`.
@@ -120,7 +120,7 @@ Any key in the dataset inventory (`ds.meta['inventory']`) can be used for this.
 So for example:
 
 ```{code-block} python
-ds[0].files.download(path="~/sunpy/data/{dataset_id}")
+ds[0].files.download(path="~/sunpy/data/{dataset_id}") # doctest: +SKIP
 ```
 
 would save the file to `~/sunpy/data/BLKGA/VBI_2022_06_02T17_22_50_173_00486136_I_BLKGA_L1.fits`.
@@ -128,7 +128,7 @@ would save the file to `~/sunpy/data/BLKGA/VBI_2022_06_02T17_22_50_173_00486136_
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
 ```{code-block} python
-ds.files.download()
+ds.files.download() # doctest: +SKIP
 ```
 
 Alternatively, the user tools offer another function which can also be used to download a full dataset.
@@ -171,7 +171,7 @@ We will want a multi-dimensional dataset, so let's use the VISP one we looked at
 
 ```{code-block} python
 ds = dkist.Dataset.from_directory("~/sunpy/data/VISP/AGLKO")
-ds.files.download(wait=False, progress=False)
+ds.files.download(wait=False, progress=False) # doctest: +SKIP
 ```
 
 Here we're setting the data to download, but notice that the function has returned almost immediately, so we can close the notebook and continue to the next session without interrupting it.
