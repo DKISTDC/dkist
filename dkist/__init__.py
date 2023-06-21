@@ -1,7 +1,7 @@
 """
 The DKIST package aims to help you search, obtain and use DKIST data as part of your Python software.
 """
-from pkg_resources import DistributionNotFound, get_distribution
+from importlib.metadata import PackageNotFoundError, version
 
 import astropy.config as _config
 
@@ -9,8 +9,8 @@ from .dataset import Dataset, TiledDataset  # noqa
 from .utils.sysinfo import system_info  # noqa
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = version("package-name")
+except PackageNotFoundError:
     # package is not installed
     __version__ = "unknown"
 
