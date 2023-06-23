@@ -2,6 +2,7 @@ import importlib.resources as importlib_resources
 from pathlib import Path
 from textwrap import dedent
 
+import numpy as np
 from jsonschema.exceptions import ValidationError
 
 import asdf
@@ -114,6 +115,8 @@ class Dataset(NDCube):
         if "inventory" not in meta:
             raise ValueError("The meta dict must contain the inventory record.")
 
+        self.headers = meta["headers"].copy()
+
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)
 
@@ -121,14 +124,24 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
+            self.headers = self._slice_headers(item)
         return sliced_dataset
+
+    def _slice_headers(self, slice_):
+        file_idx = self.files._array_slice_to_loader_slice(slice_)
+        grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
+        file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+        files_shape = (i for i in self.files.shape if i != 1)
+        flat_index = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+
+        return self.headers[flat_idx]
 
     """
     Properties.
     """
 
     @property
-    def headers(self):
+    def all_headers(self):
         """
         An `~astropy.table.Table` of all the FITS headers for all files in this dataset.
 
