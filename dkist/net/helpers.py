@@ -49,6 +49,16 @@ def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponse
         can be a table or a row from the search results returned by a call to
         ``Fido.search``.
 
+    path
+        The path to save the data in, must be accessible by the Globus
+        endpoint.
+        The default value is ``/~/``.
+        It is possible to put placeholder strings in the path with any key
+        from the dataset inventory dictionary which can be accessed as
+        ``ds.meta['inventory']``. An example of this would be
+        ``path="~/dkist/{datasetId}"`` to save the files in a folder named
+        with the dataset ID being downloaded.
+
     destination_endpoint
         A unique specifier for a Globus endpoint. If `None` a local
         endpoint will be used if it can be found, otherwise an error will
