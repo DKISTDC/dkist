@@ -124,17 +124,25 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
-            self.headers = self._slice_headers(item)
+            sliced_dataset.headers = self._slice_headers(item)
         return sliced_dataset
 
     def _slice_headers(self, slice_):
-        file_idx = self.files._array_slice_to_loader_slice(slice_)
+        idx = self.files._array_slice_to_loader_slice(slice_)
+        if idx == (np.s_[:],):
+            return self.all_headers.copy()
+        file_idx = []
+        for i in idx:
+            if not isinstance(i, slice):
+                i = slice(i, i+1)
+            file_idx.append(i)
+        file_idx = tuple(file_idx)
         grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
         file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
-        files_shape = (i for i in self.files.shape if i != 1)
-        flat_index = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+        files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
 
-        return self.headers[flat_idx]
+        return self.all_headers[flat_idx].copy()
 
     """
     Properties.
