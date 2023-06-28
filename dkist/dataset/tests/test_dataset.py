@@ -116,3 +116,8 @@ def test_file_manager():
 
 def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
+
+
+def test_inventory_propery():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    assert dataset.inventory == dataset.meta['inventory']

@@ -1,0 +1,1 @@
+Add a `Dataset.inventory` attribute to more easily access the inventory metadata (previously `.meta['inventory']`.
