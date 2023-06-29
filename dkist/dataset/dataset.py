@@ -122,7 +122,7 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
-            sliced_dataset.headers = self._slice_headers(item)
+            sliced_dataset.meta["headers"] = self._slice_headers(item)
         return sliced_dataset
 
     def _slice_headers(self, slice_):
