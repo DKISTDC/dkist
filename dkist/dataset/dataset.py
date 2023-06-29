@@ -115,8 +115,6 @@ class Dataset(NDCube):
         if "inventory" not in meta:
             raise ValueError("The meta dict must contain the inventory record.")
 
-        self.headers = meta["headers"].copy()
-
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)
 
