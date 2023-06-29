@@ -173,6 +173,13 @@ class Dataset(NDCube):
         """
         return self._file_manager
 
+    @property
+    def inventory(self):
+        """
+        Convenience attribute to acces the inventory metadata.
+        """
+        return self.meta['inventory']
+
     """
     Dataset loading and saving routines.
     """

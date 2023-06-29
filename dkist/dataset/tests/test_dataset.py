@@ -119,6 +119,11 @@ def test_no_file_manager(dataset_3d):
     assert dataset_3d.files is None
 
 
+def test_inventory_propery():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    assert dataset.inventory == dataset.meta['inventory']
+
+
 def test_header_slicing_single_index():
     dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
     idx = 5
