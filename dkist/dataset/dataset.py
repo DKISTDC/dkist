@@ -128,7 +128,7 @@ class Dataset(NDCube):
     def _slice_headers(self, slice_):
         idx = self.files._array_slice_to_loader_slice(slice_)
         if idx == (np.s_[:],):
-            return self.all_headers.copy()
+            return self.headers.copy()
         file_idx = []
         for i in idx:
             if not isinstance(i, slice):
@@ -140,14 +140,14 @@ class Dataset(NDCube):
         files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
         flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
 
-        return self.all_headers[flat_idx].copy()
+        return self.headers[flat_idx].copy()
 
     """
     Properties.
     """
 
     @property
-    def all_headers(self):
+    def headers(self):
         """
         An `~astropy.table.Table` of all the FITS headers for all files in this dataset.
 
