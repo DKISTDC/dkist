@@ -122,6 +122,7 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
+            sliced_dataset.meta = sliced_dataset.meta.copy()
             sliced_dataset.meta["headers"] = self._slice_headers(item)
         return sliced_dataset
 
@@ -140,7 +141,7 @@ class Dataset(NDCube):
         files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
         flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
 
-        return self.headers[flat_idx].copy()
+        return self.meta["headers"][flat_idx]
 
     """
     Properties.
