@@ -155,3 +155,13 @@ def test_header_slicing_3D_slice():
 
     assert len(sliced.files.filenames) == len(sliced_header_files)
     assert sliced.files.filenames == sliced_header_files
+
+
+def test_modify_sliced_header():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    idx = 5
+    sliced = dataset[idx]
+
+    sliced.headers['FILENAME'] = 'some_new_file'
+
+    assert sliced.headers == dataset.headers[5]
