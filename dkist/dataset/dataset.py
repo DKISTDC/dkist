@@ -141,7 +141,9 @@ class Dataset(NDCube):
         files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
         flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
 
-        return self.meta["headers"][flat_idx]
+        # Explicitly create new header table to ensure consistency
+        # Otherwise would return a reference sometimes and a new table others
+        return self.meta["headers"].copy()[flat_idx]
 
     """
     Properties.
