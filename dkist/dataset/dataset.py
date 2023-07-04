@@ -139,7 +139,7 @@ class Dataset(NDCube):
     def _slice_headers(self, slice_):
         idx = self.files._array_slice_to_loader_slice(slice_)
         if idx == (np.s_[:],):
-            return self.headers
+            return self.headers.copy()
         file_idx = []
         for i in idx:
             if not isinstance(i, slice):
