@@ -87,6 +87,16 @@ class Dataset(NDCube):
 
     headers : `astropy.table.Table`
         A Table of all FITS headers for all files comprising this dataset.
+
+    Notes
+    -----
+    When slicing a Dataset instance, both the file manager and the header table
+    will also be sliced so that these attributes on the new object refer only
+    to the relevant files. However, note that they behave slightly differently.
+    The file manager will be a reference to the file manager of the original
+    Dataset, meaning that any file name changes made to the sliced object will
+    propagate to the original. This is not the case for the header table, as
+    slicing creates a new object in this case.
     """
 
     _file_manager = FileManagerDescriptor(default_type=FileManager)
