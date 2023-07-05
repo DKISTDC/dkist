@@ -8,6 +8,7 @@ import pytest
 import asdf
 import astropy.units as u
 import gwcs
+from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
@@ -121,3 +122,36 @@ def test_no_file_manager(dataset_3d):
 def test_inventory_propery():
     dataset = load_dataset(os.path.join(rootdir, 'EIT'))
     assert dataset.inventory == dataset.meta['inventory']
+
+
+def test_header_slicing_single_index():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    idx = 5
+    sliced = dataset[idx]
+
+    sliced_headers = dataset.headers[idx]
+    # Filenames in the header don't match the names of the files because why would you expect those things to be the same
+    sliced_header_files = sliced_headers['FILENAME'] + '_s.fits'
+
+    assert len(sliced.files.filenames) == 1
+    assert isinstance(sliced_headers, Row)
+    assert sliced.files.filenames[0] == sliced_header_files
+
+
+def test_header_slicing_3D_slice():
+    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    idx = np.s_[:3, :, 0]
+    sliced = dataset[idx]
+
+    file_idx = dataset.files._array_slice_to_loader_slice(idx)
+    grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
+    file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+
+    flat_idx = np.ravel_multi_index(file_idx, dataset.data.shape[0])
+
+    sliced_headers = dataset.headers[flat_idx]
+    # Filenames in the header don't match the names of the files because why would you expect those things to be the same
+    sliced_header_files = [f+'_s.fits' for f in sliced_headers['FILENAME']]
+
+    assert len(sliced.files.filenames) == len(sliced_header_files)
+    assert sliced.files.filenames == sliced_header_files

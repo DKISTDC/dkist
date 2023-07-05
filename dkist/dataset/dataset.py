@@ -1,5 +1,7 @@
 from textwrap import dedent
 
+import numpy as np
+
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
@@ -81,6 +83,16 @@ class Dataset(NDCube):
 
     headers : `astropy.table.Table`
         A Table of all FITS headers for all files comprising this dataset.
+
+    Notes
+    -----
+    When slicing a Dataset instance, both the file manager and the header table
+    will also be sliced so that these attributes on the new object refer only
+    to the relevant files. However, note that they behave slightly differently.
+    The file manager will be a reference to the file manager of the original
+    Dataset, meaning that any file name changes made to the sliced object will
+    propagate to the original. This is not the case for the header table, as
+    slicing creates a new object in this case.
     """
 
     _file_manager = FileManagerDescriptor(default_type=FileManager)
@@ -116,7 +128,28 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
+            sliced_dataset.meta = sliced_dataset.meta.copy()
+            sliced_dataset.meta["headers"] = self._slice_headers(item)
         return sliced_dataset
+
+    def _slice_headers(self, slice_):
+        idx = self.files._array_slice_to_loader_slice(slice_)
+        if idx == (np.s_[:],):
+            return self.headers.copy()
+        file_idx = []
+        for i in idx:
+            if not isinstance(i, slice):
+                i = slice(i, i+1)
+            file_idx.append(i)
+        file_idx = tuple(file_idx)
+        grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
+        file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+        files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+
+        # Explicitly create new header table to ensure consistency
+        # Otherwise would return a reference sometimes and a new table others
+        return self.meta["headers"].copy()[flat_idx]
 
     """
     Properties.
