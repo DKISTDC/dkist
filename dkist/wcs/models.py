@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Union, Iterable
 
 import numpy as np
@@ -11,11 +12,22 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, separable
 
-__all__ = ['CoupledCompoundModel',
-           'InverseVaryingCelestialTransform',
-           'VaryingCelestialTransform',
-           'BaseVaryingCelestialTransform',
-           'Ravel']
+__all__ = [
+    'CoupledCompoundModel',
+    'InverseVaryingCelestialTransform',
+    'InverseVaryingCelestialTransform2D',
+    'InverseVaryingCelestialTransformSlit',
+    'InverseVaryingCelestialTransformSlit2D',
+    'VaryingCelestialTransform',
+    'VaryingCelestialTransform2D',
+    'VaryingCelestialTransformSlit',
+    'VaryingCelestialTransformSlit2D',
+    'BaseVaryingCelestialTransform',
+    'BaseVaryingCelestialTransform2D',
+    'BaseVaryingCelestialTransformSlit',
+    'Ravel',
+    'Unravel',
+]
 
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
@@ -37,6 +49,8 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
         The reference pixel (a length two array).
     crval
         The world coordinate at the reference pixel (a length two array).
+    cdelt
+        The sample interval along the pixel axis
     pc
         The rotation matrix for the affine transform. If specifying parameters
         with units this should have celestial (``u.deg``) units.
@@ -80,7 +94,7 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
     return shift | scale | rot | projection | skyrot
 
 
-class BaseVaryingCelestialTransform(Model):
+class BaseVaryingCelestialTransform(Model, ABC):
     """
     Shared components between the forward and reverse varying celestial transforms.
     """
@@ -278,7 +292,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         return self._map_transform(lon, lat, z, crpix, cdelt, lon_pole, inverse=True)
 
 
-class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
+class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform, ABC):
     def _map_transform(self, x, y, z, q, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
         bx, by, bz, bq = np.broadcast_arrays(x, y, z, q, subok=True)
@@ -418,7 +432,7 @@ class VaryingCelestialTransformSlit(BaseVaryingCelestialTransformSlit):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inputs = ("slity", "raster")
+        self.inputs = ("along_slit", "raster")
         self.outputs = ("lon", "lat")
 
         if len(self.table_shape) != 1:
@@ -426,10 +440,10 @@ class VaryingCelestialTransformSlit(BaseVaryingCelestialTransformSlit):
 
     @property
     def input_units(self):
-        return {"slity": u.pix, "raster": u.pix}
+        return {"along_slit": u.pix, "raster": u.pix}
 
-    def evaluate(self, slity, raster, crpix, cdelt, lon_pole):
-        return self._map_transform(slity, raster, crpix, cdelt, lon_pole)
+    def evaluate(self, along_slit, raster, crpix, cdelt, lon_pole):
+        return self._map_transform(along_slit, raster, crpix, cdelt, lon_pole)
 
     @property
     def inverse(self):
@@ -466,7 +480,7 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inputs = ("slity", "raster", "repeat")
+        self.inputs = ("along_slit", "raster", "repeat")
         self.outputs = ("lon", "lat")
 
         if len(self.table_shape) != 2:
@@ -474,10 +488,10 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
 
     @property
     def input_units(self):
-        return {"slity": u.pix, "raster": u.pix, "repeat": u.pix}
+        return {"along_slit": u.pix, "raster": u.pix, "repeat": u.pix}
 
-    def evaluate(self, slity, raster, repeat, crpix, cdelt, lon_pole):
-        return self._map_transform(slity, raster, repeat, crpix, cdelt, lon_pole)
+    def evaluate(self, along_slit, raster, repeat, crpix, cdelt, lon_pole):
+        return self._map_transform(along_slit, raster, repeat, crpix, cdelt, lon_pole)
 
     @property
     def inverse(self):
@@ -711,22 +725,29 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
     if (table_d := len(table_shape)) not in (1, 2):
         raise ValueError("Only one or two dimensional lookup tables are supported.")
 
+    # TODO: Looks like a candidate for single dispatch
     if inverse:
-        cls = InverseVaryingCelestialTransform
         if slit:
-            cls = InverseVaryingCelestialTransformSlit
-        if table_d == 2:
-            cls = InverseVaryingCelestialTransform2D
-            if slit:
+            if table_d == 1:
+                cls = InverseVaryingCelestialTransformSlit
+            elif table_d == 2:
                 cls = InverseVaryingCelestialTransformSlit2D
+        else:
+            if table_d == 1:
+                cls = InverseVaryingCelestialTransform
+            elif table_d == 2:
+                cls = InverseVaryingCelestialTransform2D
     else:
-        cls = VaryingCelestialTransform
         if slit:
-            cls = VaryingCelestialTransformSlit
-        if table_d == 2:
-            cls = VaryingCelestialTransform2D
-            if slit:
+            if table_d == 1:
+                cls = VaryingCelestialTransformSlit
+            elif table_d == 2:
                 cls = VaryingCelestialTransformSlit2D
+        else:
+            if table_d == 1:
+                cls = VaryingCelestialTransform
+            elif table_d == 2:
+                cls = VaryingCelestialTransform2D
 
     return cls(
         crpix=crpix,
