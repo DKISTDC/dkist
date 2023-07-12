@@ -8,8 +8,9 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
+from dkist.wcs.models import VaryingCelestialTransform2D  # VaryingCelestialTransform3D,
+from dkist.wcs.models import (Ravel, Unravel,  # VaryingCelestialTransformSlit3D,
+                              VaryingCelestialTransform, VaryingCelestialTransformSlit,
                               VaryingCelestialTransformSlit2D, generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
@@ -353,6 +354,20 @@ def test_vct_slit2d():
     ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix)
     assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
 
+def test_vct_slit3d():
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = pc_table.reshape((5, 2, 3, 2, 2))
+
+    kwargs = dict(crpix=(5, 5) * u.pix,
+                  cdelt=(1, 1) * u.arcsec/u.pix,
+                  crval_table=(0, 0) * u.arcsec,
+                  lon_pole=180 * u.deg)
+
+    vct_slit = VaryingCelestialTransformSlit3D(pc_table=pc_table, **kwargs)
+    pixel = (0*u.pix, 0*u.pix, 0*u.pix, 0*u.pix)
+    world = vct_slit(*pixel)
+    ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix)
+    assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
 
 def test_vct_slit_unitless():
     pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)]

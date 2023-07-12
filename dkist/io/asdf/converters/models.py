@@ -13,29 +13,55 @@ class VaryingCelestialConverter(TransformConverterBase):
         "dkist.wcs.models.InverseVaryingCelestialTransform",
         "dkist.wcs.models.VaryingCelestialTransform2D",
         "dkist.wcs.models.InverseVaryingCelestialTransform2D",
+        "dkist.wcs.models.VaryingCelestialTransform3D",
+        "dkist.wcs.models.InverseVaryingCelestialTransform3D",
         "dkist.wcs.models.VaryingCelestialTransformSlit",
         "dkist.wcs.models.InverseVaryingCelestialTransformSlit",
         "dkist.wcs.models.VaryingCelestialTransformSlit2D",
         "dkist.wcs.models.InverseVaryingCelestialTransformSlit2D",
+        "dkist.wcs.models.VaryingCelestialTransformSlit3D",
+        "dkist.wcs.models.InverseVaryingCelestialTransformSlit3D",
     ]
 
     def select_tag(self, obj, tags, ctx):
         from dkist.wcs.models import (InverseVaryingCelestialTransform,
                                       InverseVaryingCelestialTransform2D,
+                                      InverseVaryingCelestialTransform3D,
                                       InverseVaryingCelestialTransformSlit,
                                       InverseVaryingCelestialTransformSlit2D,
+                                      InverseVaryingCelestialTransformSlit3D,
                                       VaryingCelestialTransform, VaryingCelestialTransform2D,
-                                      VaryingCelestialTransformSlit,
-                                      VaryingCelestialTransformSlit2D)
+                                      VaryingCelestialTransform3D, VaryingCelestialTransformSlit,
+                                      VaryingCelestialTransformSlit2D,
+                                      VaryingCelestialTransformSlit3D)
 
-        if isinstance(obj, (VaryingCelestialTransform, VaryingCelestialTransform2D)):
+        if isinstance(
+                obj,
+                (VaryingCelestialTransform,
+                 VaryingCelestialTransform2D,
+                 VaryingCelestialTransform3D)
+        ):
             return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
-        elif isinstance(obj, (InverseVaryingCelestialTransform, InverseVaryingCelestialTransform2D)):
+        elif isinstance(
+                obj,
+                (InverseVaryingCelestialTransform,
+                 InverseVaryingCelestialTransform2D,
+                 InverseVaryingCelestialTransform3D)
+        ):
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
-        elif isinstance(obj, (VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D)):
+        elif isinstance(
+                obj,
+                (VaryingCelestialTransformSlit,
+                 VaryingCelestialTransformSlit2D,
+                 VaryingCelestialTransformSlit3D)
+        ):
             return "asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0"
-        elif isinstance(obj, (InverseVaryingCelestialTransformSlit,
-                              InverseVaryingCelestialTransformSlit2D)):
+        elif isinstance(
+                obj,
+                (InverseVaryingCelestialTransformSlit,
+                 InverseVaryingCelestialTransformSlit2D,
+                 InverseVaryingCelestialTransformSlit3D)
+                 ):
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform_slit-1.0.0"
         else:
             raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
