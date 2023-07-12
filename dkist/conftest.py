@@ -4,6 +4,7 @@ from pathlib import Path
 import dask.array as da
 import numpy as np
 import pytest
+from dkist_data_simulator.spec214.visp import SimpleVISPDataset
 
 import asdf
 import astropy.modeling.models as m
@@ -20,6 +21,7 @@ from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
+from dkist_inventory.asdf_generator import dataset_from_fits
 
 
 @pytest.fixture
@@ -290,3 +292,14 @@ def small_visp_dataset():
     vispdir = Path(rootdir) / "small_visp"
     with asdf.open(vispdir / "test_visp.asdf") as f:
         return f.tree['dataset']
+
+
+@pytest.fixture(scope="session")
+def large_visp_dataset():
+    vispdir = Path(rootdir) / "large_visp"
+    ds = SimpleVISPDataset(n_maps=1, n_steps=10, n_stokes=4, time_delta=10,
+                           linewave=500*u.nm, detector_shape=(500, 1280))
+    ds.generate_files(vispdir)
+    dataset_from_fits(vispdir, "test_visp.asdf")
+
+    return Dataset.from_asdf(vispdir / "test_visp.asdf")
