@@ -7,6 +7,7 @@ import pytest
 from dkist_data_simulator.spec214.visp import SimpleVISPDataset
 
 import asdf
+import astropy
 import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
