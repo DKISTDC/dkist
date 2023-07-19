@@ -154,7 +154,7 @@ class Dataset(NDCube):
             file_idx.append(slc)
         grid = np.mgrid[tuple(file_idx)]
         file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
-        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order='F')
 
         # Explicitly create new header table to ensure consistency
         # Otherwise would return a reference sometimes and a new table others
