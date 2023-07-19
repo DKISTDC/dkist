@@ -296,6 +296,8 @@ def small_visp_dataset():
 
 @pytest.fixture(scope="session")
 def large_visp_dataset():
+    # Need this so that astropy doesn't try to download data and kill the tests
+    astropy.utils.iers.conf.auto_download = False
     vispdir = Path(rootdir) / "large_visp"
     ds = SimpleVISPDataset(n_maps=1, n_steps=20, n_stokes=4, time_delta=10,
                            linewave=500*u.nm, detector_shape=(500, 1280))
