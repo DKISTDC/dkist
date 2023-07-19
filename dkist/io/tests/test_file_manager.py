@@ -5,8 +5,6 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-import asdf
-
 from dkist import net
 from dkist.data.test import rootdir
 from dkist.io.file_manager import FileManager, StripedExternalArray, StripedExternalArrayView
@@ -23,15 +21,15 @@ def file_manager(eit_dataset):
 
 
 @pytest.fixture
-def externalarray(file_manager):
+def loader_array(file_manager):
     """
     An array of external array references.
     """
-    return file_manager.external_array_references
+    return file_manager._striped_external_array.loader_array
 
 
-def test_load_and_slicing(file_manager, externalarray):
-    ext_shape = np.array(externalarray, dtype=object).shape
+def test_load_and_slicing(file_manager, loader_array):
+    ext_shape = np.array(loader_array, dtype=object).shape
     assert file_manager._striped_external_array.loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
@@ -41,33 +39,23 @@ def test_load_and_slicing(file_manager, externalarray):
     assert not np.isnan(array).all()
 
     sliced_manager = file_manager[5:8]
-    ext_shape = np.array(externalarray[5:8], dtype=object).shape
+    ext_shape = np.array(loader_array[5:8], dtype=object).shape
     assert sliced_manager._striped_external_array.loader_array.shape == ext_shape
     assert sliced_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
 
-def test_filenames(file_manager, externalarray):
-    assert len(file_manager.filenames) == len(externalarray)
-    assert file_manager.filenames == [e.fileuri for e in externalarray]
+def test_filenames(file_manager, loader_array):
+    assert len(file_manager.filenames) == len(loader_array)
+    assert (file_manager.filenames == file_manager._striped_external_array.fileuri_array.flatten()).all()
 
 
-def test_dask(file_manager, externalarray):
-    ext_shape = np.array(externalarray, dtype=object).shape
+def test_dask(file_manager, loader_array):
+    ext_shape = np.array(loader_array, dtype=object).shape
     assert file_manager._striped_external_array.loader_array.shape == ext_shape
     assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
 
     assert isinstance(file_manager._generate_array(), da.Array)
     assert_allclose(file_manager._generate_array(), np.array(file_manager._generate_array()))
-
-
-def test_collection_to_references(tmpdir, file_manager):
-    ears = file_manager.external_array_references
-
-    for ear in ears:
-        assert isinstance(ear, asdf.ExternalArrayReference)
-        assert ear.target == file_manager._striped_external_array.target
-        assert ear.dtype == file_manager._striped_external_array.dtype
-        assert ear.shape == file_manager._striped_external_array.shape
 
 
 def test_collection_getitem(tmpdir, file_manager):
@@ -174,7 +162,7 @@ def test_reprs(file_manager):
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.io.file_manager._orchestrate_transfer_task",
+    yield mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
                        autospec=True)
 
 
@@ -239,7 +227,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
                                            folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
-    dataset.files.download(path="~/{Dataset ID}")
+    dataset.files.download(path="~/{dataset_id}")
 
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
@@ -264,3 +252,47 @@ def test_length_one_first_array_axis(small_visp_dataset):
     assert len(small_visp_dataset[0].files.filenames) == 1
 
     assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
+
+
+@pytest.mark.parametrize("kwargs", (
+    {},
+    {"path": "~/", "overwrite": True}
+))
+def test_download_quality(mocker, small_visp_dataset, kwargs):
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    from dkist.net import conf
+
+    small_visp_dataset.files.quality_report(**kwargs)
+
+    # Insert the expected default kwargs
+    if kwargs.get("path") is None:
+        kwargs["path"] = small_visp_dataset.files.basepath
+    if "overwrite" not in kwargs:
+        kwargs["overwrite"] = None
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/quality?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+        **kwargs
+    )
+
+
+@pytest.mark.parametrize("kwargs", (
+    {},
+    {"path": "~/", "overwrite": True}
+))
+def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    from dkist.net import conf
+
+    small_visp_dataset.files.preview_movie(**kwargs)
+
+    # Insert the expected default kwargs
+    if kwargs.get("path") is None:
+        kwargs["path"] = small_visp_dataset.files.basepath
+    if "overwrite" not in kwargs:
+        kwargs["overwrite"] = None
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/movie?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+        **kwargs
+    )

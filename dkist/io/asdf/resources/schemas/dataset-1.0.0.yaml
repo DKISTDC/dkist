@@ -23,7 +23,9 @@ properties:
     tag: "core/ndarray-1.0.0"
 
   unit:
-    tag: "unit/unit-1.0.0"
+    anyOf:
+      - tag: "unit/unit-1.0.0"
+      - tag: "tag:stsci.edu:asdf/unit/unit-1.0.0"
 
   meta:
     description: Dataset metadata, describing the whole dataset.

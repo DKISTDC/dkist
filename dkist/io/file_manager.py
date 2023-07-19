@@ -15,25 +15,23 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
-from typing import Any, List, Tuple, Union, Iterable, Optional
+from typing import Any, Tuple, Union, Iterable, Optional
 from pathlib import Path
 
 import dask.array
 import numpy as np
+from parfive import Downloader
 
 try:
     from numpy.typing import DTypeLike, NDArray  # NOQA
 except ImportError:
     NDArray = DTypeLike = Iterable
 
-from asdf.tags.core.external_reference import ExternalArrayReference
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
-from dkist.net import conf as net_conf
-from dkist.net.helpers import _orchestrate_transfer_task
-from dkist.utils.inventory import humanize_inventory
+from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 
 class BaseStripedExternalArray:
@@ -42,10 +40,10 @@ class BaseStripedExternalArray:
     """
 
     def __len__(self) -> int:
-        return self.reference_array.size
+        return self.loader_array.size
 
     def __eq__(self, other) -> bool:
-        uri = (self.reference_array == other.reference_array).all()
+        uri = (self.fileuri_array == other.fileuri_array).all()
         target = self.target == other.target
         dtype = self.dtype == other.dtype
         shape = self.shape == other.shape
@@ -53,29 +51,22 @@ class BaseStripedExternalArray:
         return all((uri, target, dtype, shape))
 
     @staticmethod
-    def _output_shape_from_ref_array(shape, reference_array) -> Tuple[int]:
+    def _output_shape_from_ref_array(shape, loader_array) -> Tuple[int]:
         # If the first dimension is one we are going to squash it.
         if shape[0] == 1:
             shape = shape[1:]
 
-        if len(reference_array) == 1:
+        if len(loader_array) == 1:
             return shape
         else:
-            return tuple(list(reference_array.shape) + list(shape))
+            return tuple(list(loader_array.shape) + list(shape))
 
     @property
     def output_shape(self) -> Tuple[int, ...]:
         """
         The final shape of the reconstructed data array.
         """
-        return self._output_shape_from_ref_array(self.shape, self.reference_array)
-
-    @property
-    def _fileuris(self) -> NDArray[str]:
-        """
-        Numpy array of fileuris
-        """
-        return np.vectorize(lambda x: x.fileuri)(self.reference_array)
+        return self._output_shape_from_ref_array(self.shape, self.loader_array)
 
     def _generate_array(self) -> dask.array.Array:
         """
@@ -85,7 +76,7 @@ class BaseStripedExternalArray:
         still have a reference to this `~.FileManager` object, meaning changes
         to this object will be reflected in the data loaded by the array.
         """
-        return stack_loader_array(self.loader_array).reshape(self.output_shape)
+        return stack_loader_array(self.loader_array, self.chunksize).reshape(self.output_shape)
 
 
 class StripedExternalArray(BaseStripedExternalArray):
@@ -98,6 +89,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         *,
         loader: BaseFITSLoader,
         basepath: os.PathLike = None,
+        chunksize: Iterable[int] = None,
     ):
         shape = tuple(shape)
         self.shape = shape
@@ -106,14 +98,13 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._loader = loader
         self._basepath = None
         self.basepath = basepath  # Use the setter to convert to a Path
+        self.chunksize = chunksize
 
-        self._reference_array = np.vectorize(
-            lambda uri: ExternalArrayReference(uri, self.target, self.dtype, self.shape)
-        )(fileuris)
+        self._fileuri_array = np.array(fileuris)
 
-        loader_array = np.empty_like(self.reference_array, dtype=object)
-        for i, ele in enumerate(self.reference_array.flat):
-            loader_array.flat[i] = loader(ele, self)
+        loader_array = np.empty_like(self._fileuri_array, dtype=object)
+        for i, fileuri in enumerate(self._fileuri_array.flat):
+            loader_array.flat[i] = loader(fileuri, shape, dtype, target, self)
 
         self._loader_array = loader_array
 
@@ -122,6 +113,10 @@ class StripedExternalArray(BaseStripedExternalArray):
 
     def __repr__(self) -> str:
         return f"{object.__repr__(self)}\n{self}"
+
+    @property
+    def ndim(self):
+        return len(self.loader_array.shape)
 
     @property
     def basepath(self) -> os.PathLike:
@@ -135,11 +130,11 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._basepath = Path(value).expanduser() if value is not None else None
 
     @property
-    def reference_array(self) -> NDArray[ExternalArrayReference]:
+    def fileuri_array(self) -> NDArray[str]:
         """
-        An array of `asdf.ExternalArrayReference` objects.
+        An array of relative (to ``basepath``) file uris.
         """
-        return self._reference_array
+        return self._fileuri_array
 
     @property
     def loader_array(self) -> NDArray[BaseFITSLoader]:
@@ -151,16 +146,10 @@ class StripedExternalArray(BaseStripedExternalArray):
         """
         return self._loader_array
 
-    def _to_ears(self, urilist) -> List[ExternalArrayReference]:
-        # This is separate to the property because it's recursive
-        if isinstance(urilist, (list, tuple)):
-            return list(map(self._to_ears, urilist))
-        return ExternalArrayReference(urilist, self.target, self.dtype, self.shape)
-
 
 class StripedExternalArrayView(BaseStripedExternalArray):
     # This class presents a view int a FITSLoader object It applies a slice to
-    # the reference_array and loader_array properties Any property which
+    # the fileuri_array and loader_array properties Any property which
     # references the sliced objects should be defined in Base or this view
     # class.
     __slots__ = ["parent", "parent_slice"]
@@ -190,11 +179,13 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         self.parent.basepath = value
 
     @property
-    def reference_array(self) -> NDArray[ExternalArrayReference]:
+    def fileuri_array(self) -> NDArray[str]:
         """
-        An array of `asdf.ExternalArrayReference` objects.
+        An array of relative (to ``basepath``) file uris.
         """
-        return np.array(self._reference_array[self.parent_slice])
+        # array call here to ensure that a length one array is returned rather
+        # than a single element.
+        return np.array(self._fileuri_array[self.parent_slice])
 
     @property
     def loader_array(self) -> NDArray[BaseFITSLoader]:
@@ -204,14 +195,18 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         These loader objects implement the minimal array-like interface for
         conversion to a dask array.
         """
+        # array call here to ensure that a length one array is returned rather
+        # than a single element.
         return np.array(self._loader_array[self.parent_slice])
 
 
 class BaseFileManager:
+    __slots__ = ["_striped_external_array"]
+
     @classmethod
-    def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None):
+    def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
         fits_loader = StripedExternalArray(
-            fileuris, target, dtype, shape, loader=loader, basepath=basepath
+            fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=None,
         )
         return cls(fits_loader)
 
@@ -231,12 +226,12 @@ class BaseFileManager:
         return f"{object.__repr__(self)}\n{self}"
 
     def __getitem__(self, item):
-        item = sanitize_slices(item, self._striped_external_array.reference_array.ndim)
+        item = sanitize_slices(item, self._striped_external_array.ndim)
         return type(self)(StripedExternalArrayView(self._striped_external_array, item))
 
-    def _array_slice_to_reference_slice(self, aslice):
+    def _array_slice_to_loader_slice(self, aslice):
         """
-        Convert a slice for the reconstructed array to a slice for the reference_array.
+        Convert a slice for the reconstructed array to a slice for the loader_array.
         """
         fits_array_shape = self._striped_external_array.shape
         aslice = list(sanitize_slices(aslice, len(self.output_shape)))
@@ -248,7 +243,7 @@ class BaseFileManager:
         return tuple(aslice)
 
     def _slice_by_cube(self, item):
-        item = self._array_slice_to_reference_slice(item)
+        item = self._array_slice_to_loader_slice(item)
         loader_view = StripedExternalArrayView(self._striped_external_array, item)
         return type(self)(loader_view)
 
@@ -256,11 +251,13 @@ class BaseFileManager:
         return self._striped_external_array._generate_array()
 
     @property
-    def external_array_references(self):
+    def fileuri_array(self):
         """
-        Represent this collection as a list of `asdf.ExternalArrayReference` objects.
+        An array of all the fileuris referenced by this `.FileManager`.
+
+        This array is shaped to match the striped dimensions of the dataset.
         """
-        return self._striped_external_array.reference_array.tolist()
+        return self._striped_external_array.fileuri_array
 
     @property
     def basepath(self):
@@ -278,7 +275,7 @@ class BaseFileManager:
         """
         Return a list of file names referenced by this Array Container.
         """
-        return self._striped_external_array._fileuris.flatten().tolist()
+        return self.fileuri_array.flatten().tolist()
 
     @property
     def output_shape(self):
@@ -307,12 +304,76 @@ class FileManager(BaseFileManager):
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
+    __slots__ = ["_ndcube"]
 
     def __init__(self, fits_loader: StripedExternalArray):
         super().__init__(fits_loader)
         # When this object is attached to a Dataset object this attribute will
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
+
+    @property
+    def _metadata_streamer_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
+
+        return conf.download_endpoint
+
+    def quality_report(self, path=None, overwrite=None):
+        """
+        Download the quality report PDF.
+
+        Parameters
+        ----------
+        path: `str` or `pathlib.Path`
+            The destination path to save the file to. See
+            `parfive.Downloader.simple_download` for details.
+            The default path is ``.basepath``, if ``.basepath`` is None it will
+            default to `~/`.
+        overwrite: `bool`
+            Set to `True` to overwrite file if it already exists. See
+            `parfive.Downloader.simple_download` for details.
+
+        Returns
+        -------
+        results: `parfive.Results`
+            A `~parfive.Results` obejct containing the filepath of the
+            downloaded file if the download was successful, and any errors if it
+            was not.
+        """
+        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
+        if path is None and self.basepath:
+            path = self.basepath
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
+
+    def preview_movie(self, path=None, overwrite=None):
+        """
+        Download the preview movie.
+
+        Parameters
+        ----------
+        path: `str` or `pathlib.Path`
+            The destination path to save the file to. See
+            `parfive.Downloader.simple_download` for details.
+            The default path is ``.basepath``, if ``.basepath`` is None it will
+            default to `~/`.
+        overwrite: `bool`
+            Set to `True` to overwrite file if it already exists. See
+            `parfive.Downloader.simple_download` for details.
+
+        Returns
+        -------
+        results: `parfive.Results`
+            A `~parfive.Results` obejct containing the filepath of the
+            downloaded file if the download was successful, and any errors if it
+            was not.
+        """
+        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
+        if path is None and self.basepath:
+            path = self.basepath
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
     def download(self, path=None, destination_endpoint=None, progress=True, wait=True, label=None):
         """
@@ -323,8 +384,8 @@ class FileManager(BaseFileManager):
         path : `pathlib.Path` or `str`, optional
             The path to save the data in, must be accessible by the Globus
             endpoint.
-            The default value is ``.basepath``, if this is None it will default
-            to ``/~/``.
+            The default value is ``.basepath``, if ``.basepath`` is None it will
+            default to ``/~/``.
             It is possible to put placeholder strings in the path with any key
             from the dataset inventory dictionary which can be accessed as
             ``ds.meta['inventory']``. An example of this would be
@@ -356,18 +417,22 @@ class FileManager(BaseFileManager):
         label : `str`
             Label for the Globus transfer. If `None` then a default will be used.
         """
+        # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
+        from dkist.net import conf as net_conf
+        from dkist.net.helpers import _orchestrate_transfer_task
+
         if self._ndcube is None:
             raise ValueError(
                 "This file manager has no associated Dataset object, so the data can not be downloaded."
             )
 
         inv = self._ndcube.meta["inventory"]
-        human_inv = humanize_inventory(inv)
+        path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
         destination_path = path or self.basepath or "/~/"
         destination_path = Path(destination_path).as_posix()
-        destination_path = Path(destination_path.format(**human_inv))
+        destination_path = Path(destination_path.format(**path_inv))
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.

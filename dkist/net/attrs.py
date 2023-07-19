@@ -3,22 +3,48 @@ Search attributes which are specific to the `dkist.net.DKISTClient`.
 
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
-import astropy.units as u
+import astropy.units as _u
 import sunpy.net._attrs as _sunpy_attrs
-from sunpy.coordinates.frames import Helioprojective
-from sunpy.coordinates.utils import get_rectangle_coordinates
+from sunpy.coordinates.frames import Helioprojective as _Helioprojective
+from sunpy.coordinates.utils import get_rectangle_coordinates as _get_rectangle_coordinates
 from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
 
-__all__ = ['Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
+__all__ = ['PageSize', 'Page', 'Dataset', 'WavelengthBand', 'Embargoed', 'Observable',
            'Experiment', 'Proposal', 'TargetType', 'Recipe',
            'FriedParameter', 'PolarimetricAccuracy', 'ExposureTime',
            'EmbargoEndTime', 'BrowseMovie', 'BoundingBox',
-           'SpectralSampling', 'SpatialSampling', 'TemporalSampling']
+           'SpectralSampling', 'SpatialSampling', 'TemporalSampling', 'SummitSoftwareVersion',
+           'WorkflowName', 'WorkflowVersion', 'ObservingProgramExecutionID',
+           'InstrumentProgramExecutionID', 'HeaderVersion']
 
 
 # SimpleAttrs
+
+class PageSize(_SimpleAttr):
+    """
+    The number of search results to return.
+
+    Parameters
+    ----------
+    page_size: `int`
+    """
+    def __init__(self, page_size: int):
+        super().__init__(page_size)
+
+
+class Page(_SimpleAttr):
+    """
+    The page of results to show
+
+    Parameters
+    ----------
+    page: `int`
+    """
+    def __init__(self, page: int):
+        super().__init__(page)
+
 
 # datasetIds [array]
 class Dataset(_SimpleAttr):
@@ -133,7 +159,16 @@ class Embargoed(_SimpleAttr):
         A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed: bool):
-        super().__init__(bool(is_embargoed))
+        if isinstance(is_embargoed, str):
+            if is_embargoed.lower() == "false":
+                is_embargoed = False
+            elif is_embargoed.lower() == "true":
+                is_embargoed = True
+            else:
+                raise ValueError("is_embargoed must be either True or False")
+        elif not isinstance(is_embargoed, bool):
+            raise ValueError("is_embargoed must be either True or False")
+        super().__init__(is_embargoed)
 
 
 # Range Attrs
@@ -152,7 +187,7 @@ class FriedParameter(_Range):
     friedmax : `u.Quantity`
         The maximum value of the average fried parameter to search between.
     """
-    def __init__(self, friedmin: u.cm, friedmax: u.cm):
+    def __init__(self, friedmin: _u.cm, friedmax: _u.cm):
         super().__init__(friedmin, friedmax)
 
     def collides(self, other):
@@ -174,8 +209,8 @@ class ExposureTime(_Range):
     """
     Most common exposure time of the calibrated data frames within the dataset.
     """
-    @u.quantity_input
-    def __init__(self, expmin: u.s, expmax: u.s):
+    @_u.quantity_input
+    def __init__(self, expmin: _u.s, expmax: _u.s):
         super().__init__(expmin, expmax)
 
     def collides(self, other):
@@ -257,18 +292,18 @@ class BoundingBox(_DataAttr):
     as seen by an observer on Earth **on Jan 1st 2020**.
     """
 
-    def __init__(self, bottom_left, *, top_right=None, width: u.deg = None,
-                 height: u.deg = None, search="containing"):
-        bottom_left, top_right = get_rectangle_coordinates(bottom_left,
-                                                           top_right=top_right,
-                                                           width=width, height=height)
-        bottom_left = bottom_left.transform_to(Helioprojective(observer="earth"))
-        top_right = top_right.transform_to(Helioprojective(observer="earth"))
+    def __init__(self, bottom_left, *, top_right=None, width: _u.deg = None,
+                 height: _u.deg = None, search="containing"):
+        bottom_left, top_right = _get_rectangle_coordinates(bottom_left,
+                                                            top_right=top_right,
+                                                            width=width, height=height)
+        bottom_left = bottom_left.transform_to(_Helioprojective(observer="earth"))
+        top_right = top_right.transform_to(_Helioprojective(observer="earth"))
 
-        self.hpc_bounding_box_arcsec = ((bottom_left.Tx.to_value(u.arcsec),
-                                         bottom_left.Ty.to_value(u.arcsec)),
-                                        (top_right.Tx.to_value(u.arcsec),
-                                         top_right.Ty.to_value(u.arcsec)))
+        self.hpc_bounding_box_arcsec = ((bottom_left.Tx.to_value(_u.arcsec),
+                                         bottom_left.Ty.to_value(_u.arcsec)),
+                                        (top_right.Tx.to_value(_u.arcsec),
+                                         top_right.Ty.to_value(_u.arcsec)))
 
         self.search_type = search
 
@@ -288,8 +323,8 @@ class SpectralSampling(_Range):
     spectralmax : `u.Quantity`
         The maximum value of the average spectral sampling to search between.
     """
-    u.quantity_input(equivalencies=u.spectral())
-    def __init__(self, spectralmin: u.nm, spectralmax: u.nm):
+    _u.quantity_input(equivalencies=_u.spectral())
+    def __init__(self, spectralmin: _u.nm, spectralmax: _u.nm):
         super().__init__(spectralmin, spectralmax)
 
     def collides(self, other):
@@ -308,7 +343,7 @@ class SpatialSampling(_Range):
     spatialmax :
         The maximum value of the average spatial sampling to search between.
     """
-    def __init__(self, spatialmin: u.arcsec/u.pix, spatialmax: u.arcsec/u.pix):
+    def __init__(self, spatialmin: _u.arcsec/_u.pix, spatialmax: _u.arcsec/_u.pix):
         super().__init__(spatialmin, spatialmax)
 
     def collides(self, other):
@@ -327,8 +362,89 @@ class TemporalSampling(_Range):
     temporalmax : `u.Quantity`
         The maximum value of the average temporal sampling to search between.
     """
-    def __init__(self, temporalmin: u.s, temporalmax: u.s):
+    def __init__(self, temporalmin: _u.s, temporalmax: _u.s):
         super().__init__(temporalmin, temporalmax)
 
     def collides(self, other):
         return isinstance(other, self.__class__)
+
+
+# highLevelSoftwareVersion
+class SummitSoftwareVersion(_SimpleAttr):
+    """
+    Version of the software used to record the data at the summit.
+
+    Parameters
+    ----------
+    version : `str`
+        Version of the software to search for.
+    """
+    def __init__(self, version: str):
+        super().__init__(version)
+
+
+# workflowName
+class WorkflowName(_SimpleAttr):
+    """
+    Name of the calibrarion workflow used.
+
+    Parameters
+    ----------
+    workflow_name : `str`
+        Name of the workflow.
+    """
+    def __init__(self, workflow_name: str):
+        super().__init__(workflow_name)
+
+
+# workflowVersion
+class WorkflowVersion(_SimpleAttr):
+    """
+    Version of the calibration workflow used.
+
+    Parameters
+    ----------
+    workflow : `str`
+        Version of the workflow.
+    """
+    def __init__(self, workflow: str):
+        super().__init__(workflow)
+
+
+# observingProgramExecutionId
+class ObservingProgramExecutionID(_SimpleAttr):
+    """
+    Execution ID of the Observing Program.
+
+    Parameters
+    ----------
+    obs_program : `str`
+    """
+    def __init__(self, obs_program: str):
+        super().__init__(obs_program)
+
+
+# instrumentProgramExecutionId
+class InstrumentProgramExecutionID(_SimpleAttr):
+    """
+    Execution ID of the Instrument Program
+
+    Parameters
+    ----------
+    instr_program : `str`
+    """
+    def __init__(self, instr_program: str):
+        super().__init__(instr_program)
+
+
+# headerVersion
+class HeaderVersion(_SimpleAttr):
+    """
+    Header Specification Version
+
+    Parameters
+    ----------
+    version : `str`
+    """
+    def __init__(self, version: str):
+        super().__init__(version)

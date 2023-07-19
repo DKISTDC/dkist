@@ -38,6 +38,7 @@ def example_api_response():
     return {
         "authorizationStatusCode": "string",
         "authorizationStatusDescription": "string",
+        "recordCount": 5,
         "searchResults": [
             {
                 "asdfObjectKey": "string",
@@ -75,6 +76,7 @@ def example_api_response():
                 "embargoEndDate": "2020-02-28T17:05:53.330Z",
                 "browseMovieUrl": "string",
                 "isDownloadable": True,
+                "averageDatasetSpectralSampling": None  # Some fields are optional
             }
         ],
     }
@@ -104,7 +106,7 @@ def mocked_client(mocker, client, example_api_response):
 
 def test_query_response_from_results(empty_query_response, example_api_response, expected_table_keys):
     dclient = DKISTClient()
-    qr = DKISTQueryResponseTable.from_results(example_api_response["searchResults"], client=dclient)
+    qr = DKISTQueryResponseTable.from_results([example_api_response], client=dclient)
 
     assert len(qr) == 1
     assert isinstance(qr.client, DKISTClient)
@@ -119,9 +121,8 @@ def test_query_response_from_results_unknown_field(empty_query_response, example
     This test asserts that if the API starts returning new fields we don't error, they get passed though verbatim.
     """
     dclient = DKISTClient()
-    resp = example_api_response["searchResults"]
-    resp[0].update({'spamEggs': 'Some Spam'})
-    qr = DKISTQueryResponseTable.from_results(resp, client=dclient)
+    example_api_response["searchResults"][0].update({'spamEggs': 'Some Spam'})
+    qr = DKISTQueryResponseTable.from_results([example_api_response], client=dclient)
 
     assert len(qr) == 1
     assert isinstance(qr.client, DKISTClient)

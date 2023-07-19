@@ -1,3 +1,103 @@
+1.0.0b14 (2023-06-12)
+=====================
+
+Features
+--------
+
+- Adds support to Ravel for N-dimensional data. (`#249 <https://github.com/DKISTDC/dkist/pull/249>`_)
+
+
+1.0.0b13 (2023-05-19)
+=====================
+
+Features
+--------
+
+- Add support for passing a list of dataset IDs as strings to `dkist.net.transfer_complete_datasets`. (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+
+
+Bug Fixes
+---------
+
+- Fix errors with some types of input in `dkist.net.transfer_complete_datasets`. (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+- Fix searching for Globus endpoints with SDK 3 (`#240 <https://github.com/DKISTDC/dkist/pull/240>`_)
+- Fixes bug in the inverse property of CoupledCompoundModel by correcting the various mappings in the inverse. (`#242 <https://github.com/DKISTDC/dkist/pull/242>`_)
+
+
+1.0.0b12 (2023-05-16)
+=====================
+
+Features
+--------
+
+- Drop support for Python 3.8 in line with `NEP 29 <https://numpy.org/neps/nep-0029-deprecation_policy.html>_`. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
+- Add new methods `.FileManager.quality_report()` and `.FileManager.preview_movie()` to download the quality report and preview movie. These are accessed as ``Dataset.files.quality_report`` and ``Dataset.files.preview_movie``. (`#235 <https://github.com/DKISTDC/dkist/pull/235>`_)
+
+
+Bug Fixes
+---------
+
+- Unit for ``lon_pole`` was set to the spatial unit of the input parameters within `~dkist.wcs.models.VaryingCelestialTransform`.
+  It is now fixed to always be degrees. (`#225 <https://github.com/DKISTDC/dkist/pull/225>`_)
+- Add a new model to take a 2D index and return the corresponding correct index for a 1D array, and the inverse model for the reverse operation.
+  To be used as a compound with Tabular1D so that it looks like a Tabular2D but the compound model can still be inverted. (`#227 <https://github.com/DKISTDC/dkist/pull/227>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Internal improvements to how the data are loaded from the collection of FITS files.
+  This should have no user facing effects, but provides a foundation for future performance work. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
+
+
+1.0.0b11 (2023-02-15)
+=====================
+
+Features
+--------
+
+- Add ability to page through the DKIST results and affect the page size. (`#212 <https://github.com/DKISTDC/dkist/pull/212>`_)
+- Fix, and make requried, the unit property on a dataset in ASDF files. (`#221 <https://github.com/DKISTDC/dkist/pull/221>`_)
+
+
+Bug Fixes
+---------
+
+- Fix bugs in testing caused by the release of ``pytest 7.2.0``. (`#210 <https://github.com/DKISTDC/dkist/pull/210>`_)
+- Make loading a mosaiced VBI dataset work with `Dataset.from_asdf`. (`#213 <https://github.com/DKISTDC/dkist/pull/213>`_)
+- Add support for Python 3.11 (`#218 <https://github.com/DKISTDC/dkist/pull/218>`_)
+
+
+Improved Documentation
+----------------------
+
+- Add documentation for available path interpolation keys. (`#207 <https://github.com/DKISTDC/dkist/pull/207>`_)
+
+
+1.0.0b9 (2022-09-30)
+====================
+
+Features
+--------
+
+- Add a ``label=`` kwarg to `.FileManager.download` and
+  `.transfer_complete_datasets` allowing the user to completely customise the
+  Globus transfer task label. (`#193 <https://github.com/DKISTDC/dkist/pull/193>`_)
+
+
+Bug Fixes
+---------
+
+- Successfully ask for re-authentication when Globus token is stale. (`#197 <https://github.com/DKISTDC/dkist/pull/197>`_)
+- Fix a bug where ``FileManager.download`` would fail if there was not an
+  asdf file or quality report PDF in inventory. (`#199 <https://github.com/DKISTDC/dkist/pull/199>`_)
+- Fix an issue with slicing a dataset where the slicing wouldn't work correctly
+  if the first axis of the data array has length one. (`#199 <https://github.com/DKISTDC/dkist/pull/199>`_)
+- No more invalid characters in default Globus label name. (`#200 <https://github.com/DKISTDC/dkist/pull/200>`_)
+- Hide extraneous names in `dkist.net.attrs` with underscores so they don't get imported when using that module. (`#201 <https://github.com/DKISTDC/dkist/pull/201>`_)
+- Catch empty return value from data search in `transfer_complete_datasets` and raise a ValueError telling the user what's happening. (`#204 <https://github.com/DKISTDC/dkist/pull/204>`_)
+
+
 v1.0.0b8 (2022-07-18)
 =====================
 

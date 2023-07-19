@@ -4,6 +4,7 @@ minimise (virtual) memory usage and the number of open files.
 """
 
 import abc
+import logging
 from pathlib import Path
 
 import dask.array as da
@@ -13,6 +14,8 @@ from dask import delayed
 from astropy.io import fits
 from sunpy.util.decorators import add_common_docstring
 
+_LOGGER = logging.getLogger(__name__)
+
 __all__ = ['BaseFITSLoader', 'AstropyFITSLoader']
 
 
@@ -20,41 +23,52 @@ common_parameters = """
 
     Parameters
     ----------
-
-    externalarray: `asdf.ExternalArrayReference`
-        The asdf array reference, must be to a FITS file (although this is not validated).
-
-    basepath: `str`
-        The base path for the filenames in the `asdf.ExternalArrayReference`,
-        if not specified the filepaths are treated as absolute.
+    fileuri: `str`
+        The filename, either absolute, or if `basepath` is specified, relative to `basepath`.
+    shape: `tuple`
+        The shape of the array to be proxied.
+    dtype: `numpy.dtype`
+        The dtype of the resulting array
+    target: `int`
+        The HDU number to load the array from.
+    array_container: `BaseStripedExternalArray`
+        The parent object of this class, which builds the array from a sequence
+        of these loaders.
 """
 
 
 @add_common_docstring(append=common_parameters)
 class BaseFITSLoader(metaclass=abc.ABCMeta):
     """
-    Base class for resolving an `asdf.ExternalArrayReference` to a FITS file.
+    Base FITS array proxy.
+
+    This class implements the array-like API needed for dask to convert a FITS
+    array into a dask array without loading the FITS file until data access
+    time.
     """
 
-    def __init__(self, externalarray, array_container):
-        self.externalarray = externalarray
+    def __init__(self, fileuri, shape, dtype, target, array_container):
+        self.fileuri = fileuri
+        self.shape = shape
+        self.dtype = dtype
+        self.target = target
         self.array_container = array_container
-        # These are needed for this object to be array-like
-        self.shape = self.externalarray.shape
         self.ndim = len(self.shape)
-        self.dtype = self.externalarray.dtype
+        self.size = np.prod(self.shape)
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
-        return "<FITS array in {0.fileuri} shape: {0.shape} dtype: {0.dtype}>".format(self.externalarray)
+        return "<FITS array in {0.fileuri} shape: {0.shape} dtype: {0.dtype}>".format(self)
 
-    def __array__(self):
-        return self.fits_array
+    @property
+    def data(self):
+        return self[:]
 
+    @abc.abstractmethod
     def __getitem__(self, slc):
-        return self.fits_array[slc]
+        pass
 
     @property
     def basepath(self):
@@ -66,22 +80,9 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         Construct a non-relative path to the file, using ``basepath`` if provided.
         """
         if self.basepath:
-            return self.basepath / self.externalarray.fileuri
+            return self.basepath / self.fileuri
         else:
-            return Path(self.externalarray.fileuri)
-
-    @property
-    def fits_array(self):
-        """
-        The FITS array object.
-        """
-        return self._read_fits_array()
-
-    @abc.abstractmethod
-    def _read_fits_array(self):
-        """
-        Read and return a reference to the FITS array.
-        """
+            return Path(self.fileuri)
 
 
 @add_common_docstring(append=common_parameters)
@@ -90,18 +91,22 @@ class AstropyFITSLoader(BaseFITSLoader):
     Resolve an `~asdf.ExternalArrayReference` to a FITS file using `astropy.io.fits`.
     """
 
-    def _read_fits_array(self):
+    def __getitem__(self, slc):
         if not self.absolute_uri.exists():
+            _LOGGER.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
             return da.from_delayed(delayed(np.broadcast_to)(np.nan, self.shape) * np.nan,
                                    self.shape, self.dtype)
 
         with fits.open(self.absolute_uri,
-                       memmap=True,  # don't load the whole array into memory, let dask access the part it needs
-                       do_not_scale_image_data=True,  # don't scale as that would cause it to be loaded into memory
+                       memmap=False,  # memmap is redundant with dask and delayed loading
+                       do_not_scale_image_data=True,  # don't scale as we shouldn't need to
                        mode="denywrite") as hdul:
+            _LOGGER.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
-            hdul.verify('fix')
-            hdu = hdul[self.externalarray.target]
-            return hdu.data
+            hdu = hdul[self.target]
+            if hasattr(hdu, "section"):
+                return hdu.section[slc]
+            else:
+                return hdu.data[slc]

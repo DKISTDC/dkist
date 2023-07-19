@@ -66,7 +66,7 @@ class TiledDataset(Collection):
         self._validate_component_datasets(self._data, inventory)
 
     def __contains__(self, x):
-        return self._data.__contains__(x)
+        return any([ele is x for ele in self._data.flat])
 
     def __len__(self):
         return self._data.__len__()

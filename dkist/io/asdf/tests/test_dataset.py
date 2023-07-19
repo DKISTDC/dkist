@@ -1,5 +1,5 @@
+import importlib.resources as importlib_resources
 from pathlib import Path
-from importlib import resources
 
 import numpy as np
 import pytest
@@ -44,8 +44,8 @@ def assert_dataset_equal(new, old):
     new.meta["headers"] = new_headers
     assert old.wcs.name == new.wcs.name
     assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
-    ac_new = new.files.external_array_references
-    ac_old = old.files.external_array_references
+    ac_new = new.files.fileuri_array
+    ac_old = old.files.fileuri_array
     assert ac_new == ac_old
     assert old.unit == new.unit
     assert old.mask == new.mask
@@ -86,7 +86,7 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.0.0"
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.1.0"
         assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
@@ -101,22 +101,22 @@ def test_asdf_tags(dataset, tmp_path):
                          indirect=True)
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
     tree = {'dataset': tagobj}
-    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to(Path(tmpdir / "test.asdf"))
 
 
-@pytest.mark.parametrize("asdf_file",
-                         [rootdir / "eit_dataset_0.1.0.asdf",
-                          rootdir / "eit_dataset_0.2.0.asdf",
-                          rootdir / "eit_dataset_0.3.0.asdf"])
-def test_read_all_schema_versions(asdf_file):
+def test_read_all_schema_versions(eit_dataset_asdf_path):
     """
     This test validates that we can successfully read a full and valid Dataset
     object from files with all versions of the dataset schema.
     """
-    with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
-        with asdf.open(asdf_file) as afile:
+    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+        # Firstly verify that the tag versions in the test filename are the ones used in the file
+        with asdf.open(eit_dataset_asdf_path, _force_raw_types=True) as afile:
+            assert afile["dataset"]._tag.rsplit("/")[-1] in str(eit_dataset_asdf_path)
+
+        with asdf.open(eit_dataset_asdf_path) as afile:
             dataset = afile["dataset"]
             dataset.files.basepath = rootdir / "EIT"
 
@@ -135,3 +135,39 @@ def test_read_all_schema_versions(asdf_file):
     assert isinstance(dataset.wcs, gwcs.WCS)
     assert dataset.wcs.world_n_dim == 3
     assert dataset.wcs.pixel_n_dim == 3
+
+
+@pytest.fixture
+def wrap_object(mocker):
+
+    def wrap_object(target, attribute):
+        mock = mocker.MagicMock()
+        real_attribute = getattr(target, attribute)
+
+        def mocked_attribute(self, *args, **kwargs):
+            mock.__call__(*args, **kwargs)
+            return real_attribute(self, *args, **kwargs)
+
+        mocker.patch.object(target, attribute, mocked_attribute)
+
+        return mock
+
+    return wrap_object
+
+
+def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
+    # Import this here to prevent hitting https://bugs.python.org/issue35753 on Python <3.10
+    # Importing call is enough to trigger a doctest error
+    from unittest.mock import call
+
+    chunksize = (32, 16)
+    with asdf.open(eit_dataset_asdf_path) as tree:
+        dataset = tree["dataset"]
+        dataset.files.basepath = rootdir / "EIT"
+        dataset.files._striped_external_array.chunksize = chunksize
+        mocked = wrap_object(dataset.files._striped_external_array._loader, "__getitem__")
+        dataset._data = dataset.files._generate_array()
+        dataset.data.compute()
+
+    expected_call = call((slice(0, chunksize[0], None), slice(0, chunksize[1], None)))
+    assert expected_call in mocked.mock_calls

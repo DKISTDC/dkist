@@ -1,0 +1,1 @@
+Make `dkist.Dataset` return the appropriately sliced header table when slicing data.

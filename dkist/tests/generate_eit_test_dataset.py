@@ -7,12 +7,13 @@ import sunpy.map
 from astropy.io import fits
 from astropy.modeling.models import (AffineTransformation2D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift)
+from astropy.table import Table
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
 from sunpy.time import parse_time
 
 from dkist_inventory.asdf_generator import references_from_filenames
-from dkist_inventory.inventory import table_from_headers
+from dkist_inventory.header_parsing import HeaderParser
 from dkist_inventory.transforms import generate_lookup_table
 
 
@@ -77,6 +78,14 @@ def main():
         with fits.open(filepath) as hdul:
             header = hdul[0].header
             headers.append(dict(header))
+            headers[-1].pop('')
+            headers[-1].pop('COMMENT')
+            headers[-1].pop('HISTORY')
+            headers[-1]["DNAXIS"] = 3
+            headers[-1]["DNAXIS3"] = len(files)
+            headers[-1]["DAAXES"] = 2
+            headers[-1]["DEAXES"] = 1
+            headers[-1]["DINDEX3"] = i + 1
         time = parse_time(header['DATE-OBS'])
         if i == 0:
             start_time = time
@@ -115,13 +124,14 @@ def main():
 
     print(wcs(*[1*u.pix]*3, with_units=True))
 
-    ac = references_from_filenames(files, np.asanyarray(headers), (len(files),), relative_to=str(rootdir / "EIT"))
-    ac.basepath = rootdir / "EIT" # TODO: We shouldn't need to do this really
+    hp = HeaderParser.from_headers(headers, filenames=files, validate=False)
+    ac = references_from_filenames(hp, hdu_index=0, relative_to=str(rootdir / "EIT"))
+    ac.basepath = rootdir / "EIT"  # TODO: We shouldn't need to do this really
 
     from dkist.dataset import Dataset
 
-    meta = {"inventory": {}, "headers": table_from_headers(headers)}
-    ds = Dataset(ac._generate_array(), wcs, meta=meta)
+    meta = {"inventory": {}, "headers": Table(headers)}
+    ds = Dataset(ac._generate_array(), wcs, meta=meta, unit=u.count / u.pixel)
     ds._file_manager = ac
 
     tree = {
@@ -137,6 +147,7 @@ def main():
     ds.plot()
     import matplotlib.pyplot as plt
     plt.show()
+
 
 if __name__ == "__main__":
     main()

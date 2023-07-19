@@ -17,7 +17,7 @@ Searching for DKIST Datasets with Fido
    Download of FITS files is not provided through the ``Fido`` interface.
    As is described below, FITS files can be downloaded for some or all of a dataset after reading the ASDF file.
 
-As is descibed in :ref:`sunpy:fido_guide`, searches through ``Fido`` use "attrs" which specify the search criteria.
+As is descibed in :ref:`sunpy:sunpy-tutorial-acquiring-data-index`, searches through ``Fido`` use "attrs" which specify the search criteria.
 A single search can match one or more data providers, for example it is possible to search for DKIST data and data provided by the VSO simultaneously.
 In this guide we will focus on searches only for DKIST data through using the client provided in `dkist.net`.
 
@@ -124,6 +124,9 @@ Once we have loaded the dataset, if we wish to transfer all the FITS files a sin
 If this is the first time you have run this method, or your authentication has expired, a login page should open in your webbrowser to authenticate with the Globus system.
 By default this call will download all the FITS files to the current value of ``ds.files.basepath``, i.e. by default in the same directory as the loaded ASDF file.
 You can override this behaviour by using the ``path=`` keyword argument.
+The path argument can contain keys which will be replaced by the corresponding values in the dataset's metadata.
+For example, setting `path="~/data/dkist/{instrument}/"` will download all files and save them in separate folders named for the instrument.
+A full list of the available keys can be found in :ref:`interpolation-keys`.
 
 The real power of using ``download()`` however, is that you don't have to transfer the FITS files for the frames you do not wish to study (yet).
 For instance, imagine the situation where you wish to first inspect the Stokes I profile to asses the viability of the data for your analysis, using this download method you can do this and your transfer will take about a quarter of the time.
@@ -183,3 +186,25 @@ Finally, if you know the dataset ID of a dataset you wish to download, you can j
 .. code-block:: python
 
     transfer_complete_datasets("AAAAA")
+
+.. _interpolation-keys:
+
+Path interpolation keys
+-----------------------
+
+When downloading DKIST data with ``ds.files.download()`` or ``Fido.fetch(), the ``path=`` keyword argument can be used to specify the target folder for the download.
+This path can include keys corresponding to metadata entries, and those values are then used to complete the download path.
+For example, to download a dataset into its own folder named with the dataset ID, with separate subfolders for each instrument in the dataset, you could set ``path="~/data/dkist/{dataset_id}/{instrument}/"``.
+This would take the values for the dataset ID and instrument name from either the ASDF file or the search results.
+
+Here is a full list of the metadata keywords available for this purpose and their corresponding path interpolation keys:
+
+.. generate:: html
+
+    from dkist.utils.inventory import _path_format_table
+    print(_path_format_table())
+
+The complete list of keys can be accessed using the function ``dkist.utils.inventory.path_format_keys()``::
+
+  >>> from dkist.utils.inventory import path_format_keys
+  >>> path_format_keys()

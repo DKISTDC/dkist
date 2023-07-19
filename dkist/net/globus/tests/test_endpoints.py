@@ -22,7 +22,7 @@ def endpoint_search(mocker, transfer_client):
         response = mocker.MagicMock()
         response.json = lambda: d
         responses.append(globus_sdk.response.GlobusHTTPResponse(response, transfer_client))
-    return responses
+    return {"DATA": responses}
 
 
 @pytest.fixture
@@ -78,12 +78,12 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     assert "Multiple" in str(exc.value)
 
     # Test just one result
-    mock_search.return_value = endpoint_search[1:2]
+    mock_search.return_value = {"DATA": endpoint_search["DATA"][1:2]}
     endpoint_id = get_endpoint_id(" ", transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
     # Test no results
-    mock_search.return_value = []
+    mock_search.return_value = {"DATA": []}
     with pytest.raises(ValueError) as e_info:
         get_endpoint_id(" ", transfer_client)
     assert "No matches" in str(e_info.value)
@@ -94,7 +94,7 @@ def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
                         mocker.Mock(return_value=globus_sdk.services.transfer.response.iterable.IterableTransferResponse))
     get_ep_mock = mocker.patch("globus_sdk.services.transfer.response.iterable.IterableTransferResponse.data",
                                new_callable=mocker.PropertyMock)
-    get_ep_mock.return_value = endpoint_search[1:2]
+    get_ep_mock.return_value = {"DATA": endpoint_search["DATA"][1:2]}
 
     endpoint_id = get_endpoint_id('dd1ee92a-6d04-11e5-ba46-22000b92c6ec', transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
@@ -104,7 +104,7 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
     err = globus_sdk.TransferAPIError(mocker.MagicMock())
     mocker.patch("globus_sdk.TransferClient.get_endpoint",
                  side_effect=err)
-    mock_search.return_value = endpoint_search[1:2]
+    mock_search.return_value = {"DATA": endpoint_search["DATA"][1:2]}
 
     # Test Other transfer error
     with pytest.raises(globus_sdk.TransferAPIError):

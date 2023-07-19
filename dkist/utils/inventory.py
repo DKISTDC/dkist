@@ -1,8 +1,12 @@
 """
 Functions for working with dataset inventory.
 """
+import re
+import string
 from typing import Dict
 from collections import defaultdict
+
+from astropy.table import Table
 
 __all__ = ['dehumanize_inventory', 'humanize_inventory', 'INVENTORY_KEY_MAP']
 
@@ -43,8 +47,8 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
         "qualityAverageFriedParameter": "Average Fried Parameter",
         "qualityAveragePolarimetricAccuracy": "Average Polarimetric Accuracy",
         "recipeId": "Recipe ID",
-        "recipeInstanceId": "Recipie Instance ID",
-        "recipeRunId": "Recipie Run ID",
+        "recipeInstanceId": "Recipe Instance ID",
+        "recipeRunId": "Recipe Run ID",
         "startTime": "Start Time",
         "stokesParameters": "Stokes Parameters",
         "targetTypes": "Target Types",
@@ -57,7 +61,40 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
         "averageDatasetSpatialSampling": "Average Spatial Sampling",
         "averageDatasetTemporalSampling": "Average Temporal Sampling",
         "qualityReportObjectKey": "Quality Report Filename",
+        "inputDatasetParametersPartId": "Input Dataset Parameters Part ID",
+        "inputDatasetObserveFramesPartId": "Input Dataset Observe Frames Part ID",
+        "inputDatasetCalibrationFramesPartId": "Input Dataset Calibration Frames Part ID",
+        "highLevelSoftwareVersion": "Summit Software Version",
+        "workflowName": "Calibration Workflow Name",
+        "workflowVersion": "Calibration Workflow Version",
+        "headerDataUnitCreationDate": "HDU Creation Date",
+        "observingProgramExecutionId": "Observing Program Execution ID",
+        "instrumentProgramExecutionId": "Instrument Program Execution ID",
+        "headerVersion": "Header Specification Version",
+        "headerDocumentationUrl": "Header Documentation URL",
+        "infoUrl": "Info URL",
+        "calibrationDocumentationUrl": "Calibration Documentation URL"
 })
+
+
+def _key_clean(key):
+    key = re.sub('[%s]' % re.escape(string.punctuation), '_', key)
+    key = key.replace(' ', '_')
+    key = ''.join(char for char in key
+                    if char.isidentifier() or char.isnumeric())
+    return key.lower()
+
+
+def path_format_keys(keymap):
+    """
+    Return a list of all valid keys for path formatting.
+    """
+    return tuple(map(_key_clean, keymap.values()))
+
+
+def _path_format_table(keymap=INVENTORY_KEY_MAP):
+    t = Table({'Inventory Keyword': list(keymap.keys()), 'Path Key': path_format_keys(keymap)})
+    return '\n'.join(t.pformat(max_lines=-1, html=True))
 
 
 def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
@@ -69,6 +106,17 @@ def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
     for key, value in inventory.items():
         humanized_inventory[key_converter[key]] = value
     return humanized_inventory
+
+
+def path_format_inventory(human_inv):
+    """
+    Given a single humanized inventory record return a dict for formatting paths.
+    """
+    # Putting this here because of circular imports
+    from ..net.client import DKISTQueryResponseTable as Table
+
+    t = Table.from_results([{"searchResults": [human_inv]}], client=None)
+    return t[0].response_block_map
 
 
 def dehumanize_inventory(humanized_inventory: Dict[str, str]) -> Dict[str, str]:

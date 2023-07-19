@@ -1,7 +1,8 @@
+import importlib.resources as importlib_resources
 from pathlib import Path
 from textwrap import dedent
-from importlib import resources
 
+import numpy as np
 from jsonschema.exceptions import ValidationError
 
 import asdf
@@ -86,6 +87,16 @@ class Dataset(NDCube):
 
     headers : `astropy.table.Table`
         A Table of all FITS headers for all files comprising this dataset.
+
+    Notes
+    -----
+    When slicing a Dataset instance, both the file manager and the header table
+    will also be sliced so that these attributes on the new object refer only
+    to the relevant files. However, note that they behave slightly differently.
+    The file manager will be a reference to the file manager of the original
+    Dataset, meaning that any file name changes made to the sliced object will
+    propagate to the original. This is not the case for the header table, as
+    slicing creates a new object in this case.
     """
 
     _file_manager = FileManagerDescriptor(default_type=FileManager)
@@ -121,7 +132,28 @@ class Dataset(NDCube):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
             sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
+            sliced_dataset.meta = sliced_dataset.meta.copy()
+            sliced_dataset.meta["headers"] = self._slice_headers(item)
         return sliced_dataset
+
+    def _slice_headers(self, slice_):
+        idx = self.files._array_slice_to_loader_slice(slice_)
+        if idx == (np.s_[:],):
+            return self.headers.copy()
+        file_idx = []
+        for i in idx:
+            if not isinstance(i, slice):
+                i = slice(i, i+1)
+            file_idx.append(i)
+        file_idx = tuple(file_idx)
+        grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
+        file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+        files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+
+        # Explicitly create new header table to ensure consistency
+        # Otherwise would return a reference sometimes and a new table others
+        return self.meta["headers"].copy()[flat_idx]
 
     """
     Properties.
@@ -153,6 +185,13 @@ class Dataset(NDCube):
         """
         return self._file_manager
 
+    @property
+    def inventory(self):
+        """
+        Convenience attribute to acces the inventory metadata.
+        """
+        return self.meta['inventory']
+
     """
     Dataset loading and saving routines.
     """
@@ -173,7 +212,7 @@ class Dataset(NDCube):
         elif len(asdf_files) > 1:
             raise NotImplementedError("Multiple asdf files found in this "
                                       "directory. Use from_asdf to specify which "
-                                      "one to use.") # pragma: no cover
+                                      "one to use.")  # pragma: no cover
 
         asdf_file = asdf_files[0]
 
@@ -184,14 +223,19 @@ class Dataset(NDCube):
         """
         Construct a dataset object from a filepath of a suitable asdf file.
         """
+        from dkist.dataset import TiledDataset
         filepath = Path(filepath).expanduser()
         base_path = filepath.parent
         try:
-            with resources.path("dkist.io", "level_1_dataset_schema.yaml") as schema_path:
+            with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
                 with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                                lazy_load=False, copy_arrays=True) as ff:
                     ds = ff.tree['dataset']
-                    ds.files.basepath = base_path
+                    if isinstance(ds, TiledDataset):
+                        for sub in ds.flat:
+                            sub.files.basepath = base_path
+                    else:
+                        ds.files.basepath = base_path
                     return ds
 
         except ValidationError as e:

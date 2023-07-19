@@ -1,13 +1,14 @@
 import os
-import cgi
 import json
 import urllib.parse
 import urllib.request
 from typing import Any, List, Mapping, Iterable
+from textwrap import dedent
 from functools import partial
 from collections import defaultdict
 
 import aiohttp
+import numpy as np
 import parfive
 
 import astropy.units as u
@@ -17,6 +18,7 @@ from sunpy.net import attr
 from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
+from sunpy.util.net import parse_header
 
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
@@ -34,14 +36,41 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # Define some class properties to better format the results table.
     # TODO: remove experimentDescription from this list, when we can limit the
     # length of the field to something nicer
-    hide_keys: List[str] = ["Storage Bucket", "Full Stokes", "asdf Filename", "Recipie Instance ID",
-                            "Recipie Run ID", "Recipe ID", "Movie Filename", "Level 0 Frame count",
-                            "Creation Date", "Last Updated", "Experiment IDs", "Proposal IDs",
-                            "Preview URL", "Quality Report Filename", "Experiment Description"]
+    hide_keys: List[str] = [
+        "Storage Bucket",
+        "Full Stokes",
+        "asdf Filename",
+        "Recipe Instance ID",
+        "Recipe Run ID",
+        "Recipe ID",
+        "Movie Filename",
+        "Level 0 Frame count",
+        "Creation Date",
+        "Last Updated",
+        "Experiment IDs",
+        "Proposal IDs",
+        "Preview URL",
+        "Quality Report Filename",
+        "Experiment Description",
+        "Input Dataset Parameters Part ID",
+        "Input Dataset Observe Frames Part ID",
+        "Input Dataset Calibration Frames Part ID",
+        "Summit Software Version",
+        "Calibration Workflow Name",
+        "Calibration Workflow Version",
+        "HDU Creation Date",
+        "Observing Program Execution ID",
+        "Instrument Program Execution ID",
+        "Header Specification Version",
+        "Header Documentation URL",
+        "Info URL",
+        "Calibration Documentation URL",
+    ]
 
     # These keys are shown in the repr and str representations of this class.
     _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
 
+    total_available_results = TableAttribute(default=0)
 
     @staticmethod
     def _process_table(results: "DKISTQueryResponseTable") -> "DKISTQueryResponseTable":
@@ -60,6 +89,9 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
+            none_values = results[colname] == None
+            if any(none_values):
+                results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
 
         if results:
@@ -69,19 +101,43 @@ class DKISTQueryResponseTable(QueryResponseTable):
         return results
 
     @classmethod
-    def from_results(cls, results: Iterable[Mapping[str, Any]], *, client: "DKISTClient") -> "DKISTQueryResponseTable":
+    def from_results(cls, responses: Iterable[Mapping[str, Any]], *, client: "DKISTClient") -> "DKISTQueryResponseTable":
         """
         Construct the results table from the API results.
         """
+        total_available_results = 0
         new_results = defaultdict(list)
-        for result in results:
-            for key, value in result.items():
-                new_results[INVENTORY_KEY_MAP[key]].append(value)
+        for response in responses:
+            total_available_results += response.get('recordCount', 0)
+            for result in response["searchResults"]:
+                for key, value in result.items():
+                    new_results[INVENTORY_KEY_MAP[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
         data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
+        data.total_available_results = total_available_results
 
         return data
+
+    def __str__(self):
+        super_str = super().__str__()
+        if self.total_available_results != 0 and self.total_available_results != len(self):
+            return dedent(f"""
+            Showing {len(self)} of {self.total_available_results} available results.
+            Use a.dkist.Page(2) to show the second page of results.\n
+            """) + super_str
+        return super_str
+
+    def _repr_html_(self):
+        super_html = super()._repr_html_()
+        if self.total_available_results != 0 and self.total_available_results != len(self):
+            return dedent(f"""
+            <p>
+            Showing {len(self)} of {self.total_available_results} available results.
+            Use <code>a.dkist.Page(2)</code> to show the second page of results.\n
+            </p>
+            """) + super_html
+        return super_html
 
 
 class DKISTClient(BaseClient):
@@ -91,7 +147,7 @@ class DKISTClient(BaseClient):
     .. note::
 
         This class is not intended to be used directly.
-        You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:fido_guide`.
+        You should use `~sunpy.net.Fido` to search and download data, see :ref:`sunpy:sunpy-tutorial-acquiring-data-index`.
     """
     @property
     def _dataset_search_url(self):
@@ -111,17 +167,22 @@ class DKISTClient(BaseClient):
         """
         Search for datasets provided by the DKIST data centre.
         """
+        from dkist.net import conf
 
         query = attr.and_(*args)
         queries = walker.create(query)
 
         results = []
         for url_parameters in queries:
-            query_string = urllib.parse.urlencode(url_parameters)
+            if 'pageSize' not in url_parameters:
+                url_parameters.update({'pageSize': conf.default_page_size})
+            # TODO make this accept and concatenate multiple wavebands in a search
+            query_string = urllib.parse.urlencode(url_parameters, doseq=True)
             full_url = f"{self._dataset_search_url}?{query_string}"
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
-            results += data["searchResults"]
+            results.append(data)
+
 
         return DKISTQueryResponseTable.from_results(results, client=self)
 
@@ -137,7 +198,7 @@ class DKISTClient(BaseClient):
         if resp:
             cdheader = resp.headers.get("Content-Disposition", None)
             if cdheader:
-                _, params = cgi.parse_header(cdheader)
+                _, params = parse_header(cdheader)
                 name = params.get('filename', "")
 
         return str(path).format(file=name, **row.response_block_map)
@@ -163,8 +224,7 @@ class DKISTClient(BaseClient):
 
         for row in query_results:
             url = f"{self._metadata_streamer_url}/asdf?datasetId={row['Dataset ID']}"
-            # Set max_splits here as the metadata streamer doesn't like accept-range at the moment.
-            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), max_splits=1)
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:

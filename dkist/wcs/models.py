@@ -14,7 +14,8 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 __all__ = ['CoupledCompoundModel',
            'InverseVaryingCelestialTransform',
            'VaryingCelestialTransform',
-           'BaseVaryingCelestialTransform']
+           'BaseVaryingCelestialTransform',
+           'Ravel']
 
 
 def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
@@ -57,7 +58,8 @@ def generate_celestial_transform(crpix: Union[Iterable[float], u.Quantity],
     if lon_pole is None:
         lon_pole = 180
     if spatial_unit is not None:
-        lon_pole = u.Quantity(lon_pole, unit=spatial_unit)
+        # Lon pole should always have the units of degrees
+        lon_pole = u.Quantity(lon_pole, unit=u.deg)
 
     # Make translation unitful if all parameters have units
     translation = (0, 0)
@@ -650,19 +652,20 @@ class CoupledCompoundModel(CompoundModel):
         left_inverse = self.left.inverse
         right_inverse = self.right.inverse
 
-        total_inputs = self.n_outputs
-        n_left_only_inputs = total_inputs - self.shared_inputs
+        n_left_only_inputs = left_inverse.n_inputs - self.shared_inputs
+        n_right_only_inputs = right_inverse.n_outputs - self.shared_inputs
 
-        # Pass through arguments to the left model unchanged while computing the right output
+        # left only inputs are pass thru
         mapping = list(range(n_left_only_inputs))
-        step1 = m.Mapping(mapping) & right_inverse
-
-        # Now pass through the right outputs unchanged while also feeding them into the left model
-
-        # This mapping duplicates the output of the right inverse to be fed
-        # into the left and also out unmodified at the end of the transform
-        inter_mapping = mapping + list(range(max(mapping) + 1, max(mapping) + 1 + right_inverse.n_outputs)) * 2
-        step2 = m.Mapping(inter_mapping) | (left_inverse & m.Identity(right_inverse.n_outputs))
+        # step1 passes through the left-only inputs and inverts the right only inputs
+        step1 = m.Mapping(tuple(mapping)) & right_inverse
+        # next we remap the output of step 1 and replicate the shared outputs
+        shared_start = max(mapping) + 1
+        shared = list(range(shared_start, shared_start + self.shared_inputs)) * 2
+        right_start = max(shared) + 1
+        right = list(range(right_start, right_start + n_right_only_inputs))
+        inter_mapping = mapping + shared + right
+        step2 = m.Mapping(tuple(inter_mapping)) | (left_inverse & m.Identity(right_inverse.n_outputs))
 
         return step1 | step2
 
@@ -733,3 +736,154 @@ def varying_celestial_transform_from_tables(crpix: Union[Iterable[float], u.Quan
         lon_pole=lon_pole,
         projection=projection
     )
+
+
+class Ravel(Model):
+    n_outputs = 1
+    _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def n_inputs(self):
+        return len(self.array_shape)
+
+    @property
+    def inputs(self):
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, value):
+        self._inputs = value
+
+    @property
+    def input_units(self):
+        return {f'x{idx}': u.pix for idx in range(self.n_inputs)}
+
+    @property
+    def outputs(self):
+        return self._outputs
+
+    @outputs.setter
+    def outputs(self, value):
+        self._outputs = value
+
+    @property
+    def return_units(self):
+        return {'y': u.pix}
+
+    def __init__(self, array_shape, order='C', **kwargs):
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
+        self.array_shape = tuple(array_shape)
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
+        super().__init__(**kwargs)
+        # super dunder init sets inputs and outputs to default values so set what we want here
+        self.inputs = tuple([f'x{idx}' for idx in range(self.n_inputs)])
+        self.outputs = 'y',
+
+    def evaluate(self, *inputs_):
+        """Evaluate the forward ravel for a given tuple of pixel values."""
+        if hasattr(inputs_[0], "unit"):
+            has_units = True
+            input_values = [item.to_value(u.pix) for item in inputs_]
+        else:
+            has_units = False
+            input_values = inputs_
+        # round the index values, but clip them if they exceed the array bounds
+        # the bounds are one less than the shape dimension value
+        array_bounds = np.array(self.array_shape) - 1
+        rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds[:, np.newaxis])
+        result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
+        index = 0 if self.order == "F" else -1
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        fraction = input_values[index] - rounded_inputs[index]
+        result += fraction
+        # Put the units back if they were there...
+        if has_units:
+            result = result * u.pix
+        else:
+            result = np.array([result])
+        return result
+
+    @property
+    def inverse(self):
+        return Unravel(self.array_shape, order=self.order)
+
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}(array_shape={self.array_shape}, order="{self.order}")>'
+
+
+class Unravel(Model):
+    n_inputs = 1
+    _separable = False
+    _input_units_allow_dimensionless = True
+
+    @property
+    def inputs(self):
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, value):
+        self._inputs = value
+
+    @property
+    def input_units(self):
+        return {'x': u.pix}
+
+    @property
+    def n_outputs(self):
+        return len(self.array_shape)
+
+    @property
+    def outputs(self):
+        return self._outputs
+
+    @outputs.setter
+    def outputs(self, value):
+        self._outputs = value
+
+    @property
+    def return_units(self):
+        return {f'y{idx}': u.pix for idx in range(self.n_outputs)}
+
+    def __init__(self, array_shape, order='C', **kwargs):
+        if len(array_shape) < 2 or np.prod(array_shape) < 1:
+            raise ValueError("array_shape must be at least 2D and have values >= 1")
+        self.array_shape = array_shape
+        if order not in ("C", "F"):
+            raise ValueError("order kwarg must be one of 'C' or 'F'")
+        self.order = order
+        super().__init__(**kwargs)
+        # super dunder init sets inputs and outputs to default values so set what we want here
+        self.inputs = 'x',
+        self.outputs = tuple([f'y{idx}' for idx in range(self.n_outputs)])
+
+    def evaluate(self, input_):
+        """Evaluate the reverse ravel (unravel) for a given pixel value."""
+        if hasattr(input_, "unit"):
+            has_units = True
+            input_value = [item.to_value(u.pix) for item in input_]
+            input_value_int = [int(item) for item in input_value]
+        else:
+            has_units = False
+            input_value = input_
+            input_value_int = [int(item) for item in input_]
+
+        result = list(np.unravel_index(input_value_int, self.array_shape, order=self.order))
+        result = [item.astype(float) for item in result]
+        # Adjust the result to allow a fractional part for interpolation in Tabular1D
+        index = 0 if self.order == "F" else -1
+        fraction = np.remainder(input_value, 1)
+        result[index] += fraction
+        if has_units:
+            result = result * u.pix
+        return result
+
+    @property
+    def inverse(self):
+        return Ravel(self.array_shape, order=self.order)
+
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}(array_shape={self.array_shape}, order="{self.order}")>'

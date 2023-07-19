@@ -24,8 +24,9 @@ from dkist.io.loaders import AstropyFITSLoader
 
 @pytest.fixture
 def array():
-    shape = np.random.randint(10, 100, size=2)
-    x = np.ones(shape) + 10
+    shape = 2**np.random.randint(2, 7, size=2)
+    x = np.ones(np.prod(shape)) + 10
+    x = x.reshape(shape)
     return da.from_array(x, tuple(shape))
 
 
@@ -203,13 +204,15 @@ def dataset(array, identity_gwcs):
             'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf',
             'browseMovieObjectKey': 'test_proposal/test_dataset/test_dataset.mp4',
             'qualityReportObjectKey': 'test_proposal/test_dataset/test_dataset.pdf',
+            'wavelengthMin': 0,
+            'wavelengthMax': 0,
         },
         'headers': Table()
     }
 
     identity_gwcs.array_shape = array.shape
     identity_gwcs.pixel_shape = array.shape[::-1]
-    ds = Dataset(array, wcs=identity_gwcs, meta=meta)
+    ds = Dataset(array, wcs=identity_gwcs, meta=meta, unit=u.count)
     # Sanity checks
     assert ds.data is array
     assert ds.wcs is identity_gwcs
@@ -234,7 +237,7 @@ def dataset_3d(identity_gwcs_3d, empty_meta):
     identity_gwcs_3d.pixel_shape = array.shape[::-1]
     identity_gwcs_3d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_3d, meta=empty_meta)
+    return Dataset(array, wcs=identity_gwcs_3d, meta=empty_meta, unit=u.count)
 
 
 @pytest.fixture
@@ -246,7 +249,7 @@ def dataset_4d(identity_gwcs_4d, empty_meta):
     identity_gwcs_4d.pixel_shape = array.shape[::-1]
     identity_gwcs_4d.array_shape = array.shape
 
-    return Dataset(array, wcs=identity_gwcs_4d, meta=empty_meta)
+    return Dataset(array, wcs=identity_gwcs_4d, meta=empty_meta, unit=u.count)
 
 
 @pytest.fixture

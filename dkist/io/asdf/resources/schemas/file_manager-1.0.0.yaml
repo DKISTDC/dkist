@@ -22,6 +22,8 @@ properties:
       anyOf:
       - type: integer
         minimum: 0
+  chunksize:
+    type: array
 
 required: [fileuris, target, datatype, shape]
 additionalProperties: false
