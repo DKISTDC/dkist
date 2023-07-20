@@ -465,7 +465,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform2D(
+        ivct = InverseVaryingCelestialTransform3D(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -478,20 +478,20 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
 
 # TODO: Test
 class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
-    n_inputs = 4
+    n_inputs = 5
     n_outputs = 2
 
     @property
     def input_units(self):
-        return {"lon": u.deg, "lat": u.deg, "z": u.pix, "q": u.pix}
+        return {"lon": u.deg, "lat": u.deg, "m": u.pix, "z": u.pix, "q": u.pix}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inputs = ("lon", "lat", "z", "q")
+        self.inputs = ("lon", "lat", "m", "z", "q")
         self.outputs = ("x", "y")
 
-    def evaluate(self, lon, lat, z, q, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, z, q, crpix, cdelt, lon_pole,
+    def evaluate(self, lon, lat, m, z, q, crpix, cdelt, lon_pole, **kwargs):
+        return self._map_transform(lon, lat, m, z, q, crpix, cdelt, lon_pole,
                                    inverse=True)
 
 
@@ -760,21 +760,21 @@ class VaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform):
         return x_out, y_out
 
 # TODO: Test
-class InverseVaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform2D):
-    n_inputs = 4
+class InverseVaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform3D):
+    n_inputs = 5
     n_outputs = 1
 
     @property
     def input_units(self):
-        return {"lon": u.deg, "lat": u.deg, "raster": u.pix, "repeat": u.pix}
+        return {"lon": u.deg, "lat": u.deg, "meas_num": u.pix, "raster": u.pix, "repeat": u.pix}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inputs = ("lon", "lat", "raster", "repeat")
+        self.inputs = ("lon", "lat", "meas_num", "raster", "repeat")
         self.outputs = ("slit-y",)
 
-    def evaluate(self, lon, lat, raster, repeat, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, raster, repeat, crpix, cdelt,
+    def evaluate(self, lon, lat, meas_num, raster, repeat, crpix, cdelt, lon_pole, **kwargs):
+        return self._map_transform(lon, lat, meas_num, raster, repeat, crpix, cdelt,
                                    lon_pole, inverse=True)[0]
 
 class CoupledCompoundModel(CompoundModel):

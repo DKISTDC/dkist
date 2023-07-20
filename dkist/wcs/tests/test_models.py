@@ -9,9 +9,9 @@ from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
 from dkist.wcs.models import VaryingCelestialTransform2D  # VaryingCelestialTransform3D,
-from dkist.wcs.models import (Ravel, Unravel,  # VaryingCelestialTransformSlit3D,
-                              VaryingCelestialTransform, VaryingCelestialTransformSlit,
-                              VaryingCelestialTransformSlit2D, generate_celestial_transform,
+from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
+                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
+                              VaryingCelestialTransformSlit3D, generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
 
@@ -290,7 +290,7 @@ def test_vct_dispatch():
                                                      **kwargs)
 
     assert isinstance(vct_2d, VaryingCelestialTransform2D)
-
+    # TODO: Update for new 3D capability
     with pytest.raises(ValueError, match="Only one or two dimensional lookup tables are supported"):
         varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[1:].reshape((3, 2, 2, 2, 2)),
                                                 crval_table=crval_table[1:].reshape((3, 2, 2, 2)),
@@ -355,7 +355,7 @@ def test_vct_slit2d():
     assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
 
 def test_vct_slit3d():
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 30)] * u.arcsec
     pc_table = pc_table.reshape((5, 2, 3, 2, 2))
 
     kwargs = dict(crpix=(5, 5) * u.pix,
@@ -366,7 +366,7 @@ def test_vct_slit3d():
     vct_slit = VaryingCelestialTransformSlit3D(pc_table=pc_table, **kwargs)
     pixel = (0*u.pix, 0*u.pix, 0*u.pix, 0*u.pix)
     world = vct_slit(*pixel)
-    ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix)
+    ipixel = vct_slit.inverse(*world, 0*u.pix, 0*u.pix, 0*u.pix)
     assert u.allclose(ipixel, pixel[0], atol=1e-5*u.pix)
 
 def test_vct_slit_unitless():
