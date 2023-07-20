@@ -8,8 +8,8 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import VaryingCelestialTransform2D  # VaryingCelestialTransform3D,
 from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D, VaryingCelestialTransform3D,
                               VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
                               VaryingCelestialTransformSlit3D, generate_celestial_transform,
                               varying_celestial_transform_from_tables)
@@ -269,32 +269,41 @@ def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
 
 
 def test_vct_dispatch():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
-    varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
-
-    crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
-    crval_table = crval_table.reshape((5, 3, 2))
-
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 16)] * u.arcsec
+    varying_matrix_lt = varying_matrix_lt.reshape((2, 2, 2, 2, 2, 2))
+    crval_table = list(zip(np.arange(1, 17), np.arange(17, 33))) * u.arcsec
+    crval_table = crval_table.reshape((2, 2, 2, 2, 2))
     kwargs = dict(crpix=(5, 5) * u.pix,
                   cdelt=(1, 1) * u.arcsec/u.pix,
                   lon_pole=180 * u.deg)
 
-    vct_3d = varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[0],
-                                                     crval_table=crval_table[0],
-                                                     **kwargs)
+    vct = varying_celestial_transform_from_tables(
+        pc_table=varying_matrix_lt[0, 0, 0],
+        crval_table=crval_table[0, 0, 0],
+        **kwargs,
+    )
+    assert isinstance(vct, VaryingCelestialTransform)
 
-    assert isinstance(vct_3d, VaryingCelestialTransform)
-
-    vct_2d = varying_celestial_transform_from_tables(pc_table=varying_matrix_lt,
-                                                     crval_table=crval_table,
-                                                     **kwargs)
-
+    vct_2d = varying_celestial_transform_from_tables(
+        pc_table=varying_matrix_lt[0, 0],
+        crval_table=crval_table[0, 0],
+        **kwargs,
+    )
     assert isinstance(vct_2d, VaryingCelestialTransform2D)
-    # TODO: Update for new 3D capability
-    with pytest.raises(ValueError, match="Only one or two dimensional lookup tables are supported"):
-        varying_celestial_transform_from_tables(pc_table=varying_matrix_lt[1:].reshape((3, 2, 2, 2, 2)),
-                                                crval_table=crval_table[1:].reshape((3, 2, 2, 2)),
-                                                **kwargs)
+
+    vct_3d = varying_celestial_transform_from_tables(
+        pc_table=varying_matrix_lt[0],
+        crval_table=crval_table[0],
+        **kwargs
+    )
+    assert isinstance(vct_3d, VaryingCelestialTransform3D)
+
+    with pytest.raises(ValueError, match="Only 1D, 2D and 3D lookup tables are supported."):
+        varying_celestial_transform_from_tables(
+            pc_table=varying_matrix_lt,
+            crval_table=crval_table,
+            **kwargs,
+        )
 
 
 def test_vct_shape_errors():

@@ -952,7 +952,7 @@ def varying_celestial_transform_from_tables(
         crval_table,
     )
     if (table_d := len(table_shape)) not in range(1, 4):
-        raise ValueError("Only one or two dimensional lookup tables are supported.")
+        raise ValueError("Only 1D, 2D and 3D lookup tables are supported.")
 
     cls = varying_celestial_transform_dict[(slit, table_d, inverse)]
     return cls(
