@@ -1,0 +1,1 @@
+Add a new `load_dataset()` function to combine and replace `Dataset.from_directory()` and `Dataset.from_asdf()`.
