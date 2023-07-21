@@ -90,6 +90,11 @@ def test_from_not_directory():
         assert "directory argument" in str(e)
 
 
+def test_load_tiled_dataset():
+    ds = load_dataset(os.path.join(rootdir, 'test_tiled_dataset.asdf'))
+    assert ds.shape == (3, 3)
+
+
 def test_from_directory_not_dir():
     with pytest.raises(ValueError) as e:
         load_dataset(rootdir / 'EIT' / 'eit_2004-03-01T00_00_10.515000.asdf')
