@@ -302,7 +302,7 @@ def large_visp_dataset():
     astropy.utils.iers.conf.iers_degraded_accuracy = 'ignore'
     vispdir = Path(rootdir) / "large_visp"
     ds = SimpleVISPDataset(n_maps=1, n_steps=20, n_stokes=4, time_delta=10,
-                           linewave=500*u.nm, detector_shape=(500, 1280))
+                           linewave=500*u.nm, detector_shape=(50, 128))
     ds.generate_files(vispdir)
     dataset_from_fits(vispdir, "test_visp.asdf")
 
