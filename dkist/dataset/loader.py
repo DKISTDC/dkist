@@ -35,8 +35,6 @@ def _load_from_directory(directory):
     asdf file and a collection of FITS files.
     """
     base_path = Path(directory).expanduser()
-    if not base_path.is_dir():
-        raise ValueError("directory argument must be a directory")
     asdf_files = tuple(base_path.glob("*.asdf"))
 
     if not asdf_files:
