@@ -9,7 +9,7 @@ import asdf
 
 @singledispatch
 def load_dataset():
-    pass
+    """Function to load a Dataset from either an asdf file path or a directory."""
 
 
 @load_dataset.register
