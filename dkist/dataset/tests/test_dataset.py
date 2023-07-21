@@ -125,7 +125,7 @@ def test_inventory_propery():
 
 
 def test_header_slicing_single_index():
-    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    dataset = load_dataset(os.path.join(rootdir, 'EIT'))
     idx = 5
     sliced = dataset[idx]
 
@@ -139,7 +139,7 @@ def test_header_slicing_single_index():
 
 
 def test_header_slicing_3D_slice():
-    dataset = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+    dataset = load_dataset(os.path.join(rootdir, 'EIT'))
     idx = np.s_[:3, :, 0]
     sliced = dataset[idx]
 
