@@ -9,7 +9,7 @@ DKIST User Tools
    :target: https://app.element.io/#/room/#dki-solar-telescope:openastronomy.org
 .. image:: https://github.com/DKISTDC/dkist/actions/workflows/main.yml/badge.svg?branch=main
    :target: https://github.com/DKISTDC/dkist/actions/workflows/main.yml
-.. image:: https://codecov.io/github/dkistdc/dkist/branch/master/graph/badge.svg?token=A4ggaCurqz 
+.. image:: https://codecov.io/github/dkistdc/dkist/branch/master/graph/badge.svg?token=A4ggaCurqz
    :target: https://codecov.io/github/dkistdc/dkist
 .. image:: https://readthedocs.com/projects/dkistdc-dkist/badge/?version=latest
    :target: https://docs.dkist.nso.edu/projects/python-tools
