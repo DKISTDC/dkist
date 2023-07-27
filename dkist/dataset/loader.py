@@ -23,7 +23,6 @@ def _load_from_path(path: Path):
     if not path.is_dir():
         if not path.exists():
             raise ValueError(f"File {path} does not exist.")
-        # elif raise error if extension is not .asdf
         return _load_from_asdf(path)
     else:
         return _load_from_directory(path)
