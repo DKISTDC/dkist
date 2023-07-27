@@ -3,11 +3,13 @@ from textwrap import dedent
 import numpy as np
 
 import gwcs
+from astropy.utils.decorators import deprecated
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.file_manager import FileManager
 
+from .loader import load_dataset
 from .utils import dataset_info_str
 
 __all__ = ['Dataset']
@@ -187,6 +189,29 @@ class Dataset(NDCube):
         Convenience attribute to acces the inventory metadata.
         """
         return self.meta['inventory']
+
+    """
+    Dataset loading and saving routines.
+    """
+
+    @classmethod
+    @deprecated(since="1.0.0", alternative=load_dataset)
+    def from_directory(cls, directory):
+        """
+        Construct a `~dkist.dataset.Dataset` from a directory containing one
+        asdf file and a collection of FITS files.
+        """
+
+        return load_dataset(directory)
+
+    @classmethod
+    @deprecated(since="1.0.0", alternative=load_dataset)
+    def from_asdf(cls, filepath):
+        """
+        Construct a dataset object from a filepath of a suitable asdf file.
+        """
+
+        return load_dataset(filepath)
 
     """
     Private methods.

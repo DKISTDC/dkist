@@ -10,6 +10,7 @@ import astropy.units as u
 import gwcs
 from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.exceptions import AstropyDeprecationWarning
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, load_dataset
@@ -93,6 +94,22 @@ def test_from_not_directory():
 def test_load_tiled_dataset():
     ds = load_dataset(os.path.join(rootdir, 'test_tiled_dataset-1.0.0_dataset-1.1.0.asdf'))
     assert ds.shape == (3, 3)
+
+
+def test_load_with_old_methods():
+    with pytest.raises(AstropyDeprecationWarning) as e:
+        ds = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
+        assert isinstance(ds.data, da.Array)
+        assert isinstance(ds.wcs, gwcs.WCS)
+        assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+        assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
+
+    with pytest.raises(AstropyDeprecationWarning) as e:
+        ds = Dataset.from_asdf(os.path.join(rootdir, 'EIT', "eit_test_dataset.asdf"))
+        assert isinstance(ds.data, da.Array)
+        assert isinstance(ds.wcs, gwcs.WCS)
+        assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+        assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
 
 
 def test_from_directory_not_dir():
