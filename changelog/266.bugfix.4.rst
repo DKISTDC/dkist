@@ -1,1 +1,0 @@
-Add search attrs corresponding to new columns in dataset inventory.
