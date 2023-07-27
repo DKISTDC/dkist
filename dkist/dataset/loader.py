@@ -3,7 +3,6 @@ from pathlib import Path
 from functools import singledispatch
 
 from jsonschema.exceptions import ValidationError
-
 import asdf
 
 
