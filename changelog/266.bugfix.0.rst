@@ -1,1 +1,0 @@
-Improve speed of `import dkist` by preventing automatic import of `dkist.net`.

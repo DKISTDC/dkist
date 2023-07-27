@@ -1,3 +1,26 @@
+v1.0.0b15 (2023-07-24)
+======================
+
+Features
+--------
+
+- Add path interpolation to `transfer_complete_datasets()` path location argument. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Add a `Dataset.inventory` attribute to more easily access the inventory metadata (previously `.meta['inventory']`. (`#272 <https://github.com/DKISTDC/dkist/pull/272>`_)
+- Add experimental support for 3D LUTs to TimeVaryingCelestialTransform (`#277 <https://github.com/DKISTDC/dkist/pull/277>`_)
+
+
+Bug Fixes
+---------
+
+- Improve speed of `import dkist` by preventing automatic import of `dkist.net`. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Fix how Fido uses Wavelength to search for datasets. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Fix using `a.dkist.Embargoed.false` and `a.dkist.Embargoed.true` to specify embargo status. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Add units support to `a.dkist.FriedParameter`. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Add search attrs corresponding to new columns in dataset inventory. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Make `dkist.Dataset` return the appropriately sliced header table when slicing data. (`#271 <https://github.com/DKISTDC/dkist/pull/271>`_)
+- Update docstring for `transfer_complete_datasets()` to include previously missing `path` parameter. (`#273 <https://github.com/DKISTDC/dkist/pull/273>`_)
+
+
 1.0.0b14 (2023-06-12)
 =====================
 

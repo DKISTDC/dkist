@@ -1,1 +1,0 @@
-Add path interpolation to `transfer_complete_datasets()` path location argument.

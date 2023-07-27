@@ -1,1 +1,0 @@
-Fix using `a.dkist.Embargoed.false` and `a.dkist.Embargoed.true` to specify embargo status.
