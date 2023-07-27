@@ -91,7 +91,7 @@ def test_from_not_directory():
 
 
 def test_load_tiled_dataset():
-    ds = load_dataset(os.path.join(rootdir, 'test_tiled_dataset.asdf'))
+    ds = load_dataset(os.path.join(rootdir, 'test_tiled_dataset-1.0.0_dataset-1.1.0.asdf'))
     assert ds.shape == (3, 3)
 
 
