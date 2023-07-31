@@ -97,14 +97,14 @@ def test_load_tiled_dataset():
 
 
 def test_load_with_old_methods():
-    with pytest.raises(AstropyDeprecationWarning) as e:
+    with pytest.warns(AstropyDeprecationWarning):
         ds = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
         assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
         assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
 
-    with pytest.raises(AstropyDeprecationWarning) as e:
+    with pytest.warns(AstropyDeprecationWarning) as e:
         ds = Dataset.from_asdf(os.path.join(rootdir, 'EIT', "eit_test_dataset.asdf"))
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
