@@ -121,3 +121,18 @@ def pp_matrix(wcs):
         wid = np.max([len(a) for a in col])
         mstr[:, i] = np.char.rjust(col, wid)
     print(np.array_str(mstr, max_line_width=1000))
+
+
+def extract_pc_matrix(headers, naxes=None):
+    """
+    Given an astropy table of headers extract one or more PC matricies.
+    """
+    if naxes is None:
+        naxes = headers[0]["NAXIS"]
+    keys = []
+    for i, j in np.ndindex((naxes, naxes)):
+        keys.append(f"PC{i+1}_{j+1}")
+
+    sub = headers[keys]
+
+    return np.array(np.array(headers[keys]).tolist()).reshape(len(sub), naxes, naxes)
