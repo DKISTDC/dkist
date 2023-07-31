@@ -92,7 +92,7 @@ How to do this is detailed in the next section, :ref:`loadinglevel1data`, but a 
 
 .. code-block:: python
 
-   ds = dkist.Dataset.from_asdf(files[0])
+   ds = dkist.load_dataset(files[0])
 
 Once the dataset is loaded, we can use the `dkist.Dataset.files` property to manage where the dataset looks for the FITS files associated with the dataset.
 By default the ``Dataset`` object will assume the FITS files are in the same directory as the ASDF file that was loaded.
