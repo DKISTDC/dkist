@@ -64,7 +64,6 @@ extensions = [
     'sphinx_automodapi.automodapi',
     'sphinx_automodapi.smart_resolver',
     'sphinx_changelog',
-    'sphinx_gallery.gen_gallery',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
@@ -168,23 +167,10 @@ graphviz_dot_args = [
     '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
 ]
 
-# -- Sphinx Gallery ------------------------------------------------------------
-sphinx_gallery_conf = {
-    'backreferences_dir': os.path.join('generated', 'modules'),
-    'filename_pattern': '^((?!skip_).)*$',
-    'examples_dirs': os.path.join('..', 'examples'),
-    'gallery_dirs': os.path.join('generated', 'gallery'),
-    'abort_on_example_error': False,
-    'plot_gallery': 'True',
-    'remove_config_comments': True,
-    'doc_module': ('dkist'),
-    'only_warn_on_example_error': True,
-}
-
 # -- MyST_NB -------------------------------------------------------------------
 nb_execution_allow_errors = False
 nb_execution_in_temp = True
 nb_execution_mode = 'auto'
 nb_execution_timeout = 300
 nb_output_stderr = 'show'
-execution_show_tb = True
+nb_execution_show_tb = True
