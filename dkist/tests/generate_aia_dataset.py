@@ -18,6 +18,7 @@ from sunpy.net import attrs as a
 from sunpy.net.jsoc import JSOCClient
 from sunpy.time import parse_time
 
+from dkist import load_dataset
 from dkist.asdf_maker.helpers import generate_lookup_table
 
 
@@ -204,9 +205,7 @@ def main():
 
     # import sys; sys.exit(0)
 
-    from dkist.dataset import Dataset
-
-    ds = Dataset.from_directory(str(path))
+    ds = load_dataset(str(path))
     print(repr(ds))
     print(repr(ds.wcs))
     print(ds.wcs(*[1*u.pix]*4, with_units=True))
