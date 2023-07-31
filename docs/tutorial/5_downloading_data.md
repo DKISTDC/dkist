@@ -102,6 +102,9 @@ ds
 ```
 
 ```{code-cell} ipython
+---
+tags: [skip-execution]
+---
 ds[0].files.download()
 ds[0].plot()
 ```
@@ -186,6 +189,9 @@ To demonstrate this, let's grab some data for the next session, which will be on
 We will want a multi-dimensional dataset, so let's use the VISP one we looked at in the last session.
 
 ```{code-cell} python
+---
+tags: [skip-execution]
+---
 dkist.net.transfer_complete_datasets('AGLKO', wait=False, progress=False)
 ```
 
