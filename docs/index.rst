@@ -10,6 +10,7 @@ The DKIST Python tools provide a package (`dkist`) which aims to help you search
   self
   installation
   guide/index
+  tutorial/index
   reference
   whatsnew/index
   developer

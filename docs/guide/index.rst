@@ -12,6 +12,5 @@ This guide is broken up into the following sections:
 
    level1data
    usertools
-   install
    net
    loading
