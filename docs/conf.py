@@ -180,3 +180,11 @@ sphinx_gallery_conf = {
     'doc_module': ('dkist'),
     'only_warn_on_example_error': True,
 }
+
+# -- MyST_NB -------------------------------------------------------------------
+nb_execution_allow_errors = False
+nb_execution_in_temp = True
+nb_execution_mode = 'auto'
+nb_execution_timeout = 300
+nb_output_stderr = 'show'
+execution_show_tb = True
