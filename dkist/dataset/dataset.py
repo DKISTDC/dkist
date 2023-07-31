@@ -138,16 +138,21 @@ class Dataset(NDCube):
         idx = self.files._array_slice_to_loader_slice(slice_)
         if idx == (np.s_[:],):
             return self.headers.copy()
-        file_idx = []
-        for i in idx:
-            if not isinstance(i, slice):
-                i = slice(i, i+1)
-            file_idx.append(i)
-        file_idx = tuple(file_idx)
-        grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
-        file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+
         files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
-        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1])
+        file_idx = []
+        for ax, slc in enumerate(idx):
+            if not isinstance(slc, slice):
+                slc = slice(slc, slc+1, 1)
+            else:
+                # mgrid has to have a stop, so if it's missing from the slice we
+                # add it.
+                stop = slc.stop or files_shape[ax]
+                slc = slice(slc.start, stop, slc.step)
+            file_idx.append(slc)
+        grid = np.mgrid[tuple(file_idx)]
+        file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order='F')
 
         # Explicitly create new header table to ensure consistency
         # Otherwise would return a reference sometimes and a new table others

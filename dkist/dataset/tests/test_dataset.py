@@ -158,22 +158,21 @@ def test_header_slicing_single_index():
     assert len(sliced.files.filenames) == 1
     assert isinstance(sliced_headers, Row)
     assert sliced.files.filenames[0] == sliced_header_files
+    assert (sliced.headers['DINDEX3'] == sliced_headers['DINDEX3']).all()
 
 
-def test_header_slicing_3D_slice():
-    dataset = load_dataset(os.path.join(rootdir, 'EIT'))
-    idx = np.s_[:3, :, 0]
+def test_header_slicing_3D_slice(large_visp_dataset):
+    dataset = large_visp_dataset
+    idx = np.s_[:2, 10:15, 0]
     sliced = dataset[idx]
 
     file_idx = dataset.files._array_slice_to_loader_slice(idx)
     grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
-    file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
+    file_idx = tuple(grid[i].ravel() for i in range(np.prod(grid.shape[:-2])))
 
-    flat_idx = np.ravel_multi_index(file_idx, dataset.data.shape[0])
+    flat_idx = np.ravel_multi_index(file_idx, dataset.data.shape[:-2])
 
     sliced_headers = dataset.headers[flat_idx]
-    # Filenames in the header don't match the names of the files because why would you expect those things to be the same
-    sliced_header_files = [f+'_s.fits' for f in sliced_headers['FILENAME']]
 
-    assert len(sliced.files.filenames) == len(sliced_header_files)
-    assert sliced.files.filenames == sliced_header_files
+    assert len(sliced.files.filenames) == len(sliced_headers['FILENAME']) == len(sliced.headers)
+    assert (sliced.headers['DINDEX3', 'DINDEX4'] == sliced_headers['DINDEX3', 'DINDEX4']).all()
