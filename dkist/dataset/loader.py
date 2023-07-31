@@ -16,6 +16,7 @@ def load_dataset():
 
 @load_dataset.register
 def _load_from_string(path: str):
+    # TODO Adjust this to accept URLs as well
     return _load_from_path(Path(path))
 
 
