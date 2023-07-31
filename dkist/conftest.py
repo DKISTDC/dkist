@@ -304,4 +304,4 @@ def large_visp_dataset(tmp_path_factory):
     ds.generate_files(vispdir)
     dataset_from_fits(vispdir, "test_visp.asdf")
 
-    return load_directory(vispdir / "test_visp.asdf")
+    return load_dataset(vispdir / "test_visp.asdf")
