@@ -16,6 +16,7 @@ from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
 
+from dkist import load_dataset
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
@@ -303,4 +304,4 @@ def large_visp_dataset(tmp_path_factory):
     ds.generate_files(vispdir)
     dataset_from_fits(vispdir, "test_visp.asdf")
 
-    return Dataset.from_asdf(vispdir / "test_visp.asdf")
+    return load_directory(vispdir / "test_visp.asdf")
