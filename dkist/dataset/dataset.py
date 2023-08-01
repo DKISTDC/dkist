@@ -7,8 +7,8 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.file_manager import FileManager
-from dkist.utils.decorators import deprecated
 
+from ..utils.decorators import deprecated
 from .loader import load_dataset
 from .utils import dataset_info_str
 
