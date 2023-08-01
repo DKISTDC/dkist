@@ -10,8 +10,8 @@ import asdf
 @singledispatch
 def load_dataset(target):
     """Function to load a Dataset from either an asdf file path or a directory."""
-    raise TypeError("Input type not recognised. Must be a string or pathlib.Path referencing a
-                    .asdf file or a directory containing one.")
+    raise TypeError("Input type not recognised. Must be a string or pathlib.Path referencing a "
+                    ".asdf file or a directory containing one.")
 
 
 @load_dataset.register
