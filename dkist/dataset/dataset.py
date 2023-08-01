@@ -3,11 +3,11 @@ from textwrap import dedent
 import numpy as np
 
 import gwcs
-from astropy.utils.decorators import deprecated
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.file_manager import FileManager
+from dkist.utils.decorators import deprecated
 
 from .loader import load_dataset
 from .utils import dataset_info_str
@@ -200,7 +200,7 @@ class Dataset(NDCube):
     """
 
     @classmethod
-    @deprecated(since="1.0.0", alternative=load_dataset)
+    @deprecated(since="1.0.0", alternative="load_dataset")
     def from_directory(cls, directory):
         """
         Construct a `~dkist.dataset.Dataset` from a directory containing one
@@ -210,7 +210,7 @@ class Dataset(NDCube):
         return load_dataset(directory)
 
     @classmethod
-    @deprecated(since="1.0.0", alternative=load_dataset)
+    @deprecated(since="1.0.0", alternative="load_dataset")
     def from_asdf(cls, filepath):
         """
         Construct a dataset object from a filepath of a suitable asdf file.

@@ -10,11 +10,11 @@ import astropy.units as u
 import gwcs
 from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils.exceptions import AstropyDeprecationWarning
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, load_dataset
 from dkist.io import FileManager
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
 @pytest.fixture
@@ -97,14 +97,14 @@ def test_load_tiled_dataset():
 
 
 def test_load_with_old_methods():
-    with pytest.warns(AstropyDeprecationWarning):
+    with pytest.warns(DKISTDeprecationWarning):
         ds = Dataset.from_directory(os.path.join(rootdir, 'EIT'))
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
         assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
         assert ds.files.basepath == Path(os.path.join(rootdir, 'EIT'))
 
-    with pytest.warns(AstropyDeprecationWarning) as e:
+    with pytest.warns(DKISTDeprecationWarning) as e:
         ds = Dataset.from_asdf(os.path.join(rootdir, 'EIT', "eit_test_dataset.asdf"))
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
