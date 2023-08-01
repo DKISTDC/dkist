@@ -12,7 +12,7 @@ from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
-from dkist.dataset import Dataset, load_dataset, TiledDataset
+from dkist.dataset import Dataset, TiledDataset, load_dataset
 from dkist.io import FileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
