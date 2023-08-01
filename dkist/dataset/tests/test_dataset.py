@@ -12,7 +12,7 @@ from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
-from dkist.dataset import Dataset, load_dataset
+from dkist.dataset import Dataset, load_dataset, TiledDataset
 from dkist.io import FileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
@@ -93,6 +93,7 @@ def test_from_not_directory():
 
 def test_load_tiled_dataset():
     ds = load_dataset(os.path.join(rootdir, 'test_tiled_dataset-1.0.0_dataset-1.1.0.asdf'))
+    assert isinstance(ds, TiledDataset)
     assert ds.shape == (3, 3)
 
 
