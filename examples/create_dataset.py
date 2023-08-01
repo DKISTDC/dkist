@@ -12,7 +12,7 @@ from dkist.data.sample import EIT_DATASET
 ###############################################################################
 # Dataset objects are created from a directory containing one asdf file and
 # many FITS files. Here we use a test dataset made from EIT images.
-ds = dkist.dataset.Dataset.from_directory(EIT_DATASET)
+ds = dkist.dataset.load_dataset(EIT_DATASET)
 
 ###############################################################################
 # The dataset comprises of a `dask.Array` object and a `gwcs.WCS` object. The
