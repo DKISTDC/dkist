@@ -118,6 +118,12 @@ def test_from_directory_not_dir():
         assert "must be a directory" in str(e)
 
 
+def test_load_with_invalid_input():
+    with pytest.raises(TypeError) as e:
+        load_dataset(42)
+        assert "Input type not recognised." in str(e)
+
+
 def test_crop_few_slices(dataset_4d):
     sds = dataset_4d[0, 0]
     assert sds.wcs.world_n_dim == 2
