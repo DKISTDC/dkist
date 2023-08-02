@@ -13,28 +13,28 @@ kernelspec:
 ---
 # Astropy and SunPy - A Quick Primer
 
-Before we progress to searching for DKIST data we need to cover some functionality of the [SunPy](https://sunpy.org) and [Astropy](https://astropy.org) packages.
-These two packages, amongst a few others, are the core components of the DKIST tools.
-In this session we shall only quickly cover the functionality of SunPy and Astropy we need for the rest of the workshop.
-There are many other parts of these packages which are useful when working with DKIST data, which you should explore.
-As we covered in the introduction, Python is a modular language; Astropy provides fundamental functionality for a lot of different types of astronomy.
-In this section we shall cover the following parts of Astropy:
+This tutorial will cover the basic functionality of SunPy and Astropy which is relevant to the `dkist` package.
+There are many other parts of these packages which are useful when working with DKIST data, which you should explore in their respective documentation pages.
+See [here for SunPy's documentation](https://docs.sunpy.org/) and [here for astropy's](https://docs.astropy.org/).
 
-* Units
-* World Coordinate Systems
-* Coordinates
+In this tutorial you will:
+
+* Convert values between different physical units
+* Define spatial and spectral coordinates
+* Convert between world and pixel coordinate systems
 
 ## Units
 
 Astropy provides a subpackage {obj}`astropy.units` which provides tools for associating physical units with numbers and arrays.
 This lets you do mathematical operations on these arrays while propagating the units.
 
-To get started we import `astropy.units` because we are going to be using this a lot, we import it as `u`.
+To get started we import `astropy.units`.
+Because we are going to be using this a lot, we import it as `u`.
 ```{code-cell} python
 import astropy.units as u
 ```
 
-Now we can access various units as such:
+Now we can access various physical units defined in astropy, such as metres or kilograms:
 ```{code-cell} python
 u.m
 ```
@@ -43,17 +43,18 @@ u.m
 u.kg
 ```
 
-We can now attach a unit to a number:
+We can also attach a unit to a number to create a quantity:
 ```{code-cell} python
 length = 10 * u.m
 length
 ```
 
-We can also compose multiple quantities (a number with a unit):
+And use multiple quantities in a calculation:
 
 ```{code-cell} python
 
-speed = length / (30 * u.min)
+time = 30 * u.min
+speed = length / time
 speed
 ```
 
@@ -61,35 +62,6 @@ Using the `.to()` method on a `u.Quantity` object lets you convert a quantity to
 
 ```{code-cell} python
 speed.to(u.km/u.h)
-```
-
-### Equivalencies
-
-Some conversions are not done by a conversion factor as between miles and kilometers – for example converting between wavelength and frequency:
-
-```{code-cell} python
----
-tags: [raises-exception]
----
-(656.281 * u.nm).to(u.Hz)  # Fails because they are not compatible
-```
-
-However we can make use of a spectral *equivalency* to indicate the link between the units:
-
-```{code-cell} python
-(656.281 * u.nm).to(u.Hz, equivalencies=u.spectral())
-```
-
-### Constants
-
-The `astropy.constants` sub-package provides a set of physical constants which are compatible with the units/quantities framework:
-
-```{code-cell} python
-from astropy.constants import M_sun, c
-```
-```{code-cell} python
-E = 3 * M_sun * c ** 2
-E.to(u.J)
 ```
 
 ## Coordinates
