@@ -107,12 +107,12 @@ A simple example of specifying the path is:
 ---
 tags: [skip-execution]
 ---
-Fido.fetch(vbi[0], path="/data/mypath/")
+Fido.fetch(vbi[0], path="data/my_vbi_data/")
 ```
 
-This will download the ASDF file as `/data/mypath/filename.asdf`.
+This will download the ASDF file as `data/my_vbi_data/<filename>.asdf`.
 
-With the nature of DKIST data being a large number of files, FITS + ASDF for a whole dataset, we probably want to keep each dataset in it's own folder.
+With the nature of DKIST data being a large number of files, FITS + ASDF for a whole dataset, we probably want to keep each dataset in its own folder.
 `Fido` makes this easy by allowing you to provide a path template rather than a specific path.
 To see the list of parameters we can use in these path templates we can run:
 ```{code-cell} python
