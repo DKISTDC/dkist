@@ -22,11 +22,12 @@ A `Dataset` class is constructed from the ASDF file for that dataset, this ASDF 
 * A `gwcs` object which provides coordinate information for the whole dataset.
 * A list of all the component FITS files and the required order to combine them into a single array.
 
-If a `Dataset` object is created from just the ASDF file, without access to the arrays in the FITS files then all the data will be missing, but everything else will function the same.
+In this tutorial we will create `Dataset`s using only the ASDF files.
+This will mean we won't have access to the data arrays in the FITS files, but everything else will function the same.
 
 ## Constructing `Dataset` Objects
 
-There are a two ways to construct a `Dataset`, by providing a path to an ASDF file or by providing a directory containing an ASDF file.
+We can construct a `Dataset` by providing a path to an ASDF file.
 Here we shall first fetch an ASDF file with Fido and then pass it to `dkist.load_dataset`:
 
 ```{code-cell} ipython
@@ -42,16 +43,12 @@ from sunpy.net import Fido, attrs as a
 
 ```{code-cell} ipython
 # Create DKIST Fido client instance
-res = Fido.search(a.dkist.Dataset('BXVWV'))
-
-res
-```
-```{code-cell} ipython
+res = Fido.search(a.dkist.Dataset('BXVWV')) # This is the dataset selected in the previous tutorial.
 files = Fido.fetch(res)
 files
 ```
 
-Remember, that the file we have downloaded is a single ASDF file, **not** the whole dataset.
+Remember that the file we have downloaded is a single ASDF file, **not** the whole dataset.
 We can use this file to construct the `Dataset`:
 
 ```{code-cell} ipython
