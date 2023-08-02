@@ -28,7 +28,7 @@ If a `Dataset` object is created from just the ASDF file, without access to the 
 ## Constructing `Dataset` Objects
 
 There are a two ways to construct a `Dataset`, by providing a path to an ASDF file or by providing a directory containing an ASDF file.
-Here we shall first fetch an ASDF file with Fido and then pass it to `Dataset.from_asdf`:
+Here we shall first fetch an ASDF file with Fido and then pass it to `dkist.load_dataset`:
 
 ```{code-cell} ipython
 ---
@@ -56,7 +56,7 @@ Remember, that the file we have downloaded is a single ASDF file, **not** the wh
 We can use this file to construct the `Dataset`:
 
 ```{code-cell} ipython
-ds = dkist.Dataset.from_asdf(files[0])
+ds = dkist.load_dataset(files[0])
 ```
 
 Now we have a `Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
@@ -207,7 +207,7 @@ files = Fido.fetch(res)
 ```
 
 ```{code-cell} ipython
-tds = dkist.Dataset.from_asdf(files[0])
+tds = dkist.load_dataset(files[0])
 tds
 ```
 

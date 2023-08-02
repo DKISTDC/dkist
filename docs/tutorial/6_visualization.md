@@ -22,11 +22,15 @@ We'll use the VISP data we downloaded at the end of the last notebook.
 import dkist
 import matplotlib.pyplot as plt
 
-# For testing only, fix this later
-#ds = dkist.Dataset.from_directory('/home/drew/sunpy/data/pid_1_118/AGLKO/')
-ds = dkist.Dataset.from_asdf('/home/drew/sunpy/data/AGLKO_test.asdf')
-ds.files.basepath = "/home/drew/sunpy/data/pid_1_123/AGLKO"
-ds
+from sunpy.net import Fido, attrs as a
+import dkist.net
+```
+
+```{code-cell} python
+res = Fido.search(a.dkist.Dataset("AGLKO"))
+asdf_file = Fido.fetch(res)[0]
+
+ds = dkist.load_dataset(asdf_file)
 ```
 
 ## Plotting our data
@@ -83,8 +87,8 @@ It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
 ```{code-cell} ipython
-#ds[0, :, 400, :].plot()
-#plt.show()
+ds[0, :, 400, :].plot()
+plt.show()
 ```
 
 ## More advanced plotting
@@ -94,7 +98,10 @@ Let's use 'AWEMA', which we used in a previous session.
 We haven't actually downloaded the full data for this dataset yet, but the plotting will all still work anyway, and you can download the data later on or in the background if you would like to see the full plots.
 
 ```{code-cell} ipython
-ds = dkist.Dataset.from_directory('/home/drew/sunpy/data/VBI/AWEMA/')[0, 0]
+res = Fido.search(a.dkist.Dataset("AWEMA"))
+asdf_file = Fido.fetch(res)[0]
+
+ds = dkist.load_dataset(asdf_file)[0, 0]
 ```
 
 Now let's take a slice of the data and plot it.
