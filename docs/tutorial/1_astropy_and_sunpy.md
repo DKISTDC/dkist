@@ -146,7 +146,7 @@ print(repr(spc))
 
 One of the other core components of the ecosystem provided by Astropy is the {obj}`astropy.wcs` package which provides tools for mapping pixel to world coordinates and world to pixel.
 When loading a FITS file with complete (and standard compliant) WCS metadata we can create an `astropy.wcs.WCS` object.
-For the this example we will use some sunpy sample data from AIA.
+For the this example we will use a sample VISP header distributed with the `dkist` package.
 
 ```{code-cell} python
 import sunpy.coordinates
@@ -155,21 +155,14 @@ import sunpy.coordinates
 To read this FITS file we will use {obj}`astropy.io.fits` (you can also use `sunpy` for this).
 
 ```{code-cell} python
-from astropy.io import fits
-
-hdu_list = fits.open("../data/VISP_2022_10_24T19_47_33_218_00630205_I_BEOGN_L1.fits")
-```
-
-We can now access the header of the second HDU:
-```{code-cell} python
-hdu_list[1].header
+from dkist.data.sample import VISP_HEADER
 ```
 
 Using this header we can create a `astropy.wcs.WCS` object:
 ```{code-cell} python
 from astropy.wcs import WCS
 
-wcs = WCS(hdu_list[1].header)
+wcs = WCS(VISP_HEADER)
 wcs
 ```
 
