@@ -1,5 +1,9 @@
 import pathlib
 
-__all__ = ["EIT_DATASET"]
+from astropy.io import fits
 
-EIT_DATASET = pathlib.Path(__file__).parent / "test" / "EIT"
+__all__ = ["VISP_HEADER"]
+
+_data_dir = pathlib.Path(__file__).parent
+
+VISP_HEADER = fits.Header.fromtextfile(_data_dir / "VISP_HEADER.hdr")
