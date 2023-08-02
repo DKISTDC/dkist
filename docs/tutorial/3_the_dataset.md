@@ -12,10 +12,9 @@ kernelspec:
   name: python3
 ---
 
-# The `Dataset` Class
+# Working with the `Dataset` class
 
-As previously discussed we know that a "DKIST dataset" is comprised of many files, including an ASDF and many FITS files.
-The user tools represent all these files with the {obj}`dkist.Dataset` class.
+In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
 A `Dataset` class is constructed from the ASDF file for that dataset, this ASDF file contains the following information:
 * A table containing all the headers from all FITS files that comprise the dataset.
@@ -43,7 +42,7 @@ from sunpy.net import Fido, attrs as a
 
 ```{code-cell} ipython
 # Create DKIST Fido client instance
-res = Fido.search(a.dkist.Dataset('AYDEW'))
+res = Fido.search(a.dkist.Dataset('BXVWV'))
 
 res
 ```

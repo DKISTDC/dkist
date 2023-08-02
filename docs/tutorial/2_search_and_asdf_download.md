@@ -66,22 +66,22 @@ As you can see this has returned two separate tables, one for VBI and one for VI
 
 ## Working with Results Tables
 
-In this case, although we've searched for VISP data as well, let's first look at just the VBI results, the first table.
+In this case, although we've searched for VISP data as well, let's first look at just the VISP results, the second table.
 ```{code-cell} python
-vbi = res[0]
-vbi
+visp = res[0]
+visp
 ```
 
 We can do some sorting and filtering using this table.
 For instance, if we are interested in choosing data with a particular $r_0$ value, we can show only that column plus a few to help us identify the data:
 ```{code-cell} python
-vbi["Dataset ID", "Start Time", "Average Fried Parameter", "Embargoed"]
+visp["Dataset ID", "Start Time", "Average Fried Parameter", "Embargoed"]
 ```
 
 or sort based on the $r_0$ column, and pick the top 5 rows:
 ```{code-cell} python
-vbi.sort("Average Fried Parameter")
-vbi[:5]
+visp.sort("Average Fried Parameter")
+visp[:5]
 ```
 
 Once we have selected the rows we are interested in we can move onto downloading the ASDF files.
@@ -95,32 +95,16 @@ To download the FITS files containing the data, see the [downloading data tutori
 
 To download files with `Fido` we pass the search results to `Fido.fetch`.
 
-If we want to download the first VBI file we searched for earlier we can do so like this:
+Let's do so with one of the VISP files we searched for earlier:
 ```{code-cell} python
-Fido.fetch(vbi[0])
+Fido.fetch(visp[2])
 ```
 This will download the ASDF file to the sunpy default data directory `~/sunpy/data`, we can customise this with the `path=` keyword argument.
 
 A simple example of specifying the path is:
 
 ```{code-cell} python
----
-tags: [skip-execution]
----
-Fido.fetch(vbi[0], path="data/my_vbi_data/")
+Fido.fetch(visp[:5], path="~/sunpy/data/{instrument}/{dataset_id}/")
 ```
 
-This will download the ASDF file as `data/my_vbi_data/<filename>.asdf`.
-
-With the nature of DKIST data being a large number of files, FITS + ASDF for a whole dataset, we probably want to keep each dataset in its own folder.
-`Fido` makes this easy by allowing you to provide a path template rather than a specific path.
-To see the list of parameters we can use in these path templates we can run:
-```{code-cell} python
-vbi.path_format_keys()
-```
-
-So if we want to put each of our ASDF files in a directory named with the Dataset ID and Instrument we can do:
-
-```{code-cell} python
-Fido.fetch(vbi[:5], path="~/sunpy/data/{instrument}/{dataset_id}/")
-```
+This will put each of our ASDF files in a directory named with the corresponding Dataset ID and Instrument.
