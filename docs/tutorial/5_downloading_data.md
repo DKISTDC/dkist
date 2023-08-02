@@ -83,7 +83,7 @@ from sunpy.net import Fido, attrs as a
 res = Fido.search(a.dkist.Dataset('BLKGA'))
 files = Fido.fetch(res)
 # This is a TiledDataset so we need to index to get back a Dataset object
-ds = dkist.Dataset.from_asdf(files[0])[0, 0]
+ds = dkist.load_dataset(files[0])[0, 0]
 ```
 
 As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the datset even before downloading any.
