@@ -1,0 +1,2 @@
+class DKISTDeprecationWarning(DeprecationWarning):
+    pass

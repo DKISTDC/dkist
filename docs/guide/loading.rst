@@ -74,7 +74,7 @@ The only thing which is specific to the `~dkist.Dataset` class is the interactio
 When you slice a dataset the new, smaller, dataset has a new `~dkist.Dataset.files` object which is unrelated to the one of the larger parent `~dkist.Dataset`.
 This means that if you slice the dataset::
 
-  >>> ds = dkist.Dataset.from_asdf(myfilename)
+  >>> ds = dkist.load_dataset(myfilename)
   >>> small_ds = ds[10:20, :, 5]
 
 and then download the files corresponding to the smaller dataset::
