@@ -10,13 +10,6 @@ The user tools represent all these files with the {obj}`dkist.Dataset` class.
 EXPLANATION
 There are a two ways to construct a `Dataset`, by providing a path to an ASDF file or by providing a directory containing an ASDF file.
 
-First let's have a look at the basic representation of the `Dataset`.
-
-```{code-cell} ipython
-ds
-```
-
-This tells us that we have a 4-dimensional data cube and what values the axes correspond to.
 Importantly, it not only gives us information about the *pixel* axes (the actual dimensions of the array itself), but also the *world* axes (the physical quantities related to the observation).
 It also gives us a correlation matrix showing how the pixel axes relate to the world axes.
 

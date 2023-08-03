@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-# Working with the `Dataset` class
+# Working with the a VISP `Dataset`
 
 In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
@@ -58,23 +58,24 @@ ds = dkist.load_dataset(files[0])
 Now we have a `Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
 This may sound unhelpful but we'll see how it can be very powerful.
 
-First let's have a look at the basic representation of the `Dataset`.
+Let's have a look at the basic representation of the `Dataset`.
 
 ```{code-cell} ipython
 ds
 ```
 
-This tells us that we have a 4-dimensional data cube and what values the axes correspond to.
-Importantly, it not only gives us information about the *pixel* axes (the actual dimensions of the array itself), but also the *world* axes (the physical quantities related to the observation).
-It also gives us a correlation matrix showing how the pixel axes relate to the world axes.
+This gives us a lot of information about the both the *pixel dimensions* of the data (the coordinates of the detector grid) and the *world dimensions* (the physical coordinates of the image).
+Before we go on to using the `Dataset` for inspecing the data, we should take a moment to inpsect these coordinate systems and consider what they mean.
 
 ## `Dataset` and `NDCube`: Coordinate aware arrays
 
-The `Dataset` class is an extension to [SunPy's `NDCube` class](https://docs.sunpy.org/projects/ndcube/), in this section we shall demonstrate some of the key functionality of `NDCube` with DKIST data.
+The `Dataset` class is an extension to [SunPy's `NDCube` class](https://docs.sunpy.org/projects/ndcube/).
+Much of the following functionality is available in all `NDCube` objects.
+See the `NDCube` documentation for more detail.
 
 ### Pixel, Array and World Ordering
 
-Before we jump into using the `Dataset` class we need to clarify some definitions:
+We will use the following definitions to distinguish between pixel, array, and world coordinates:
 
 * **Pixel** ordering is defined as "Cartesian" ordering, or the same as Fortran ordering or column major. This is the ordering used by FITS files and WCS objects in Python.
 * **Array** ordering is defined a C or row-major ordering. This is use by Python's numpy arrays, as Python is implemented in C.
@@ -83,7 +84,7 @@ Before we jump into using the `Dataset` class we need to clarify some definition
 
 ### Coordinates, Arrays, Pixels, oh my!
 
-An key aspect of the `Dataset` is that it is coordinate aware.
+A key aspect of the `Dataset` is that it is coordinate aware.
 That is, it is able to map between array indices and physical dimensions.
 This means that you can easily convert from a position in the array to a location defined by physical coordinates.
 
