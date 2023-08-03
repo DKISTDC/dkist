@@ -1,4 +1,4 @@
-.. _install:
+.. _dkist-installation:
 
 Installation and Setup
 ======================
