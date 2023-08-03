@@ -205,7 +205,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         # We need to broadcast the arrays together so they are all the same shape
         bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
         # Convert the z coordinate into an index to the lookup tables
-        ind = self.sanitize_index(bz)
+        zind = self.sanitize_index(bz)
 
         # Generate output arrays (ignore units for simplicity)
         if isinstance(bx, u.Quantity):
@@ -217,12 +217,13 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for zind in np.unique(ind):
+        z_range = np.unique(zind)
+        for zzind in z_range:
             # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(zind, crpix[0], cdelt[0], lon_pole[0])
+            sct = self.transform_at_index(zzind, crpix[0], cdelt[0], lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
-            mask = ind == zind
+            mask = zind == zzind
             if inverse:
                 xx, yy = sct.inverse(bx[mask], by[mask])
             else:
@@ -323,8 +324,10 @@ class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform, ABC):
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for qq in np.unique(qind):
-            for zz in np.unique(zind):
+        z_range = np.unique(zind)  # raster
+        q_range = np.unique(qind)  # other: maps or meas
+        for zz in z_range:
+            for qq in q_range:
                 # Scalar parameters are reshaped to be length one arrays by modeling
                 sct = self.transform_at_index((zz, qq), crpix[0], cdelt[0], lon_pole[0])
 
@@ -416,15 +419,17 @@ class BaseVaryingCelestialTransform3D(BaseVaryingCelestialTransform, ABC):
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for mm in np.unique(mind):
-            for qq in np.unique(qind):
-                for zz in np.unique(zind):
+        m_range = np.unique(mind)  # raster
+        q_range = np.unique(qind)  # maps
+        z_range = np.unique(zind)  # meas
+        for mm in m_range:
+            for zz in z_range:
+                for qq in q_range:
                     # Scalar parameters are reshaped to be length one arrays by modeling
                     sct = self.transform_at_index((mm, zz, qq), crpix[0], cdelt[0], lon_pole[0])
 
                     # Call this transform for all values of x, y where z == zind q == qind and m == mind
-                    mask = np.logical_and(mind == mm, zind == zz, qind == qq)
-                    # TODO: Figure out what to do here...
+                    mask = np.logical_and(np.logical_and(mind == mm, zind == zz), qind == qq)
                     if inverse:
                         xx, yy = sct.inverse(bx[mask], by[mask])
                     else:
@@ -476,7 +481,6 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
         return ivct
 
 
-# TODO: Test
 class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
     n_inputs = 5
     n_outputs = 2
@@ -497,6 +501,7 @@ class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
 
 class BaseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform, ABC):
     def _map_transform(self, x, y, crpix, cdelt, lon_pole, inverse=False):
+        # x: along slit, y: raster position, both in pixels
         # We need to broadcast the arrays together so they are all the same shape
         bx, by = np.broadcast_arrays(x, y, subok=True)
         # Convert the z coordinate into an index to the lookup tables
@@ -512,14 +517,15 @@ class BaseVaryingCelestialTransformSlit(BaseVaryingCelestialTransform, ABC):
 
         # We now loop over every unique value of y and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for yyind in np.unique(yind):
+        y_range = np.unique(yind)
+        for yyind in y_range:
             # Scalar parameters are reshaped to be length one arrays by modeling
             sct = self.transform_at_index(yyind, crpix[0], cdelt[0], lon_pole[0])
 
             # Call this transform for all values of x, y where y == yind
             mask = yind == yyind
             if inverse:
-                # Note this isn't use as the inverse of this model uses the
+                # Note this isn't used as the inverse of this model uses the
                 # standard 2D inverse.
                 xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
             else:
@@ -636,10 +642,12 @@ class VaryingCelestialTransformSlit2D(BaseVaryingCelestialTransform):
 
         # We now loop over every unique value of y and z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        for yyind in np.unique(yind):
-            for zzind in np.unique(zind):
+        y_range = np.unique(yind)
+        z_range = np.unique(zind)
+        for yyind in y_range:
+            for zzind in z_range:
                 # Scalar parameters are reshaped to be length one arrays by modeling
-                sct = self.transform_at_index((zzind, yyind), crpix[0], cdelt[0], lon_pole[0])
+                sct = self.transform_at_index((yyind, zzind), crpix[0], cdelt[0], lon_pole[0])
 
                 # Call this transform for all values of x, y where z == zind
                 mask = np.logical_and(zind == zzind, yind == yyind)
@@ -689,7 +697,6 @@ class VaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform):
         self.inputs = ("along_slit", "meas_num", "raster", "repeat")
         self.outputs = ("lon", "lat")
 
-        # TODO: Will this work for 2D if num_meas == 1?
         if len(self.table_shape) != 3:
             raise ValueError("This model can only be constructed with a three dimensional lookup table.")
 
@@ -730,19 +737,20 @@ class VaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform):
 
         # We now loop over every unique value of y and z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        # TODO: why this particular order?
-        for mmind in np.unique(mind):
-            for yyind in np.unique(yind):
-                for zzind in np.unique(zind):
+        m_range = np.unique(mind)
+        y_range = np.unique(yind)
+        z_range = np.unique(zind)
+        for mmind in m_range:
+            for yyind in y_range:
+                for zzind in z_range:
                     # Scalar parameters are reshaped to be length one arrays by modeling
-                    sct = self.transform_at_index((mmind, zzind, yyind), crpix[0], cdelt[0], lon_pole[0])
+                    sct = self.transform_at_index((mmind, yyind, zzind), crpix[0], cdelt[0], lon_pole[0])
 
                     # Call this transform for all values of x, y where m == mind, y == yind and z == zind
-                    mask = np.logical_and(mmind == mind, zind == zzind, yind == yyind)
+                    mask = np.logical_and(np.logical_and(mmind == mind, zind == zzind), yind == yyind)
                     if inverse:
-                        # TODO: figure out what to do here...
-                        # Note this isn't use as the inverse of this model uses the
-                        # standard 2D inverse.
+                        # Note this isn't used as the inverse of this model uses the
+                        # standard 3D inverse.
                         xx, yy = sct.inverse(bx[mask], by[mask])  # pragma: no cover
                     else:
                         xx, yy = sct(bx[mask], by[mask])
@@ -759,7 +767,6 @@ class VaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform):
 
         return x_out, y_out
 
-# TODO: Test
 class InverseVaryingCelestialTransformSlit3D(BaseVaryingCelestialTransform3D):
     n_inputs = 5
     n_outputs = 1
