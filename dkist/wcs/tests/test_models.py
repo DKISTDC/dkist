@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pytest
 from numpy.random import default_rng
@@ -356,154 +358,39 @@ def test_vct_shape_errors():
     with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
         VaryingCelestialTransformSlit2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
+    with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
+        VaryingCelestialTransform3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
+
+    with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
+        VaryingCelestialTransformSlit3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
+
+@pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("slit", [pytest.param(True, id="spectrograph"), pytest.param(False, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct(has_units):
-    # LUT is 1D, corresponding to the number of raster steps
-    num_raster_steps = 10
-    num_x_pts = 4
-    num_y_pts = 8
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, num_raster_steps)]
-    crpix = (3, 3)
-    cdelt = (1, 1)
-    crval_table = (0, 0)
-    lon_pole = 180
-    raster = np.arange(num_raster_steps)
-    x = np.arange(num_x_pts)
-    y = np.arange(num_y_pts)
-    # a raster vector that is outside the table
-    raster_1 = raster + 1
-    atol = 1.e-5
-    if has_units:
-        pc_table *= u.arcsec
-        crpix *= u.pix
-        cdelt *= u.arcsec/u.pix
-        crval_table *= u.arcsec
-        lon_pole *= u.deg
-        raster *= u.pix
-        raster_1 *= u.pix
-        atol *= u.pix
-        x *= u.pix
-        y *= u.pix
-    kwargs = dict(
-        crpix=crpix,
-        cdelt=cdelt,
-        crval_table=crval_table,
-        lon_pole=lon_pole,
-    )
-    grid = np.meshgrid(x, y, raster, indexing='ij')
-    grid2 = np.meshgrid(x, y, raster_1, indexing='ij')
-
-    vct = VaryingCelestialTransform(pc_table=pc_table, **kwargs)
-    # forward transform returns lat and long vectors
-    world = vct(*grid)
-    assert len(world) == 2
-    grid_shape = grid[0].shape
-    assert np.all([world_item.shape == grid_shape for world_item in world])
-    assert np.all([grid_item.shape == grid_shape for grid_item in grid])
-    # there should be no nans in world:
-    assert not np.any(np.isnan(world))
-    # reverse transform to get round trip
-    ipixel = vct.inverse(*world, grid[2])
-    # round trip should be the same as what we started with
-    # grid[0:2] is the full set of (x, y) coordinates
-    assert u.allclose(ipixel, grid[0:2], atol=atol)
-
-    # grid2 has coordinates outside the lut boundaries and should have nans
-    world2 = vct(*grid2)
-    assert np.any(np.isnan([item for item in world2]))
-
-@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct2d(has_units):
-    # LUT is 2D, corresponding to:
-    # 2D combinations of (n_meas, n_raster, n_maps)
-    # (1, m, n) or (m, n, 1), m > 1, n > 1
-    # (m, 1, n) is not used because it means only a single raster step
-    # (m, n, q) is 3D and uses the vct3d class
-    # we cannot know apriori what m and n represent for this use case
-    num_raster_steps = 10
-    num_x_pts = 4
-    num_y_pts = 8
-    num_other_steps = 3
-    table_length = num_raster_steps * num_other_steps
+def test_vct(has_units, slit, num_varying_axes):
+    if slit:
+        num_sensor_axes = 1
+        sensor_dims = [5]
+    else:
+        num_sensor_axes = 2
+        sensor_dims = [4, 8]
+    varying_axis_dims = np.zeros(num_varying_axes, dtype=int)
+    for i in range(num_varying_axes - 1):
+        varying_axis_dims[i] = i + 2
+    # num raster steps
+    varying_axis_dims[-1] = 10
+    table_length = np.prod(varying_axis_dims)
     pc_table = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, table_length)])
-    pc_table = pc_table.reshape((num_other_steps, num_raster_steps, 2, 2))
+    pc_table = pc_table.reshape((*varying_axis_dims, 2, 2))
     crpix = (3, 3)
     cdelt = (1, 1)
-    crval_table = (0, 0)
+    crval_table = np.array([0, 0])
     lon_pole = 180
-    raster = np.arange(num_raster_steps)
-    x = np.arange(num_x_pts)
-    y = np.arange(num_y_pts)
-    other_steps = np.arange(num_other_steps)
+    varying_axis_pts = [np.arange(item) for item in varying_axis_dims]
+    varying_axis_pts_1 = copy.deepcopy(varying_axis_pts)
+    varying_axis_pts_1[-1] += 1
+    sensor_axis_pts = [np.arange(item) for item in sensor_dims]
     # a raster vector that is outside the table
-    raster_1 = raster + 1
-    atol = 1.e-5
-    if has_units:
-        pc_table *= u.arcsec
-        crpix *= u.pix
-        cdelt *= u.arcsec/u.pix
-        crval_table *= u.arcsec
-        lon_pole *= u.deg
-        raster *= u.pix
-        raster_1 *= u.pix
-        atol *= u.pix
-        x *= u.pix
-        y *= u.pix
-        other_steps *= u.pix
-    kwargs = dict(
-        crpix=crpix,
-        cdelt=cdelt,
-        crval_table=crval_table,
-        lon_pole=lon_pole,
-    )
-    grid = np.meshgrid(x, y, other_steps, raster, indexing='ij')
-    grid2 = np.meshgrid(x, y, other_steps, raster_1, indexing='ij')
-
-    vct = VaryingCelestialTransform2D(pc_table=pc_table, **kwargs)
-    # forward transform returns lat and long vectors
-    world = vct(*grid)
-    assert len(world) == 2
-    grid_shape = grid[0].shape
-    assert np.all([world_item.shape == grid_shape for world_item in world])
-    assert np.all([grid_item.shape == grid_shape for grid_item in grid])
-    # there should be no nans in world:
-    assert not np.any(np.isnan(world))
-    # reverse transform to get round trip
-    ipixel = vct.inverse(*world, grid[2], grid[3])
-    # round trip should be the same as what we started with
-    # grid[0:2] is the full set of (x, y) coordinates
-    assert u.allclose(ipixel, grid[0:2], atol=atol)
-
-    # grid2 has coordinates outside the lut boundaries and should have nans
-    world2 = vct(*grid2)
-    assert np.any(np.isnan([item for item in world2]))
-
-
-@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct3d(has_units):
-    # LUT is 3D, corresponding to:
-    # All combinations of (n_meas, n_raster, n_maps)
-    # where n_meas, n_raster, n_maps are all > 1
-    # This use case currently occurs in only for Cryo CI
-    num_raster_steps = 10
-    num_x_pts = 4
-    num_y_pts = 8
-    num_meas = 2
-    num_maps = 3
-    table_length = num_raster_steps * num_meas * num_maps
-    pc_table = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, table_length)])
-    pc_table = pc_table.reshape((num_meas, num_maps, num_raster_steps, 2, 2))
-    crpix = (3, 3)
-    cdelt = (1, 1)
-    crval_table = (0, 0)
-    lon_pole = 180
-    raster = np.arange(num_raster_steps)
-    x = np.arange(num_x_pts)
-    y = np.arange(num_y_pts)
-    map_steps = np.arange(num_maps)
-    meas = np.arange(num_meas)
-    # a raster vector that is outside the table
-    raster_1 = raster + 1
     atol = 1.e-5
     if has_units:
         pc_table *= u.arcsec
@@ -511,23 +398,25 @@ def test_vct3d(has_units):
         cdelt *= u.arcsec / u.pix
         crval_table *= u.arcsec
         lon_pole *= u.deg
-        raster *= u.pix
-        raster_1 *= u.pix
+        for i in range(num_varying_axes):
+            varying_axis_pts[i] *= u.pix
+        for i in range(num_varying_axes):
+            varying_axis_pts_1[i] *= u.pix
         atol *= u.pix
-        x *= u.pix
-        y *= u.pix
-        map_steps *= u.pix
-        meas *= u.pix
-    kwargs = dict(
+        for i in range(num_sensor_axes):
+            sensor_axis_pts[i] *= u.pix
+    grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing='ij')
+    grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing='ij')
+    inverse_grid_inputs = grid[num_sensor_axes:]
+
+    vct = varying_celestial_transform_from_tables(
         crpix=crpix,
         cdelt=cdelt,
+        pc_table=pc_table,
         crval_table=crval_table,
         lon_pole=lon_pole,
+        slit=slit,
     )
-    grid = np.meshgrid(x, y, meas, map_steps, raster, indexing='ij')
-    grid2 = np.meshgrid(x, y, meas, map_steps, raster_1, indexing='ij')
-
-    vct = VaryingCelestialTransform3D(pc_table=pc_table, **kwargs)
     # forward transform returns lat and long vectors
     world = vct(*grid)
     assert len(world) == 2
@@ -537,195 +426,15 @@ def test_vct3d(has_units):
     # there should be no nans in world:
     assert not np.any(np.isnan(world))
     # reverse transform to get round trip
-    ipixel = vct.inverse(*world, grid[2], grid[3], grid[4])
+    ipixel = vct.inverse(*world, *inverse_grid_inputs)
     # round trip should be the same as what we started with
     # grid[0:2] is the full set of (x, y) coordinates
-    assert u.allclose(ipixel, grid[0:2], atol=atol)
+    assert u.allclose(ipixel, grid[:num_sensor_axes], atol=atol)
 
     # grid2 has coordinates outside the lut boundaries and should have nans
     world2 = vct(*grid2)
     assert np.any(np.isnan([item for item in world2]))
 
-
-@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct_slit(has_units):
-    # LUT is 1D, corresponding to the number of raster steps
-    num_raster_steps = 10
-    num_slit_steps = 5
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, num_raster_steps)]
-    crpix = (3, 3)
-    cdelt = (1, 1)
-    crval_table = (0, 0)
-    lon_pole = 180
-    # make sure along_slit and raster are different so result axis lengths are different
-    along_slit = np.arange(num_slit_steps)
-    raster = np.arange(num_raster_steps)
-    # a raster vector that is outside the table
-    raster_1 = raster + 1
-    atol = 1.e-5
-    if has_units:
-        pc_table *= u.arcsec
-        crpix *= u.pix
-        cdelt *= u.arcsec/u.pix
-        crval_table *= u.arcsec
-        lon_pole *= u.deg
-        along_slit *= u.pix
-        raster *= u.pix
-        raster_1 *= u.pix
-        atol *= u.pix
-    kwargs = dict(
-        crpix=crpix,
-        cdelt=cdelt,
-        crval_table=crval_table,
-        lon_pole=lon_pole,
-    )
-    grid = np.meshgrid(along_slit, raster, indexing='ij')
-    grid2 = np.meshgrid(along_slit, raster_1, indexing='ij')
-
-    vct_slit = VaryingCelestialTransformSlit(pc_table=pc_table, **kwargs)
-    # forward transform returns a tuple of lat and long vectors
-    world = vct_slit(*grid)
-    assert len(world) == 2
-    grid_shape = grid[0].shape
-    assert np.all([world_item.shape == grid_shape for world_item in world])
-    assert np.all([grid_item.shape == grid_shape for grid_item in grid])
-    # there should be no nans in world:
-    assert not np.any(np.isnan(world))
-    # reverse transform to get round trip
-    ipixel = vct_slit.inverse(*world, grid[1])
-    # round trip should be the same as what we started with
-    assert u.allclose(ipixel, grid[0], atol=atol)
-
-    # grid2 has coordinates outside the lut boundaries and should have nans
-    world2 = vct_slit(*grid2)
-    assert np.any(np.isnan(world2))
-
-
-@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct_slit2d(has_units):
-    # LUT is 2D, corresponding to:
-    # 2D combinations of (n_meas, n_raster, n_maps)
-    # (1, m, n) or (m, n, 1), m > 1, n > 1
-    # (m, 1, n) is not used because it means only a single raster step
-    # (m, n, q) is 3D and uses the slit3d class
-    # we cannot know apriori what m and n represent for this use case
-    num_raster_steps = 10
-    num_other_steps = 3
-    num_slit_steps = 5
-    table_length = num_raster_steps * num_other_steps
-    pc_table = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, table_length)])
-    pc_table = pc_table.reshape((num_other_steps, num_raster_steps, 2, 2))
-    crpix = (3, 3)
-    cdelt = (1, 1)
-    crval_table = (0, 0)
-    lon_pole = 180
-    along_slit = np.arange(num_slit_steps)
-    raster = np.arange(num_raster_steps)
-    other_steps = np.arange(num_other_steps)
-    # a raster vector that is outside the table
-    raster_1 = raster + 1
-    atol = 1.e-5
-    if has_units:
-        pc_table *= u.arcsec
-        crpix *= u.pix
-        cdelt *= u.arcsec/u.pix
-        crval_table *= u.arcsec
-        lon_pole *= u.deg
-        along_slit *= u.pix
-        raster *= u.pix
-        raster_1 *= u.pix
-        atol *= u.pix
-        other_steps *= u.pix
-    kwargs = dict(
-        crpix=crpix,
-        cdelt=cdelt,
-        crval_table=crval_table,
-        lon_pole=lon_pole,
-    )
-    grid = np.meshgrid(along_slit, other_steps, raster, indexing='ij')
-    grid2 = np.meshgrid(along_slit, other_steps, raster_1, indexing='ij')
-
-    vct_slit_2d = VaryingCelestialTransformSlit2D(pc_table=pc_table, **kwargs)
-
-    # forward transform returns lat and long vectors
-    world = vct_slit_2d(*grid)
-    assert len(world) == 2
-    grid_shape = grid[0].shape
-    assert np.all([world_item.shape == grid_shape for world_item in world])
-    assert np.all([grid_item.shape == grid_shape for grid_item in grid])
-    # there should be no nans in world:
-    assert not np.any(np.isnan(world))
-    # reverse transform to get round trip
-    ipixel = vct_slit_2d.inverse(*world, grid[1], grid[2])
-    assert u.allclose(ipixel, grid[0], atol=atol)
-
-    # grid2 has coordinates outside the lut boundaries and should have nans
-    world2 = vct_slit_2d(*grid2)
-    assert np.any(np.isnan(world2))
-
-
-@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
-def test_vct_slit3d(has_units):
-    # LUT is 3D, corresponding to:
-    # All combinations of (n_meas, n_raster, n_maps)
-    # where n_meas, n_raster, n_maps are all > 1
-    # This use case currently occurs in only for Cryo SP
-    num_raster_steps = 10
-    num_meas = 2
-    num_maps = 3
-    num_slit_steps = 5
-    table_length = num_raster_steps * num_meas * num_maps
-    pc_table = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, table_length)])
-    pc_table = pc_table.reshape((num_meas, num_maps, num_raster_steps, 2, 2))
-    crpix = (3, 3)
-    cdelt=(1, 1)
-    crval_table=(0, 0)
-    lon_pole=180
-    along_slit = np.arange(num_slit_steps)
-    raster = np.arange(num_raster_steps)
-    map_steps = np.arange(num_maps)
-    meas = np.arange(num_meas)
-    # a raster vector that is outside the table
-    raster_1 = raster + 1
-    atol = 1.e-5
-    if has_units:
-        pc_table *= u.arcsec
-        crpix *= u.pix
-        cdelt *= u.arcsec/u.pix
-        crval_table *= u.arcsec
-        lon_pole *= u.deg
-        along_slit *= u.pix
-        raster *= u.pix
-        raster_1 *= u.pix
-        atol *= u.pix
-        map_steps *= u.pix
-        meas *= u.pix
-    kwargs = dict(
-        crpix=crpix,
-        cdelt=cdelt,
-        crval_table=crval_table,
-        lon_pole=lon_pole,
-    )
-    grid = np.meshgrid(along_slit, meas, map_steps, raster, indexing='ij')
-    grid2 = np.meshgrid(along_slit, meas, map_steps, raster_1, indexing='ij')
-
-    vct_slit_3d = VaryingCelestialTransformSlit3D(pc_table=pc_table, **kwargs)
-
-    # forward transform returns lat and long vectors
-    world = vct_slit_3d(*grid)
-    assert len(world) == 2
-    grid_shape = grid[0].shape
-    assert np.all([world_item.shape == grid_shape for world_item in world])
-    assert np.all([grid_item.shape == grid_shape for grid_item in grid])
-    # there should be no nans in world:
-    assert not np.any(np.isnan(world))
-    # reverse transform to get round trip
-    ipixel = vct_slit_3d.inverse(*world, grid[1], grid[2], grid[3])
-    assert u.allclose(ipixel, grid[0], atol=atol)
-
-    # grid2 has coordinates outside the lut boundaries and should have nans
-    world2 = vct_slit_3d(*grid2)
-    assert np.any(np.isnan(world2))
 
 def _evaluate_ravel(array_shape, inputs, order="C"):
     """Evaluate the ravel computation using brute force for comparison with numpy result."""
