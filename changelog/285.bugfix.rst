@@ -1,7 +1,1 @@
-Fixed coordinate reversal in VaryingCelestialTransformSlit2D._map_transform().
-
-Rewrote cvt unit tests and ensured both imager and slit classes have 1D - 3D LUT table support and full round-trip
-tests for the entire pixel table. There is lots of code duplication in the vct classes and unit tests.
-This will be remediated with the refactor of the vct classes in issue 279.
-
-Minor cleanup and reformatting.
+Fixed inverse transform in `.VaryingCelestialTransformSlit2D._map_transform`. Which fixes a bug in VISP WCSes.
