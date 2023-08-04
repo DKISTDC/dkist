@@ -133,6 +133,8 @@ This selects only 100 of the raster step points.
 
 ## TiledDataset
 
+PUT THIS IN A SEPARATE 'WORKING WITH A VBI DATASET' TUTORIAL
+
 So far we have been working with VISP data, which is continuous in a sense, in that there are no gaps or overlaps in the coordinates axes.
 However, instruments like VBI take multiple images at different locations with the intention of tiling them together to form a larger image.
 In this case, those images do not share a common pixel grid and therefore cannot be simply stacked together.

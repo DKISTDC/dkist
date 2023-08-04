@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-# Working with the a VISP `Dataset`
+# Working with a VISP `Dataset`
 
 In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
@@ -65,7 +65,7 @@ ds
 ```
 
 This gives us a lot of information about the both the *pixel dimensions* of the data (the coordinates of the detector grid) and the *world dimensions* (the physical coordinates of the image).
-Before we go on to using the `Dataset` for inspecing the data, we should take a moment to inpsect these coordinate systems and consider what they mean.
+Before we go on to using the `Dataset` for inspecting the data, we will take a moment to discuss coordinate systems and consider what the `Dataset` output above means.
 
 ## `Dataset` and `NDCube`: Coordinate aware arrays
 
@@ -81,6 +81,7 @@ We will use the following definitions to distinguish between pixel, array, and w
 * **Array** ordering is defined a C or row-major ordering. This is use by Python's numpy arrays, as Python is implemented in C.
 * **World** coordinates are the physical coordinates that correspond to pixel coordinates. These are not always in either pixel or array order, but tend to be close to pixel order.
 
+The pixel grid will always be aligned with the array, so pixel and array coordinates are the same except for the ordering.
 
 ### Coordinates, Arrays, Pixels, oh my!
 
@@ -88,81 +89,68 @@ A key aspect of the `Dataset` is that it is coordinate aware.
 That is, it is able to map between array indices and physical dimensions.
 This means that you can easily convert from a position in the array to a location defined by physical coordinates.
 
-The first thing we can inspect about our dataset is the dimensionality of the underlying array.
+To achieve this, `Dataset` tracks the pixel and world coordinates independently in the `wcs` (World Coordinate System) attribute.
+The output above tells us that we have a 4-dimensional pixel grid and a 5-dimensional world grid:
+
 ```{code-cell} python
-ds.dimensions
+ds.wcs.pixel_n_dim, ds.wcs.world_n_dim
 ```
 
-This is the **array** dimensions, we can get the corresponding **pixel** axis names with:
+The next few lines tell us about the data array and the pixel dimensions.
+
+```{code-cell} python
+ds.data
+```
+
+This tells us that the data are (or will be) stored in a dask array, and the array dimensions.
+(More on Dask and dask arrays in a later tutorial.)
+
+We can get the corresponding **pixel** axis names with:
 
 ```{code-cell} python
 ds.wcs.pixel_axis_names
 ```
 
-note how these are reversed from one another, we can print them together with:
+Note that these are in reverse order compared to the `ds` output ealier.
+This is because they are in *pixel* order rather than *array* order.
+
+Next we see the description of the world coordinates.
+This information is also accessable through the `wcs` attribute:
+
 ```{code-cell} python
-for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.dimensions):
-    print(f"{name}: {length}")
+ds.wcs.world_axis_names
 ```
 
-These axes map onto world axes via the axis correlation matrix we saw in the first session:
+This tells us the names of the physical axes, each of which corresponds to a type of phyical observation (lon/lat, time, wavelength, etc.) and has its own units.
+
 ```{code-cell} python
-ds.wcs.axis_correlation_matrix
+ds.wcs.world_axis_physical_types, ds.wcs.world_axis_units
 ```
 
-We can get a list of the world axes which correspond to each array axis with:
+You will have noticed that the pixel and world coordinates have different numbers of dimensions.
+This is because in this dataset the detector is not aligned with the solar latitude/longitude coordinate system, so any change in position along the detector slit will be equivalent to a change in both latitude and longitude.
+To see this, we can look at the physical coordinates which correspond to each array axis, just as we did for the world axes.
+
 ```{code-cell} python
 ds.array_axis_physical_types
 ```
 
-Finally, as we saw in the first session, we can convert between pixel or array coordinates and world coordinates:
-
-```{code-cell} ipython
-# Convert array indices to world (physical) coordinates
-ds.wcs.array_index_to_world(0, 10, 20, 30)
-```
-
-```{code-cell} ipython
-# Convert pixel coords to world coords
-world = ds.wcs.pixel_to_world(30, 20, 10, 0)
-world
-```
-
-and we can also do the reverse:
+The final piece of output is the axis correlation matrix which summarises which pixel and world axes correspond to each other:
 
 ```{code-cell} python
-ds.wcs.world_to_pixel(*world)
+ds.wcs.axis_correlation_matrix
 ```
+
+We can use all of this information about the dataset coordinates to convert from pixel to world coordinates or vice versa.
+This is useful, if for example we want to plot our data at, say, a particular wavelength.
 
 ```{code-cell} python
-ds.wcs.world_to_array_index(*world)
-```
-
-Finally, it's possible to get all the axis coordinates along one or more axes
-
-```{warning}
-This might eat all your <del>cat</del> RAM.
-
-The algorithm used to calculate these coordinates in ndcube isn't as memory efficient as it could be, and when working with the large multi-dimensional DKIST data you can really notice it!
-```
-
-```{code-cell} python
----
-tags: [output_scroll]
----
-ds.axis_world_coords()
-```
-
-```{code-cell} python
----
-tags: [output_scroll]
----
-ds.axis_world_coords('time')
+wl_idx = ds.wcs.world_to_pixel() # Need to figure out what input goes here
 ```
 
 ### Slicing Datasets
 
-Another useful feature of the `Dataset` class, which it inherits from `NDCube` is the ability to "slice" the dataset and get a smaller dataset, with the array and coordinate information in tact.
+A useful feature of the `Dataset` class, which it inherits from `NDCube` is the ability to "slice" the dataset and get a smaller dataset, with the array and coordinate information in tact.
 
 For example, to extract the Stokes I component of the dataset we would do:
 
@@ -185,48 +173,3 @@ ds[:, 100:200, :, :]
 ```
 
 This selects only 100 of the raster step points.
-
-
-## TiledDataset
-
-So far we have been working with VISP data, which is continuous in a sense, in that there are no gaps or overlaps in the coordinates axes.
-However, instruments like VBI take multiple images at different locations with the intention of tiling them together to form a larger image.
-In this case, those images do not share a common pixel grid and therefore cannot be simply stacked together.
-It is possible to use `reproject` to regrid the images into a larger array, but since this would interpolate the data, it is not done by default.
-
-This kind of tiled data cannot be stored in a single `Dataset` object.
-There is therefore a wrapper object called `TiledDataset`, which is essentially an array of `Dataset` objects.
-Let's demonstrate this with a VBI dataset.
-
-```{code-cell} python
-res = Fido.search(a.dkist.Dataset('BLKGA'))
-files = Fido.fetch(res)
-```
-
-```{code-cell} ipython
-tds = dkist.load_dataset(files[0])
-tds
-```
-
-To access the individual tiles, we can then index this normally to get back the `Dataset` objects.
-
-```{code-cell} ipython
-ds = tds[0, 0]
-ds
-```
-
-```{error}
-Due to a known issue with the VBI level 1 FITS headers, the ordering of these tiles in the array are likley incorrect.
-```
-
-The `TiledDataset` stores the FITS headers for all the files of the individual `Dataset`s in the `combined_headers` attribute.
-This means that the metadata can still be inspected in many of the ways we will see in later sessions.
-Later releases of the user tools may also include helper functions for regridding a `TiledDataset` into a single `Dataset` object.
-
-`TiledDataset` also has a `.flat` attribute which let's you iterate over the tiles in order.
-For example to get the start times of all the tiles we can do:
-
-```{code-cell} python
-for tile in tds.flat:
-    print(tile[:, 0, 0].wcs.array_index_to_world(0)[1])
-```
