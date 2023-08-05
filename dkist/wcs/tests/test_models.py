@@ -375,6 +375,7 @@ def test_vct(has_units, slit, num_varying_axes):
         num_sensor_axes = 2
         sensor_dims = [4, 8]
     varying_axis_dims = np.zeros(num_varying_axes, dtype=int)
+    # Create increasing dimension sizes starting with a value of 2
     for i in range(num_varying_axes - 1):
         varying_axis_dims[i] = i + 2
     # num raster steps
@@ -386,11 +387,11 @@ def test_vct(has_units, slit, num_varying_axes):
     cdelt = (1, 1)
     crval_table = np.array([0, 0])
     lon_pole = 180
-    varying_axis_pts = [np.arange(item) for item in varying_axis_dims]
+    varying_axis_pts = [np.arange(npts) for npts in varying_axis_dims]
+    # create a set of varying axis points with a raster vector that is outside the original table
     varying_axis_pts_1 = copy.deepcopy(varying_axis_pts)
     varying_axis_pts_1[-1] += 1
     sensor_axis_pts = [np.arange(item) for item in sensor_dims]
-    # a raster vector that is outside the table
     atol = 1.e-5
     if has_units:
         pc_table *= u.arcsec
@@ -407,7 +408,8 @@ def test_vct(has_units, slit, num_varying_axes):
             sensor_axis_pts[i] *= u.pix
     grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing='ij')
     grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing='ij')
-    inverse_grid_inputs = grid[num_sensor_axes:]
+    # the portion of the grid due to the varying axes coordinates
+    varying_axes_grid = grid[num_sensor_axes:]
 
     vct = varying_celestial_transform_from_tables(
         crpix=crpix,
@@ -426,9 +428,9 @@ def test_vct(has_units, slit, num_varying_axes):
     # there should be no nans in world:
     assert not np.any(np.isnan(world))
     # reverse transform to get round trip
-    ipixel = vct.inverse(*world, *inverse_grid_inputs)
+    ipixel = vct.inverse(*world, *varying_axes_grid)
     # round trip should be the same as what we started with
-    # grid[0:2] is the full set of (x, y) coordinates
+    # grid[:num_sensor_axes] is the set of on-sensor coordinates
     assert u.allclose(ipixel, grid[:num_sensor_axes], atol=atol)
 
     # grid2 has coordinates outside the lut boundaries and should have nans
