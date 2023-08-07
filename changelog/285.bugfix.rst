@@ -1,0 +1,1 @@
+Fixed inverse transform in `.VaryingCelestialTransformSlit2D._map_transform`. Which fixes a bug in VISP WCSes.
