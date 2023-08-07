@@ -43,7 +43,7 @@ from sunpy.net import Fido, attrs as a
 
 ```{code-cell} ipython
 # Create DKIST Fido client instance
-res = Fido.search(a.dkist.Dataset('BXVWV')) # This is the dataset selected in the previous tutorial.
+res = Fido.search(a.dkist.Dataset('AGLKO')) # This is the dataset selected in the previous tutorial.
 files = Fido.fetch(res)
 files
 ```
@@ -142,11 +142,8 @@ ds.wcs.axis_correlation_matrix
 ```
 
 We can use all of this information about the dataset coordinates to convert from pixel to world coordinates or vice versa.
-This is useful, if for example we want to plot our data at, say, a particular wavelength.
-
-```{code-cell} python
-wl_idx = ds.wcs.world_to_pixel() # Need to figure out what input goes here
-```
+So if for example we want to plot our data at, say, a particular wavelength, we can find the corresponding array index with `ds.wcs.world_to_array_index()`
+<!-- Actually put a calculation here when the function works -->
 
 ### Slicing Datasets
 
@@ -166,10 +163,21 @@ Note how we have dropped a world coordinate, this information is preserved in th
 ds[0].global_coords
 ```
 
-We can also slice out a section of an axis of the dataset:
+We can also slice the data further, as we would for a normal numpy array.
+So for instance we can select a small section of the image in Stokes I at some arbitrary wavelength:
 
 ```{code-cell} python
-ds[:, 100:200, :, :]
+cropped = ds[0, 400:850, 100, 950:1600]
+cropped
 ```
 
-This selects only 100 of the raster step points.
+Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.
+
+Finally, we can plot our cropped dataset to show the feature we were looking at.
+
+```{code-cell} python
+import matplotlib.pyplot as plt
+
+cropped.plot()
+plt.show()
+```
