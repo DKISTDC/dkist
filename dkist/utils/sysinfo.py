@@ -9,7 +9,7 @@ __all__ = ['system_info']
 
 def system_info():
     """
-    Prints ones' system info in an "attractive" fashion.
+    Prints one's system info in an "attractive" fashion.
     """
     package_name = "dkist"
     requirements = get_requirements(package_name)
