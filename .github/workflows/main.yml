@@ -4,6 +4,10 @@ on:
   # Allow manual runs through the web UI
   workflow_dispatch:
   push:
+    # Only run CI on release branches and main
+    branches:
+      - 'main'
+      - '*.*'
   pull_request:
   schedule:
     #        ┌───────── minute (0 - 59)
