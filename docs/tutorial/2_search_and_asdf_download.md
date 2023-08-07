@@ -56,19 +56,20 @@ These are general attrs which can be used to search multiple clients.
 
 So far the returned results have had to match all the attrs provided, because we have used the `&` (logical and) operator to join them.
 If we want results that match either one of multiple options we can use the `|` operator.
+Let's also restrict our search to a particular proposal, `pid_1_123`.
 
 ```{code-cell} python
-res = Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False))
+res = Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False) & a.dkist.Proposal("pid_1_123"))
 res
 ```
 
-As you can see this has returned two separate tables, one for VBI and one for VISP.
+As you can see this has returned two separate tables, one for VBI and one for VISP, even though in fact the VBI table is empty.
 
 ## Working with Results Tables
 
-In this case, although we've searched for VISP data as well, let's first look at just the VISP results, the second table.
+In this case, since there is no VBI data, let's first look at just the VISP results, the second table.
 ```{code-cell} python
-visp = res[0]
+visp = res[1]
 visp
 ```
 
@@ -78,10 +79,10 @@ For instance, if we are interested in choosing data with a particular $r_0$ valu
 visp["Dataset ID", "Start Time", "Average Fried Parameter", "Embargoed"]
 ```
 
-or sort based on the $r_0$ column, and pick the top 5 rows:
+or sort based on the $r_0$ column, and pick the top 3 results, showing the same columns as before:
 ```{code-cell} python
 visp.sort("Average Fried Parameter")
-visp[:5]
+visp["Dataset ID", "Start Time", "Average Fried Parameter", "Embargoed"][:3]
 ```
 
 Once we have selected the rows we are interested in we can move onto downloading the ASDF files.
@@ -95,16 +96,17 @@ To download the FITS files containing the data, see the [downloading data tutori
 
 To download files with `Fido` we pass the search results to `Fido.fetch`.
 
-Let's do so with one of the VISP files we searched for earlier:
+Let's do so with one of our VISP results:
 ```{code-cell} python
-Fido.fetch(visp[2])
+Fido.fetch(visp[0])
 ```
 This will download the ASDF file to the sunpy default data directory `~/sunpy/data`, we can customise this with the `path=` keyword argument.
+Note that you can also pass more than one result to be downloaded.
 
-A simple example of specifying the path is:
+A simple example of both of these is:
 
 ```{code-cell} python
-Fido.fetch(visp[:5], path="~/sunpy/data/{instrument}/{dataset_id}/")
+Fido.fetch(visp[:3], path="~/sunpy/data/{instrument}/{dataset_id}/")
 ```
 
 This will put each of our ASDF files in a directory named with the corresponding Dataset ID and Instrument.
