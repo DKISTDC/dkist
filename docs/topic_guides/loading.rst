@@ -74,14 +74,15 @@ The only thing which is specific to the `~dkist.Dataset` class is the interactio
 When you slice a dataset the new, smaller, dataset has a new `~dkist.Dataset.files` object which is unrelated to the one of the larger parent `~dkist.Dataset`.
 This means that if you slice the dataset::
 
-  >>> ds = dkist.load_dataset(myfilename)
-  >>> small_ds = ds[10:20, :, 5]
+  >>> import dkist
+  >>> ds = dkist.load_dataset(myfilename)  # doctest: +SKIP
+  >>> small_ds = ds[10:20, :, 5]  # doctest: +SKIP
 
 and then download the files corresponding to the smaller dataset::
 
-  >>> small_ds.download()
+  >>> small_ds.download()  # doctest: +SKIP
 
 The data will be available for the smaller dataset and not the larger one, as only ``small_ds.files.basepath`` is modified by ``small_ds.files.download`` and not ``ds.files.basepath``.
 To set the parent dataset to use the same basepath as the post-download smaller dataset you have to run::
 
-  >>> ds.files.basepath = small_ds.files.basepath
+  >>> ds.files.basepath = small_ds.files.basepath  # doctest: +SKIP

@@ -204,7 +204,9 @@ Here is a full list of the metadata keywords available for this purpose and thei
     from dkist.utils.inventory import _path_format_table
     print(_path_format_table())
 
-The complete list of keys can be accessed using the function ``dkist.utils.inventory.path_format_keys()``::
+The complete list of keys can be accessed on the return value from a ``Fido`` search as follows::
 
-  >>> from dkist.utils.inventory import path_format_keys
-  >>> path_format_keys()
+  >>> from sunpy.net import Fido, attrs as a
+  >>> import dkist.net
+  >>> res = Fido.search(a.dkist.Dataset("AGLKO"))  # doctest: +SKIP
+  >>> res.path_format_keys()  # doctest: +SKIP

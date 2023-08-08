@@ -36,12 +36,10 @@ Here is a really quick demo of searching for all unembargoed VISP data and downl
     <BLANKLINE>
     84 Results from the DKISTClient:
     <BLANKLINE>
-           Start Time               End Time        ... Average Temporal Sampling
-                                                    ...             s
-    ----------------------- ----------------------- ... -------------------------
-    2022-06-02T17:50:42.635 2022-06-02T18:17:30.676 ...         804.0204285714267
-                        ...                     ... ...                       ...
-    2022-12-27T20:02:43.756 2022-12-27T21:45:38.500 ...         3087.372073750004
+           Start Time               End Time        ...
+                                                    ...
+    ----------------------- ----------------------- ...
+                        ...                     ... ...
     Length = 84 rows
     <BLANKLINE>
     <BLANKLINE>
