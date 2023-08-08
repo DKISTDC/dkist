@@ -126,11 +126,11 @@ By default this call will download all the FITS files to the current value of ``
 You can override this behaviour by using the ``path=`` keyword argument.
 The path argument can contain keys which will be replaced by the corresponding values in the dataset's metadata.
 For example, setting `path="~/data/dkist/{instrument}/"` will download all files and save them in separate folders named for the instrument.
-A full list of the available keys can be found in :ref:`interpolation-keys`.
+A full list of the available keys can be found in :ref:`dkist:topic-guides:interpolation-keys`.
 
 The real power of using ``download()`` however, is that you don't have to transfer the FITS files for the frames you do not wish to study (yet).
 For instance, imagine the situation where you wish to first inspect the Stokes I profile to asses the viability of the data for your analysis, using this download method you can do this and your transfer will take about a quarter of the time.
-The `~dkist.Dataset` class allows you to do this by slicing it, more details of how to do this are described in :ref:`dataset-slicing`.
+The `~dkist.Dataset` class allows you to do this by slicing it, more details of how to do this are described in :ref:`dkist:topic-guides:dataset-slicing`.
 
 Continuing our example of only wanting to download the Stokes I profile we can do this by slicing the 0th element of the first array dimension (the stokes axis):
 

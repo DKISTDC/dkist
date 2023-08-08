@@ -3,7 +3,7 @@
 Loading and Working with Level One Data
 =======================================
 
-As we saw in the :ref:`downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
+As we saw in the :ref:`dkist:topic-guides:downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
 The `dkist.Dataset` class provides access to all the components of the dataset, and is a slightly customised `ndcube.NDCube` object, so all functionality provided by ndcube is applicable to the ``Dataset`` class.
 
 This section of the guide will cover things specifc to the `~dkist.Dataset` class, but will not cover the basics which are in the `ndcube documentation <https://docs.sunpy.org/projects/ndcube>`__.
@@ -39,7 +39,7 @@ The two main functions it enables are: modifying the base path for where the FIT
 The `~dkist.io.FileManager.basepath` property sets the directory from which the FITS files will be loaded on demand; assigning this to a different directory will cause the FITS to be loaded from that path.
 If at any point the file with the required filename as specified by the ASDF can not be found its slice of the array will be returned as NaN.
 The `~dkist.io.FileManager.download` method is designed to allow you to transfer some or all of the FITS files from the data center using Globus.
-For more details on how to use it see the :ref:`downloading-fits` section.
+For more details on how to use it see the :ref:`dkist:topic-guides:downloading-fits` section.
 It is important to note that `~dkist.io.FileManager.download` will set the `~dkist.io.FileManager.basepath` property to the destination directory when using a local personal endpoint.
 
 The Dask Array
