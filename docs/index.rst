@@ -1,4 +1,4 @@
-.. _dkist-index:
+.. _dkist:index:
 
 DKIST Python Tools Documentation
 ================================
@@ -32,7 +32,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
         This tutorial walks you through how to search for, download and load DKIST Level one data.
 
     .. grid-item-card:: Topic Guides
-        :link: dkist:topic-guide:index
+        :link: dkist:topic-guides:index
         :link-type: ref
         :text-align: center
 
@@ -42,7 +42,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
         Most useful for answering "why" questions.
 
     .. grid-item-card:: Reference
-        :link: dkist:api:index
+        :link: dkist:api
         :link-type: ref
         :text-align: center
 

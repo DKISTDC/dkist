@@ -1,4 +1,4 @@
-.. _changelog:
+.. _dkist:whatsnew:changelog:
 
 **************
 Full Changelog

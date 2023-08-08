@@ -1,4 +1,4 @@
-.. _usertools:
+.. _dkist:topic-guides:usertools:
 
 What to Expect from the DKIST Python Tools
 ==========================================

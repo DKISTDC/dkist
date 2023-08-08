@@ -12,7 +12,7 @@ By the end of this tutorial you should be familiar with how to:
 * How to transfer FITS files to your local computer using Globus.
 * How to do some basic plotting of the DKIST data.
 
-Before you get started with this tutorial follow {ref}`dkist-installation` to get Python and the ``dkist`` package installed.
+Before you get started with this tutorial follow {ref}`dkist:installation` to get Python and the ``dkist`` package installed.
 
 **Contents**
 

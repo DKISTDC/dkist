@@ -1,4 +1,4 @@
-.. _searchdownload:
+.. _dkist:topic-guides:searchdownload:
 
 Searching and Downloading Level One Data
 ========================================
@@ -53,7 +53,7 @@ This would return any datasets taken by the VBI or VISP instruments in our time 
 
 Many other combinations of searches are available, such as searching for a specific proposal identifier with `~dkist.net.attrs.Proposal`.
 
-.. _downloading-asdf:
+.. _dkist:topic-guides:downloading-asdf:
 
 Downloading the ASDF Metadata Files
 ###################################
@@ -66,7 +66,7 @@ Once you have identified one or more datasets of interest, you can download the 
 
 This will return a list-like object which contains one or more filepaths to the downloaded ASDF files.
 
-.. _downloading-fits:
+.. _dkist:topic-guides:downloading-fits:
 
 Downloading FITS files with Globus
 ----------------------------------
@@ -88,7 +88,7 @@ This workflow enables you to choose what FITS files you want to transfer based o
 
 The first step in this workflow is to construct a `dkist.Dataset` object from an already downloaded ASDF.
 
-How to do this is detailed in the next section, :ref:`loadinglevel1data`, but a quick example, following on from the ``Fido.fetch`` call above:
+How to do this is detailed in the next section, :ref:`dkist:topic-guides:loadinglevel1data`, but a quick example, following on from the ``Fido.fetch`` call above:
 
 .. code-block:: python
 

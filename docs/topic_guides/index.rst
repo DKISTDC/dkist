@@ -1,4 +1,4 @@
-.. _dkist:topic-guide:index:
+.. _dkist:topic-guides:index:
 
 Topic Guides
 ============

@@ -1,4 +1,4 @@
-.. _level1data:
+.. _dkist:topic-guides:level1data:
 
 Level One DKIST Data
 ====================

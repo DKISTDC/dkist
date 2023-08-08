@@ -1,3 +1,5 @@
+.. _dkist:developer-guide:index:
+
 Developer Guide
 ===============
 
@@ -74,3 +76,10 @@ These are:
 * The ``dataset`` and ``tiled_dataset`` schemas.
 * The ``dataset`` and ``tiled_dataset`` tags.
 * The ``file_manager`` schema and tag which is referenced by ``dataset``.
+
+Sphinx References
+-----------------
+
+When authoring documentation files each page (at minimum) should have a reference on its top title.
+This should take the form ``dkist:<section>:<page>``, so for the index page of the ``topic_guides/`` folder it is ``dkist:topic-guides:index``.
+All references should take this three element format, so a subheading in a page would be ``dkist:section:subheading``.

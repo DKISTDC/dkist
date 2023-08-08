@@ -1,4 +1,4 @@
-.. _release_history:
+.. _dkist:whatsnew:index:
 
 ***************
 Release History
