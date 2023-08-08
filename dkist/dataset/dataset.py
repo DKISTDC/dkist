@@ -9,7 +9,6 @@ from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 from dkist.io.file_manager import FileManager
 from dkist.utils.decorators import deprecated
 
-from .loader import load_dataset
 from .utils import dataset_info_str
 
 __all__ = ['Dataset']
@@ -206,7 +205,7 @@ class Dataset(NDCube):
         Construct a `~dkist.dataset.Dataset` from a directory containing one
         asdf file and a collection of FITS files.
         """
-
+        from .loader import load_dataset
         return load_dataset(directory)
 
     @classmethod
@@ -215,7 +214,7 @@ class Dataset(NDCube):
         """
         Construct a dataset object from a filepath of a suitable asdf file.
         """
-
+        from .loader import load_dataset
         return load_dataset(filepath)
 
     """
