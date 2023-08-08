@@ -47,7 +47,7 @@ Here is a really quick demo of searching for all unembargoed VISP data and downl
     >>> asdf_files = Fido.fetch(res[:, 0])  # doctest: +REMOTE_DATA
     >>> asdf_files  # doctest: +REMOTE_DATA
     <parfive.results.Results object at ...>
-    ['.../VISP_L1_20220602T175042_BDWQK.asdf']
+    ['...VISP_L1_20220602T175042_BDWQK.asdf']
 
 
 Reading Datasets
