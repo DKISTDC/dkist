@@ -1,46 +1,45 @@
 import platform
+from importlib.metadata import version, distribution
 
-from pkg_resources import get_distribution
-
-from sunpy.extern.distro import linux_distribution
-from sunpy.util.sysinfo import find_dependencies
+import sunpy.extern.distro as distro
+from sunpy.util.sysinfo import find_dependencies, get_keys_list, get_requirements
 
 __all__ = ['system_info']
 
 
 def system_info():
     """
-    Display information about your system for submitting bug reports.
+    Prints one's system info in an "attractive" fashion.
     """
-    base_reqs = get_distribution("dkist").requires()
-    base_reqs = {base_req.name.lower() for base_req in base_reqs}
-
-    missing_packages, installed_packages = find_dependencies(package="dkist")
+    package_name = "dkist"
+    requirements = get_requirements(package_name)
+    base_reqs = get_keys_list(requirements['required'])
+    missing_packages, installed_packages = find_dependencies(package=package_name)
     extra_prop = {"System": platform.system(),
                   "Arch": f"{platform.architecture()[0]}, ({platform.processor()})",
                   "Python": platform.python_version(),
-                  "SunPy": get_distribution("dkist").version}
+                  package_name: version(package_name)}
     sys_prop = {**installed_packages, **missing_packages, **extra_prop}
-
-    print("==============================")
-    print("DKIST Installation Information")
-    print("==============================")
+    title_str = f"{package_name} Installation Information"
+    print("=" * len(title_str))
+    print(title_str)
+    print("=" * len(title_str))
     print()
     print("General")
     print("#######")
     if sys_prop['System'] == "Linux":
-        distro = " ".join(linux_distribution())
-        print(f"OS: {distro} (Linux {platform.release()})")
+        print(f"OS: {distro.name()} ({distro.version()}, Linux {platform.release()})")
     elif sys_prop['System'] == "Darwin":
         print(f"OS: Mac OS {platform.mac_ver()[0]}")
     elif sys_prop['System'] == "Windows":
         print(f"OS: Windows {platform.release()} {platform.version()}")
     else:
         print("Unknown OS")
-    for sys_info in ['Arch', 'SunPy']:
-        print('{} : {}'.format(sys_info, sys_prop[sys_info]))
+    for sys_info in ['Arch', package_name]:
+        print(f'{sys_info}: {sys_prop[sys_info]}')
+    print(f'Installation path: {distribution(package_name)._path}')
     print()
-    print("Required Dependices")
-    print("###################")
+    print("Required Dependencies")
+    print("#####################")
     for req in base_reqs:
-        print('{}: {}'.format(req, sys_prop[req]))
+        print(f'{req}: {sys_prop[req]}')
