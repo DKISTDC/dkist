@@ -4,6 +4,10 @@ on:
   # Allow manual runs through the web UI
   workflow_dispatch:
   push:
+    # Only run CI on release branches and main
+    branches:
+      - 'main'
+      - '*.*'
   pull_request:
   schedule:
     #        ┌───────── minute (0 - 59)
@@ -24,7 +28,7 @@ jobs:
       coverage: 'codecov'
       envs: |
         - linux: py311
-        - windows: py310
+        - windows: py310-online
         - macos: py39
         - linux: build_docs
           pytest: false

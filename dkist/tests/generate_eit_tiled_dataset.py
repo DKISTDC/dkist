@@ -16,11 +16,12 @@ class DemoMosaicedVBIBlueDataset(MosaicedVBIBlueDataset):
         return np.zeros(self.array_shape) + (self.mosaic_keys("MINDEX1") * self.mosaic_keys("MINDEX2"))
 
 
-mosaic = MosaicedVBIBlueDataset(2, 1, linewave=500*u.nm, detector_shape=(2, 2))
+if __name__ == "__main__":
+    mosaic = MosaicedVBIBlueDataset(2, 1, linewave=500*u.nm, detector_shape=(2, 2))
 
-with tempfile.TemporaryDirectory() as tempdir:
-    mosaic.generate_files(tempdir, required_only=True)
+    with tempfile.TemporaryDirectory() as tempdir:
+        mosaic.generate_files(tempdir, required_only=True)
 
-    asdf_filename = rootdir / "test_tiled_dataset.asdf"
-    ds = dataset_from_fits(tempdir, asdf_filename)
-    print(ds)
+        asdf_filename = rootdir / "test_tiled_dataset.asdf"
+        ds = dataset_from_fits(tempdir, asdf_filename)
+        print(ds)

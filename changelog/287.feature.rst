@@ -1,0 +1,2 @@
+Add the ability to load more than one asdf file at once to
+`dkist.load_dataset`.
