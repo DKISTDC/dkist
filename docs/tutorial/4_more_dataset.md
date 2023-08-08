@@ -108,7 +108,6 @@ So in general you may want to use the path interpolation feature of the various 
 ### Reducing file downloads
 We have mentioned a few times already that we can reduce the size of a data download by finding just the data that interests us and slicing the dataset down to just that portion.
 However, there is an important point to note about this, which is that you need to keep in mind how the data are stored across the dataset's files.
-For this example let's use a larger and more complicated dataset.
 
 As we saw before, each FITS file contains effectively a 2D image - a single raster scan at one polarisation state - and we have many of these files to make a full 4D dataset.
 What this means is that if we look at a subset of the scan steps or polarisation states, we will reduce the number of files across which the array is stored.
