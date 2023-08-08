@@ -10,6 +10,6 @@ If you’re starting fresh you might want to check out the Tutorial first.
   :maxdepth: 1
 
   level1data
-   usertools
-   net
-   loading
+  usertools
+  net
+  loading
