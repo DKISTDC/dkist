@@ -62,7 +62,7 @@ If you need to do advanced computation on the array, you may need to `rechunk <h
 For example if you wanted to perform a fitting operation along the wavelength axis, you may want one chunk per pixel for each wavelength.
 This would allow a much faster distributed computation of the fit, but at the expense of memory to load and rechunk the array.
 
-.. _dataset-slicing:
+.. _dkist:topic-guides:dataset-slicing:
 
 Slicing and files
 -----------------

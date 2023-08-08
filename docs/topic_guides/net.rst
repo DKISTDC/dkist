@@ -7,7 +7,7 @@ The DKIST Data Center provides a search interface for searching for level one da
 This means you can search for whole collections of FITS files, each with an associated ASDF metadata file and other ancillary files (such as preview movies).
 The ASDF and other ancillary files are made available to download over HTTP, to transfer the FITS files we use `Globus <https://www.globus.org/data-transfer>`__.
 
-.. _searching-datasets:
+.. _dkist:topic-guides:searching-datasets:
 
 Searching for DKIST Datasets with Fido
 --------------------------------------
@@ -187,7 +187,7 @@ Finally, if you know the dataset ID of a dataset you wish to download, you can j
 
     transfer_complete_datasets("AAAAA")
 
-.. _interpolation-keys:
+.. _dkist:topic-guides:interpolation-keys:
 
 Path interpolation keys
 -----------------------
