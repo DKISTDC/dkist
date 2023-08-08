@@ -22,7 +22,7 @@ Each dataset comprises a number of different files:
   * An mp4 preview movie.
   * A (large) number of FITS files, each containing a "calibrated exposure".
   
-The ASDF, quality report and preview movie can all be downloaded without authenticating, the FITS files require the use of Globus, which is covered in [this tutorial](./5_downloading_data.html).
+The ASDF, quality report and preview movie can all be downloaded without authenticating, the FITS files require the use of Globus, which is covered in {ref}`dkist:tutorial:downloading-data`.
 
 ## Using `Fido.search`
 
@@ -92,7 +92,7 @@ Once we have selected the rows we are interested in we can move onto downloading
 
 ```{note}
 Only the ASDF files can be downloaded with `Fido`.
-To download the FITS files containing the data, see the [downloading data tutorial](../5_downloading_data.html)
+To download the FITS files containing the data, see the [downloading data tutorial](dkist:tutorial:downloading-data)
 ```
 
 To download files with `Fido` we pass the search results to `Fido.fetch`.
