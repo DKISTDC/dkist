@@ -31,9 +31,8 @@ Globus will only be able to transfer files onto your machine in the specified pa
 
 ### The Globus web app
 
-Many of you will already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
-If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-We will not be using the web app significantly for this workshop, and generally we don't recommend downloading data this way, since the user tools are better suited to navigating the quantities of data that DKIST provides.
+If you are not already familiar with using the [Globus web app](https://app.globus.org/) to download data, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
+We will not be using the web app significantly for this tutorial, and generally we don't recommend downloading data this way, since the user tools are better suited to navigating the quantities of data that DKIST provides.
 However, we will be going over how to use the web app now so that we can demonstrate some of the underlying concepts.
 
 **Endpoints** (also called **Collections** in the web app) are locations registered with Globus for data transfer.
@@ -72,7 +71,7 @@ This is to save download time and avoid duplication.
 ## Dataset and downloading
 
 Now that we've been over the basic concepts of how data downloads work in Globus, let's see how to do it with the user tools.
-For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
+For this section we don't recommend that you run the download commands as we go through the tutorial unless you're willing to wait for them to complete, which may take some time.
 First let's load up another `Dataset`.
 
 ```{code-cell} ipython
@@ -80,10 +79,10 @@ import dkist
 import dkist.net
 from sunpy.net import Fido, attrs as a
 
-res = Fido.search(a.dkist.Dataset('BLKGA'))
+res = Fido.search(a.dkist.Dataset('BEOGN'))
 files = Fido.fetch(res)
 # This is a TiledDataset so we need to index to get back a Dataset object
-ds = dkist.load_dataset(files[0])[0, 0]
+ds = dkist.load_dataset(files[0])
 ```
 
 As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the datset even before downloading any.
@@ -132,7 +131,7 @@ tags: [skip-execution]
 ds[0].files.download(path="~/dkist/{dataset_id}")
 ```
 
-would save the file to `~/dkist/BLKGA/VBI_2022_06_02T17_22_50_173_00486136_I_BLKGA_L1.fits`.
+would save the file to `~/dkist/BEOGN/VISP_2022_10_24T19_47_14_518_00630205_I_BEOGN_L1.fits`.
 
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
@@ -186,7 +185,7 @@ Of course, be cautious with this approach if the next step of your code depends 
 Setting `wait=False` will also skip the wait at the end of each dataset if downloading more than one, so all the transfers will be set up on Globus and then the function will return.
 
 To demonstrate this, let's grab some data for the next session, which will be on visualisation.
-We will want a multi-dimensional dataset, so let's use the VISP one we looked at in the last session.
+Let's return to our VISP dataset from previous tutorials.
 
 ```{code-cell} python
 ---
