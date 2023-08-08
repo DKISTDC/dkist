@@ -90,7 +90,7 @@ extensions = [
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'jupyter_execute', '_NOTES.md']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'jupyter_execute', '*_NOTES.*']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
