@@ -14,23 +14,18 @@ kernelspec:
 
 # More `Dataset`
 
-Firstly we need to re-create our dataset object from the last notebook.
-Remember it was a `TiledDataset` so we will index it to just get the first `Dataset` object.
+Firstly we need to re-create our dataset object from the last tutorial.
 
 ```{code-cell} ipython
 import dkist
-import dkist.net
-from sunpy.net import Fido, attrs as a
 
-res = Fido.search(a.dkist.Dataset('AWEMA'))
-files = Fido.fetch(res, path='~/sunpy/data/{instrument}/{dataset_id}')
-ds = dkist.Dataset.from_asdf(files[0])[0, 0]
+ds = dkist.load_dataset("~/sunpy/data/VISP/AGLKO")
 ```
 
 The `Dataset` object allows us to do some basic inspection of the dataset as a whole without having to download the entire thing, using the metadata in the FITS headers.
 This will save you a good amount of time and also ease the load on the DKIST servers.
 For example, we can check the seeing conditions during the observation and discount any data which will not be of high enough quality to be useful.
-We will go through this as an excercise later.
+We will go through this as an exercise in a later tutorial.
 
 ## The `headers` table
 
@@ -115,16 +110,7 @@ We have mentioned a few times already that we can reduce the size of a data down
 However, there is an important point to note about this, which is that you need to keep in mind how the data are stored across the dataset's files.
 For this example let's use a larger and more complicated dataset.
 
-```{code-cell} ipython
-ds = dkist.Dataset.from_asdf(Fido.fetch(Fido.search(a.dkist.Dataset('AYDEW')))[0])
-ds
-```
-
-```{code-cell} ipython
-ds.files
-```
-
-So in this case we can see that each FITS file contains effectively a 2D image - a single raster scan at one polarisation state - and that we have many of these files to make a full 4D dataset.
+As we saw before, each FITS file contains effectively a 2D image - a single raster scan at one polarisation state - and we have many of these files to make a full 4D dataset.
 What this means is that if we look at a subset of the scan steps or polarisation states, we will reduce the number of files across which the array is stored.
 
 ```{code-cell} ipython
