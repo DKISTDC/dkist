@@ -6,17 +6,13 @@ Installation and Setup
 Python
 ------
 
-If you don't already have a Python installation then we recommend
-installing Python with
-`miniforge <https://github.com/conda-forge/miniforge/#miniforge>`__. If
-you already have Python and either ``conda`` or ``pip`` working you can
-skip the next section.
+If you don't already have a Python installation then we recommend installing Python with `miniforge <https://github.com/conda-forge/miniforge/#miniforge>`__.
+If you already have Python and either ``conda`` or ``pip`` working you can skip the next section.
 
 Installing miniforge
 ~~~~~~~~~~~~~~~~~~~~
 
-First, download the installer for your system and architecture from the
-links below:
+First, download the installer for your system and architecture from the links below:
 
 .. grid:: 3
 
@@ -66,17 +62,14 @@ Then select your platform to install miniforge:
         Prompt" entry in your start menu.
 
 
-In a new terminal (miniforge Prompt on Windows) run ``conda list`` to
-test that the install has worked.
+In a new terminal (miniforge Prompt on Windows) run ``conda list`` to test that the install has worked.
 
 Installing ``dkist`` with conda
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Follow this section if you have just installed miniforge, or if you have
-conda installed from miniconda or anaconda.
+Follow this section if you have just installed miniforge, or if you have conda installed from miniconda or anaconda.
 
-Open a new terminal (miniforge Prompt or anaconda prompt on Windows) and
-run:
+Open a new terminal (miniforge Prompt or anaconda prompt on Windows) and run:
 
 .. code-block:: bash
 
@@ -91,8 +84,7 @@ to create a new environment for this workshop. Then run:
 Installing ``dkist`` with pip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you know what you are doing and have Python installed without conda,
-please make a clean virtual environment and run:
+If you know what you are doing and have Python installed without conda, please make a clean virtual environment and run:
 
 .. code-block:: bash
 
@@ -102,9 +94,5 @@ please make a clean virtual environment and run:
 Globus
 ------
 
-To download DKIST data you need `Globus Connect Personal
-(GCP) <https://www.globus.org/globus-connect-personal>`__, and a Globus
-account. The
-`DKIST Help
-Desk <https://nso.atlassian.net/servicedesk/customer/portal/3/article/247694160>`__
-has some pages to help with this.
+To download DKIST data you need `Globus Connect Personal (GCP) <https://www.globus.org/globus-connect-personal>`__, and a Globus account.
+The `DKIST Help Desk <https://nso.atlassian.net/servicedesk/customer/portal/3/article/247694160>`__ has some pages to help with this.

@@ -77,8 +77,17 @@ These are:
 * The ``dataset`` and ``tiled_dataset`` tags.
 * The ``file_manager`` schema and tag which is referenced by ``dataset``.
 
+Documentation
+-------------
+
+Narrative style
+***************
+
+All narrative documentation (not docstrings) should be formatted as one sentence per line.
+All documentation should be written in US English.
+
 Sphinx References
------------------
+*****************
 
 When authoring documentation files each page (at minimum) should have a reference on its top title.
 This should take the form ``dkist:<section>:<page>``, so for the index page of the ``topic_guides/`` folder it is ``dkist:topic-guides:index``.
