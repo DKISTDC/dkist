@@ -1,0 +1,114 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Start Time, datatype: string}
+# - {name: End Time, datatype: string}
+# - {name: Instrument, datatype: string}
+# - {name: Wavelength, unit: nm, datatype: string, subtype: 'float64[2]'}
+# - {name: Bounding Box, datatype: string}
+# - {name: Movie Filename, datatype: string}
+# - {name: Storage Bucket, datatype: string}
+# - {name: Dataset ID, datatype: string}
+# - {name: Dataset Size, unit: Gibyte, datatype: float64}
+# - {name: Experiment IDs, datatype: string, subtype: 'string[1]'}
+# - {name: Exposure Time, unit: s, datatype: float64}
+# - {name: Level 0 Frame count, datatype: int64}
+# - {name: Primary Experiment ID, datatype: string}
+# - {name: Primary Proposal ID, datatype: string}
+# - {name: Proposal IDs, datatype: string, subtype: 'string[1]'}
+# - {name: Recipe Instance ID, datatype: int64}
+# - {name: Recipe Run ID, datatype: int64}
+# - {name: Recipe ID, datatype: int64}
+# - {name: Full Stokes, datatype: bool}
+# - {name: Stokes Parameters, datatype: string}
+# - {name: Target Types, datatype: string, subtype: 'string[1]'}
+# - {name: Creation Date, datatype: string}
+# - {name: Number of Frames, datatype: int64}
+# - {name: Average Fried Parameter, datatype: float64}
+# - {name: asdf Filename, datatype: string}
+# - {name: Experiment Description, datatype: string}
+# - {name: Embargoed, datatype: bool}
+# - {name: Last Updated, datatype: string}
+# - {name: Preview URL, datatype: string}
+# - {name: Downloadable, datatype: bool}
+# - {name: Has Spectral Axis, datatype: bool}
+# - {name: Has Temporal Axis, datatype: bool}
+# - {name: Average Spectral Sampling, unit: nm, datatype: float64}
+# - {name: Average Spatial Sampling, unit: arcsec, datatype: float64}
+# - {name: Average Temporal Sampling, unit: s, datatype: float64}
+# - {name: Quality Report Filename, datatype: string}
+# - {name: Input Dataset Parameters Part ID, datatype: int64}
+# - {name: Input Dataset Observe Frames Part ID, datatype: int64}
+# - {name: Input Dataset Calibration Frames Part ID, datatype: int64}
+# - {name: Summit Software Version, datatype: string}
+# - {name: Calibration Workflow Name, datatype: string}
+# - {name: Calibration Workflow Version, datatype: string}
+# - {name: HDU Creation Date, datatype: string}
+# - {name: Observing Program Execution ID, datatype: string}
+# - {name: Instrument Program Execution ID, datatype: string}
+# - {name: Header Specification Version, datatype: string}
+# - {name: Header Documentation URL, datatype: string}
+# - {name: Info URL, datatype: string}
+# - {name: Calibration Documentation URL, datatype: string}
+# meta: !!omap
+# - __attributes__: {total_available_results: 1}
+# - __serialized_columns__:
+#     Average Spatial Sampling:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: !astropy.units.Unit {unit: arcsec}
+#       value: !astropy.table.SerializedColumn {name: Average Spatial Sampling}
+#     Average Spectral Sampling:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: &id002 !astropy.units.Unit {unit: nm}
+#       value: !astropy.table.SerializedColumn {name: Average Spectral Sampling}
+#     Average Temporal Sampling:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: &id001 !astropy.units.Unit {unit: s}
+#       value: !astropy.table.SerializedColumn {name: Average Temporal Sampling}
+#     Creation Date:
+#       __class__: astropy.time.core.Time
+#       format: isot
+#       in_subfmt: '*'
+#       out_subfmt: '*'
+#       precision: 3
+#       scale: utc
+#       value: !astropy.table.SerializedColumn {name: Creation Date}
+#     Dataset Size:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: !astropy.units.Unit {unit: Gibyte}
+#       value: !astropy.table.SerializedColumn {name: Dataset Size}
+#     End Time:
+#       __class__: astropy.time.core.Time
+#       format: isot
+#       in_subfmt: '*'
+#       out_subfmt: '*'
+#       precision: 3
+#       scale: utc
+#       value: !astropy.table.SerializedColumn {name: End Time}
+#     Exposure Time:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: *id001
+#       value: !astropy.table.SerializedColumn {name: Exposure Time}
+#     Last Updated:
+#       __class__: astropy.time.core.Time
+#       format: isot
+#       in_subfmt: '*'
+#       out_subfmt: '*'
+#       precision: 3
+#       scale: utc
+#       value: !astropy.table.SerializedColumn {name: Last Updated}
+#     Start Time:
+#       __class__: astropy.time.core.Time
+#       format: isot
+#       in_subfmt: '*'
+#       out_subfmt: '*'
+#       precision: 3
+#       scale: utc
+#       value: !astropy.table.SerializedColumn {name: Start Time}
+#     Wavelength:
+#       __class__: astropy.units.quantity.Quantity
+#       unit: *id002
+#       value: !astropy.table.SerializedColumn {name: Wavelength}
+# schema: astropy-2.0
+"Start Time" "End Time" Instrument Wavelength "Bounding Box" "Movie Filename" "Storage Bucket" "Dataset ID" "Dataset Size" "Experiment IDs" "Exposure Time" "Level 0 Frame count" "Primary Experiment ID" "Primary Proposal ID" "Proposal IDs" "Recipe Instance ID" "Recipe Run ID" "Recipe ID" "Full Stokes" "Stokes Parameters" "Target Types" "Creation Date" "Number of Frames" "Average Fried Parameter" "asdf Filename" "Experiment Description" Embargoed "Last Updated" "Preview URL" Downloadable "Has Spectral Axis" "Has Temporal Axis" "Average Spectral Sampling" "Average Spatial Sampling" "Average Temporal Sampling" "Quality Report Filename" "Input Dataset Parameters Part ID" "Input Dataset Observe Frames Part ID" "Input Dataset Calibration Frames Part ID" "Summit Software Version" "Calibration Workflow Name" "Calibration Workflow Version" "HDU Creation Date" "Observing Program Execution ID" "Instrument Program Execution ID" "Header Specification Version" "Header Documentation URL" "Info URL" "Calibration Documentation URL"
+2022-10-24T21:28:07.635 2022-10-24T22:20:01.304 VISP [630.2424776472172,631.826964866207] (219.9,-350.33),(189.44,-485.39) pid_1_123/AGLKO/AGLKO.mp4 data AGLKO 8.0 "[""eid_1_123""]" 48.00811267605634 4000 eid_1_123 pid_1_123 "[""pid_1_123""]" 359 587 1 True IQUV "[""unknown""]" 2023-04-21T22:18:17.759 4000 0.0532291613649084 pid_1_123/AGLKO/VISP_L1_20221024T212807_AGLKO.asdf "Solar Orbiter is an ESA/NASA's Sun orbiting mission that was launched in February 2020. The nominal science phase of the mission started in November 2021. The six remote sensing and four in situ instruments on board Solar Orbiter provide high-resolution observation of the solar atmosphere and measure the plasma properties at the satellite. The Solar Orbiter observations allow for the study of the connection between the Sun and the heliosphere. On 13 October 2022, the Solar Orbiter will reach its perihelion 0.32 AU, and on 16 October, it will be in quadrature with Earth with respect to the Sun. As Solar Orbiter moves closer to the Sun-Earth line, we propose to co-observe a single active region with DKIST over multiple days. This will allow us to simultaneously collect some of the highest spatial resolution photospheric, chromospheric (both with the VBI at DKIST), and coronal (with the EUI onboard Solar Orbiter) imaging ever sampled. On top of this, high-resolution spectropolarimetric data sampled by the ViSP and the SPICE instruments will provide context about the local magnetic field and line-of-sight velocities in exquisite detail. Such co-observations will return open-source datasets that will allow researchers to understand better the evolution of active regions (which are, of course, extremely important as the predominant locations where space weather events are driven from) and to probe the flows of mass and energy between different atmospheric layers in unprecedented detail. We propose that these datasets be sampled over 2-3 days, between the 22nd and 27th October 2022." False 2023-05-19T22:14:07.195 https://api.dkistdc.nso.edu/download/movie?datasetId=AGLKO&download=false True True True 0.00162511509639976 0.04160701928854328 1556.834391000005 pid_1_123/AGLKO/AGLKO.pdf 409 456 454 Alakai_8-0 l0_to_l1_visp 2.0.1 2023-04-21T20:11:06.741000 eid_1_123_opcDZ50l_R001.95962.19588221 id.100944.338872 3.5.0 https://docs.dkist.nso.edu/projects/data-products/en/v3.5.0 https://docs.dkist.nso.edu https://docs.dkist.nso.edu/projects/visp/en/v2.0.1/l0_to_l1_visp.html

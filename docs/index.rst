@@ -23,7 +23,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
     :gutter: 2
 
     .. grid-item-card:: Tutorial
-        :link: dkist-tutorial-index
+        :link: dkist:tutorial:index
         :link-type: ref
         :text-align: center
 
@@ -32,7 +32,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
         This tutorial walks you through how to search for, download and load DKIST Level one data.
 
     .. grid-item-card:: Topic Guides
-        :link: dkist-topic-guide-index
+        :link: dkist:topic-guide:index
         :link-type: ref
         :text-align: center
 
@@ -42,7 +42,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
         Most useful for answering "why" questions.
 
     .. grid-item-card:: Reference
-        :link: api
+        :link: dkist:api:index
         :link-type: ref
         :text-align: center
 
@@ -93,4 +93,4 @@ This means that there isn't actually a lot of code in the `dkist` package, and m
 
 The upshot of this when using the DKIST Python tools is that you will mostly not be (directly) using functionality provided by the `dkist` package.
 You will need to be familiar with the other packages in the ecosystem to make use of the tools provided here.
-The main interfaces you will need to know are `sunpy.net.Fido` and `ndcube.NDCube`, we cover these in :ref:`dkist-tutorial-index`.
+The main interfaces you will need to know are `sunpy.net.Fido` and `ndcube.NDCube`, we cover these in :ref:`dkist:tutorial:index`.

@@ -11,6 +11,7 @@ kernelspec:
   language: python
   name: python3
 ---
+(dkist:tutorial:search-and-download)=
 # Searching for DKIST Datasets
 
 In this tutorial you will search for DKIST datasets available at the DKIST Data Center.

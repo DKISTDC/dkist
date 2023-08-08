@@ -11,6 +11,7 @@ kernelspec:
   language: python
   name: python3
 ---
+(dkist:tutorial:astropy-and-sunpy)=
 # Astropy and SunPy - A Quick Primer
 
 This tutorial will cover the basic functionality of SunPy and Astropy which is relevant to the `dkist` package.

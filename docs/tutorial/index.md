@@ -1,4 +1,4 @@
-(dkist-tutorial-index)=
+(dkist:tutorial:index)=
 Python Tools Tutorial
 =====================
 

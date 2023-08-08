@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:more-dataset)=
 # More `Dataset`
 
 Firstly we need to re-create our dataset object from the last tutorial.
