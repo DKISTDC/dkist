@@ -74,7 +74,7 @@ def load_dataset(target):
 
     """
     known_types = _known_types_docs().keys()
-    raise TypeError(f"Input type {type(target)} not recognised. It must be one of {', '.join(known_types)}.")
+    raise TypeError(f"Input type {type(target).__name__} not recognised. It must be one of {', '.join(known_types)}.")
 
 
 @load_dataset.register(Results)
@@ -82,7 +82,7 @@ def _load_from_results(results):
     """
     The results from a call to ``Fido.fetch``, all results must be valid DKIST ASDF files.
     """
-    _load_from_iterable(results)
+    return _load_from_iterable(results)
 
 
 # In Python 3.11 we can use the Union type here
@@ -130,7 +130,7 @@ def _load_from_directory(directory):
     asdf_files = tuple(base_path.glob("*.asdf"))
 
     if not asdf_files:
-        raise ValueError("No asdf file found in directory.")
+        raise ValueError(f"No asdf file found in directory {base_path}.")
     elif len(asdf_files) > 1:
         return _load_from_iterable(asdf_files)
 
