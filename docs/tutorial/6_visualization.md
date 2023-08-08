@@ -16,7 +16,7 @@ kernelspec:
 
 In this session we will look at how to take a better look at the actual data once we've downloaded it.
 As usual, first we'll need a dataset.
-We'll use the VISP data we downloaded at the end of the last notebook.
+We'll use the VISP data we downloaded at the end of the last tutorial.
 
 ```{code-cell} python
 import dkist
@@ -124,7 +124,7 @@ To do this, we can use the `.plot_coord()` method.
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
-coord = SkyCoord(-620*u.arcsec, -405*u.arcsec, frame='helioprojective')
+coord = SkyCoord(-520*u.arcsec, -405*u.arcsec, frame='helioprojective', observer='earth', obstime=ds[0].headers['DATE-AVG'][0])
 # Plot the coordinate as a white circle
 ax.plot_coord(coord, 'wo')
 plt.show()
