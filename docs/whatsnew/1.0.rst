@@ -112,3 +112,54 @@ For a complete guide to working with the ``Dataset`` object see :ref:`dkist:tuto
 
     >>> # A helper for downloading FITS files
     >>> ds.files  # doctest: +SKIP
+
+
+Downloading a Full Dataset with Globus
+--------------------------------------
+
+Finally, the ``dkist`` package provides two ways of downloading the full dataset with all FITS files using Globus.
+The first is if you know you want the whole dataset with all the FITS files, based on a dataset ID or a search you can use `dkist.net.transfer_complete_datasets`.
+
+.. code-block:: python
+
+    >>> import dkist.net
+    >>> dkist.net.transfer_complete_datasets("AGLKO")  # doctest: +SKIP
+
+Secondly, if you have downloaded an ASDF file and opened it, you can download all the FITS files current referenced by your ``Dataset`` object with `ds.files.download <dkist.io.FileManager.download>`.
+
+.. code-block:: python
+
+    >>> ds.files.download()  # doctest: +SKIP
+
+This means you can first slice out a smaller dataset, and then only download the files related to that part of the dataset:
+
+.. code-block:: python
+
+    >>> stokes_I_ds = ds[0]  # doctest: +REMOTE_DATA
+    >>> stokes_I_ds  # doctest: +REMOTE_DATA
+    <dkist.dataset.dataset.Dataset object at ...>
+    This Dataset has 3 pixel and 4 world dimensions
+    <BLANKLINE>
+    dask.array<getitem, shape=(490, 976, 2555), dtype=float64, chunksize=(1, 976, 2555), chunktype=numpy.ndarray>
+    <BLANKLINE>
+    Pixel Dim  Axis Name                Data size  Bounds
+            0  raster scan step number        490  None
+            1  spatial along slit             976  None
+            2  dispersion axis               2555  None
+    <BLANKLINE>
+    World Dim  Axis Name                  Physical Type                   Units
+            0  time                       time                            s
+            1  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            3  wavelength                 em.wl                           nm
+    <BLANKLINE>
+    Correlation between pixel and world axes:
+    <BLANKLINE>
+                 Pixel Dim
+    World Dim    0    1    2
+            0  yes   no   no
+            1  yes  yes   no
+            2  yes  yes   no
+            3   no   no  yes
+
+    >>> stokes_I_ds.files.download()  # doctest: +SKIP
