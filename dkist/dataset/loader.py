@@ -132,9 +132,7 @@ def _load_from_directory(directory):
     if not asdf_files:
         raise ValueError("No asdf file found in directory.")
     elif len(asdf_files) > 1:
-        raise NotImplementedError("Multiple asdf files found in this "
-                                    "directory. Use from_asdf to specify which "
-                                    "one to use.")  # pragma: no cover
+        return _load_from_iterable(asdf_files)
 
     asdf_file = asdf_files[0]
 
