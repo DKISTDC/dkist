@@ -89,12 +89,12 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            none_values = results[colname] == None
-            if any(none_values):
+            none_values = np.array(results[colname] == None)
+            if none_values.any():
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
 
-        if results:
+        if results and "Wavelength" not in results.colnames:
             results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
             results.remove_columns(("Wavelength Min", "Wavelength Max"))
 

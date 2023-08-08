@@ -1,4 +1,7 @@
-from dkist.utils.inventory import _path_format_table, dehumanize_inventory, humanize_inventory
+from dkist.data.test import rootdir
+from dkist.net.client import DKISTQueryResponseTable
+from dkist.utils.inventory import (_path_format_table, dehumanize_inventory,
+                                   humanize_inventory, path_format_inventory)
 
 
 def test_humanize_loop():
@@ -114,3 +117,8 @@ def test_path_format_table():
     table = table[table.find('\n')+1:]
 
     assert table == output
+
+
+def test_cycle_single_row():
+    tt = DKISTQueryResponseTable.read(rootdir / "AGLKO-inv.ecsv")
+    path_format_inventory(dict(tt[0]))
