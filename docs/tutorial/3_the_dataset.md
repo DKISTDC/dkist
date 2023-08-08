@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:visp-dataset)=
 # Working with a VISP `Dataset`
 
 In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.

@@ -1,4 +1,4 @@
-.. _api:
+.. _dkist:api:index:
 
 Reference / API
 ===============

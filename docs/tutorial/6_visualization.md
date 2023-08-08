@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:visualizing)=
 # Visualizing DKIST Data
 
 In this session we will look at how to take a better look at the actual data once we've downloaded it.

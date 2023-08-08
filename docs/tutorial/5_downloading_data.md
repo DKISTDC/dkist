@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:downloading-data)=
 # Downloading Data
 
 ## Setting up and using Globus
