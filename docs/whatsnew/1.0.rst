@@ -1,0 +1,163 @@
+.. _dkist:whatsnew:1.0:
+
+************************
+v1.0 - We're out of beta
+************************
+
+The 1.0 release of the ``dkist`` package is the first release where we are declaring the package out of beta, and ready for general use.
+First off this *does not* mean it's "done"!
+There's still a `long list <https://github.com/DKISTDC/dkist/issues>`__ of things we know we need to do.
+However, with this release we are confident that the core functionality works and you can search for, transfer and download DKIST datasets with the user tools.
+When you inevitably find bugs and things that do not work please `open an issue <https://github.com/DKISTDC/dkist/issues/new/choose>`__.
+
+What's in 1.0
+=============
+
+Normally in this part of the release announcement we would show off all the cool things which are new in the release, but *everything* is new!
+Therefore, I will quickly highlight the core functionality included in this release.
+
+Searching for Datasets
+----------------------
+
+The ``dkist.net`` sub-package provides a plugin for `sunpy.net.Fido` which allows it to search for DKIST datasets.
+For a full tour of this functionality see the :ref:`dkist:tutorial:search-and-download` section of the :ref:`dkist:tutorial:index`.
+
+Here is a really quick demo of searching for all unembargoed VISP data and downloading the first ASDF file in the results table.
+
+.. code-block:: python
+
+    >>> from sunpy.net import Fido, attrs as a
+    >>> import dkist.net
+
+    >>> res = Fido.search(a.Instrument.visp, a.dkist.Embargoed.false)  # doctest: +REMOTE_DATA
+    >>> res  # doctest: +REMOTE_DATA
+    <sunpy.net.fido_factory.UnifiedResponse object at ...>
+    Results from 1 Provider:
+    <BLANKLINE>
+    84 Results from the DKISTClient:
+    <BLANKLINE>
+           Start Time               End Time        ...
+                                                    ...
+    ----------------------- ----------------------- ...
+                        ...                     ... ...
+    Length = 84 rows
+    <BLANKLINE>
+    <BLANKLINE>
+
+    >>> asdf_files = Fido.fetch(res[:, 0])  # doctest: +REMOTE_DATA
+    >>> asdf_files  # doctest: +REMOTE_DATA
+    <parfive.results.Results object at ...>
+    ['...VISP_L1_20220602T175042_BDWQK.asdf']
+
+
+Reading Datasets
+----------------
+
+The ``dkist`` package implements two classes for representing a "Dataset", `dkist.Dataset`, and for observations with multiple spatial tiles, `dkist.TiledDataset` which is a collection of ``Dataset`` objects.
+Any DKIST level one ASDF file can be loaded with the `dkist.load_dataset` function.
+
+.. code-block:: python
+
+    >>> import dkist
+
+    >>> ds = dkist.load_dataset(asdf_files)  # doctest: +REMOTE_DATA
+    >>> ds  # doctest: +REMOTE_DATA
+    <dkist.dataset.dataset.Dataset object at ...>
+    This Dataset has 4 pixel and 5 world dimensions
+    <BLANKLINE>
+    dask.array<reshape, shape=(4, 490, 976, 2555), dtype=float64, chunksize=(1, 1, 976, 2555), chunktype=numpy.ndarray>
+    <BLANKLINE>
+    Pixel Dim  Axis Name                Data size  Bounds
+            0  polarization state               4  None
+            1  raster scan step number        490  None
+            2  spatial along slit             976  None
+            3  dispersion axis               2555  None
+    <BLANKLINE>
+    World Dim  Axis Name                  Physical Type                   Units
+            0  stokes                     phys.polarization.stokes        unknown
+            1  time                       time                            s
+            2  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            3  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            4  wavelength                 em.wl                           nm
+    <BLANKLINE>
+    Correlation between pixel and world axes:
+    <BLANKLINE>
+                   Pixel Dim
+    World Dim    0    1    2    3
+            0  yes   no   no   no
+            1   no  yes   no   no
+            2   no  yes  yes   no
+            3   no  yes  yes   no
+            4   no   no   no  yes
+
+
+Working with ``Dataset``
+------------------------
+
+The `dkist.Dataset` is a subclass of `ndcube.NDCube` with some special DKIST-specific functionality.
+For a complete guide to working with the ``Dataset`` object see :ref:`dkist:tutorial:visp-dataset`.
+
+.. code-block:: python
+
+    >>> # The dataset inventory record, containing core metadata
+    >>> ds.inventory  # doctest: +SKIP
+
+    >>> # A table of all the FITS headers
+    >>> ds.headers  # doctest: +SKIP
+
+    >>> # A lazy-loading dask array of all the data
+    >>> ds.data  # doctest: +SKIP
+
+    >>> # A helper for downloading FITS files
+    >>> ds.files  # doctest: +SKIP
+
+
+Downloading a Full Dataset with Globus
+--------------------------------------
+
+Finally, the ``dkist`` package provides two ways of downloading the full dataset with all FITS files using Globus.
+The first is if you know you want the whole dataset with all the FITS files, based on a dataset ID or a search you can use `dkist.net.transfer_complete_datasets`.
+
+.. code-block:: python
+
+    >>> import dkist.net
+    >>> dkist.net.transfer_complete_datasets("AGLKO")  # doctest: +SKIP
+
+Secondly, if you have downloaded an ASDF file and opened it, you can download all the FITS files current referenced by your ``Dataset`` object with `ds.files.download <dkist.io.FileManager.download>`.
+
+.. code-block:: python
+
+    >>> ds.files.download()  # doctest: +SKIP
+
+This means you can first slice out a smaller dataset, and then only download the files related to that part of the dataset:
+
+.. code-block:: python
+
+    >>> stokes_I_ds = ds[0]  # doctest: +REMOTE_DATA
+    >>> stokes_I_ds  # doctest: +REMOTE_DATA
+    <dkist.dataset.dataset.Dataset object at ...>
+    This Dataset has 3 pixel and 4 world dimensions
+    <BLANKLINE>
+    dask.array<getitem, shape=(490, 976, 2555), dtype=float64, chunksize=(1, 976, 2555), chunktype=numpy.ndarray>
+    <BLANKLINE>
+    Pixel Dim  Axis Name                Data size  Bounds
+            0  raster scan step number        490  None
+            1  spatial along slit             976  None
+            2  dispersion axis               2555  None
+    <BLANKLINE>
+    World Dim  Axis Name                  Physical Type                   Units
+            0  time                       time                            s
+            1  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            3  wavelength                 em.wl                           nm
+    <BLANKLINE>
+    Correlation between pixel and world axes:
+    <BLANKLINE>
+                 Pixel Dim
+    World Dim    0    1    2
+            0  yes   no   no
+            1  yes  yes   no
+            2  yes  yes   no
+            3   no   no  yes
+
+    >>> stokes_I_ds.files.download()  # doctest: +SKIP

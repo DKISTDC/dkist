@@ -1,4 +1,4 @@
-.. _searchdownload:
+.. _dkist:topic-guides:searchdownload:
 
 Searching and Downloading Level One Data
 ========================================
@@ -7,7 +7,7 @@ The DKIST Data Center provides a search interface for searching for level one da
 This means you can search for whole collections of FITS files, each with an associated ASDF metadata file and other ancillary files (such as preview movies).
 The ASDF and other ancillary files are made available to download over HTTP, to transfer the FITS files we use `Globus <https://www.globus.org/data-transfer>`__.
 
-.. _searching-datasets:
+.. _dkist:topic-guides:searching-datasets:
 
 Searching for DKIST Datasets with Fido
 --------------------------------------
@@ -53,7 +53,7 @@ This would return any datasets taken by the VBI or VISP instruments in our time 
 
 Many other combinations of searches are available, such as searching for a specific proposal identifier with `~dkist.net.attrs.Proposal`.
 
-.. _downloading-asdf:
+.. _dkist:topic-guides:downloading-asdf:
 
 Downloading the ASDF Metadata Files
 ###################################
@@ -66,7 +66,7 @@ Once you have identified one or more datasets of interest, you can download the 
 
 This will return a list-like object which contains one or more filepaths to the downloaded ASDF files.
 
-.. _downloading-fits:
+.. _dkist:topic-guides:downloading-fits:
 
 Downloading FITS files with Globus
 ----------------------------------
@@ -88,7 +88,7 @@ This workflow enables you to choose what FITS files you want to transfer based o
 
 The first step in this workflow is to construct a `dkist.Dataset` object from an already downloaded ASDF.
 
-How to do this is detailed in the next section, :ref:`loadinglevel1data`, but a quick example, following on from the ``Fido.fetch`` call above:
+How to do this is detailed in the next section, :ref:`dkist:topic-guides:loadinglevel1data`, but a quick example, following on from the ``Fido.fetch`` call above:
 
 .. code-block:: python
 
@@ -126,11 +126,11 @@ By default this call will download all the FITS files to the current value of ``
 You can override this behaviour by using the ``path=`` keyword argument.
 The path argument can contain keys which will be replaced by the corresponding values in the dataset's metadata.
 For example, setting `path="~/data/dkist/{instrument}/"` will download all files and save them in separate folders named for the instrument.
-A full list of the available keys can be found in :ref:`interpolation-keys`.
+A full list of the available keys can be found in :ref:`dkist:topic-guides:interpolation-keys`.
 
 The real power of using ``download()`` however, is that you don't have to transfer the FITS files for the frames you do not wish to study (yet).
 For instance, imagine the situation where you wish to first inspect the Stokes I profile to asses the viability of the data for your analysis, using this download method you can do this and your transfer will take about a quarter of the time.
-The `~dkist.Dataset` class allows you to do this by slicing it, more details of how to do this are described in :ref:`dataset-slicing`.
+The `~dkist.Dataset` class allows you to do this by slicing it, more details of how to do this are described in :ref:`dkist:topic-guides:dataset-slicing`.
 
 Continuing our example of only wanting to download the Stokes I profile we can do this by slicing the 0th element of the first array dimension (the stokes axis):
 
@@ -187,7 +187,7 @@ Finally, if you know the dataset ID of a dataset you wish to download, you can j
 
     transfer_complete_datasets("AAAAA")
 
-.. _interpolation-keys:
+.. _dkist:topic-guides:interpolation-keys:
 
 Path interpolation keys
 -----------------------
@@ -204,7 +204,9 @@ Here is a full list of the metadata keywords available for this purpose and thei
     from dkist.utils.inventory import _path_format_table
     print(_path_format_table())
 
-The complete list of keys can be accessed using the function ``dkist.utils.inventory.path_format_keys()``::
+The complete list of keys can be accessed on the return value from a ``Fido`` search as follows::
 
-  >>> from dkist.utils.inventory import path_format_keys
-  >>> path_format_keys()
+  >>> from sunpy.net import Fido, attrs as a
+  >>> import dkist.net
+  >>> res = Fido.search(a.dkist.Dataset("AGLKO"))  # doctest: +SKIP
+  >>> res.path_format_keys()  # doctest: +SKIP

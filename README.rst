@@ -28,7 +28,7 @@ data.
 Documentation
 -------------
 
-See the documentation at `https://docs.dkist.nso.edu/projects/python-tools<https://docs.dkist.nso.edu/projects/python-tools>`__.
+See the documentation at `https://docs.dkist.nso.edu/projects/python-tools <https://docs.dkist.nso.edu/projects/python-tools>`__.
 
 Installation
 ------------
@@ -51,4 +51,4 @@ the terms of the BSD 3-Clause license.
 Code of Conduct
 ---------------
 
-When you are interacting with the `dkist` project you are asked to follow the SunPy `Code of Conduct<https://sunpy.org/coc>`__.
+When you are interacting with the `dkist` project you are asked to follow the SunPy `Code of Conduct <https://sunpy.org/coc>`__.

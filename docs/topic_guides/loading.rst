@@ -1,9 +1,9 @@
-.. _loadinglevel1data:
+.. _dkist:topic-guides:loadinglevel1data:
 
 Loading and Working with Level One Data
 =======================================
 
-As we saw in the :ref:`downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
+As we saw in the :ref:`dkist:topic-guides:downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
 The `dkist.Dataset` class provides access to all the components of the dataset, and is a slightly customised `ndcube.NDCube` object, so all functionality provided by ndcube is applicable to the ``Dataset`` class.
 
 This section of the guide will cover things specifc to the `~dkist.Dataset` class, but will not cover the basics which are in the `ndcube documentation <https://docs.sunpy.org/projects/ndcube>`__.
@@ -39,7 +39,7 @@ The two main functions it enables are: modifying the base path for where the FIT
 The `~dkist.io.FileManager.basepath` property sets the directory from which the FITS files will be loaded on demand; assigning this to a different directory will cause the FITS to be loaded from that path.
 If at any point the file with the required filename as specified by the ASDF can not be found its slice of the array will be returned as NaN.
 The `~dkist.io.FileManager.download` method is designed to allow you to transfer some or all of the FITS files from the data center using Globus.
-For more details on how to use it see the :ref:`downloading-fits` section.
+For more details on how to use it see the :ref:`dkist:topic-guides:downloading-fits` section.
 It is important to note that `~dkist.io.FileManager.download` will set the `~dkist.io.FileManager.basepath` property to the destination directory when using a local personal endpoint.
 
 The Dask Array
@@ -62,7 +62,7 @@ If you need to do advanced computation on the array, you may need to `rechunk <h
 For example if you wanted to perform a fitting operation along the wavelength axis, you may want one chunk per pixel for each wavelength.
 This would allow a much faster distributed computation of the fit, but at the expense of memory to load and rechunk the array.
 
-.. _dataset-slicing:
+.. _dkist:topic-guides:dataset-slicing:
 
 Slicing and files
 -----------------
@@ -74,14 +74,15 @@ The only thing which is specific to the `~dkist.Dataset` class is the interactio
 When you slice a dataset the new, smaller, dataset has a new `~dkist.Dataset.files` object which is unrelated to the one of the larger parent `~dkist.Dataset`.
 This means that if you slice the dataset::
 
-  >>> ds = dkist.load_dataset(myfilename)
-  >>> small_ds = ds[10:20, :, 5]
+  >>> import dkist
+  >>> ds = dkist.load_dataset(myfilename)  # doctest: +SKIP
+  >>> small_ds = ds[10:20, :, 5]  # doctest: +SKIP
 
 and then download the files corresponding to the smaller dataset::
 
-  >>> small_ds.download()
+  >>> small_ds.download()  # doctest: +SKIP
 
 The data will be available for the smaller dataset and not the larger one, as only ``small_ds.files.basepath`` is modified by ``small_ds.files.download`` and not ``ds.files.basepath``.
 To set the parent dataset to use the same basepath as the post-download smaller dataset you have to run::
 
-  >>> ds.files.basepath = small_ds.files.basepath
+  >>> ds.files.basepath = small_ds.files.basepath  # doctest: +SKIP

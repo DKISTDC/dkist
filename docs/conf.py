@@ -64,7 +64,6 @@ extensions = [
     'sphinx_automodapi.automodapi',
     'sphinx_automodapi.smart_resolver',
     'sphinx_changelog',
-    'sphinx_gallery.gen_gallery',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
@@ -77,7 +76,10 @@ extensions = [
     'sphinx_autodoc_typehints',  # must be loaded after napoleon
     'sunpy.util.sphinx.doctest',
     'sunpy.util.sphinx.generate',
+    'myst_nb',
+    'sphinx_design',
 ]
+
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
 
@@ -88,11 +90,13 @@ extensions = [
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'jupyter_execute', '**/*_NOTES.md']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 source_suffix = '.rst'
+
+myst_enable_extensions = ['colon_fence', 'dollarmath', 'substitution']
 
 # The master toctree document.
 master_doc = 'index'
@@ -163,15 +167,10 @@ graphviz_dot_args = [
     '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
 ]
 
-# -- Sphinx Gallery ------------------------------------------------------------
-sphinx_gallery_conf = {
-    'backreferences_dir': os.path.join('generated', 'modules'),
-    'filename_pattern': '^((?!skip_).)*$',
-    'examples_dirs': os.path.join('..', 'examples'),
-    'gallery_dirs': os.path.join('generated', 'gallery'),
-    'abort_on_example_error': False,
-    'plot_gallery': 'True',
-    'remove_config_comments': True,
-    'doc_module': ('dkist'),
-    'only_warn_on_example_error': True,
-}
+# -- MyST_NB -------------------------------------------------------------------
+nb_execution_allow_errors = False
+nb_execution_in_temp = True
+nb_execution_mode = 'auto'
+nb_execution_timeout = 300
+nb_output_stderr = 'show'
+nb_execution_show_tb = True

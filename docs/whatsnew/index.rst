@@ -1,4 +1,4 @@
-.. _release_history:
+.. _dkist:whatsnew:index:
 
 ***************
 Release History
@@ -7,4 +7,5 @@ Release History
 .. toctree::
    :maxdepth: 1
 
+   1.0
    changelog
