@@ -1,1 +1,0 @@
-Update minimum required versions of asdf, asdf-astropy, dask, matplotlib, numpy, parfive, and sunpy.

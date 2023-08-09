@@ -1,1 +1,0 @@
-Add jsonschema as an explicit dependency (previously it was provided by asdf).

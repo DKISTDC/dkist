@@ -1,24 +1,55 @@
+1.0.0 (2023-08-09)
+==================
+
+Features
+--------
+
+- Add a new `dkist.load_dataset` function to combine and replace ``Dataset.from_directory()`` and ``Dataset.from_asdf()``. (`#274 <https://github.com/DKISTDC/dkist/pull/274>`_)
+- Add the ability to load more than one asdf file at once to `dkist.load_dataset`. (`#287 <https://github.com/DKISTDC/dkist/pull/287>`_)
+
+
+Bug Fixes
+---------
+
+- Fix minor bugs for header slicing functionality and expand test coverage for edge-cases. (`#275 <https://github.com/DKISTDC/dkist/pull/275>`_)
+- Fixed inverse transform in `.VaryingCelestialTransformSlit2D`. Which fixes a bug in VISP WCSes. (`#285 <https://github.com/DKISTDC/dkist/pull/285>`_)
+- Fix a bug preventing the transfer of a single dataset with :meth:`~dkist.net.transfer_complete_datasets`. (`#288 <https://github.com/DKISTDC/dkist/pull/288>`_)
+
+
+Improved Documentation
+----------------------
+
+- Added a new tutorial section based on the NSO workshop material. (`#281 <https://github.com/DKISTDC/dkist/pull/281>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Add jsonschema as an explicit dependency (previously it was provided by asdf). (`#274 <https://github.com/DKISTDC/dkist/pull/274>`_)
+- Update minimum required versions of asdf, asdf-astropy, dask, matplotlib, numpy, parfive, and sunpy. (`#275 <https://github.com/DKISTDC/dkist/pull/275>`_)
+
+
 v1.0.0b15 (2023-07-24)
 ======================
 
 Features
 --------
 
-- Add path interpolation to `transfer_complete_datasets()` path location argument. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
-- Add a `Dataset.inventory` attribute to more easily access the inventory metadata (previously `.meta['inventory']`. (`#272 <https://github.com/DKISTDC/dkist/pull/272>`_)
-- Add experimental support for 3D LUTs to TimeVaryingCelestialTransform (`#277 <https://github.com/DKISTDC/dkist/pull/277>`_)
+- Add path interpolation to :meth:`~dkist.net.transfer_complete_datasets` path location argument. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Add a `.Dataset.inventory` attribute to more easily access the inventory metadata (previously ``.meta['inventory']``. (`#272 <https://github.com/DKISTDC/dkist/pull/272>`_)
+- Add experimental support for 3D LUTs to ``TimeVaryingCelestialTransform`` classes. (`#277 <https://github.com/DKISTDC/dkist/pull/277>`_)
 
 
 Bug Fixes
 ---------
 
-- Improve speed of `import dkist` by preventing automatic import of `dkist.net`. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Improve speed of ``import dkist`` by preventing automatic import of ``dkist.net``. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
 - Fix how Fido uses Wavelength to search for datasets. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
-- Fix using `a.dkist.Embargoed.false` and `a.dkist.Embargoed.true` to specify embargo status. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
-- Add units support to `a.dkist.FriedParameter`. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Fix using ``a.dkist.Embargoed.false`` and ``a.dkist.Embargoed.true`` to specify embargo status. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
+- Add units support to ``a.dkist.FriedParameter``. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
 - Add search attrs corresponding to new columns in dataset inventory. (`#266 <https://github.com/DKISTDC/dkist/pull/266>`_)
 - Make `dkist.Dataset` return the appropriately sliced header table when slicing data. (`#271 <https://github.com/DKISTDC/dkist/pull/271>`_)
-- Update docstring for `transfer_complete_datasets()` to include previously missing `path` parameter. (`#273 <https://github.com/DKISTDC/dkist/pull/273>`_)
+- Update docstring for :meth:`dkist.net.transfer_complete_datasets` to include previously missing ``path`` parameter. (`#273 <https://github.com/DKISTDC/dkist/pull/273>`_)
 
 
 1.0.0b14 (2023-06-12)
@@ -53,8 +84,8 @@ Bug Fixes
 Features
 --------
 
-- Drop support for Python 3.8 in line with `NEP 29 <https://numpy.org/neps/nep-0029-deprecation_policy.html>_`. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
-- Add new methods `.FileManager.quality_report()` and `.FileManager.preview_movie()` to download the quality report and preview movie. These are accessed as ``Dataset.files.quality_report`` and ``Dataset.files.preview_movie``. (`#235 <https://github.com/DKISTDC/dkist/pull/235>`_)
+- Drop support for Python 3.8 in line with `NEP 29 <https://numpy.org/neps/nep-0029-deprecation_policy.html>`__. (`#232 <https://github.com/DKISTDC/dkist/pull/232>`_)
+- Add new methods :meth:`.FileManager.quality_report` and :meth:`.FileManager.preview_movie` to download the quality report and preview movie. These are accessed as ``Dataset.files.quality_report`` and ``Dataset.files.preview_movie``. (`#235 <https://github.com/DKISTDC/dkist/pull/235>`_)
 
 
 Bug Fixes
@@ -87,7 +118,7 @@ Bug Fixes
 ---------
 
 - Fix bugs in testing caused by the release of ``pytest 7.2.0``. (`#210 <https://github.com/DKISTDC/dkist/pull/210>`_)
-- Make loading a mosaiced VBI dataset work with `Dataset.from_asdf`. (`#213 <https://github.com/DKISTDC/dkist/pull/213>`_)
+- Make loading a mosaiced VBI dataset work with ``Dataset.from_asdf``. (`#213 <https://github.com/DKISTDC/dkist/pull/213>`_)
 - Add support for Python 3.11 (`#218 <https://github.com/DKISTDC/dkist/pull/218>`_)
 
 
@@ -103,9 +134,7 @@ Improved Documentation
 Features
 --------
 
-- Add a ``label=`` kwarg to `.FileManager.download` and
-  `.transfer_complete_datasets` allowing the user to completely customise the
-  Globus transfer task label. (`#193 <https://github.com/DKISTDC/dkist/pull/193>`_)
+- Add a ``label=`` kwarg to `.FileManager.download` and `dkist.net.transfer_complete_datasets` allowing the user to completely customise the Globus transfer task label. (`#193 <https://github.com/DKISTDC/dkist/pull/193>`_)
 
 
 Bug Fixes
@@ -118,7 +147,7 @@ Bug Fixes
   if the first axis of the data array has length one. (`#199 <https://github.com/DKISTDC/dkist/pull/199>`_)
 - No more invalid characters in default Globus label name. (`#200 <https://github.com/DKISTDC/dkist/pull/200>`_)
 - Hide extraneous names in `dkist.net.attrs` with underscores so they don't get imported when using that module. (`#201 <https://github.com/DKISTDC/dkist/pull/201>`_)
-- Catch empty return value from data search in `transfer_complete_datasets` and raise a ValueError telling the user what's happening. (`#204 <https://github.com/DKISTDC/dkist/pull/204>`_)
+- Catch empty return value from data search in `dkist.net.transfer_complete_datasets` and raise a ``ValueError`` telling the user what's happening. (`#204 <https://github.com/DKISTDC/dkist/pull/204>`_)
 
 
 v1.0.0b8 (2022-07-18)
@@ -127,10 +156,8 @@ v1.0.0b8 (2022-07-18)
 Features
 --------
 
-- Support passing a whole `~sunpy.net.fido_factory.UnifiedResponse` to
-  `dkist.net.transfer_complete_datasets`. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
-- Support pretty formatting of new Dataset Inventory fields in Fido search
-  results table. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
+- Support passing a whole `~sunpy.net.fido_factory.UnifiedResponse` to `~dkist.net.transfer_complete_datasets`. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
+- Support pretty formatting of new Dataset Inventory fields in Fido search results table. (`#165 <https://github.com/DKISTDC/dkist/pull/165>`_)
 
 
 Bug Fixes
@@ -261,8 +288,7 @@ Bug Fixes
 Features
 --------
 
-- Implement `DKISTClient.fetch` to download asdf files from the metadata
-  streamer service. (`#90 <https://github.com/DKISTDC/dkist/pull/90>`_)
+- Implement `.DKISTClient.fetch` to download asdf files from the metadata streamer service. (`#90 <https://github.com/DKISTDC/dkist/pull/90>`_)
 - Enable tests on Windows (`#95 <https://github.com/DKISTDC/dkist/pull/95>`_)
 - Added search bounding box functionality to DKIST client. (`#100 <https://github.com/DKISTDC/dkist/pull/100>`_)
 - Added support for new dataset search parameters (``hasSpectralAxis``, ``hasTemporalAxis``, ``averageDatasetSpectralSamplingMin``, ``averageDatasetSpectralSamplingMax``, ``averageDatasetSpatialSamplingMin``, ``averageDatasetSpatialSamplingMax``, ``averageDatasetTemporalSamplingMin``, ``averageDatasetTemporalSamplingMax``) (`#108 <https://github.com/DKISTDC/dkist/pull/108>`_)
@@ -272,8 +298,7 @@ Trivial/Internal Changes
 ------------------------
 
 - Support gwcs 0.14 and ndcube 2.0.0b1 (`#86 <https://github.com/DKISTDC/dkist/pull/86>`_)
-- Update Fido client for changes in sunpy 2.1; bump the sunpy dependancy to at
-  least 2.1rc3. (`#89 <https://github.com/DKISTDC/dkist/pull/89>`_)
+- Update Fido client for changes in sunpy 2.1; bump the sunpy dependancy to at least 2.1rc3. (`#89 <https://github.com/DKISTDC/dkist/pull/89>`_)
 
 
 v0.1a2 (2020-04-29)
@@ -291,15 +316,15 @@ v0.1a1 (2020-03-27)
 Backwards Incompatible Changes
 ------------------------------
 
-- Move the `dkist.asdf_maker` package to `dkist.io.asdf.generator` while also refactoring its internal structure to hopefully make it a little easier to follow. (`#71 <https://github.com/DKISTDC/dkist/pull/71>`_)
+- Move the ``dkist.asdf_maker`` package to ``dkist.io.asdf.generator`` while also refactoring its internal structure to hopefully make it a little easier to follow. (`#71 <https://github.com/DKISTDC/dkist/pull/71>`_)
 
 
 Features
 --------
 
-- Add `dkist.dataset.Dataset` class to represent a dataset to the user. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
+- Add `dkist.Dataset` class to represent a dataset to the user. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
 - Add code for converting a nested list of `asdf.ExternalArrayReference` objects to a `dask.array.Array`. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
-- Add implementation of `dkist.dataset.Dataset.pixel_to_world` and `dkist.dataset.Dataset.world_to_pixel`. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
+- Add implementation of ``Dataset.pixel_to_world`` and ``Dataset.world_to_pixel``. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
 - Add ability to crop Dataset array by world coordinates. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
 - Add a reader for asdf files. (`#1 <https://github.com/DKISTDC/dkist/pull/1>`_)
 - Add a dkist config file using custom location from astropy (`#3 <https://github.com/DKISTDC/dkist/pull/3>`_)
@@ -313,7 +338,7 @@ Features
 - Add a ``dataset_from_fits`` function that generates an asdf file in a directory
   with a set of FITS files. (`#21 <https://github.com/DKISTDC/dkist/pull/21>`_)
 - Add support for array wcs calls post slicing a non-separable dimension. (`#23 <https://github.com/DKISTDC/dkist/pull/23>`_)
-- Add ``relative_to`` kwarg to `dkist.asdf_maker.generator.dataset_from_fits` and `dkist.asdf_maker.generator.asdf_tree_from_filenames`. (`#26 <https://github.com/DKISTDC/dkist/pull/26>`_)
+- Add ``relative_to`` kwarg to ``dkist.asdf_maker.generator.dataset_from_fits`` and ``dkist.asdf_maker.generator.asdf_tree_from_filenames``. (`#26 <https://github.com/DKISTDC/dkist/pull/26>`_)
 - Add support for 2D plotting with WCSAxes. (`#27 <https://github.com/DKISTDC/dkist/pull/27>`_)
 - All asdf files are now validated against the level 1 dataset schema on save and load. (`#41 <https://github.com/DKISTDC/dkist/pull/41>`_)
 - Add support for returning an array of NaNs when the file is not present. This is needed to support partial dataset download from the DC. (`#43 <https://github.com/DKISTDC/dkist/pull/43>`_)
@@ -322,14 +347,13 @@ Features
 - Add support for multiple globus oauth scopes (`#50 <https://github.com/DKISTDC/dkist/pull/50>`_)
 - Added support for starting and monitoring Globus transfer tasks (`#55 <https://github.com/DKISTDC/dkist/pull/55>`_)
 - Allow easy access to the filenames contained in an
-  `dkist.io.BaseFITSArrayContainer` object via a `~dkist.io.BaseFITSArrayContainer.filenames` property. (`#56 <https://github.com/DKISTDC/dkist/pull/56>`_)
-- `dkist.io.BaseFITSArrayContainer` objects are now sliceable. (`#56 <https://github.com/DKISTDC/dkist/pull/56>`_)
-- Initial implementation of `dkist.Dataset.download` method for transferring
-  files via globus (`#57 <https://github.com/DKISTDC/dkist/pull/57>`_)
+  ``dkist.io.BaseFITSArrayContainer`` object via a ``.filenames`` property. (`#56 <https://github.com/DKISTDC/dkist/pull/56>`_)
+- ``dkist.io.BaseFITSArrayContainer`` objects are now sliceable. (`#56 <https://github.com/DKISTDC/dkist/pull/56>`_)
+- Initial implementation of ``dkist.Dataset.download`` method for transferring files via globus (`#57 <https://github.com/DKISTDC/dkist/pull/57>`_)
 - Rely on development NDCube 2 for all slicing and plotting code (`#60 <https://github.com/DKISTDC/dkist/pull/60>`_)
 - Change Level 1 asdf layout to use a tag and schema for ``Dataset``. This allows
-  reading of asdf files independant from the `dkist.Dataset` class. (`#66 <https://github.com/DKISTDC/dkist/pull/66>`_)
-- Implement a new more efficient asdf schema and tag for `dkist.io.array_containers.BaseFITSArrayContainer` to massively improve asdf load times. (`#70 <https://github.com/DKISTDC/dkist/pull/70>`_)
+  reading of asdf files independent from the `dkist.Dataset` class. (`#66 <https://github.com/DKISTDC/dkist/pull/66>`_)
+- Implement a new more efficient asdf schema and tag for ``BaseFITSArrayContainer`` to massively improve asdf load times. (`#70 <https://github.com/DKISTDC/dkist/pull/70>`_)
 - Add a `sunpy.net.Fido` client for searching DKIST Dataset inventory. Currently only supports search. (`#73 <https://github.com/DKISTDC/dkist/pull/73>`_)
 - Implement correct extraction of dataset inventory from headers and gwcs. Also
   updates some data to be closer to the in progress outgoing header spec (214) (`#76 <https://github.com/DKISTDC/dkist/pull/76>`_)
@@ -338,7 +362,7 @@ Features
 Bug Fixes
 ---------
 
-- Fix the units in `spatial_model_from_header` (`#19 <https://github.com/DKISTDC/dkist/pull/19>`_)
+- Fix the units in ``spatial_model_from_header`` (`#19 <https://github.com/DKISTDC/dkist/pull/19>`_)
 - Correctly parse headers when generating gwcses so that only values that change
   along that physical axis are considered. (`#21 <https://github.com/DKISTDC/dkist/pull/21>`_)
 - Reverse the ordering of gWCS objects generated by ``asdf_helpers`` as they are
@@ -352,4 +376,4 @@ Bug Fixes
 Trivial/Internal Changes
 ------------------------
 
-- Migrate the `dkist.dataset.Dataset` class to use gWCS's APE 14 API (`#32 <https://github.com/DKISTDC/dkist/pull/32>`_)
+- Migrate the `dkist.Dataset` class to use gWCS's APE 14 API (`#32 <https://github.com/DKISTDC/dkist/pull/32>`_)

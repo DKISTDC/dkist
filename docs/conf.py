@@ -167,6 +167,11 @@ graphviz_dot_args = [
     '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
 ]
 
+# Use a high-contrast code style from accessible-pygments
+# Our theme isn't using the correct background colours for code blocks, so this
+# isn't as high-contrast as it should be.
+pygments_style = "github-light"
+
 # -- MyST_NB -------------------------------------------------------------------
 nb_execution_allow_errors = False
 nb_execution_in_temp = True
