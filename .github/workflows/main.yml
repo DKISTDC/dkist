@@ -9,6 +9,9 @@ on:
       - 'main'
       - '*.*'
   pull_request:
+  release:
+    types:
+      - released
   schedule:
     #        ┌───────── minute (0 - 59)
     #        │ ┌───────── hour (0 - 23)
@@ -35,8 +38,14 @@ jobs:
           libraries:
             apt:
               - graphviz
-        - linux: py311-devdeps
         - linux: py39-oldestdeps
+
+  allowed-fail-tests:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      coverage: 'codecov'
+      envs: |
+        - linux: py311-devdeps
 
   publish:
     needs: [tests]
