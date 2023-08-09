@@ -65,7 +65,7 @@ jobs:
 
   notify:
     if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
-    needs: [tests, publish]
+    needs: [tests, allowed-fail-tests, publish]
     runs-on: ubuntu-latest
     steps:
       - uses: Cadair/matrix-notify-action@main
