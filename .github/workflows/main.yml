@@ -8,6 +8,11 @@ on:
     branches:
       - 'main'
       - '*.*'
+    tags:
+      - 'v*'
+      - '!*dev*'
+      - '!*pre*'
+      - '!*post*'
   pull_request:
   release:
     types:
