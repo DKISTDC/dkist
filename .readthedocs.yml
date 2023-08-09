@@ -6,7 +6,6 @@ sphinx:
 
 # Optionally build your docs in additional formats such as PDF
 formats:
-   - pdf
    - htmlzip
 
 build:
