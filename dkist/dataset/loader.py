@@ -2,7 +2,7 @@ import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import singledispatch
 
-from jsonschema.exceptions import ValidationError
+from asdf.exceptions import ValidationError
 from parfive import Results
 
 import asdf
