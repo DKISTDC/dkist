@@ -5,7 +5,10 @@ from functools import singledispatch
 from parfive import Results
 
 import asdf
-from asdf.exceptions import ValidationError
+try:
+    from asdf.exceptions import ValidationError
+except ImportError:
+    from asdf import ValidationError
 
 
 @singledispatch
