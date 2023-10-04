@@ -179,7 +179,7 @@ def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pi
 @pytest.fixture
 def identity_gwcs_5d_stokes(identity_gwcs_4d):
     stokes_frame = cf.StokesFrame(axes_order=(4,))
-    stokes_model = generate_lookup_table([0, 1, 2, 3] * u.one, interpolation='nearest')
+    stokes_model = generate_lookup_table([1, 2, 3, 4] * u.one, interpolation='nearest')
     transform = identity_gwcs_4d.forward_transform
     frame = cf.CompositeFrame(identity_gwcs_4d.output_frame.frames + [stokes_frame])
 
