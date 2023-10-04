@@ -312,3 +312,8 @@ def large_visp_dataset(tmp_path_factory):
         with open(vispdir / "test_visp.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp.asdf")
+
+
+@pytest.fixture(scope="session")
+def croppable_visp_dataset(tmp_path_factory):
+    return load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
