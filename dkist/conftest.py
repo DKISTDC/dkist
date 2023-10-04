@@ -407,3 +407,8 @@ def pytest_runtest_call(item):
         # TODO raise a warning here
         warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets will not be used.")
         yield item
+
+
+@pytest.fixture(scope="session")
+def croppable_visp_dataset(tmp_path_factory):
+    return load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
