@@ -415,5 +415,5 @@ def croppable_visp_dataset():
 
 
 @pytest.fixture(scope="session")
-def croppable_visp_dataset():
+def croppable_cryo_dataset():
     return load_dataset(Path(rootdir) / "dataset_1006.asdf")
