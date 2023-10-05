@@ -341,5 +341,10 @@ def visp_dataset_no_headers(tmp_path_factory):
 
 
 @pytest.fixture(scope="session")
-def croppable_visp_dataset(tmp_path_factory):
+def croppable_visp_dataset():
     return load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
+
+
+@pytest.fixture(scope="session")
+def croppable_visp_dataset():
+    return load_dataset(Path(rootdir) / "dataset_1006.asdf")
