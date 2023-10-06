@@ -67,8 +67,11 @@ So the list needed to specify the default ordering would be `[None, None, 'y', '
 If instead we want to plot the image formed by the raster scan at a particular wavelength and Stokes value, we would do this:
 
 ```{code-cell} ipython
-#ds.plot(plot_axes=[None, 'y', None, 'x'])
-#plt.show()
+---
+tags: [skip-execution]
+---
+ds.plot(plot_axes=[None, 'y', None, 'x'])
+plt.show()
 ```
 
 You may have noticed this plot took somewhat longer to draw than the previous one.
@@ -80,6 +83,9 @@ You can also use `plot_axes` to create a line plot, by specifying only one axis 
 So to plot a spectrum at a fixed Stokes, time and raster location we can tell plot to use the dispersion axis as the x axis.
 
 ```{code-cell} ipython
+---
+tags: [skip-execution]
+---
 ds.plot(plot_axes=[None, None, 'x', None])
 plt.show()
 ```
