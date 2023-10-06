@@ -7,9 +7,7 @@ import abc
 import logging
 from pathlib import Path
 
-import dask.array as da
 import numpy as np
-from dask import delayed
 
 from astropy.io import fits
 from sunpy.util.decorators import add_common_docstring
@@ -96,8 +94,7 @@ class AstropyFITSLoader(BaseFITSLoader):
             _LOGGER.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
-            return da.from_delayed(delayed(np.broadcast_to)(np.nan, self.shape) * np.nan,
-                                   self.shape, self.dtype)
+            return np.broadcast_to(np.nan, self.shape) * np.nan
 
         with fits.open(self.absolute_uri,
                        memmap=False,  # memmap is redundant with dask and delayed loading
