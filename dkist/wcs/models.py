@@ -961,8 +961,9 @@ def varying_celestial_transform_from_tables(
     if (table_d := len(table_shape)) not in range(1, 4):
         raise ValueError("Only 1D, 2D and 3D lookup tables are supported.")
 
-    cls = varying_celestial_transform_dict[(slit, table_d, inverse)]
-    return cls(
+
+    cls = varying_celestial_transform_dict[(False, table_d, inverse)]
+    transform = cls(
         crpix=crpix,
         cdelt=cdelt,
         crval_table=crval_table,
@@ -970,6 +971,14 @@ def varying_celestial_transform_from_tables(
         lon_pole=lon_pole,
         projection=projection,
     )
+
+    # For slit models we duplicate one of the spatial pixel inputs to also be the lookup table input
+    if slit is not None:
+        mapping = list(range(table_d + 2))
+        mapping[2] = slit
+        transform = m.Mapping(mapping) | transform
+
+    return transform
 
 
 class Ravel(Model):
