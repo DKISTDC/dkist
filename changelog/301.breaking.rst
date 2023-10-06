@@ -1,0 +1,4 @@
+The ASDF files currently being served by the data center are incompatible with
+gwcs 0.19+. This is due to a change in how Stokes coordinates are represented.
+In this release we have pinned the gwcs version to <0.19. A future release will
+require 0.19+ when the ASDF files have been updated.
