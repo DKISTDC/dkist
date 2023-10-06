@@ -30,7 +30,7 @@ Here is a really quick demo of searching for all unembargoed VISP data and downl
     >>> import dkist.net
 
     >>> res = Fido.search(a.Instrument.visp, a.dkist.Embargoed.false)  # doctest: +REMOTE_DATA
-    >>> res  # doctest: +REMOTE_DATA
+    >>> res  # doctest: +SKIP
     <sunpy.net.fido_factory.UnifiedResponse object at ...>
     Results from 1 Provider:
     <BLANKLINE>
