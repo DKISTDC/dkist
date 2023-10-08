@@ -16,7 +16,7 @@ from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTrans
 
 def test_roundtrip_vct():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2]
-                         for a in np.linspace(0, 90, 10)] * u.arcsec
+                         for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
                                     cdelt=(1, 1) * u.arcsec/u.pix,
@@ -42,7 +42,7 @@ def test_roundtrip_vct():
 
 
 def test_roundtrip_vct_2d():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
     vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
@@ -70,7 +70,7 @@ def test_roundtrip_vct_2d():
 
 def test_roundtrip_vct_slit():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2]
-                         for a in np.linspace(0, 90, 10)] * u.arcsec
+                         for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransformSlit(crpix=(5, 5) * u.pix,
                                         cdelt=(1, 1) * u.arcsec/u.pix,
@@ -84,7 +84,7 @@ def test_roundtrip_vct_slit():
 
 
 def test_roundtrip_vct_slit2d():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
     vct = VaryingCelestialTransformSlit2D(crpix=(5, 5) * u.pix,

@@ -23,13 +23,13 @@ def vct_crval():
     return VaryingCelestialTransform(crpix=(5, 5) * u.pix,
                                      cdelt=(1, 1) * u.arcsec/u.pix,
                                      crval_table=crval_table,
-                                     pc_table=np.identity(2) * u.arcsec,
+                                     pc_table=np.identity(2) * u.pix,
                                      lon_pole=180 * u.deg)
 
 
 @pytest.fixture
 def vct_2d_pc():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
     return VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
@@ -132,7 +132,7 @@ def test_coupled_sep_2d_extra(vct_2d_pc, linear_time):
 
 
 def test_coupled_slit_no_repeat(linear_time):
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
     kwargs = dict(crpix=(5, 5) * u.pix,
                   cdelt=(1, 1) * u.arcsec/u.pix,
@@ -149,7 +149,7 @@ def test_coupled_slit_no_repeat(linear_time):
 
 
 def test_coupled_slit_with_repeat(linear_time):
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     pc_table = pc_table.reshape((5, 3, 2, 2))
 
     kwargs = dict(crpix=(5, 5) * u.pix,

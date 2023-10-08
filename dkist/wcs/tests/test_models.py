@@ -22,18 +22,20 @@ def test_generate_celestial():
         crpix=[0, 0] * u.pix,
         crval=[0, 0] * u.arcsec,
         cdelt=[1, 1] * u.arcsec/u.pix,
-        pc=np.identity(2) * u.arcsec,
+        pc=np.identity(2) * u.pix,
     )
 
     # Traverse the tree to make sure it's what we expect
     assert isinstance(tfrm, CompoundModel)
     assert isinstance(tfrm.right, m.RotateNative2Celestial)
     assert isinstance(tfrm.left.right, m.Pix2Sky_TAN)
-    assert isinstance(tfrm.left.left.right, m.AffineTransformation2D)
-    assert isinstance(tfrm.left.left.left.right, CompoundModel)
-    assert isinstance(tfrm.left.left.left.right.left, m.Multiply)
+    assert isinstance(tfrm.left.left.right, CompoundModel)
+    assert isinstance(tfrm.left.left.right.left, m.Multiply)
+    assert isinstance(tfrm.left.left.right.right, m.Multiply)
     assert isinstance(tfrm.left.left.left.left, CompoundModel)
     assert isinstance(tfrm.left.left.left.left.right, m.Shift)
+    assert isinstance(tfrm.left.left.left.left.left, m.Shift)
+    assert isinstance(tfrm.left.left.left.right, m.AffineTransformation2D)
 
     # Copout and only test that one parameter has units
     shift1 = tfrm.left.left.left.left.right
@@ -52,7 +54,7 @@ def test_generate_celestial_unitless():
 
 
 def test_varying_transform_no_lon_pole_unit():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
     # Without a lon_pole passed, the transform was originally setting
     # the unit for it to be the same as crval, which is wrong.
     vct = VaryingCelestialTransform(
@@ -65,8 +67,9 @@ def test_varying_transform_no_lon_pole_unit():
     assert isinstance(trans5, CompoundModel)
     assert u.allclose(trans5.right.lon_pole, 180 * u.deg)
 
+
 def test_varying_transform_pc():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransform(
         crpix=(5, 5) * u.pix,
@@ -80,7 +83,7 @@ def test_varying_transform_pc():
     assert isinstance(trans5, CompoundModel)
 
     # Verify that we have the 5th matrix in the series
-    affine = trans5.left.left.right
+    affine = next(filter(lambda sm: isinstance(sm, m.AffineTransformation2D), trans5.traverse_postorder()))
     assert isinstance(affine, m.AffineTransformation2D)
     assert u.allclose(affine.matrix, varying_matrix_lt[5])
     # x.shape=(1,), y.shape=(1,), z.shape=(1,)
@@ -101,7 +104,7 @@ def test_varying_transform_pc():
     (np.mgrid[0:1024, 0:1000, 0:2] * u.pix, (1024, 1000, 2)),
 ))
 def test_varying_transform_pc_shapes(pixel, lon_shape):
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransform(
         crpix=(5, 5) * u.pix,
@@ -134,7 +137,7 @@ def test_varying_transform_pc_unitless():
     assert isinstance(trans5, CompoundModel)
 
     # Verify that we have the 5th matrix in the series
-    affine = trans5.left.left.right
+    affine = next(filter(lambda sm: isinstance(sm, m.AffineTransformation2D), trans5.traverse_postorder()))
     assert isinstance(affine, m.AffineTransformation2D)
     assert u.allclose(affine.matrix, varying_matrix_lt[5])
 
@@ -151,7 +154,7 @@ def test_varying_transform_crval():
         crpix=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=crval_table,
-        pc_table=np.identity(2) * u.arcsec,
+        pc_table=np.identity(2) * u.pix,
         lon_pole=180 * u.deg,
     )
 
@@ -222,7 +225,7 @@ def test_vct_errors():
 
 
 def test_varying_transform_4d_pc():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
 
     vct = VaryingCelestialTransform2D(
@@ -275,7 +278,7 @@ def test_varying_transform_4d_pc_unitless():
       np.arange(3)[..., None, None]), (3, 5, 10)),
 ))
 def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
     vct = VaryingCelestialTransform2D(
@@ -294,7 +297,7 @@ def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
 
 
 def test_vct_dispatch():
-    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 16)] * u.arcsec
+    varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 16)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((2, 2, 2, 2, 2, 2))
     crval_table = list(zip(np.arange(1, 17), np.arange(17, 33))) * u.arcsec
     crval_table = crval_table.reshape((2, 2, 2, 2, 2))
@@ -334,7 +337,7 @@ def test_vct_dispatch():
 
 
 def test_vct_shape_errors():
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.arcsec
+    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     pc_table = pc_table.reshape((5, 3, 2, 2))
 
     crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
@@ -394,7 +397,7 @@ def test_vct(has_units, slit, num_varying_axes):
     sensor_axis_pts = [np.arange(item) for item in sensor_dims]
     atol = 1.e-5
     if has_units:
-        pc_table *= u.arcsec
+        pc_table *= u.pix
         crpix *= u.pix
         cdelt *= u.arcsec / u.pix
         crval_table *= u.arcsec
@@ -476,6 +479,7 @@ def _evaluate_unravel(array_shape, index, order="C"):
         indices = indices[::-1]
     return tuple(indices)
 
+
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 @pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
@@ -514,6 +518,7 @@ def test_ravel_model(ndim, has_units, input_type):
             assert np.allclose(ravel_value, expected_ravel)
             assert np.allclose(unraveled_values, expected_unravel)
             assert np.allclose(round_trip, expected_ravel)
+
 
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
@@ -563,6 +568,7 @@ def test_raveled_tabular1d(ndim, has_units, input_type):
             assert np.allclose(raveled_tab.inverse(expected_ravel), expected_unravel)
             assert np.allclose(raveled_tab.inverse.inverse(*inputs), expected_ravel)
 
+
 @pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_ordering(ndim, order):
@@ -595,6 +601,7 @@ def test_ravel_repr(ndim, order):
 def test_ravel_bad_array_shape(array_shape, ravel):
     with pytest.raises(ValueError) as e:
         ravel(array_shape)
+
 
 @pytest.mark.parametrize("order", ["A", "B"])
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
