@@ -6,12 +6,14 @@ from asdf.testing.helpers import roundtrip_object
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
-from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
+from dkist.wcs.models import (CoupledCompoundModel,
+                              InverseVaryingCelestialTransform,
                               InverseVaryingCelestialTransform2D,
-                              InverseVaryingCelestialTransformSlit,
-                              InverseVaryingCelestialTransformSlit2D, Ravel, Unravel,
-                              VaryingCelestialTransform, VaryingCelestialTransform2D,
-                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D)
+                              Ravel,
+                              Unravel,
+                              VaryingCelestialTransform,
+                              VaryingCelestialTransform2D,
+                              varying_celestial_transform_from_tables)
 
 
 def test_roundtrip_vct():
@@ -72,7 +74,7 @@ def test_roundtrip_vct_slit():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2]
                          for a in np.linspace(0, 90, 10)] * u.pix
 
-    vct = VaryingCelestialTransformSlit(crpix=(5, 5) * u.pix,
+    vct = varying_celestial_transform_from_tables(crpix=(5, 5) * u.pix,
                                         cdelt=(1, 1) * u.arcsec/u.pix,
                                         crval_table=(0, 0) * u.arcsec,
                                         pc_table=varying_matrix_lt,

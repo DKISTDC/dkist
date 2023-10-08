@@ -10,10 +10,12 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransform3D,
-                              VaryingCelestialTransformSlit, VaryingCelestialTransformSlit2D,
-                              VaryingCelestialTransformSlit3D, generate_celestial_transform,
+from dkist.wcs.models import (Ravel,
+                              Unravel,
+                              VaryingCelestialTransform,
+                              VaryingCelestialTransform2D,
+                              VaryingCelestialTransform3D,
+                              generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
 
@@ -352,20 +354,11 @@ def test_vct_shape_errors():
     with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
         VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
 
-    with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
-        VaryingCelestialTransformSlit(crval_table=crval_table, pc_table=pc_table, **kwargs)
-
     with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
         VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
-    with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
-        VaryingCelestialTransformSlit2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
-
     with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
         VaryingCelestialTransform3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
-
-    with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
-        VaryingCelestialTransformSlit3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
 
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
