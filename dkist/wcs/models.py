@@ -924,6 +924,30 @@ class CoupledCompoundModel(CompoundModel):
 
         return matrix
 
+
+class BiDirectionalMapping(m.Mapping):
+    """
+    A Mapping which uses a different mapping for the forward and backward directions.
+    """
+    def __init__(
+            self,
+            forward_mapping,
+            backward_mapping,
+            forward_n_inputs=None,
+            backward_n_inputs=None,
+            name=None,
+            meta=None,
+    ):
+        super().__init__(forward_mapping, n_inputs=forward_n_inputs, name=name, meta=meta)
+        self.backward_mapping = backward_mapping
+        self.forward_mapping = self.mapping
+        self.backward_n_inputs = backward_n_inputs
+        self.forward_n_inputs = self.n_inputs
+
+    @property
+    def inverse(self):
+        return m.Mapping(self.backward_mapping, n_inputs=self.backward_n_inputs)
+
 varying_celestial_transform_dict = {
     # Map (slit, num_dims, inverse) to class
     (False, 1, False): VaryingCelestialTransform,
@@ -948,7 +972,7 @@ def varying_celestial_transform_from_tables(
         lon_pole: Union[float, u.Quantity] = None,
         projection: Model = m.Pix2Sky_TAN(),
         inverse=False,
-        slit=False,
+        slit=None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -972,12 +996,17 @@ def varying_celestial_transform_from_tables(
         projection=projection,
     )
 
-    # For slit models we duplicate one of the spatial pixel inputs to also be the lookup table input
+    # For slit models we duplicate one of the spatial pixel inputs to also be
+    # the lookup table input
     if slit is not None:
-        mapping = list(range(table_d + 2))
-        mapping[2] = slit
-        transform = m.Mapping(mapping) | transform
-
+        if slit not in [0, 1]:
+            raise ValueError("The slit dimension must be one of the first two pixel dimensions.")
+        mapping = list(range(table_d + 2 - 1))
+        mapping.insert(2, slit)
+        backward_mapping = [[1, 0][slit]]
+        transform = BiDirectionalMapping(forward_mapping=mapping,
+                                         backward_mapping=backward_mapping,
+                                         backward_n_inputs=transform.inverse.n_outputs) | transform
     return transform
 
 

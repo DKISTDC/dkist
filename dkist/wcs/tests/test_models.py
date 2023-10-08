@@ -367,8 +367,9 @@ def test_vct_shape_errors():
     with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
         VaryingCelestialTransformSlit3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
+
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
-@pytest.mark.parametrize("slit", [pytest.param(True, id="spectrograph"), pytest.param(False, id="imager")])
+@pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 def test_vct(has_units, slit, num_varying_axes):
     if slit:
