@@ -61,7 +61,7 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
                       frame="helioprojective",
                       obstime="2023-01-01T13:03:13.863",
                       observer=coords[0][0].observer)
-    coord1 = SkyCoord(-1153*u.arcsec, 232*u.arcsec,
+    coord1 = SkyCoord(-1275*u.arcsec, 174*u.arcsec,
                       frame="helioprojective",
                       obstime="2023-01-01T13:03:13.863",
                       observer=coords[1][0].observer)
@@ -78,6 +78,12 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
         Time("2023-01-01T13:03:13"),
         None,
     ])
+
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims
+    assert cropped.data.shape[0] == croppable_cryo_dataset.data.shape[0]
+    assert cropped.data.shape[1] == croppable_cryo_dataset.data.shape[1] - 1
+    assert cropped.data.shape[2] == croppable_cryo_dataset.data.shape[2] - 1
+    assert cropped.data.shape[3:] == croppable_cryo_dataset.data.shape[3:]
 
 
 def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
