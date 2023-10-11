@@ -35,6 +35,11 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
         StokesCoord('I'),
     ])
 
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims - 1
+    assert cropped.data.shape == croppable_cryo_dataset.data.shape[1:]
+    # This won't be true yet because of bugs in the Stokes WCS
+    # assert (cropped.headers['DINDEX4'] == 1).all()
+
 
 def test_crop_cryo_by_time(croppable_cryo_dataset):
     coords = (croppable_cryo_dataset.wcs.pixel_to_world(0, 0, 0, 0, 0),
