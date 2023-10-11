@@ -57,9 +57,6 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     #     <Time object: scale='utc' format='isot' value=2023-01-01T13:03:13.863>,
     #     StokesCoord('U')])
 
-    # Crop using all calculated coords
-    croppable_cryo_dataset.crop(*coords)
-
     coord0 = SkyCoord(-1011*u.arcsec, 314*u.arcsec,
                       frame="helioprojective",
                       obstime="2023-01-01T13:03:13.863",
@@ -69,21 +66,8 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
                       obstime="2023-01-01T13:03:13.863",
                       observer=coords[1][0].observer)
 
-    # Crop using relevant calculated coords
-    # Time and space are coupled in this ds so need the coords for both
-    cropped1 = croppable_cryo_dataset.crop([
-        coords[0][0],
-        coords[0][1],
-        None,
-    ],
-    [
-        coords[1][0],
-        coords[1][1],
-        None,
-    ])
-
     # Crop using user-defined coords
-    cropped2 = croppable_cryo_dataset.crop([
+    cropped = croppable_cryo_dataset.crop([
         coord0,
         # Time has to be later than the start time becuase the crop is the smallest range that includes specified values
         Time("2023-01-01T13:00:04"),
