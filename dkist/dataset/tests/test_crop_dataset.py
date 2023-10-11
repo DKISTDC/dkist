@@ -84,13 +84,12 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     assert cropped.data.shape[1] == croppable_cryo_dataset.data.shape[1] - 1
     assert cropped.data.shape[2] == croppable_cryo_dataset.data.shape[2] - 1
     assert cropped.data.shape[3:] == croppable_cryo_dataset.data.shape[3:]
+    # Should also test here for consistency of world coords
 
 
 def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
     coords = (croppable_cryo_dataset.wcs.pixel_to_world(0, 0, 0, 0, 0),
               croppable_cryo_dataset.wcs.pixel_to_world(1000, 1000, 2, 2, 3))
-    pixel_coords = (croppable_cryo_dataset.wcs.world_to_pixel(*coords[0]),
-                    croppable_cryo_dataset.wcs.world_to_pixel(*coords[1]))
 
     # ([<SkyCoord (Helioprojective: obstime=2023-01-01T13:03:13.863, rsun=695700.0 km,
     #         observer=<HeliographicStonyhurst Coordinate (obstime=2023-01-01T13:03:13.863, rsun=695700.0 km):
@@ -104,8 +103,6 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
     #     (Tx, Ty) in arcsec (-1153.0021188, 231.97726162)>,
     #     <Time object: scale='utc' format='isot' value=2023-01-01T13:06:23.863>,
     #     StokesCoord('U')])
-    # Using calculated coords
-    cropped1 = croppable_cryo_dataset.crop(*coords)
 
     coord0 = SkyCoord(-1011*u.arcsec, 314*u.arcsec,
                       frame="helioprojective",
@@ -121,7 +118,7 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
                       observer=coords[1][0].observer)
 
     # Crop using user-defined coords
-    cropped2 = croppable_cryo_dataset.crop([
+    cropped = croppable_cryo_dataset.crop([
         coord0,
         Time("2023-01-01T13:00:04"),
         None,
@@ -131,3 +128,9 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
         Time("2023-01-01T13:06:23"),
         None,
     ])
+
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims
+    assert cropped.data.shape[:3] == croppable_cryo_dataset.data.shape[:3]
+    assert cropped.data.shape[3] == 1001
+    assert cropped.data.shape[4] == 999
+    # Should also test here for consistency of world coords
