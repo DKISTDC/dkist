@@ -7,8 +7,10 @@ from parfive import Results
 import asdf
 
 try:
+    # first try to import from asdf.exceptions for asdf 2.15+
     from asdf.exceptions import ValidationError
 except ImportError:
+    # fall back to top level asdf for older versions of asdf
     from asdf import ValidationError
 
 
