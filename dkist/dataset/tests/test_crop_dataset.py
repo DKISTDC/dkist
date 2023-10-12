@@ -17,14 +17,14 @@ def test_crop_visp_by_only_stokes(croppable_visp_dataset):
         StokesCoord('I'),
     ])
 
-    assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.pixel_n_dims - 1
+    assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_visp_dataset.data.shape[1:]
     # This won't be true yet because of bugs in the Stokes WCS
     # assert (cropped.headers['DINDEX4'] == 1).all()
 
 
 def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
-    croppable_cryo_dataset.crop([
+    cropped = croppable_cryo_dataset.crop([
         None,
         None,
         StokesCoord('I'),
@@ -35,7 +35,7 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
         StokesCoord('I'),
     ])
 
-    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims - 1
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_cryo_dataset.data.shape[1:]
     # This won't be true yet because of bugs in the Stokes WCS
     # assert (cropped.headers['DINDEX4'] == 1).all()
@@ -57,11 +57,11 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     #     <Time object: scale='utc' format='isot' value=2023-01-01T13:03:13.863>,
     #     StokesCoord('U')])
 
-    coord0 = SkyCoord(-1011*u.arcsec, 314*u.arcsec,
+    coord0 = SkyCoord(-1010.9*u.arcsec, 314.2*u.arcsec,
                       frame="helioprojective",
                       obstime="2023-01-01T13:03:13.863",
                       observer=coords[0][0].observer)
-    coord1 = SkyCoord(-1275*u.arcsec, 174*u.arcsec,
+    coord1 = SkyCoord(-1275.1*u.arcsec, 174.4*u.arcsec,
                       frame="helioprojective",
                       obstime="2023-01-01T13:03:13.863",
                       observer=coords[1][0].observer)
@@ -79,7 +79,7 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
         None,
     ])
 
-    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim
     assert cropped.data.shape[0] == croppable_cryo_dataset.data.shape[0]
     assert cropped.data.shape[1] == croppable_cryo_dataset.data.shape[1] - 1
     assert cropped.data.shape[2] == croppable_cryo_dataset.data.shape[2] - 1
@@ -129,7 +129,7 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
         None,
     ])
 
-    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.pixel_n_dims
+    assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim
     assert cropped.data.shape[:3] == croppable_cryo_dataset.data.shape[:3]
     assert cropped.data.shape[3] == 1001
     assert cropped.data.shape[4] == 999
