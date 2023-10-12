@@ -1,11 +1,3 @@
-1.0.1 (unreleased)
-==================
-
-Trivial/Internal Changes
-------------------------
-
-- Import `ValidationError` from `asdf.exceptions` and drop `jsonschema` as a dependency. (`#295 <https://github.com/DKISTDC/dkist/pull/295>`_)
-
 1.0.0 (2023-08-09)
 ==================
 
