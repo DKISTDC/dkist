@@ -1,3 +1,26 @@
+v1.0.1 (2023-10-13)
+===================
+
+Backwards Incompatible Changes
+------------------------------
+
+- The ASDF files currently being served by the data center are incompatible with
+  gwcs 0.19+. This is due to a change in how Stokes coordinates are represented.
+  In this release we have pinned the gwcs version to <0.19. A future release will
+  require 0.19+ when the ASDF files have been updated. (`#301 <https://github.com/DKISTDC/dkist/pull/301>`_)
+
+
+Bug Fixes
+---------
+
+- Add missing dependencies to setup.cfg - explicit is better than implicit. (`#294 <https://github.com/DKISTDC/dkist/pull/294>`_)
+- Import ValidationError from asdf, drop jsonschema as a dependency. (`#295 <https://github.com/DKISTDC/dkist/pull/295>`_)
+- Implement missing ``select_tag`` method of ``DatasetConverter``. (`#297 <https://github.com/DKISTDC/dkist/pull/297>`_)
+- Update varying celestial transform schema ref to use a uri instead of a tag. (`#298 <https://github.com/DKISTDC/dkist/pull/298>`_)
+- Ensure that we don't nest Dask arrays when no FITS files can be read.
+  This might result in more memory being used when computing an array with missing files. (`#301 <https://github.com/DKISTDC/dkist/pull/301>`_)
+
+
 1.0.0 (2023-08-09)
 ==================
 

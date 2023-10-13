@@ -1,1 +1,0 @@
-Import ValidationError from asdf, drop jsonschema as a dependency.

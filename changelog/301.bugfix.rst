@@ -1,2 +1,0 @@
-Ensure that we don't nest Dask arrays when no FITS files can be read.
-This might result in more memory being used when computing an array with missing files.
