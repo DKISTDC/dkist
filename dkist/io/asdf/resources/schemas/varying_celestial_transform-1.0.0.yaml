@@ -30,7 +30,7 @@ properties:
       - tag: "core/ndarray-1.0.0"
       - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
   projection:
-    $ref: "tag:stsci.edu:asdf/transform/transform-1.2.0"
+    $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
 
 required: [crpix, cdelt, lon_pole, crval_table, pc_table, projection]
 additionalProperties: true

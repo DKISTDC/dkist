@@ -1,0 +1,1 @@
+Update varying celestial transform schema ref to use a uri instead of a tag.
