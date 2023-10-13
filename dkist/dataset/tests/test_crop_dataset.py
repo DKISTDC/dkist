@@ -23,6 +23,23 @@ def test_crop_visp_by_only_stokes(croppable_visp_dataset):
     # assert (cropped.headers['DINDEX4'] == 1).all()
 
 
+def test_crop_visp_by_time(croppable_visp_dataset):
+    coords = (croppable_visp_dataset.wcs.pixel_to_world(0, 0, 200, 0),
+              croppable_visp_dataset.wcs.pixel_to_world(2555, 976, 400, 4))
+    cropped = croppable_visp_dataset.crop([
+        coords[0][1],
+        coords[0][0],
+        coords[0][2],
+        None,
+    ],
+    [
+        coords[1][1],
+        coords[1][0],
+        coords[1][2],
+        None,
+    ])
+
+
 def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
     cropped = croppable_cryo_dataset.crop([
         None,
