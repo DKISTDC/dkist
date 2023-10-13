@@ -1,5 +1,5 @@
 import astropy.units as u
-from astropy.coordinates import SkyCoord, StokesCoord
+from astropy.coordinates import SkyCoord, SpectralCoord, StokesCoord
 from astropy.time import Time
 
 
@@ -27,18 +27,29 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     coords = (croppable_visp_dataset.wcs.pixel_to_world(0, 0, 200, 0),
               croppable_visp_dataset.wcs.pixel_to_world(2555, 976, 400, 4))
     cropped = croppable_visp_dataset.crop([
-        coords[0][1],
-        coords[0][0],
-        coords[0][2],
+        SpectralCoord(630.242*u.nm),
+        SkyCoord(-423.41*u.arcsec, 169.40*u.arcsec,
+                 frame="helioprojective",
+                 obstime="2022-10-24T19:15:38",
+                 observer=coords[0][0].observer),
+        Time("2022-10-24T19:08:09"),
         None,
     ],
     [
-        coords[1][1],
-        coords[1][0],
-        coords[1][2],
+        SpectralCoord(631.829*u.nm),
+        SkyCoord(-420.85*u.arcsec, 304.50*u.arcsec,
+                 frame="helioprojective",
+                 obstime="2022-10-24T19:15:38",
+                 observer=coords[1][0].observer),
+        Time("2022-10-24T19:18:32"),
         None,
     ])
 
+    assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim
+    assert cropped.data.shape[0] == croppable_visp_dataset.data.shape[0]
+    assert cropped.data.shape[1] == 201
+    assert cropped.data.shape[2:] == croppable_visp_dataset.data.shape[2:]
+    # Should also test here for consistency of world coords
 
 def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
     cropped = croppable_cryo_dataset.crop([
