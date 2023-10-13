@@ -51,6 +51,41 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     assert cropped.data.shape[2:] == croppable_visp_dataset.data.shape[2:]
     # Should also test here for consistency of world coords
 
+
+def test_crop_visp_by_lonlat(croppable_visp_dataset):
+    coords = (croppable_visp_dataset.wcs.pixel_to_world(500, 200, 0, 0),
+              croppable_visp_dataset.wcs.pixel_to_world(1000, 600, 687, 4))
+
+    coord0 = SkyCoord(-432.38*u.arcsec, 195.78*u.arcsec,
+                      frame="helioprojective",
+                      obstime="2022-10-24T19:15:38",
+                      observer=coords[0][0].observer)
+
+    coord1 = SkyCoord(-412.17*u.arcsec, 222.38*u.arcsec,
+                      frame="helioprojective",
+                      obstime="2022-10-24T19:15:38",
+                      observer=coords[1][0].observer)
+
+    cropped = croppable_visp_dataset.crop([
+        SpectralCoord(630.568*u.nm),
+        coord0,
+        Time("2022-10-24T18:57:46"),
+        None,
+    ],
+    [
+        SpectralCoord(631.218*u.nm),
+        coord1,
+        Time("2022-10-24T19:33:26"),
+        None,
+    ])
+
+    assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim
+    assert cropped.data.shape[:1] == croppable_visp_dataset.data.shape[:1]
+    assert cropped.data.shape[2] == 401
+    assert cropped.data.shape[3] == 501
+    # Should also test here for consistency of world coords
+
+
 def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
     cropped = croppable_cryo_dataset.crop([
         None,
