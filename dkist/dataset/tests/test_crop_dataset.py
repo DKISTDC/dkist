@@ -49,7 +49,14 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     assert cropped.data.shape[0] == croppable_visp_dataset.data.shape[0]
     assert cropped.data.shape[1] == 201
     assert cropped.data.shape[2:] == croppable_visp_dataset.data.shape[2:]
+
     # Should also test here for consistency of world coords
+    # Well I've done that but this makes it horribly horribly slow becuase the comparisons take ages
+    orig_coords = croppable_visp_dataset.axis_world_coords()
+    cropped_coords = cropped.axis_world_coords()
+    assert cropped_coords[0][0] == orig_coords[0][0]
+    assert cropped_coords[2] == orig_coords[2][200:601]
+    assert cropped_coords[3] == orig_coords[3]
 
 
 def test_crop_visp_by_lonlat(croppable_visp_dataset):
