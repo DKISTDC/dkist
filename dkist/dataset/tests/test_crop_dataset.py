@@ -25,10 +25,10 @@ def test_crop_visp_by_only_stokes(croppable_visp_dataset):
 
 def test_crop_visp_by_time(croppable_visp_dataset):
     coords = (croppable_visp_dataset.wcs.pixel_to_world(0, 0, 200, 0),
-              croppable_visp_dataset.wcs.pixel_to_world(2555, 976, 400, 4))
+              croppable_visp_dataset.wcs.pixel_to_world(2554, 975, 400, 3))
     cropped = croppable_visp_dataset.crop([
         SpectralCoord(630.242*u.nm),
-        SkyCoord(-423.41*u.arcsec, 169.40*u.arcsec,
+        SkyCoord(-426.41*u.arcsec, 169.40*u.arcsec,
                  frame="helioprojective",
                  obstime="2022-10-24T19:15:38",
                  observer=coords[0][0].observer),
@@ -36,10 +36,10 @@ def test_crop_visp_by_time(croppable_visp_dataset):
         None,
     ],
     [
-        SpectralCoord(631.829*u.nm),
-        SkyCoord(-420.85*u.arcsec, 304.50*u.arcsec,
+        SpectralCoord(631.827*u.nm),
+        SkyCoord(-420.85*u.arcsec, 304.45*u.arcsec,
                  frame="helioprojective",
-                 obstime="2022-10-24T19:15:38",
+                 obstime="2022-10-24T19:18:32",
                  observer=coords[1][0].observer),
         Time("2022-10-24T19:18:32"),
         None,
@@ -51,12 +51,12 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     assert cropped.data.shape[2:] == croppable_visp_dataset.data.shape[2:]
 
     # Should also test here for consistency of world coords
-    # Well I've done that but this makes it horribly horribly slow becuase the comparisons take ages
     orig_coords = croppable_visp_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
-    assert cropped_coords[0][0] == orig_coords[0][0]
-    assert cropped_coords[2] == orig_coords[2][200:601]
-    assert cropped_coords[3] == orig_coords[3]
+    assert (cropped_coords[0][0] == orig_coords[0][200]).all()
+    assert (cropped_coords[0][-1] == orig_coords[0][401]).all()
+    assert (cropped_coords[2] == orig_coords[2][200:401]).all()
+    assert (cropped_coords[3] == orig_coords[3]).all()
 
 
 def test_crop_visp_by_lonlat(croppable_visp_dataset):
