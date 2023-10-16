@@ -50,11 +50,11 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     assert cropped.data.shape[1] == 201
     assert cropped.data.shape[2:] == croppable_visp_dataset.data.shape[2:]
 
-    # Should also test here for consistency of world coords
     orig_coords = croppable_visp_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
     assert (cropped_coords[0][0] == orig_coords[0][200]).all()
-    assert (cropped_coords[0][-1] == orig_coords[0][401]).all()
+    assert (cropped_coords[0][-1] == orig_coords[0][400]).all()
+    assert (cropped_coords[1] == orig_coords[1]).all()
     assert (cropped_coords[2] == orig_coords[2][200:401]).all()
     assert (cropped_coords[3] == orig_coords[3]).all()
 
