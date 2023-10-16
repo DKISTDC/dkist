@@ -10,8 +10,8 @@ description:
 allOf:
   - $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
   - properties:
-    array_shape:
-      type: array
-    order:
-      type: string
+      array_shape:
+        type: array
+      order:
+        type: string
     required: [array_shape, order]

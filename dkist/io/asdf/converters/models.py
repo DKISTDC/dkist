@@ -27,13 +27,8 @@ class VaryingCelestialConverter(TransformConverterBase):
         from dkist.wcs.models import (InverseVaryingCelestialTransform,
                                       InverseVaryingCelestialTransform2D,
                                       InverseVaryingCelestialTransform3D,
-                                      InverseVaryingCelestialTransformSlit,
-                                      InverseVaryingCelestialTransformSlit2D,
-                                      InverseVaryingCelestialTransformSlit3D,
                                       VaryingCelestialTransform, VaryingCelestialTransform2D,
-                                      VaryingCelestialTransform3D, VaryingCelestialTransformSlit,
-                                      VaryingCelestialTransformSlit2D,
-                                      VaryingCelestialTransformSlit3D)
+                                      VaryingCelestialTransform3D)
 
         if isinstance(
                 obj,
@@ -49,20 +44,6 @@ class VaryingCelestialConverter(TransformConverterBase):
                  InverseVaryingCelestialTransform3D)
         ):
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
-        elif isinstance(
-                obj,
-                (VaryingCelestialTransformSlit,
-                 VaryingCelestialTransformSlit2D,
-                 VaryingCelestialTransformSlit3D)
-        ):
-            return "asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0"
-        elif isinstance(
-                obj,
-                (InverseVaryingCelestialTransformSlit,
-                 InverseVaryingCelestialTransformSlit2D,
-                 InverseVaryingCelestialTransformSlit3D)
-                 ):
-            return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform_slit-1.0.0"
         else:
             raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
 
@@ -73,6 +54,11 @@ class VaryingCelestialConverter(TransformConverterBase):
         if "inverse_varying_celestial_transform" in tag:
             inverse = True
 
+        # Support reading files with the old Slit classes in them
+        slit = None
+        if "_slit" in tag:
+            slit = 1
+
         return varying_celestial_transform_from_tables(
             crpix=node["crpix"],
             cdelt=node["cdelt"],
@@ -81,7 +67,7 @@ class VaryingCelestialConverter(TransformConverterBase):
             pc_table=node["pc_table"],
             projection=node["projection"],
             inverse=inverse,
-            slit="_slit" in tag
+            slit=slit,
         )
 
     def to_yaml_tree_transform(self, model, tag, ctx):
@@ -161,3 +147,29 @@ class RavelConverter(TransformConverterBase):
         from dkist.wcs.models import Ravel
 
         return Ravel(node["array_shape"], order=node["order"])
+
+
+class AsymmetricMappingConverter(TransformConverterBase):
+    """
+    ASDF serialization support for Ravel
+    """
+
+    tags  = [
+        "asdf://dkist.nso.edu/tags/asymmetric_mapping_model-1.0.0"
+    ]
+
+    types = ["dkist.wcs.models.AsymmetricMapping"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        node = {
+            "forward_mapping": model.forward_mapping,
+            "backward_mapping": model.backward_mapping,
+            "forward_n_inputs": model.forward_n_inputs,
+            "backward_n_inputs": model.backward_n_inputs,
+        }
+        return node
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import AsymmetricMapping
+
+        return AsymmetricMapping(**node)

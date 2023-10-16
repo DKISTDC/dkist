@@ -8,8 +8,7 @@ from astropy.modeling import CompoundModel, Model
 from astropy.modeling.separable import separability_matrix
 
 from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransformSlit,
-                              VaryingCelestialTransformSlit2D)
+                              VaryingCelestialTransform2D, varying_celestial_transform_from_tables)
 
 
 @pytest.fixture
@@ -137,9 +136,10 @@ def test_coupled_slit_no_repeat(linear_time):
     kwargs = dict(crpix=(5, 5) * u.pix,
                   cdelt=(1, 1) * u.arcsec/u.pix,
                   crval_table=(0, 0) * u.arcsec,
-                  lon_pole=180 * u.deg)
+                  lon_pole=180 * u.deg,
+                  slit=1)
 
-    vct_slit = VaryingCelestialTransformSlit(pc_table=pc_table, **kwargs)
+    vct_slit = varying_celestial_transform_from_tables(pc_table=pc_table, **kwargs)
 
     tfrm = CoupledCompoundModel("&", vct_slit, linear_time, shared_inputs=1)
     pixel = (0*u.pix, 4*u.pix)
@@ -155,9 +155,10 @@ def test_coupled_slit_with_repeat(linear_time):
     kwargs = dict(crpix=(5, 5) * u.pix,
                   cdelt=(1, 1) * u.arcsec/u.pix,
                   crval_table=(0, 0) * u.arcsec,
-                  lon_pole=180 * u.deg)
+                  lon_pole=180 * u.deg,
+                  slit=1)
 
-    vct_slit = VaryingCelestialTransformSlit2D(pc_table=pc_table, **kwargs)
+    vct_slit = varying_celestial_transform_from_tables(pc_table=pc_table, **kwargs)
 
     tfrm = CoupledCompoundModel("&", vct_slit, linear_time & linear_time, shared_inputs=2)
     pixel = (0*u.pix, 0*u.pix, 0*u.pix)

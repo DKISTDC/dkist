@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union, Iterable
+from typing import Union, Literal, Iterable
 
 import numpy as np
 
@@ -23,7 +23,7 @@ __all__ = [
     "BaseVaryingCelestialTransform",
     "BaseVaryingCelestialTransform2D",
     "generate_celestial_transform",
-    "BiDirectionalMapping",
+    "AsymmetricMapping",
     "varying_celestial_transform_from_tables",
     "Ravel",
     "Unravel",
@@ -633,18 +633,18 @@ class CoupledCompoundModel(CompoundModel):
         return matrix
 
 
-class BiDirectionalMapping(m.Mapping):
+class AsymmetricMapping(m.Mapping):
     """
     A Mapping which uses a different mapping for the forward and backward directions.
     """
     def __init__(
-            self,
-            forward_mapping,
-            backward_mapping,
-            forward_n_inputs=None,
-            backward_n_inputs=None,
-            name=None,
-            meta=None,
+        self,
+        forward_mapping,
+        backward_mapping,
+        forward_n_inputs=None,
+        backward_n_inputs=None,
+        name=None,
+        meta=None,
     ):
         super().__init__(forward_mapping, n_inputs=forward_n_inputs, name=name, meta=meta)
         self.backward_mapping = backward_mapping
@@ -673,8 +673,8 @@ def varying_celestial_transform_from_tables(
         crval_table: Union[Iterable[float], u.Quantity],
         lon_pole: Union[float, u.Quantity] = None,
         projection: Model = m.Pix2Sky_TAN(),
-        inverse=False,
-        slit=None,
+        inverse: bool = False,
+        slit: Union[None, Literal[0, 1]] = None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -706,10 +706,10 @@ def varying_celestial_transform_from_tables(
         mapping = list(range(table_d + 2 - 1))
         mapping.insert(2, slit)
         backward_mapping = [[1, 0][slit]]
-        transform = BiDirectionalMapping(forward_mapping=mapping,
-                                         backward_mapping=backward_mapping,
-                                         backward_n_inputs=transform.inverse.n_outputs,
-                                         name="SlitMapping") | transform
+        transform = AsymmetricMapping(forward_mapping=mapping,
+                                      backward_mapping=backward_mapping,
+                                      backward_n_inputs=transform.inverse.n_outputs,
+                                      name="SlitMapping") | transform
     return transform
 
 
