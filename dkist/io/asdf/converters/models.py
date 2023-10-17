@@ -164,9 +164,11 @@ class AsymmetricMappingConverter(TransformConverterBase):
         node = {
             "forward_mapping": model.forward_mapping,
             "backward_mapping": model.backward_mapping,
-            "forward_n_inputs": model.forward_n_inputs,
-            "backward_n_inputs": model.backward_n_inputs,
         }
+        if forward_n_inputs := node.get("forward_n_inputs"):
+            node["forward_n_inputs"] = model.forward_n_inputs
+        if backward_n_inputs := node.get("backward_n_inputs"):
+            node["backward_n_inputs"] = model.backward_n_inputs
         return node
 
     def from_yaml_tree_transform(self, node, tag, ctx):
@@ -175,7 +177,6 @@ class AsymmetricMappingConverter(TransformConverterBase):
         return AsymmetricMapping(
             node["forward_mapping"],
             node["backward_mapping"],
-            node["forward_n_inputs"],
-            node["backward_n_inputs"],
-            node["name"]
+            node.get("forward_n_inputs"),
+            node.get("backward_n_inputs"),
         )

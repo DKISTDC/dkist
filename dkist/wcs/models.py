@@ -654,7 +654,18 @@ class AsymmetricMapping(m.Mapping):
 
     @property
     def inverse(self):
-        return m.Mapping(self.backward_mapping, n_inputs=self.backward_n_inputs, name=self.name)
+        return type(self)(
+            self.backward_mapping,
+            self.forward_mapping,
+            self.backward_n_inputs,
+            self.forward_n_inputs,
+            name=self.name
+        )
+
+    def __repr__(self):
+        if self.name is None:
+            return f"<AsymmetricMapping({self.mapping})>"
+        return f"<AsymmetricMapping({self.mapping}, name={self.name!r})>"
 
 varying_celestial_transform_dict = {
     # Map (num_dims, inverse) to class

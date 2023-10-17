@@ -26,5 +26,5 @@ allOf:
         $ref: "#/definitions/mapping"
       backward_mapping:
         $ref: "#/definitions/mapping"
-    required: [forward_mapping, backward_mapping, forward_n_inputs, backward_n_inputs]
+    required: [forward_mapping, backward_mapping]
 ...
