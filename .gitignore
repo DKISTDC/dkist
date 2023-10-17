@@ -227,3 +227,4 @@ figure_test_images*
 
 # Release script
 .github_cache
+requirements-min.txt
