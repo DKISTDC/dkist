@@ -172,4 +172,10 @@ class AsymmetricMappingConverter(TransformConverterBase):
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import AsymmetricMapping
 
-        return AsymmetricMapping(**node)
+        return AsymmetricMapping(
+            node["forward_mapping"],
+            node["backward_mapping"],
+            node["forward_n_inputs"],
+            node["backward_n_inputs"],
+            node["name"]
+        )
