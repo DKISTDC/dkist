@@ -647,7 +647,10 @@ def test_asymmetric_mapping_n_inputs():
         backward_mapping,
         forward_n_inputs=3,
         backward_n_inputs=4,
+        name="TestModel",
     )
 
     assert am(1, 2, 3) == 2
     assert am.inverse(1, 2, 3, 4) == (1, 2)
+
+    assert "TestModel" in repr(am)
