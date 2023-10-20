@@ -93,7 +93,7 @@ def generate_celestial_transform(
     scale = m.Multiply(cdelt[0]) & m.Multiply(cdelt[1])
     rot = m.AffineTransformation2D(pc, translation=translation)
     skyrot = m.RotateNative2Celestial(crval[0], crval[1], lon_pole)
-    return shift | scale | rot | projection | skyrot
+    return shift | rot | scale | projection | skyrot
 
 
 class BaseVaryingCelestialTransform(Model, ABC):
