@@ -358,6 +358,25 @@ def test_vct_shape_errors():
         VaryingCelestialTransform3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
 
+@pytest.mark.parametrize("slit", [-1, np.nan, 3, 10])
+def test_vct_slit_bounds(slit):
+    crpix=[0, 0]
+    cdelt=[1, 1]
+    pc_table=np.identity(2)
+    crval_table=np.array([[1,1], [2,2]])
+    lon_pole=180
+
+    with pytest.raises(ValueError,
+                       match="must be one of the first two pixel dimensions"):
+        varying_celestial_transform_from_tables(
+            crpix=crpix,
+            cdelt=cdelt,
+            pc_table=pc_table,
+            crval_table=crval_table,
+            lon_pole=lon_pole,
+            slit=slit,
+        )
+
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
