@@ -1,9 +1,13 @@
 from asdf_astropy.converters.transform.core import TransformConverterBase, parameter_to_value
 
+import astropy.units as u
+
 
 class VaryingCelestialConverter(TransformConverterBase):
     tags = [
+        "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0",
         "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0",
+        "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0",
         "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0",
         "asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0",
         "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform_slit-1.0.0",
@@ -15,12 +19,6 @@ class VaryingCelestialConverter(TransformConverterBase):
         "dkist.wcs.models.InverseVaryingCelestialTransform2D",
         "dkist.wcs.models.VaryingCelestialTransform3D",
         "dkist.wcs.models.InverseVaryingCelestialTransform3D",
-        "dkist.wcs.models.VaryingCelestialTransformSlit",
-        "dkist.wcs.models.InverseVaryingCelestialTransformSlit",
-        "dkist.wcs.models.VaryingCelestialTransformSlit2D",
-        "dkist.wcs.models.InverseVaryingCelestialTransformSlit2D",
-        "dkist.wcs.models.VaryingCelestialTransformSlit3D",
-        "dkist.wcs.models.InverseVaryingCelestialTransformSlit3D",
     ]
 
     def select_tag(self, obj, tags, ctx):
@@ -36,14 +34,14 @@ class VaryingCelestialConverter(TransformConverterBase):
                  VaryingCelestialTransform2D,
                  VaryingCelestialTransform3D)
         ):
-            return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0"
+            return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
         elif isinstance(
                 obj,
                 (InverseVaryingCelestialTransform,
                  InverseVaryingCelestialTransform2D,
                  InverseVaryingCelestialTransform3D)
         ):
-            return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0"
+            return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0"
         else:
             raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
 
@@ -58,6 +56,13 @@ class VaryingCelestialConverter(TransformConverterBase):
         slit = None
         if "_slit" in tag:
             slit = 1
+
+        # Old files (written with the 1.0.0 tag) have the wrong units attached
+        # to the pc_table (because of the incorrect ordering of the affine
+        # transform and scale models) so we change the units.
+        if tag.endswith("1.0.0"):
+            if node["pc_table"].unit is u.arcsec:
+                node["pc_table"] = u.Quantity(node["pc_table"].value, unit=u.pix)
 
         return varying_celestial_transform_from_tables(
             crpix=node["crpix"],
