@@ -10,7 +10,7 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
-from dkist.wcs.models import (Ravel, Unravel, VaryingCelestialTransform,
+from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
                               generate_celestial_transform,
                               varying_celestial_transform_from_tables)
@@ -600,3 +600,35 @@ def test_ravel_bad_order(order, ravel):
     array_shape=(2, 2, 2)
     with pytest.raises(ValueError) as e:
         ravel(array_shape, order)
+
+
+def test_asymmetric_mapping():
+    forward_mapping = [0, 1, 1]
+    backward_mapping = [0, 1]
+    am = AsymmetricMapping(
+        forward_mapping,
+        backward_mapping
+    )
+
+    assert am(1, 2) == (1, 2, 2)
+    assert am.inverse(1, 2) == (1, 2)
+
+    assert "AsymmetricMapping" in repr(am)
+    assert "0, 1, 1" in repr(am)
+
+    assert "AsymmetricMapping" in repr(am.inverse)
+    assert "0, 1" in repr(am.inverse)
+
+
+def test_asymmetric_mapping_n_inputs():
+    forward_mapping = [1]
+    backward_mapping = [0, 1]
+    am = AsymmetricMapping(
+        forward_mapping,
+        backward_mapping,
+        forward_n_inputs=3,
+        backward_n_inputs=4,
+    )
+
+    assert am(1, 2, 3) == 2
+    assert am.inverse(1, 2, 3, 4) == (1, 2)
