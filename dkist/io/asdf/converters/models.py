@@ -1,6 +1,5 @@
-from asdf_astropy.converters.transform.core import TransformConverterBase, parameter_to_value
-
 import astropy.units as u
+from asdf_astropy.converters.transform.core import TransformConverterBase, parameter_to_value
 
 
 class VaryingCelestialConverter(TransformConverterBase):
@@ -9,6 +8,8 @@ class VaryingCelestialConverter(TransformConverterBase):
         "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0",
         "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0",
         "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0",
+        # Old slit tags must be kept so we can read old files, but not types as
+        # we will not save slit classes any more
         "asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0",
         "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform_slit-1.0.0",
     ]
