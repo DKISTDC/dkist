@@ -165,9 +165,9 @@ class AsymmetricMappingConverter(TransformConverterBase):
             "forward_mapping": model.forward_mapping,
             "backward_mapping": model.backward_mapping,
         }
-        if forward_n_inputs := node.get("forward_n_inputs"):
+        if model.forward_n_inputs is not None:
             node["forward_n_inputs"] = model.forward_n_inputs
-        if backward_n_inputs := node.get("backward_n_inputs"):
+        if model.backward_n_inputs is not None:
             node["backward_n_inputs"] = model.backward_n_inputs
         return node
 
