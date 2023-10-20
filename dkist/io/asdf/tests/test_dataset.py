@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from packaging.version import Version
 
 import asdf
 import astropy.table
@@ -180,11 +181,12 @@ def test_read_wcs_with_backwards_affine():
     gWCS transforms.
     """
     # This test will only pass with the split axes fix in gwcs
-    pytest.importorskip("gwcs", minversion="0.20.dev0")
     dataset = dkist.load_dataset(rootdir / "test_old_wcs_BRMQY.asdf")
     wcs = dataset.wcs
     pixel_inputs = [0] * wcs.pixel_n_dim
     world_outputs = wcs.pixel_to_world_values(*pixel_inputs)
-    pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
 
-    assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
+    if Version(gwcs.__version__) > Version("0.20.dev0"):
+        pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
+
+        assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
