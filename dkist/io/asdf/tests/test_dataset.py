@@ -179,7 +179,9 @@ def test_read_wcs_with_backwards_affine():
     written when we incorrectly put the scale before the affine transform in the
     gWCS transforms.
     """
-    dataset = dkist.load_dataset(rootdir / "test_old_wcs_AKEQV.asdf")
+    # This test will only pass with the split axes fix in gwcs
+    pytest.importorskip("gwcs", minversion="0.20.dev0")
+    dataset = dkist.load_dataset(rootdir / "test_old_wcs_BRMQY.asdf")
     wcs = dataset.wcs
     pixel_inputs = [0] * wcs.pixel_n_dim
     world_outputs = wcs.pixel_to_world_values(*pixel_inputs)
