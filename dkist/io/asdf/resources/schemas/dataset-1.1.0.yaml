@@ -15,15 +15,13 @@ properties:
 
   wcs:
     description: The coordinate system for the complete dataset.
-    anyOf:
-      - tag: "tag:stsci.edu:gwcs/wcs-1.0.0"
-      - tag: "tag:stsci.edu:gwcs/wcs-1.1.0"
+    tag: "tag:stsci.edu:gwcs/wcs-1.*"
 
   mask:
-    tag: "tag:stsci.edu:asdf/core/ndarray-1.0.0"
+    tag: "tag:stsci.edu:asdf/core/ndarray-1.*"
 
   unit:
-    tag: "tag:stsci.edu:asdf/unit/unit-1.0.0"
+    tag: "tag:stsci.edu:asdf/unit/unit-1.*"
 
   meta:
     description: Dataset metadata, describing the whole dataset.
@@ -31,7 +29,7 @@ properties:
     properties:
       headers:
         description: A table of all the headers for the constituent files.
-        tag: "tag:astropy.org:astropy/table/table-1.0.0"
+        tag: "tag:astropy.org:astropy/table/table-1.*"
 
       quality:
         description: A copy of the quality report of these observations.

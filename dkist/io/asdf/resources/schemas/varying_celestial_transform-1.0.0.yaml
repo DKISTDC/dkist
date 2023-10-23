@@ -11,24 +11,24 @@ type: object
 properties:
   crpix:
     anyOf:
-      - tag: "core/ndarray-1.0.0"
-      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+      - tag: "core/ndarray-1.*"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
   cdelt:
     anyOf:
-      - tag: "core/ndarray-1.0.0"
-      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+      - tag: "core/ndarray-1.*"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
   lon_pole:
     anyOf:
       - type: number
-      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
   crval_table:
     anyOf:
-      - tag: "core/ndarray-1.0.0"
-      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+      - tag: "core/ndarray-1.*"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
   pc_table:
     anyOf:
-      - tag: "core/ndarray-1.0.0"
-      - tag: "tag:stsci.edu:asdf/unit/quantity-1.1.0"
+      - tag: "core/ndarray-1.*"
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
   projection:
     $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
 
