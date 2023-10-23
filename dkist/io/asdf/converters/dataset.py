@@ -3,6 +3,7 @@ from asdf.extension import Converter
 
 class DatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/dataset-1.0.0",
         "tag:dkist.nso.edu:dkist/dataset-0.3.0",
@@ -29,7 +30,8 @@ class DatasetConverter(Converter):
         mask = node.get("mask")
 
         # If we have a tag older than 1.2.0 then we are going to see if we can
-        # find a stokes table
+        # find a stokes table, and if we do then we are going to change it to be
+        # compatible with gWCS 0.19
         if tag_version[0] == 0 or (tag_version[0] == 1 and tag_version[1] < 2):
             # Put imports here to reduce import time on entry point load
             import numpy as np
