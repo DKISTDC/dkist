@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 import astropy.units as u
 from astropy.coordinates import SkyCoord, SpectralCoord, StokesCoord
 from astropy.time import Time
@@ -47,10 +45,10 @@ def test_crop_visp_by_time(croppable_visp_dataset):
         None,
     ])
 
-    fig, ax = plt.subplots(figsize=(18, 24))
-    croppable_visp_dataset.plot(plot_axes=[None, 'y', None, 'x'])
-    plt.savefig("/home/drew/oss-projects/dkist/plottest")
-    plt.close()
+    # fig, ax = plt.subplots(figsize=(18, 24))
+    # croppable_visp_dataset.plot(plot_axes=[None, 'y', None, 'x'])
+    # plt.savefig("/home/drew/oss-projects/dkist/plottest")
+    # plt.close()
 
     assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim
     assert cropped.data.shape[0] == croppable_visp_dataset.data.shape[0]
