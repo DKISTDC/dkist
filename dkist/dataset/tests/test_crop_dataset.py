@@ -67,43 +67,44 @@ def test_crop_visp_by_time(croppable_visp_dataset):
 
 
 def test_crop_visp_by_lonlat(croppable_visp_dataset):
-    coords = (croppable_visp_dataset.wcs.pixel_to_world(500, 200, 0, 0),
-              croppable_visp_dataset.wcs.pixel_to_world(1000, 600, 687, 4))
+    coords = (croppable_visp_dataset.wcs.pixel_to_world(500, 0, 200, 0),
+              croppable_visp_dataset.wcs.pixel_to_world(1000, 977, 600, 4))
 
-    coord0 = SkyCoord(-432.38*u.arcsec, 195.78*u.arcsec,
+    coord0 = SkyCoord(-426.48*u.arcsec, 195.83*u.arcsec,
                       frame="helioprojective",
                       obstime="2022-10-24T19:15:38",
                       observer=coords[0][0].observer)
 
-    coord1 = SkyCoord(-412.17*u.arcsec, 222.38*u.arcsec,
+    coord1 = SkyCoord(-414.74*u.arcsec, 222.36*u.arcsec,
                       frame="helioprojective",
                       obstime="2022-10-24T19:15:38",
                       observer=coords[1][0].observer)
 
     cropped = croppable_visp_dataset.crop([
-        SpectralCoord(630.568*u.nm),
+        SpectralCoord(630.242*u.nm),
         coord0,
-        Time("2022-10-24T18:57:46"),
+        Time("2022-10-24T19:08:09"),
         None,
     ],
     [
-        SpectralCoord(631.218*u.nm),
+        SpectralCoord(631.830*u.nm),
         coord1,
-        Time("2022-10-24T19:33:26"),
+        Time("2022-10-24T19:28:56"),
         None,
     ])
 
     assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim
-    assert cropped.data.shape[:1] == croppable_visp_dataset.data.shape[:1]
-    assert cropped.data.shape[2] == 401
+    assert cropped.data.shape[0] == croppable_visp_dataset.data.shape[0]
+    assert cropped.data.shape[1] == 401
+    assert cropped.data.shape[2] == croppable_visp_dataset.data.shape[2]
     assert cropped.data.shape[3] == 501
 
     orig_coords = croppable_visp_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
-    assert (cropped_coords[0][0] == orig_coords[500][0]).all()
-    assert (cropped_coords[0][-1] == orig_coords[0][400]).all()
+    assert (cropped_coords[0][0] == orig_coords[0][200][500:1001]).all()
+    assert (cropped_coords[0][-1] == orig_coords[0][600][500:1001]).all()
     assert (cropped_coords[1] == orig_coords[1]).all()
-    assert (cropped_coords[2] == orig_coords[2][200:401]).all()
+    assert (cropped_coords[2] == orig_coords[2][200:601]).all()
     assert (cropped_coords[3] == orig_coords[3]).all()
 
 
