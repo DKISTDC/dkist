@@ -24,6 +24,9 @@ from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
+from dkist_inventory.asdf_generator import (dataset_from_fits, dataset_object_from_filenames,
+                                            extract_inventory)
+from dkist_inventory.header_parsing import HeaderParser
 
 
 @pytest.fixture
@@ -411,9 +414,15 @@ def pytest_runtest_call(item):
 
 @pytest.fixture(scope="session")
 def croppable_visp_dataset():
-    return load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
+    ds = load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
+    hp = HeaderParser.from_headers(ds.headers, filenames=ds.files.filenames)
+    new_ds = dataset_object_from_filenames(hp, inventory=extract_inventory(hp), hdu=1)
+    return new_ds
 
 
 @pytest.fixture(scope="session")
 def croppable_cryo_dataset():
-    return load_dataset(Path(rootdir) / "dataset_1006.asdf")
+    ds = load_dataset(Path(rootdir) / "dataset_1006.asdf")
+    hp = HeaderParser.from_headers(ds.headers, filenames=ds.files.filenames)
+    new_ds = dataset_object_from_filenames(hp, inventory=extract_inventory(hp), hdu=1)
+    return new_ds
