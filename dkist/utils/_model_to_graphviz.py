@@ -3,7 +3,7 @@ This module vizualises compound models by rendering them as a graphviz graph.
 
 It is provided as a helper module which is useful for debugging complex compound models.
 
-It is not tested, incomplete and *should be used at your own risk
+It is not tested, incomplete and *should be used at your own risk*.
 """
 
 from functools import singledispatch
