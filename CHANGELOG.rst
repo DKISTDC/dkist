@@ -1,3 +1,33 @@
+1.1.0 (2023-10-27)
+==================
+
+Backwards Incompatible Changes
+------------------------------
+
+- We now require gwcs 0.19+ and therefore astropy 5.3+ (`#305 <https://github.com/DKISTDC/dkist/pull/305>`_)
+
+
+Features
+--------
+
+- Add a new ``AsymmetricMapping`` model to allow a different mapping in the forward and reverse directions. (`#305 <https://github.com/DKISTDC/dkist/pull/305>`_)
+
+
+Bug Fixes
+---------
+
+- Fix the oversight where, when generating a model for a celestial WCS, the scale model was put before the affine transform in the pipeline. This means that the units for the affine transform matrix provided to ``VaryingCelestialTransform`` and ``generate_celestial_transform`` should be pixels not degrees. (`#305 <https://github.com/DKISTDC/dkist/pull/305>`_)
+- Fix missing references to parent transform schemas in ``Ravel`` and ``VaryingCelestialTransform`` ASDF schemas. (`#305 <https://github.com/DKISTDC/dkist/pull/305>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- To improve compatibility with external libraries that provide ASDF serialization and
+  validation (like asdf-astropy) dkist schemas were updated to use tag wildcards
+  when checking tagged objects (instead of requiring specific tag versions). (`#308 <https://github.com/DKISTDC/dkist/pull/308>`_)
+
+
 v1.0.1 (2023-10-13)
 ===================
 

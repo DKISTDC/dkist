@@ -1,3 +1,0 @@
-To improve compatibility with external libraries that provide ASDF serialization and
-validation (like asdf-astropy) dkist schemas were updated to use tag wildcards
-when checking tagged objects (instead of requiring specific tag versions).
