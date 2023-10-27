@@ -28,7 +28,7 @@ def test_crop_visp_by_time(croppable_visp_dataset):
               croppable_visp_dataset.wcs.pixel_to_world(2554, 975, 400, 3))
     cropped = croppable_visp_dataset.crop([
         SpectralCoord(630.242*u.nm),
-        SkyCoord(-426.41*u.arcsec, 169.40*u.arcsec,
+        SkyCoord(-415.65*u.arcsec, 163.64*u.arcsec,
                  frame="helioprojective",
                  obstime="2022-10-24T19:15:38",
                  observer=coords[0][0].observer),
@@ -37,9 +37,9 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     ],
     [
         SpectralCoord(631.827*u.nm),
-        SkyCoord(-420.85*u.arcsec, 304.45*u.arcsec,
+        SkyCoord(-405.41*u.arcsec, 239.01*u.arcsec,
                  frame="helioprojective",
-                 obstime="2022-10-24T19:18:32",
+                 obstime="2022-10-24T19:15:37",
                  observer=coords[1][0].observer),
         Time("2022-10-24T19:18:32"),
         None,
@@ -68,12 +68,12 @@ def test_crop_visp_by_lonlat(croppable_visp_dataset):
     coords = (croppable_visp_dataset.wcs.pixel_to_world(500, 0, 200, 0),
               croppable_visp_dataset.wcs.pixel_to_world(1000, 977, 600, 4))
 
-    coord0 = SkyCoord(-426.48*u.arcsec, 195.83*u.arcsec,
+    coord0 = SkyCoord(-415.72*u.arcsec, 178.38*u.arcsec,
                       frame="helioprojective",
                       obstime="2022-10-24T19:15:38",
                       observer=coords[0][0].observer)
 
-    coord1 = SkyCoord(-414.74*u.arcsec, 222.36*u.arcsec,
+    coord1 = SkyCoord(-394.63*u.arcsec, 193.23*u.arcsec,
                       frame="helioprojective",
                       obstime="2022-10-24T19:15:38",
                       observer=coords[1][0].observer)
@@ -127,14 +127,25 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
 def test_crop_cryo_by_time(croppable_cryo_dataset):
     coords = (croppable_cryo_dataset.wcs.pixel_to_world(0, 0, 0, 0, 0),
               croppable_cryo_dataset.wcs.pixel_to_world(1751, 1888, 1, 1, 3))
-    coord0 = SkyCoord(-1010.9*u.arcsec, 314.2*u.arcsec,
-                      frame="helioprojective",
-                      obstime="2023-01-01T13:03:13.863",
-                      observer=coords[0][0].observer)
-    coord1 = SkyCoord(-1275.1*u.arcsec, 174.4*u.arcsec,
-                      frame="helioprojective",
-                      obstime="2023-01-01T13:03:13.863",
-                      observer=coords[1][0].observer)
+    coord0 = SkyCoord(-1011.06*u.arcsec, 314.09*u.arcsec,
+                      frame=coords[0][0].frame)
+    # coord0 = SkyCoord(-1010.92*u.arcsec, 314.17*u.arcsec,
+                      # frame="helioprojective",
+                      # obstime="2023-01-01T13:03:13.863",
+                      # observer=coords[0][0].observer)
+    coord1 = SkyCoord(-1275.20*u.arcsec, 174.27*u.arcsec,
+                      frame=coords[1][0].frame)
+    # coord1 = SkyCoord(-1275.06*u.arcsec, 174.35*u.arcsec,
+                      # frame="helioprojective",
+                      # obstime="2023-01-01T13:03:13.863",
+                      # observer=coords[1][0].observer)
+
+    timecoords = []
+    times = []
+    for scan in range(3):
+        for measurement in range(3):
+            timecoords.append(croppable_cryo_dataset.wcs.pixel_to_world(0, 0, measurement, scan, 0))
+            times.append(timecoords[-1][1])
 
     cropped = croppable_cryo_dataset.crop([
         coord0,
