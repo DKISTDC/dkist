@@ -9,6 +9,7 @@ from dkist.data.test import rootdir
                         rootdir / "eit_dataset-0.3.0.asdf",
                         rootdir / "eit_dataset-1.0.0.asdf",
                         rootdir / "eit_dataset-1.1.0.asdf",
+                        rootdir / "eit_dataset-1.2.0.asdf",
 ])
 def eit_dataset_asdf_path(request):
     return request.param

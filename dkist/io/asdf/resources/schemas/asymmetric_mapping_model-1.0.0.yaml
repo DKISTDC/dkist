@@ -1,0 +1,30 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/asymmetric_mapping_model-1.0.0"
+title: >
+  Reorder, add and drop axes with different mappings in forward and reverse transforms.
+
+definitions:
+  mapping:
+    type: array
+    items:
+      type: integer
+
+allOf:
+  - $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.2.0"
+  - properties:
+      forward_n_inputs:
+        description: |
+          Explicitly set the number of input axes in the forward direction.
+        type: integer
+      backward_n_inputs:
+        description: |
+          Explicitly set the number of input axes in the backward direction.
+        type: integer
+      forward_mapping:
+        $ref: "#/definitions/mapping"
+      backward_mapping:
+        $ref: "#/definitions/mapping"
+    required: [forward_mapping, backward_mapping]
+...

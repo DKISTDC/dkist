@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from packaging.version import Version
 
 import asdf
 import astropy.table
@@ -86,7 +87,7 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.1.0"
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.2.0"
         assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
@@ -171,3 +172,24 @@ def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
 
     expected_call = call((slice(0, chunksize[0], None), slice(0, chunksize[1], None)))
     assert expected_call in mocked.mock_calls
+
+
+def test_read_wcs_with_backwards_affine():
+    """
+    This test is a regression test for ASDF files with VCTs in them which were
+    written when we incorrectly put the scale before the affine transform in the
+    gWCS transforms.
+    """
+    # This test will only pass with the split axes fix in gwcs
+    dataset = dkist.load_dataset(rootdir / "test_old_wcs_BRMQY.asdf")
+    wcs = dataset.wcs
+    pixel_inputs = [0] * wcs.pixel_n_dim
+    world_outputs = wcs.pixel_to_world_values(*pixel_inputs)
+
+    # Assert that our stokes fixing code has worked.
+    assert world_outputs[-1] == 1
+
+    if Version(gwcs.__version__) > Version("0.20.dev0"):
+        pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
+
+        assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)

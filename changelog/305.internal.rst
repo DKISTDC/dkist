@@ -1,0 +1,1 @@
+Remove all ``*Slit`` varying celestial transform models and replace them with a compound model combining a ``VaryingCelestialTransform`` and an ``AsymmetricMapping``.

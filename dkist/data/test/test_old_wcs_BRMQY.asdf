@@ -1,0 +1,349 @@
+#ASDF 1.0.0
+#ASDF_STANDARD 1.5.0
+%YAML 1.1
+%TAG ! tag:stsci.edu:asdf/
+--- !core/asdf-1.1.0
+asdf_library: !core/software-1.0.0 {author: The ASDF Developers, homepage: 'http://github.com/asdf-format/asdf',
+  name: asdf, version: 2.15.1}
+history:
+  extensions:
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension.BuiltinExtension
+    software: !core/software-1.0.0 {name: asdf, version: 2.15.1}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.1.dev4+g1d8a460}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf_astropy._manifest.CompoundManifestExtension
+    extension_uri: asdf://asdf-format.org/core/extensions/core-1.5.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.0.0
+    software: !core/software-1.0.0 {name: gwcs, version: 0.18.3}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/transform/extensions/transform-1.5.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-wcs-1.1.0
+    software: !core/software-1.0.0 {name: dkist, version: 1.0.1.dev4+g1d8a460}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://sunpy.org/extensions/sunpy-1.0.0
+    software: !core/software-1.0.0 {name: sunpy, version: 4.1.3}
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension._manifest.ManifestExtension
+    extension_uri: asdf://asdf-format.org/astronomy/coordinates/extensions/coordinates-1.0.0
+    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
+dataset: !<asdf://dkist.nso.edu/tags/dataset-1.1.0>
+  data: !<asdf://dkist.nso.edu/tags/file_manager-1.0.0>
+    datatype: float64
+    fileuris:
+    - ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
+      '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27',
+      '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
+      '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53',
+      '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66',
+      '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79',
+      '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91', '92',
+      '93', '94', '95', '96', '97', '98', '99']
+    - ['100', '101', '102', '103', '104', '105', '106', '107', '108', '109', '110',
+      '111', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121',
+      '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132',
+      '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143',
+      '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154',
+      '155', '156', '157', '158', '159', '160', '161', '162', '163', '164', '165',
+      '166', '167', '168', '169', '170', '171', '172', '173', '174', '175', '176',
+      '177', '178', '179', '180', '181', '182', '183', '184', '185', '186', '187',
+      '188', '189', '190', '191', '192', '193', '194', '195', '196', '197', '198',
+      '199']
+    - ['200', '201', '202', '203', '204', '205', '206', '207', '208', '209', '210',
+      '211', '212', '213', '214', '215', '216', '217', '218', '219', '220', '221',
+      '222', '223', '224', '225', '226', '227', '228', '229', '230', '231', '232',
+      '233', '234', '235', '236', '237', '238', '239', '240', '241', '242', '243',
+      '244', '245', '246', '247', '248', '249', '250', '251', '252', '253', '254',
+      '255', '256', '257', '258', '259', '260', '261', '262', '263', '264', '265',
+      '266', '267', '268', '269', '270', '271', '272', '273', '274', '275', '276',
+      '277', '278', '279', '280', '281', '282', '283', '284', '285', '286', '287',
+      '288', '289', '290', '291', '292', '293', '294', '295', '296', '297', '298',
+      '299']
+    - ['300', '301', '302', '303', '304', '305', '306', '307', '308', '309', '310',
+      '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '321',
+      '322', '323', '324', '325', '326', '327', '328', '329', '330', '331', '332',
+      '333', '334', '335', '336', '337', '338', '339', '340', '341', '342', '343',
+      '344', '345', '346', '347', '348', '349', '350', '351', '352', '353', '354',
+      '355', '356', '357', '358', '359', '360', '361', '362', '363', '364', '365',
+      '366', '367', '368', '369', '370', '371', '372', '373', '374', '375', '376',
+      '377', '378', '379', '380', '381', '382', '383', '384', '385', '386', '387',
+      '388', '389', '390', '391', '392', '393', '394', '395', '396', '397', '398',
+      '399']
+    shape: [1, 981, 2555]
+    target: 1
+  meta:
+    headers: !<tag:astropy.org:astropy/table/table-1.0.0>
+      colnames: []
+      columns: []
+      qtable: false
+    inventory:
+      asdfObjectKey: pid_2_67/BRMQY/VISP_L1_20230828T203650_BRMQY.asdf
+      averageDatasetSpatialSampling: 0.041633856922138134
+      averageDatasetSpectralSampling: 0.001046311530480141
+      averageDatasetTemporalSampling: 79.86088999999663
+      boundingBox: (0.64,-3.28),(-237.69,-20.61)
+      browseMovieObjectKey: pid_2_67/BRMQY/BRMQY.mp4
+      bucket: data
+      calibrationDocumentationUrl: https://docs.dkist.nso.edu/projects/visp/en/v2.7.2/l0_to_l1_visp.html
+      contributingExperimentIds: [eid_2_67]
+      contributingProposalIds: [pid_2_67]
+      datasetId: BRMQY
+      datasetInventoryId: 5832
+      datasetSize: 0
+      endTime: '2023-08-28T20:39:30.631000'
+      exposureTime: 120.00180281690142
+      frameCount: 400
+      hasAllStokes: true
+      hasSpectralAxis: true
+      hasTemporalAxis: true
+      headerDataUnitCreationDate: '2023-09-22T01:06:55.749000'
+      headerDocumentationUrl: https://docs.dkist.nso.edu/projects/data-products/en/v3.7.1
+      headerVersion: 3.7.1
+      highLevelSoftwareVersion: Pono_2.1.0
+      infoUrl: https://docs.dkist.nso.edu
+      inputDatasetCalibrationFramesPartId: 974
+      inputDatasetObserveFramesPartId: 973
+      inputDatasetParametersPartId: 769
+      instrumentName: VISP
+      instrumentProgramExecutionId: id.131746.776418
+      observingProgramExecutionId: eid_2_67_opeCrnOU_R001.130652.5687392
+      originalFrameCount: 400
+      primaryExperimentId: eid_2_67
+      primaryProposalId: pid_2_67
+      qualityAverageFriedParameter: 0.7195771944693979
+      qualityAveragePolarimetricAccuracy: null
+      qualityReportObjectKey: pid_2_67/BRMQY/BRMQY.pdf
+      recipeId: 1
+      recipeInstanceId: 831
+      recipeRunId: 1111
+      startTime: '2023-08-28T20:36:50.909000'
+      stokesParameters: IQUV
+      targetTypes: [sunspot]
+      wavelengthMax: 393.9221094537096
+      wavelengthMin: 392.89672415383905
+      workflowName: l0_to_l1_visp
+      workflowVersion: 2.7.2
+  unit: !unit/unit-1.0.0 count
+  wcs: !<tag:stsci.edu:gwcs/wcs-1.0.0>
+    name: ''
+    steps:
+    - !<tag:stsci.edu:gwcs/step-1.0.0>
+      frame: !<tag:stsci.edu:gwcs/frame-1.0.0>
+        axes_names: [spatial along slit, dispersion axis, raster scan step number,
+          polarization state]
+        axes_order: [0, 1, 2, 3]
+        axes_type: [PIXEL, PIXEL, PIXEL, PIXEL]
+        axis_physical_types: ['custom:PIXEL', 'custom:PIXEL', 'custom:PIXEL', 'custom:PIXEL']
+        name: pixel
+        naxes: 4
+        unit: [!unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel,
+          !unit/unit-1.0.0 pixel]
+      transform: !transform/compose-1.2.0
+        forward:
+        - !transform/compose-1.2.0
+          forward:
+          - !transform/remap_axes-1.3.0
+            inputs: [x0, x1, x2, x3]
+            mapping: [1, 0, 2, 3]
+            outputs: [x0, x1, x2, x3]
+          - !transform/concatenate-1.2.0
+            forward:
+            - !transform/linear1d-1.0.0
+              inputs: [x]
+              intercept: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 nm,
+                value: 392.89672415383905}
+              outputs: [y]
+              slope: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 nm.pixel**-1,
+                value: 0.001046311530480141}
+            - !<asdf://dkist.nso.edu/tags/coupled_compound_model-1.0.0>
+              forward:
+              - !<asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0>
+                cdelt: !unit/quantity-1.1.0
+                  unit: !unit/unit-1.0.0 arcsec.pixel**-1
+                  value: !core/ndarray-1.0.0
+                    source: 1
+                    datatype: float64
+                    byteorder: little
+                    shape: [2]
+                crpix: !unit/quantity-1.1.0
+                  unit: !unit/unit-1.0.0 pixel
+                  value: !core/ndarray-1.0.0
+                    source: 0
+                    datatype: float64
+                    byteorder: little
+                    shape: [2]
+                crval_table: !unit/quantity-1.1.0
+                  unit: !unit/unit-1.0.0 arcsec
+                  value: !core/ndarray-1.0.0
+                    source: 2
+                    datatype: float64
+                    byteorder: little
+                    shape: [100, 2]
+                inputs: [along_slit, raster]
+                lon_pole: 180.0
+                outputs: [lon, lat]
+                pc_table: !unit/quantity-1.1.0
+                  unit: !unit/unit-1.0.0 arcsec
+                  value: !core/ndarray-1.0.0
+                    source: 3
+                    datatype: float64
+                    byteorder: little
+                    shape: [100, 2, 2]
+                projection: !transform/gnomonic-1.2.0
+                  direction: pix2sky
+                  inputs: [x, y]
+                  outputs: [phi, theta]
+              - !transform/concatenate-1.2.0
+                forward:
+                - !transform/tabular-1.2.0
+                  bounds_error: false
+                  fill_value: .nan
+                  inputs: [x]
+                  lookup_table: !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0 s
+                    value: !core/ndarray-1.0.0
+                      source: 4
+                      datatype: float64
+                      byteorder: little
+                      shape: [100]
+                  method: linear
+                  outputs: [y]
+                  points:
+                  - !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0 pixel
+                    value: !core/ndarray-1.0.0
+                      source: 5
+                      datatype: float64
+                      byteorder: little
+                      shape: [100]
+                - !transform/tabular-1.2.0
+                  bounds_error: false
+                  fill_value: .nan
+                  inputs: [x]
+                  lookup_table: !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0
+                    value: !core/ndarray-1.0.0
+                      source: 6
+                      datatype: float64
+                      byteorder: little
+                      shape: [4]
+                  method: nearest
+                  outputs: [y]
+                  points:
+                  - !unit/quantity-1.1.0
+                    unit: !unit/unit-1.0.0 pixel
+                    value: !core/ndarray-1.0.0
+                      source: 7
+                      datatype: float64
+                      byteorder: little
+                      shape: [4]
+                inputs: [x0, x1]
+                outputs: [y0, y1]
+              inputs: [along_slit, raster, x1]
+              outputs: [lon, lat, y0, y1]
+              shared_inputs: 1
+            inputs: [x, along_slit, raster, x1]
+            outputs: [y, lon, lat, y0, y1]
+          inputs: [x0, x1, x2, x3]
+          outputs: [y, lon, lat, y0, y1]
+        - !transform/remap_axes-1.3.0
+          inputs: [x0, x1, x2, x3, x4]
+          mapping: [1, 0, 2, 3, 4]
+          outputs: [x0, x1, x2, x3, x4]
+        inputs: [x0, x1, x2, x3]
+        outputs: [x0, x1, x2, x3, x4]
+    - !<tag:stsci.edu:gwcs/step-1.0.0>
+      frame: !<tag:stsci.edu:gwcs/composite_frame-1.0.0>
+        frames:
+        - !<tag:stsci.edu:gwcs/spectral_frame-1.0.0>
+          axes_names: [wavelength]
+          axes_order: [1]
+          axis_physical_types: [em.wl]
+          name: wavelength
+          unit: [!unit/unit-1.0.0 nm]
+        - !<tag:stsci.edu:gwcs/celestial_frame-1.0.0>
+          axes_names: [helioprojective latitude, helioprojective longitude]
+          axes_order: [0, 2]
+          axis_physical_types: ['custom:pos.helioprojective.lat', 'custom:pos.helioprojective.lon']
+          name: helioprojective
+          reference_frame: !<tag:sunpy.org:sunpy/coordinates/frames/helioprojective-1.0.0>
+            frame_attributes:
+              observer: !<tag:sunpy.org:sunpy/coordinates/frames/heliographic_stonyhurst-1.1.0>
+                data: !<tag:astropy.org:astropy/coordinates/representation-1.0.0>
+                  components:
+                    x: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 m,
+                      value: 149939806198.4426}
+                    y: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 m,
+                      value: 3002952.1385555267}
+                    z: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 m,
+                      value: 18739387743.10277}
+                  type: CartesianRepresentation
+                frame_attributes:
+                  obstime: !time/time-1.1.0 2023-08-28T20:38:11.577
+                  rsun: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 km,
+                    value: 695700.0}
+              obstime: !time/time-1.1.0 2023-08-28T20:38:11.577
+              rsun: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 km,
+                value: 695700.0}
+          unit: [!unit/unit-1.0.0 arcsec, !unit/unit-1.0.0 arcsec]
+        - !<tag:stsci.edu:gwcs/temporal_frame-1.0.0>
+          axes_names: [time]
+          axes_order: [3]
+          axis_physical_types: [time]
+          name: temporal
+          reference_frame: !time/time-1.1.0 2023-08-28T20:36:50.909
+          unit: [!unit/unit-1.0.0 s]
+        - !<tag:stsci.edu:gwcs/stokes_frame-1.0.0>
+          axes_order: [4]
+          name: polarization state
+        name: CompositeFrame
+      transform: null
+...
+ÓBLK 0                             ô†N˜by°N± *ĞJúnHN¾PH@_×YX˜+“@ÓBLK 0                             =áWØæîæ´CN!ÏS7>n|ÔJ«?ğ;¶x®?ÓBLK 0              @      @      @/µ‚™S<º[HşpG£«Û(|ŸÚË?5Ä¯e²>‘Uë+Cp¿RÓ,º¹¿fËJº.€¿KühÔ”,¿ÑÔ_läp¿~ñğVp¿72j‹C€¿š³’ó¹,¿©/Ià_¿$¼Ë'¿×ÌÉ°;x¿·+¦hçf%¿G©µ(Œà_¿ä¾G'¿P>ßıVex¿#iLÖØ‹%¿ĞÏ%Ç’?„¿'Ó'2â1¿a±›ô°;x¿¨¹P®Hg%¿i6˜?„¿‚ídâ1¿\“Káp¿h_6”aq¿’Şğ2†C€¿ğ$»,¿ñÎÿ°Üp¿óH]q«q¿Ã£±.€¿©Rƒ~›–,¿(ç*eà_¿’=¹ W(¿ˆPş[Ÿ;x¿2óª[ñg%¿7L]‡C`¿Ïh0ü¸»¿àŞ^L ;x¿èÄˆ(h%¿¡r	Ñ?…AöGd²>N¾ âp¿²É]Ú™r¿7ã€o‹?„¿€MÍ
+Aã1¿FNƒÒp¿+ºr÷ªr¿Q¯}C€¿üèÆz„¼,¿vDVßuCp¿[AèŠª¼¿|8ÅÚ€¿ê‡‡Hs,¿E`ƒSà_¿úQ#} )¿
+™„ƒóx¿BF42D%¿€”ê2Xà_¿…ÀMç)¿ÕÄ“×‰;x¿G|-i%¿Éb3ƒ?„¿¹£Îúã1¿}ÒÔp¿à’Vïs¿x´E5~?„¿åÎ"ä1¿¯·*ùiào¿m½àØµ*¿ópF¤.€¿üTÂù™,¿(Îi†Kà_¿gÕ¿sÍ*¿HhÓpC€¿è¾w'¾,¿}˜eëCà_¿s¹ø+¿×$—N„;x¿@Úñj%¿®­#2_à_¿;Ä…+¿aE;x¿|õG0*j%¿îáä[|?„¿\"hÑØä1¿Î}‹9Ìp¿ßŠiWu¿Ê'Œz?„¿}Ašå1¿¿4 4Ğp¿’_|…ªu¿WÈñ{hC€¿ÚşZ­Q¿,¿¢ŒDsà_¿—phf,¿…CTZ—.€¿&óß¦Åš,¿‘‚­IqC`¿×Îî³¿¿›–ks;x¿±+k%¿ƒLûŞÍ?ç¸o@ei²>‚øØw;x¿ª]=ÓFk%¿}qœRèĞ?‡‡İ@&l²>ÌıõXÂp¿ÂÍ0öÀv¿ÿB›˜n?„¿1lkÛçå1¿dÃp¿Ô^
+w¿uÜV¿€¿1ÿ&èw,¿Bâ_C`¿daÃËÀ¿·‘.€¿Ì'î¤)œ,¿X§†Ğ9_¿àÑr~Æš¿4qÔmu;x¿ß E#)l%¿y”xad?„¿ÃÏìkæ1¿ÿ`Ô‰s;x¿Ö¯æ“Pl%¿šVGf?„¿Ù?#€æ1¿ßè•‡¼p¿®Ò†Á9x¿:éÆx.€¿Æ4[”,¿ö·Ë)ào¿»r²¼.¿/¢ğüº€¿)lê»‹x,¿Å²Ã3à_¿j–É}./¿;g¦_‹.€¿ÚºcŸ,¿˜¢äC6à_¿M[ó*/¿§á×k;x¿D¥?è+m%¿ª¼¿_?„¿Ì³ÓQç1¿t}jn;x¿°q)çjm%¿‘4ğ_Z?„¿ÏÜ}ç1¿$jaÿ¼p¿lš‘y¿ÄY„.€¿Ä­c,¿ïBä ào¿Àpy*0¿Åˆ·….€¿¤
++Ğ¹,¿¦ñ–Üà_¿ƒ­û²p0¿&Pdı»x¿Ãƒ¬DI%¿Š»ÿà_¿@Z,„0¿I)[z^;x¿GlMn%¿­½7Y?„¿@6Ãİ9è1¿/ù5d];x¿4ş~kn%¿¼ÆÉÒ}Î?E› ûŞg²>ä•²p¿˜‡¹üz¿%2ÑÁ.€¿¡9Õ‡æŸ,¿ÿ*/s³p¿œÖÑBB{¿8FŸj¦€¿&âŠ÷2{,¿Ctü\q9_¿*$#sI¿ÉJùdx¿=ê>Rä“%¿Òcçhÿß_¿¶ìW@2¿ŒSÆT;x¿‰©¤ @o%¿ÿò¶¾K?„¿Á	ålé1¿C[`mào¿ÏØˆa2¿ÏöYK³Ï?k>/Ïp²>Ôâ‹ş¦p¿ÆÌd|¿ñÃ ³w.€¿öUkB¡,¿ÓBLK 0              €      €      €g†Î²4C˜8o¡”8)¢•5Œ¡»?jùRŸğ±á?Òm ü¿"vê¡»?óNûjH¦»?S/=ç±á?õÌA´^ ü¿|7e´¦¦»?>ô¸«»?„EÜİ±á??JéO ü¿‹ğBb«»?œ¤Á/æ¯»?Ûñ*Ô±á?µ/¡@ ü¿~à…D°»?t6¤´»?—_(ÁÊ±á?izÈ1 ü¿éíƒµ»?»%)a¹»?"ÇìLÁ±á?ÍµOä" ü¿­²kˆ¿¹»?­ú! ¾»?ö–;ß·±á?yZ ü¿_Ã~¾»?Îiù’Ã»?]ÊC"®±á?Æ†ª ü¿Á¦ıbÃ»?š\âÅÇ»?"`X­¤±á?¶ß¿õÿû¿øğXq#È»?J¤æ…„Ì»?šl8›±á?TŒÕæÿû¿`ıøâÌ»?ŒYÂWkÑ»?”ğŞr‘±á?:&
+m×ÿû¿íÒÉÑ»?-		Ë,Ö»?Ë8“î‡±á?mŸmÈÿû¿4dF‹Ö»?ç†2ÄîÚ»?5!~n~±á?;4 s¹ÿû¿ }SIMÛ»?áÆù7²ß»?Ä’ët±á?Ñäøqªÿû¿@2ÿ¿à»?)G¼Ãšä»?˜ï“k±á?ÕÉBùšÿû¿ÎSùä»? ¢Ûn_é»?|™´’a±á?on ï‹ÿû¿iP·¾é»?fgP#î»?èŞñX±á?q©iå|ÿû¿
+ˆ ­î»?EÆğ èò»?ÁÒfsN±á?›ÿhÊmÿû¿ĞÄ…¿Fó»?{şñ²Ô÷»?Ú?É”D±á?‚@/:^ÿû¿qü­X3ø»?ü7Cšü»?7‚;±á?(J™"Oÿû¿¥p»ìøü»?¤=Ia¼?i‹Ém1±á?´Iğ@ÿû¿{à{Ä¿¼?Œ"œ(¼?ï–BÔ'±á?ƒÛhá0ÿû¿ÿ9R‡¼?@¯¼?ê€ ì±á?«•{@!ÿû¿{Ø{Àu¼?2xy«ß¼?O~ÊL±á?³\›ÿû¿}6Um>¼?eC³Â©¼?ói2£
+±á?U,òØÿû¿Hãî…¼?ËĞÈò™¼?–å° ±á?ñ'4*óşû¿*på¾ø¼?†ĞUÄc¼?zå¤÷°á?ä¥¦òãşû¿7\T“Â¼?$=×.#¼?G!®`í°á?²Ùy´Ôşû¿'à¯#¼?Á²¡ú'¼?0&ğ³ã°á?gÌcqÅşû¿§èC}Y(¼?Zt6Uí,¼?ÖéèµÙ°á?{¹¯µşû¿'I´8L-¼?†HÚQº1¼?>2ÍüÏ°á?×¢œ[¦şû¿–ŸÖ72¼?®,lò‡6¼?ËÈ‰GÆ°á?©…¯
+—şû¿ÄP<Ûæ6¼?¤`qV;¼?]¼°á?;ÍŒµ‡şû¿pµ;¼?SÙeK@¼?³^*…²°á?ô…àwşû¿;+‡Yª@¼?ÉÊ¾E¼?ĞDÓÅ¨°á?Eã‚hşû¿¾=]»yE¼?‡‘ÏêI¼?™}…Ÿ°á?Æ#²Yşû¿4ÔĞIJ¼?+Y»N¼?k=:•°á?ôºé°Işû¿ki(aO¼?¿òø³S¼?£º$‹°á?•pRÆ9şû¿V©ÑT¼?kÿ„X¼?Ó‘Z°á?1uÒW*şû¿s&ÀäX¼?%äHƒW]¼?/¾w°á?k0ááşû¿£åœš¶]¼?PËH'Qb¼?†š’nm°á?s·µë
+şû¿9À€F°b¼?:Àç$g¼?CÔ›c°á?LŠdlûıû¿_Ÿ
+„g¼?¨
+ª;ùk¼?W­G¿Y°á?M àëıû¿— ë_Xl¼?Ü+~Îp¼?È\åO°á?==ËWÜıû¿G­cD-q¼?@`Êu¼?ã·[»E°á?»NÌıû¿	ñ)v¼?b§x z¼?N·Û;°á?~b¼¼ıû¿İR@±ÿz¼?	kÍx¼?Ë{¬ø1°á?(Ø>#­ıû¿ò*M×¼?™|{›N„¼?˜;¾(°á?‚ÇÏŠıû¿ªÕtà­„¼?}µ«bM‰¼?B´pÕ°á?ÁÖcıû¿_i¨¬‰¼?Šä—¸&¼?¸òè°á?D•$¼}ıû¿°B†¼?İV:ÿ’¼?Õ”Ôü	°á?ƒº9nıû¿£`’‹^“¼?-mÙ—¼?py| °á? §şf^ıû¿]Z8˜¼?ş5-`Úœ¼?6ÌÈõ¯á?ºŞÿ6Nıû¿–ç¼9¼?ÃaCiµ¡¼?Ú‡9Òë¯á?á©D>ıû¿©îmÊ¢¼?vğ;'‘¦¼?Ø÷3Øá¯á?2±zÃ.ıû¿¼@ğ¦¼?­/e”«¼?úl„×¯á?H'zıû¿:+Îó«¼?Æ†õFq°¼?7BrƒÍ¯á?Ë~´´ıû¿¹â¹Ğ°¼?É0äNµ¼? µrÃ¯á?€g-êşüû¿QvY®µ¼?Aö›È-º¼?ô‰‘y¹¯á?ÚyÇïüû¿1Fº¼?è×2¿¼?íğç"¯¯á? ß˜ÈŞüû¿<qØW’¿¼?Üsœ3Ä¼?ºT’¥¯á?	»'ğÎüû¿¹Á½qÄ¼?k/G@òÈ¼?¡$8 ›¯á?ÜÛ¿üû¿µdŠËQÉ¼?åõÒÍ¼?ùÀ7ï¯á?wÙ–&¯üû¿¢¿†ƒ2Î¼?Ÿ´¤=ÛÒ¼?'Út‰†¯á?Î˜Àüû¿÷êtÓ:Ó¼?hÁ2½×¼?p.r|¯á?MP¶Ôüû¿Öù!ÌØ¼?(ã¨ŸÜ¼?åÖÑVr¯á?Ótsä~üû¿”ëJÿÜ¼?²‹aÙ‚á¼?qóZ9h¯á?)ïnüû¿ó×âá¼?Ù¨æ¼?«Ö¿]¯á?|}l^üû¿EÍSíæ¼?W‚rë¼?b¹{œS¯á? [mNüû¿ŞÉÑë¼?
+¯Wğ¼?1œuI¯á?Ú£i>üû¿÷ÑÉÅ¶ğ¼?;GÜòcõ¼?£ú|ú>¯á?€“¥à-üû¿×‘©¬Ãõ¼?—	(Jú¼?ÍÆèÌ4¯á?ƒÓüû¿jMrê©ú¼?š4¥1ÿ¼?Óa*¯á?{:Áüû¿%‚¨Şÿ¼?H4’ ½?²Íe ¯á?³H£ıûû¿oS&hx½?
+GBú'	½?'¹Ü¯á?Ñ}íûû¿ı vÊ‡	½?êuÌ½?âM@¤¯á?Ê¹¾åÜûû¿p4\Ÿp½?^Â×ú½?‘Şsg¯á?’µ€ÀÌûû¿ÀâXûY½?;;/ä½?MF´(÷®á?í–¼ûû¿z¸BD½?Æqö½?èvî“ì®á?Œj˜å«ûû¿™ªÌV½?Ù6já!½?]š8Jâ®á?v«Ã«›ûû¿„«ÑSA"½?T+–?Í&½?~bØ®á?¸7s‹ûû¿½ë0-'½?ÀÅ~Ğ¹+½?òí[¶Í®á?€Y=5{ûû¿[¡[Å,½?ŠæTÎ0½?­FµÃ®á?«K±pjûû¿ÎÀSR.1½?-…`*¼5½?m¸²Ã¸®á?ï )Zûû¿4!z*6½?ä±-ª:½?‡8o®®á?^›yÜIûû¿ŠÂ¤¢
+;½? ttÁ?½?iÄ£®á?ÉÄ9ûû¿·Ä!!@½?’‘ä­°D½?4ğşc™®á?!«(ûû¿¨?ÁºE½?<Ò¡I½?…§6®á?QPûû¿}¿J½?°ÈÕû‘N½?g¹Ç¤„®á?B21ğûû¿T»òN½?®…?«S½?¯jíy®á?’D÷úû¿|Ø,T½?Ê!¡IX½?£Ò†o®á?[]>æúû¿$…ÂmıX½?ïÜ‹
+]½?}e®á?i‰µ/Öúû¿²$7ğ]½?ğ„’I„b½?*}¼¤Z®á?q“*°Åúû¿´xäb½?h)Ÿg½?iâO®á?b­¶´úû¿ãÕ^ÿg½?ÓÍ{í“l½?ì«nE®á?	éĞ8¤úû¿»y5&ôl½?´eïQ‰q½?šT7ø:®á?íj*¶“úû¿±#éq½?á1ö9v½??I™}0®á?¡Wû.ƒúû¿}î©~ßv½?Å$’‚{½?ÏYé¬%®á?¨â×rúû¿)õ¶Êı{½?òLÂ”€½?¾Ä%®á?#ÖÖƒaúû¿èZ±õ€½?Ó·²®Œ…½?Í:¢®á?„\íPúû¿Ô™ˆÿì…½?ÓBLK 0                             Un7Šš÷û+Æ(HFM¸x        @äA`åĞù?`Fd;ßÏ	@rÂõ(\@ ëÒMbĞ@¸_ºI" @@œÂõ(\#@˜®Ê¡E–&@À˜›Ä Ğ)@HÕ£p=
+-@\şU-"0@äh¾Ÿ¿1@(‡Âõ(\3@ø¯ÆK7ù4@€/İ$–6@h×Î÷S38@|L7‰AĞ9@4`;ßOm;@x~?5^
+=@ é§ÆK§>@¢V-"@@~X9´ğ@@H+¿A@*W-²B@À[X9\C@J–Ä °*D@l¥ÆK7ùD@´Èv¾ÇE@ï|?5–F@®ó~j¼dG@•C3H@¬ƒÀÊI@Î…ëQĞI@XV9´ÈJ@ze;ßOmK@Vo=
+×;L@š¤ñÒM
+M@¼³óıÔØM@˜½õ(\§N@hı©ñÒuO@¢V-"P@3×£p‰P@Õ%1¬ğP@Ã*²ïWQ@T2333¿Q@™O—n&R@*W-²R@\ÂõôR@©cX9\S@ôe‘í|ÃS@9ƒëQ¸*T@ÊŠlçû‘T@¸í|?ùT@ ¯Gáz`U@ë±Èv¾ÇU@|¹I/V@ÁÖ£p=–V@¯Û$ıV@@ã¥›ÄdW@âıÿÿÿËW@•C3X@a
++‡šX@¦'\ÂY@àViY@‚1^ºIĞY@¶;ßO7Z@>`åĞZ@é]ºI[@×b;ßOm[@hj¼t“Ô[@­‡ÙÎ;\@ø‰—n£\@‰‘V
+]@Î®rh‘q]@_¶óıÔØ]@M»t“@^@ïÕÎ÷S§^@€İO—_@nâĞ"Ûu_@V+‡İ_@vwé&1"`@j‡ÙÎU`@â	×£p‰`@ª—n½`@ûšÄ °ğ`@r…ëQ$a@:¡E¶óWa@İ¯rh‘‹a@¦3333¿a@Ë´óıÔòa@nÃ °r&b@6GázZb@­É¡E¶b@¡ÙÎ÷SÁb@ÆZÂõôb@àßO—(c@2í|?5\c@ÎäĞ"Ûc@qóıÔxÃc@èu¾Ÿ÷c@ÓBLK 0                             Àº¯åt$}ø’EÍ7"ƒ6              ğ?       @      @      @      @      @      @       @      "@      $@      &@      (@      *@      ,@      .@      0@      1@      2@      3@      4@      5@      6@      7@      8@      9@      :@      ;@      <@      =@      >@      ?@      @@     €@@      A@     €A@      B@     €B@      C@     €C@      D@     €D@      E@     €E@      F@     €F@      G@     €G@      H@     €H@      I@     €I@      J@     €J@      K@     €K@      L@     €L@      M@     €M@      N@     €N@      O@     €O@      P@     @P@     €P@     ÀP@      Q@     @Q@     €Q@     ÀQ@      R@     @R@     €R@     ÀR@      S@     @S@     €S@     ÀS@      T@     @T@     €T@     ÀT@      U@     @U@     €U@     ÀU@      V@     @V@     €V@     ÀV@      W@     @W@     €W@     ÀW@      X@     @X@     €X@     ÀX@ÓBLK 0                                üo ·ÒQÄ.fĞ›A4              ğ?       @      @ÓBLK 0                                üo ·ÒQÄ.fĞ›A4              ğ?       @      @#ASDF BLOCK INDEX
+%YAML 1.1
+---
+- 15070
+- 15140
+- 15210
+- 16864
+- 20118
+- 20972
+- 21826
+- 21912
+...

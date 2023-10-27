@@ -1,0 +1,1 @@
+Fix the oversight where, when generating a model for a celestial WCS, the scale model was put before the affine transform in the pipeline. This means that the units for the affine transform matrix provided to ``VaryingCelestialTransform`` and ``generate_celestial_transform`` should be pixels not degrees.

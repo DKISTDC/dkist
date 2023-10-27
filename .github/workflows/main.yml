@@ -30,6 +30,7 @@ jobs:
   tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
+      default_python: '3.10'
       coverage: 'codecov'
       envs: |
         - linux: py311

@@ -1,0 +1,1 @@
+We now require gwcs 0.19+ and therefore astropy 5.3+
