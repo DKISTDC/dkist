@@ -151,15 +151,25 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     assert cropped.data.shape[1] == croppable_cryo_dataset.data.shape[1] - 1
     assert cropped.data.shape[2] == croppable_cryo_dataset.data.shape[2] - 1
     assert cropped.data.shape[3:] == croppable_cryo_dataset.data.shape[3:]
-    # Should also test here for consistency of world coords
+
+    orig_coords = croppable_cryo_dataset.axis_world_coords()
+    cropped_coords = cropped.axis_world_coords()
+
+    # Whole coordinte array is too large to compare, so check just the edges
+    assert (cropped_coords[0][0, 0, 0, :] == orig_coords[0][0, 0, 0, :]).all()
+    assert (cropped_coords[0][0, 0, -1, :] == orig_coords[0][0, 0, -1, :]).all()
+    assert (cropped_coords[0][0, 0, :, 0] == orig_coords[0][0, 0, :, 0]).all()
+    assert (cropped_coords[0][0, 0, :, -1] == orig_coords[0][0, 0, :, -1]).all()
+    assert (cropped_coords[1] == orig_coords[1][:2, :2]).all()
+    assert (cropped_coords[2] == orig_coords[2]).all()
 
 
 def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
     coords = (croppable_cryo_dataset.wcs.pixel_to_world(0, 0, 0, 0, 0),
-              croppable_cryo_dataset.wcs.pixel_to_world(1000, 1000, 2, 2, 3))
+              croppable_cryo_dataset.wcs.pixel_to_world(200, 200, 2, 2, 3))
     coord0 = SkyCoord(-1011.1*u.arcsec, 314.1*u.arcsec,
                       frame=coords[0][0].frame)
-    coord1 = SkyCoord(-1153.1*u.arcsec, 231.9*u.arcsec,
+    coord1 = SkyCoord(-1039.5*u.arcsec, 297.6*u.arcsec,
                       frame=coords[1][0].frame)
 
     # Crop using user-defined coords
@@ -176,6 +186,12 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
 
     assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim
     assert cropped.data.shape[:3] == croppable_cryo_dataset.data.shape[:3]
-    assert cropped.data.shape[3] == 1001
-    assert cropped.data.shape[4] == 1001
-    # Should also test here for consistency of world coords
+    assert cropped.data.shape[3] == 201
+    assert cropped.data.shape[4] == 201
+
+    orig_coords = croppable_cryo_dataset.axis_world_coords()
+    cropped_coords = cropped.axis_world_coords()
+
+    assert (cropped_coords[0][0, 0] == orig_coords[0][0, 0, :201, :201]).all()
+    assert (cropped_coords[1] == orig_coords[1]).all()
+    assert (cropped_coords[2] == orig_coords[2]).all()
