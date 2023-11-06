@@ -635,7 +635,7 @@ class Ravel(Model):
         else:
             has_units = False
             input_values = inputs_
-        input_values = [item.flatten() for item in input_values]
+        input_values = [item.flatten() if isinstance(item, np.ndarray) else item for item in input_values]
         # round the index values, but clip them if they exceed the array bounds
         # the bounds are one less than the shape dimension value
         array_bounds = np.array(self.array_shape) - 1
