@@ -413,11 +413,13 @@ def pytest_runtest_call(item):
 
 
 @pytest.fixture(scope="session")
-def croppable_visp_dataset():
-    ds = load_dataset(Path(rootdir) / "VISP_L1_20221024T185745_BKEWK_updated.asdf")
-    hp = HeaderParser.from_headers(ds.headers, filenames=ds.files.filenames)
-    new_ds = dataset_object_from_filenames(hp, inventory=extract_inventory(hp), hdu=1)
-    return new_ds
+def croppable_visp_dataset(tmp_path_factory):
+    vispdir = tmp_path_factory.mktemp("data")
+    # This asdf file is for dataset ID BKEWK
+    with gzip.open(Path(rootdir) / "croppable_visp.asdf.gz", mode="rb") as gfo:
+        with open(vispdir / "croppable_visp.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(vispdir / "croppable_visp.asdf")
 
 
 @pytest.fixture(scope="session")
