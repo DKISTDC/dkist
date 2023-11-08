@@ -19,8 +19,7 @@ def test_crop_visp_by_only_stokes(croppable_visp_dataset):
 
     assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_visp_dataset.data.shape[1:]
-    # This won't be true yet because of bugs in the Stokes WCS
-    # assert (cropped.headers['DINDEX4'] == 1).all()
+    assert (cropped.headers['DINDEX4'] == 1).all()
 
 
 def test_crop_visp_by_time(croppable_visp_dataset):
@@ -107,8 +106,7 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
 
     assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_cryo_dataset.data.shape[1:]
-    # This won't be true yet because of bugs in the Stokes WCS
-    # assert (cropped.headers['DINDEX4'] == 1).all()
+    assert (cropped.headers['DINDEX4'] == 1).all()
 
 
 def test_crop_cryo_by_time(croppable_cryo_dataset):
