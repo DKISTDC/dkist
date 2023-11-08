@@ -29,26 +29,17 @@ def test_crop_visp_by_time(croppable_visp_dataset):
     cropped = croppable_visp_dataset.crop([
         SpectralCoord(630.242*u.nm),
         SkyCoord(-415.65*u.arcsec, 163.64*u.arcsec,
-                 frame="helioprojective",
-                 obstime="2022-10-24T19:15:38",
-                 observer=coords[0][0].observer),
+                 frame=coords[0][0].frame),
         Time("2022-10-24T19:08:09"),
         None,
     ],
     [
         SpectralCoord(631.827*u.nm),
         SkyCoord(-405.41*u.arcsec, 239.01*u.arcsec,
-                 frame="helioprojective",
-                 obstime="2022-10-24T19:15:37",
-                 observer=coords[1][0].observer),
+                 frame=coords[1][0].frame),
         Time("2022-10-24T19:18:32"),
         None,
     ])
-
-    # fig, ax = plt.subplots(figsize=(18, 24))
-    # croppable_visp_dataset.plot(plot_axes=[None, 'y', None, 'x'])
-    # plt.savefig("/home/drew/oss-projects/dkist/plottest")
-    # plt.close()
 
     assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim
     assert cropped.data.shape[0] == croppable_visp_dataset.data.shape[0]
@@ -70,15 +61,9 @@ def test_crop_visp_by_lonlat(croppable_visp_dataset):
 
     coord0 = SkyCoord(-415.72*u.arcsec, 178.38*u.arcsec,
                       frame=coords[0][0].frame)
-                      # frame="helioprojective",
-                      # obstime="2022-10-24T19:15:38",
-                      # observer=coords[0][0].observer)
 
     coord1 = SkyCoord(-394.63*u.arcsec, 193.23*u.arcsec,
-                      frame=coords[0][0].frame)
-                      # frame="helioprojective",
-                      # obstime="2022-10-24T19:15:38",
-                      # observer=coords[1][0].observer)
+                      frame=coords[1][0].frame)
 
     cropped = croppable_visp_dataset.crop([
         SpectralCoord(630.242*u.nm),
