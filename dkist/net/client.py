@@ -21,6 +21,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
 from sunpy.util.net import parse_header
 
 from dkist.utils.inventory import INVENTORY_KEY_MAP
+from dkist.utils.net import INVENTORY_ATTR_MAP
 
 from . import attrs as dattrs
 from .attr_walker import walker
@@ -266,9 +267,15 @@ class DKISTClient(BaseClient):
         """
         Known search values for DKIST data, currently manually specified.
         """
-        return {
+        data = urllib.request.urlopen('https://api.dkistdc.nso.edu/datasets/v1/searchValues')
+        search_values = json.loads(data.read())
+        search_values = {param["parameterName"]: param["values"] for param in search_values["parameterValues"]}
+        minexpt = float(search_values["exposureTimeMin"]["minValue"])
+        maxexpt = float(search_values["exposureTimeMax"]["maxValue"])
+        return_values = {
             sattrs.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
             # instrumentNames
+            # Using these descriptions instead of auto-populating because they're more useful
             sattrs.Instrument: [("VBI", "Visible Broadband Imager"),
                                 ("VISP", "Visible Spectro-Polarimeter"),
                                 ("VTF", "Visible Tunable Filter"),
@@ -283,6 +290,19 @@ class DKISTClient(BaseClient):
             # targetTypes
             #dattrs.TargetType: [],  # This should be a controlled list.
 
+            # Time - Time attr allows times in the full range but start and end time are given separately by the DKIST API
+            sattrs.Time: [("time", f"Min: {search_values['startTimeMin']['minValue']}; max: {search_values['endTimeMax']['maxValue']}.")],
+
             # Completeness
             sattrs.Level: [("1", "DKIST data calibrated to level 1.")],
         }
+
+        for key in INVENTORY_ATTR_MAP["categorical"].keys():
+            k = INVENTORY_ATTR_MAP["categorical"][key]
+            return_values[k["attr"]] = [(name, k["desc"]) for name in search_values[key]["categoricalValues"]]
+
+        for key in INVENTORY_ATTR_MAP["range"].keys():
+            k = INVENTORY_ATTR_MAP["range"][key]
+            return_values[k["attr"]] = [(key, k["desc"]+f" {search_values[key+'Min']['minValue']}-{search_values[key+'Max']['maxValue']}.")]
+
+        return return_values
