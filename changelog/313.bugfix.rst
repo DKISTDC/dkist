@@ -1,0 +1,2 @@
+Bump minimum version of asdf to 2.11.2 to pick up jsonschema bugfix.
+Bump test skip version of gwcs to 0.21.0dev
