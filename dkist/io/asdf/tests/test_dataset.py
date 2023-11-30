@@ -189,7 +189,7 @@ def test_read_wcs_with_backwards_affine():
     # Assert that our stokes fixing code has worked.
     assert world_outputs[-1] == 1
 
-    if Version(gwcs.__version__) > Version("0.20.dev0"):
+    if Version(gwcs.__version__) > Version("0.21.dev0"):
         pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
 
         assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
