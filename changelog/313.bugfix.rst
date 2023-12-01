@@ -1,0 +1,1 @@
+Bump minimum version of asdf to 2.11.2 to pick up jsonschema bugfix.
