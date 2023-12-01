@@ -64,9 +64,9 @@ def load_dataset(target):
     World Dim  Axis Name                  Physical Type                   Units
             0  stokes                     phys.polarization.stokes        unknown
             1  time                       time                            s
-            2  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
             3  wavelength                 em.wl                           nm
-            4  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            4  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
     <BLANKLINE>
     Correlation between pixel and world axes:
     <BLANKLINE>

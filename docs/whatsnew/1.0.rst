@@ -76,8 +76,8 @@ Any DKIST level one ASDF file can be loaded with the `dkist.load_dataset` functi
     World Dim  Axis Name                  Physical Type                   Units
             0  stokes                     phys.polarization.stokes        unknown
             1  time                       time                            s
-            2  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
-            3  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            3  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
             4  wavelength                 em.wl                           nm
     <BLANKLINE>
     Correlation between pixel and world axes:
@@ -147,8 +147,8 @@ This means you can first slice out a smaller dataset, and then only download the
     <BLANKLINE>
     World Dim  Axis Name                  Physical Type                   Units
             0  time                       time                            s
-            1  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
-            2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            1  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+            2  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
             3  wavelength                 em.wl                           nm
     <BLANKLINE>
     Correlation between pixel and world axes:
