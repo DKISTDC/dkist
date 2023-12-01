@@ -36,7 +36,12 @@ INVENTORY_ATTR_MAP = {
 }
 
 
-search_api_response = Path('search_api_response.json')
+# Location of DKIST package installation
+dkist_data = Path(*Path(__file__).parts[:-2]) / 'data'
+if os.environ.get("IS_TEST_ENV"):
+    search_api_response = dkist_data / 'test' / 'api_search_values.json'
+else:
+    search_api_response = dkist_data / 'api_search_values.json'
 update_search_values = False
 # Threshold age at which to refresh search values
 max_age = dt.timedelta(days=7).total_seconds()
