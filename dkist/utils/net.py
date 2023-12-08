@@ -8,6 +8,13 @@ from pathlib import Path
 
 from ..net import attrs as dattrs
 
+
+def get_api_response_location():
+    # Location of DKIST package installation
+    dkist_data = Path(*Path(__file__).parts[:-2]) / 'data'
+    return dkist_data / 'api_search_values.json'
+
+
 INVENTORY_ATTR_MAP = {
     "range": {
         "averageDatasetSpatialSampling": {"attr": dattrs.SpatialSampling,
@@ -37,11 +44,7 @@ INVENTORY_ATTR_MAP = {
 
 
 # Location of DKIST package installation
-dkist_data = Path(*Path(__file__).parts[:-2]) / 'data'
-if os.environ.get("IS_TEST_ENV"):
-    search_api_response = dkist_data / 'test' / 'api_search_values.json'
-else:
-    search_api_response = dkist_data / 'api_search_values.json'
+search_api_response = get_api_response_location()
 update_search_values = False
 # Threshold age at which to refresh search values
 max_age = dt.timedelta(days=7).total_seconds()
