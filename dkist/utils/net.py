@@ -48,7 +48,7 @@ search_api_response = get_api_response_location()
 update_search_values = False
 # Threshold age at which to refresh search values
 max_age = dt.timedelta(days=7).total_seconds()
-if not os.environ.get('DKIST_SKIP_UPDATE_SEARCH_VALUES'):
+if not os.environ.get('DKIST_SKIP_UPDATE_SEARCH_VALUES'): #pragma: no cover
     if not search_api_response.exists():
         update_search_values = True
     else:

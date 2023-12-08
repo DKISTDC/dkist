@@ -10,4 +10,3 @@ def pytest_configure(config):
     from astropy.utils.iers import IERS_Auto; IERS_Auto.open()
 
     os.environ['DKIST_SKIP_UPDATE_SEARCH_VALUES'] = 'True'
-    os.environ['IS_TEST_ENV'] = 'True'
