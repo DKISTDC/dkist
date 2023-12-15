@@ -12,6 +12,10 @@ from ..net import attrs as dattrs
 def get_api_response_location():
     # Location of DKIST package installation
     dkist_data = Path(*Path(__file__).parts[:-2]) / 'data'
+    # This is definitely not the best way to do this but I can't get pytest to mock this function
+    # properly so here we are
+    if os.environ.get('IS_TEST_ENV'):
+        dkist_data = dkist_data / 'test'
     return dkist_data / 'api_search_values.json'
 
 
