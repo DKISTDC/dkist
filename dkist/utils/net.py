@@ -52,17 +52,17 @@ search_api_response = get_api_response_location()
 update_search_values = False
 # Threshold age at which to refresh search values
 max_age = dt.timedelta(days=7).total_seconds()
-if not os.environ.get('DKIST_SKIP_UPDATE_SEARCH_VALUES'): #pragma: no cover
+if not os.environ.get('DKIST_SKIP_UPDATE_SEARCH_VALUES'):
     if not search_api_response.exists():
-        update_search_values = True
+        update_search_values = True #pragma: no cover
     else:
         last_modified = dt.datetime.fromtimestamp(search_api_response.stat().st_mtime)
         now = dt.datetime.now()
         file_age = (now - last_modified).total_seconds()
-        if file_age > max_age:
+        if file_age > max_age: #pragma: no cover
             update_search_values = True
 
-if update_search_values:
+if update_search_values and not os.environ.get('IS_TEST_ENV'): #pragma: no cover
     logging.info("Downloading valid search values")
     data = urllib.request.urlopen('https://api.dkistdc.nso.edu/datasets/v1/searchValues')
     with open(search_api_response, "w") as f:
