@@ -14,8 +14,8 @@ from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
-import appdirs
 import globus_sdk
+import platformdirs
 
 CLIENT_ID = 'dd2d62af-0b44-4e2e-9454-1092c94b46b3'
 SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',
@@ -80,7 +80,7 @@ def get_cache_file_path():
     """
     Use appdirs to get the cache path for the user and add the filename.
     """
-    cache_dir = Path(appdirs.user_cache_dir("dkist"))
+    cache_dir = Path(platformdirs.user_cache_dir("dkist"))
     return cache_dir / "globus_auth_cache.json"
 
 
