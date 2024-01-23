@@ -72,7 +72,8 @@ class DKISTLogger(logging.Logger):
         )
 
     def _showwarning(self, *args, **kwargs):
-        # Bail out if we are not catching a warning from Astropy
+        # Bail out if we are not catching a warning from one of the given
+        # classes (or subclasses)
         if not isinstance(args[0], self.capture_warning_classes):
             return self._showwarning_orig(*args, **kwargs)
 
@@ -102,5 +103,7 @@ class DKISTLogger(logging.Logger):
             self.warning(message)
 
 
-log = DKISTLogger(__name__, level=logging.INFO, capture_warning_classes=[DKISTWarning])
-log.addHandler(AstropyStreamHandler())
+def setup_default_dkist_logger(name):
+    log = DKISTLogger(name, level=logging.INFO, capture_warning_classes=[DKISTWarning])
+    log.addHandler(AstropyStreamHandler())
+    return log

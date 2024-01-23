@@ -4,7 +4,9 @@ The DKIST package aims to help you search, obtain and use DKIST data as part of 
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
-from .logger import log
+from .logger import setup_default_dkist_logger as _setup_log
+
+log = _setup_log(__name__)
 
 try:
     __version__ = _version(__name__)
