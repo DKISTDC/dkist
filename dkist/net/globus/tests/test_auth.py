@@ -24,7 +24,7 @@ def test_http_server():
 
 
 def test_get_cache_file_path(mocker):
-    mocker.patch("appdirs.user_cache_dir", return_value="/tmp/test/")
+    mocker.patch("platformdirs.user_cache_dir", return_value="/tmp/test/")
     path = get_cache_file_path()
     assert isinstance(path, pathlib.Path)
 
@@ -33,7 +33,7 @@ def test_get_cache_file_path(mocker):
 
 
 def test_get_no_cache(mocker, tmpdir):
-    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    mocker.patch("platformdirs.user_cache_dir", return_value=str(tmpdir))
     # Test file not exists
     cache = get_cache_contents()
     assert isinstance(cache, dict)
@@ -41,7 +41,7 @@ def test_get_no_cache(mocker, tmpdir):
 
 
 def test_get_cache(mocker, tmpdir):
-    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    mocker.patch("platformdirs.user_cache_dir", return_value=str(tmpdir))
     with open(tmpdir / "globus_auth_cache.json", "w") as fd:
         json.dump({"hello": "world"}, fd)
 
@@ -52,7 +52,7 @@ def test_get_cache(mocker, tmpdir):
 
 
 def test_get_cache_not_json(mocker, tmpdir):
-    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    mocker.patch("platformdirs.user_cache_dir", return_value=str(tmpdir))
     with open(tmpdir / "globus_auth_cache.json", "w") as fd:
         fd.write("aslkjdasdjjdlsajdjklasjdj, akldjaskldjasd, lkjasdkljasldkjas")
 
@@ -64,7 +64,7 @@ def test_get_cache_not_json(mocker, tmpdir):
 def test_save_auth_cache(mocker, tmpdir):
     filename = tmpdir / "globus_auth_cache.json"
     assert not filename.exists()  # Sanity check
-    mocker.patch("appdirs.user_cache_dir", return_value=str(tmpdir))
+    mocker.patch("platformdirs.user_cache_dir", return_value=str(tmpdir))
     save_auth_cache({"hello": "world"})
 
     assert filename.exists()
