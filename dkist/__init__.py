@@ -1,18 +1,16 @@
 """
 The DKIST package aims to help you search, obtain and use DKIST data as part of your Python software.
 """
-from pkg_resources import DistributionNotFound, get_distribution
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _version
 
-import astropy.config as _config
-
-from .dataset import Dataset, TiledDataset, load_dataset  # noqa
-from .utils.sysinfo import system_info  # noqa
+from .logger import log
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
-    # package is not installed
+    __version__ = _version(__name__)
+except PackageNotFoundError:
     __version__ = "unknown"
+
 
 __all__ = ['TiledDataset', 'Dataset', 'load_dataset', 'system_info']
 
@@ -25,4 +23,10 @@ def write_default_config(overwrite=False):
     config file already exits this will write a config file appended with the
     version number, to facilitate comparison of changes.
     """
+    import astropy.config as _config
     return _config.create_config_file("dkist", "dkist", overwrite=overwrite)
+
+
+# Do internal imports last (so logger etc is initialised)
+from dkist.dataset import Dataset, TiledDataset, load_dataset  # noqa
+from dkist.utils.sysinfo import system_info  # noqa
