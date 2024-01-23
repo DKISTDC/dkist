@@ -20,8 +20,8 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header
 
+from dkist.net.attrs_values import get_search_attrs_values
 from dkist.utils.inventory import INVENTORY_KEY_MAP
-from dkist.utils.net import INVENTORY_ATTR_MAP, search_values
 
 from . import attrs as dattrs
 from .attr_walker import walker
@@ -269,36 +269,16 @@ class DKISTClient(BaseClient):
         """
         return_values = {
             sattrs.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
-            # instrumentNames
-            # Using these descriptions instead of auto-populating because they're more useful
-            sattrs.Instrument: [("VBI", "Visible Broadband Imager"),
-                                ("VISP", "Visible Spectro-Polarimeter"),
-                                ("VTF", "Visible Tunable Filter"),
-                                ("Cryo-NIRSP", "Cryogenic Near Infrared SpectroPolarimiter"),
-                                ("DL-NIRSP", "Diffraction-Limited Near-InfraRed Spectro-Polarimeter")],
+
             # hasAllStokes
             sattrs.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
                              ("intensity", "Only Stokes I is provided in the dataset.")],
             # isEmbargoed
             dattrs.Embargoed: [("True", "Data is subject to access restrictions."),
                                ("False", "Data is not subject to access restrictions.")],
-            # targetTypes
-            #dattrs.TargetType: [],  # This should be a controlled list.
-
-            # Time - Time attr allows times in the full range but start and end time are given separately by the DKIST API
-            sattrs.Time: [("time", f"Min: {search_values['startTimeMin']['minValue']}; max: {search_values['endTimeMax']['maxValue']}.")],
 
             # Completeness
             sattrs.Level: [("1", "DKIST data calibrated to level 1.")],
         }
 
-        # Auto-populate with additional keys from DKIST search API
-        for key in INVENTORY_ATTR_MAP["categorical"].keys():
-            k = INVENTORY_ATTR_MAP["categorical"][key]
-            return_values[k["attr"]] = [(name, k["desc"]) for name in search_values[key]["categoricalValues"]]
-
-        for key in INVENTORY_ATTR_MAP["range"].keys():
-            k = INVENTORY_ATTR_MAP["range"][key]
-            return_values[k["attr"]] = [(key, k["desc"]+f" {search_values[key+'Min']['minValue']}-{search_values[key+'Max']['maxValue']}.")]
-
-        return return_values
+        return {**return_values, **get_search_attrs_values()}
