@@ -4,7 +4,6 @@ minimise (virtual) memory usage and the number of open files.
 """
 
 import abc
-import logging
 from pathlib import Path
 
 import numpy as np
@@ -12,7 +11,7 @@ import numpy as np
 from astropy.io import fits
 from sunpy.util.decorators import add_common_docstring
 
-_LOGGER = logging.getLogger(__name__)
+from dkist import log
 
 __all__ = ['BaseFITSLoader', 'AstropyFITSLoader']
 
@@ -91,7 +90,7 @@ class AstropyFITSLoader(BaseFITSLoader):
 
     def __getitem__(self, slc):
         if not self.absolute_uri.exists():
-            _LOGGER.debug("File %s does not exist.", self.absolute_uri)
+            log.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
             return np.broadcast_to(np.nan, self.shape) * np.nan
@@ -100,7 +99,7 @@ class AstropyFITSLoader(BaseFITSLoader):
                        memmap=False,  # memmap is redundant with dask and delayed loading
                        do_not_scale_image_data=True,  # don't scale as we shouldn't need to
                        mode="denywrite") as hdul:
-            _LOGGER.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
+            log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
             hdu = hdul[self.target]
             if hasattr(hdu, "section"):
