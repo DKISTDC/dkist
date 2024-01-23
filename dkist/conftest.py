@@ -16,12 +16,21 @@ from astropy.table import Table
 from astropy.time import Time
 from sunpy.coordinates.frames import Helioprojective
 
-from dkist import load_dataset
+from dkist import load_dataset, log
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
+
+
+@pytest.fixture
+def caplog_dkist(caplog):
+    """
+    A `dkist.log` specifc equivalent to caplog.
+    """
+    log.addHandler(caplog.handler)
+    return caplog
 
 
 @pytest.fixture
