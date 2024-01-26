@@ -1,0 +1,104 @@
+name: Prepare release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (without leading 'v')"
+        required: true
+        type: string
+      name:
+        description: "Release name"
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  make_release_commit:
+    name: Make release
+    runs-on: ubuntu-latest
+    outputs:
+      markdown-changelog: ${{ steps.markdown-changelog.outputs.content }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install towncrier
+        run: python -m pip install --upgrade towncrier
+
+      - name: Run towncrier in draft to capture the output
+        run: towncrier build --draft --version ${{ inputs.version }} --yes > release-changelog.rst
+
+      - name: Debug changelog.rst
+        run: cat release-changelog.rst
+
+      - name: Convert to markdown with pandoc
+        uses: docker://pandoc/core:2.9
+        with:
+          args: >- # allows you to break string into multiple lines
+            --wrap=none
+            -t markdown_strict
+            --output=release-changelog.md
+            release-changelog.rst
+
+      - name: Capture Markdown Changelog
+        id: markdown-changelog
+        run: |
+          {
+            echo 'content<<EOF'
+            cat release-changelog.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Debug md changelog
+        run: |
+          echo "${{ steps.markdown-changelog.outputs.content }}"
+
+      - name: Run towncrier
+        run: |
+          towncrier build --version ${{ inputs.version }} --yes
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Commit Changelog
+        run: |
+          git commit -m "Render changelog for v${{ inputs.version }}"
+
+      - name: Push
+        run: git push
+
+  make_release:
+    name: Make Github Release
+    runs-on: ubuntu-latest
+    environment: release
+    needs: [make_release_commit]
+    steps:
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        id: create-release
+        with:
+          script: |
+            let release_name = (("${{ inputs.name }}") ? "v${{ inputs.version }} - ${{ inputs.name }}" : "v${{ inputs.version }}");
+            return await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: "v${{ inputs.version }}",
+              name: release_name,
+              body: `${{ needs.make_release_commit.outputs.markdown-changelog }}`
+            });
