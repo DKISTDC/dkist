@@ -1,0 +1,1 @@
+Fix an unpinned minimum version of ``asdf-wcs-schemas`` causing potential read errors on newest asdf files with dkist 1.1.0.
