@@ -122,4 +122,4 @@ def test_ensure_auth_decorator(mocker):
         return True
 
     assert test_func()
-    assert reauth.called_once_with(force_reauth=True)
+    reauth.assert_called_once_with(force_reauth=True)

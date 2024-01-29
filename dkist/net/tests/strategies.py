@@ -62,7 +62,7 @@ def _unit_range(attr_type):
 
 @st.composite
 def _embargo_end(draw, time=Times(
-                 max_value=datetime.datetime(datetime.datetime.utcnow().year, 1, 1, 0, 0),
+                 max_value=datetime.datetime(datetime.datetime.now(datetime.UTC).year, 1, 1, 0, 0),
                  min_value=datetime.datetime(1981, 1, 1, 0, 0)),
                  delta=TimeDelta()):
     t1 = draw(time)
