@@ -1,2 +1,0 @@
-Add a logging framework to present information to users in a nicer way.
-The logger can be accessed as ``dkist.log`` to change log levels etc.

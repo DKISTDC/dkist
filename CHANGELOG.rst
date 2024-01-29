@@ -1,3 +1,21 @@
+1.2.0 (2024-01-29)
+==================
+
+Features
+--------
+
+- Add a logging framework to present information to users in a nicer way.
+  The logger can be accessed as ``dkist.log`` to change log levels etc. (`#317 <https://github.com/DKISTDC/dkist/pull/317>`_)
+
+
+Bug Fixes
+---------
+
+- Bump minimum version of asdf to 2.11.2 to pick up jsonschema bugfix. (`#313 <https://github.com/DKISTDC/dkist/pull/313>`_)
+- Change the ``appdirs`` dependancy for the maintained ``platformdirs`` package. (`#318 <https://github.com/DKISTDC/dkist/pull/318>`_)
+- Fix an unpinned minimum version of ``asdf-wcs-schemas`` causing potential read errors on newest asdf files with dkist 1.1.0. (`#320 <https://github.com/DKISTDC/dkist/pull/320>`_)
+
+
 1.1.0 (2023-10-27)
 ==================
 
