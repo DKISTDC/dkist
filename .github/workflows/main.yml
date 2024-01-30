@@ -33,6 +33,7 @@ jobs:
       default_python: '3.10'
       coverage: 'codecov'
       envs: |
+        - linux: py312
         - linux: py311
         - windows: py310-online
         - macos: py39
