@@ -73,13 +73,14 @@ Open a new terminal (miniforge Prompt or anaconda prompt on Windows) and run:
 
 .. code-block:: bash
 
-    conda create -n dkist-workshop conda activate dkist-workshop
+    conda create -n dkist
+    conda activate dkist
 
-to create a new environment for this workshop. Then run:
+to create a new environment for this workshop, and then activate it. Then run:
 
 .. code-block:: bash
 
-    conda install -c conda-forge dkist jupyter
+    conda install -c conda-forge dkist
 
 Installing ``dkist`` with pip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +89,7 @@ If you know what you are doing and have Python installed without conda, please m
 
 .. code-block:: bash
 
-    pip install dkist jupyter
+    pip install dkist
 
 
 Globus
