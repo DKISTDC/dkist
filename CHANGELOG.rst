@@ -1,3 +1,12 @@
+1.2.1 (2024-01-30)
+==================
+
+Bug Fixes
+---------
+
+- Fix some deprecation warnings for Python 3.12 support. (`#322 <https://github.com/DKISTDC/dkist/pull/322>`_)
+
+
 1.2.0 (2024-01-29)
 ==================
 
