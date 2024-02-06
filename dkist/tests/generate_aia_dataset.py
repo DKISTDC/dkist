@@ -139,7 +139,6 @@ def main():
             header = hdul[1].header
         time = parse_time(header['DATE-OBS'])
         if i == 0:
-            root_header = header
             start_time = time
         inds.append(i)
         times.append(time)
@@ -164,7 +163,7 @@ def main():
     # this assumes all wavelength images are taken at the same time
     time_coords = np.array(
         [t.isoformat() for t in times])[list_sorter].reshape(shape)[0, :]
-    wave_coords = np.array(waves)[list_sorter].reshape(shape)[:, 0]
+    np.array(waves)[list_sorter].reshape(shape)[:, 0]
 
     smap0 = sunpy.map.Map(files[0])
     spatial = map_to_transform(smap0)

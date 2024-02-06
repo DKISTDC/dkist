@@ -615,7 +615,7 @@ def test_ravel_repr(ndim, order):
 @pytest.mark.parametrize("array_shape", [(0, 1), (1, 0), (1,)])
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_array_shape(array_shape, ravel):
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         ravel(array_shape)
 
 
@@ -623,7 +623,7 @@ def test_ravel_bad_array_shape(array_shape, ravel):
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_order(order, ravel):
     array_shape=(2, 2, 2)
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         ravel(array_shape, order)
 
 

@@ -25,7 +25,7 @@ def client():
 @pytest.mark.remote_data
 def test_search(client):
     # TODO: Write an online test to verify real behaviour once there is stable data
-    res = client.search(a.Time("2019/01/01", "2021/01/01"))
+    client.search(a.Time("2019/01/01", "2021/01/01"))
 
 
 @pytest.mark.remote_data

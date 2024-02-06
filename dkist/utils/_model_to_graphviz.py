@@ -136,7 +136,7 @@ def recursively_find_node(top, name):
         return node
 
     for sg in top.get_subgraph_list():
-        labels = [n.get_label() for n in sg.get_node_list()]
+        [n.get_label() for n in sg.get_node_list()]
         if node := recursively_find_node(sg, name):
             return node
 

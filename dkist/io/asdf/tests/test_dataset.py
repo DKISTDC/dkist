@@ -112,7 +112,7 @@ def test_read_all_schema_versions(eit_dataset_asdf_path):
     This test validates that we can successfully read a full and valid Dataset
     object from files with all versions of the dataset schema.
     """
-    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"):
         # Firstly verify that the tag versions in the test filename are the ones used in the file
         with asdf.open(eit_dataset_asdf_path, _force_raw_types=True) as afile:
             assert afile["dataset"]._tag.rsplit("/")[-1] in str(eit_dataset_asdf_path)

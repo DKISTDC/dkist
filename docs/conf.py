@@ -16,7 +16,7 @@ missing_requirements = []
 for requirement in doc_requires:
     try:
         get_distribution(requirement)
-    except Exception as e:
+    except Exception:
         missing_requirements.append(requirement.name)
 if missing_requirements:
     print(
