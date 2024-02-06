@@ -2,6 +2,7 @@
 Hypothesis strategies for testing the DKIST client.
 """
 import datetime
+from functools import cache
 
 import hypothesis.strategies as st
 from hypothesis import HealthCheck, assume, settings
@@ -17,8 +18,16 @@ from dkist.net import DKISTClient
 from dkist.net.attr_walker import walker
 
 
+@cache
+def get_registered_values():
+    """
+    Cache this so we only update it once.
+    """
+    return DKISTClient.register_values()
+
+
 def _generate_from_register_values(attr_type):
-    possible_values = DKISTClient.register_values()[attr_type]
+    possible_values = get_registered_values()[attr_type]
     possible_values = list(map(lambda x: x[0], possible_values))
 
     return st.builds(attr_type, st.sampled_from(possible_values))
@@ -73,7 +82,7 @@ def _embargo_end(draw, time=Times(
     return a.dkist.EmbargoEndTime(t1, t2)
 
 
-for attr_type in DKISTClient.register_values():
+for attr_type in get_registered_values():
     st.register_type_strategy(attr_type, _generate_from_register_values)
 
 st.register_type_strategy(a.Time, time_attr())

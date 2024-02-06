@@ -40,7 +40,7 @@ jobs:
 
       - name: Update attrs
         run: |
-          python -c "from dkist.net.attrs_values import attempt_local_update; attempt_local_update(user_file='./dkist/data/api_search_values.json')"
+          python -c "from dkist.net.attrs_values import attempt_local_update; attempt_local_update(user_file='./dkist/data/api_search_values.json', silence_errors=False)"
 
       - name: Configure Git
         run: |

@@ -12,12 +12,9 @@ from sunpy.net import attrs as sattrs
 import dkist.data
 from dkist import log
 from dkist.net import attrs as dattrs
+from dkist.net import conf as net_conf
 
-__all__ = ["get_search_attrs_values"]
-
-# TODO: This should be in the config file
-# Threshold age at which to refresh search values
-MAX_AGE = dt.timedelta(days=7).total_seconds()
+__all__ = ["attempt_local_update", "get_search_attrs_values"]
 
 # Map keys in dataset inventory to Fido attrs
 INVENTORY_ATTR_MAP = {
@@ -33,13 +30,13 @@ INVENTORY_ATTR_MAP = {
 }
 
 
-def get_file_age(path):
+def _get_file_age(path: Path) -> dt.timedelta:
     last_modified = dt.datetime.fromtimestamp(path.stat().st_mtime)
     now = dt.datetime.now()
-    return (now - last_modified).total_seconds()
+    return (now - last_modified)
 
 
-def get_cached_json():
+def _get_cached_json() -> list[Path, bool]:
     """
     Return the path to a local copy of the JSON file, and if the file should be updated.
 
@@ -55,15 +52,13 @@ def get_cached_json():
     update_needed = False
     if not user_file_exists:
         update_needed = True
-    if not user_file_exists and get_file_age(return_file) > MAX_AGE:
+    if user_file_exists and _get_file_age(return_file) > dt.timedelta(days=net_conf.attr_max_age):
         update_needed = True
 
     return return_file, update_needed
 
 
-def fetch_values_to_file(filepath, *, timeout=1):
-    # Import here to avoid unitialised module
-    from dkist.net import conf as net_conf
+def _fetch_values_to_file(filepath: Path, *, timeout: int = 1):
     data = urllib.request.urlopen(
         net_conf.dataset_endpoint + net_conf.dataset_search_values_path, timeout=timeout
     )
@@ -71,57 +66,98 @@ def fetch_values_to_file(filepath, *, timeout=1):
         f.write(data.read())
 
 
-def attempt_local_update(*, timeout=1, user_file=None):
+def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_errors: bool = True) -> bool:
     """
     Attempt to update the local data copy of the values.
+
+    Parameters
+    ----------
+    timeout
+        The number of seconds to wait before timing out an update request. This
+        is set low by default because this code is run at import of
+        ``dkist.net``.
+    user_file
+        The file to save the updated attrs JSON to. If `None` platformdirs will
+        be used to get the user data path.
+    silence_errors
+        If `True` catch all errors in this function.
+
+    Returns
+    -------
+    success
+        `True` if the update succeeded or `False` otherwise.
     """
     if user_file is None:
         user_file = platformdirs.user_data_path("dkist") / "api_search_values.json"
     user_file = Path(user_file)
-    user_file.parent.mkdir(exist_ok=True)
+    user_file.parent.mkdir(exist_ok=True, parents=True)
 
-    log.info("Fetching updated search values for the DKIST client.")
+    log.info(f"Fetching updated search values for the DKIST client to {user_file}")
 
     success = False
     try:
-        fetch_values_to_file(user_file, timeout=timeout)
+        _fetch_values_to_file(user_file, timeout=timeout)
         success = True
     except Exception as err:
         log.error("Failed to download new attrs values.")
         log.debug(str(err))
         # If an error has occured then remove the local file so it isn't
         # corrupted or invalid.
-        user_file.unlink()
+        user_file.unlink(missing_ok=True)
+        if not silence_errors:
+            raise
+
+        return success
 
     # Test that the file we just saved can be parsed as json
     try:
         with open(user_file, "r") as f:
             json.load(f)
     except Exception:
-        user_file.unlink()
-        return False
+        log.error("Downloaded file is not valid JSON.")
+        user_file.unlink(missing_ok=True)
+        if not silence_errors:
+            raise
+        success = False
 
     return success
 
 
-def get_search_attrs_values(*, allow_update=True, timeout=1):
+def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> dict:
     """
     Return the search values, updating if needed.
+
+    Parameters
+    ----------
+    allow_update
+        Allow fetching updated values from the DKIST data center if they haven't
+        beed updated in the configured amount of time (7 days by default).
+    timeout
+        The number of seconds to wait before timing out an update request. This
+        is set low by default because this code is run at import of
+        ``dkist.net``.
+
+    Returns
+    -------
+    attr_values
+        Return a transformed version of the loaded attr values from the DKIST
+        data center.
     """
-    local_path, update_needed = get_cached_json()
+    local_path, update_needed = _get_cached_json()
     if allow_update and update_needed:
         attempt_local_update(timeout=timeout)
+
     if not update_needed:
         log.debug("No update to attr values needed.")
-        log.debug(local_path.as_posix())
+        log.debug("Using attr values from %s", local_path)
 
     with open(local_path, "r") as f:
         search_values = json.load(f)
 
     search_values = {param["parameterName"]: param["values"] for param in search_values["parameterValues"]}
 
-    return_values = {}
+    attr_values = {}
     for key, attr in INVENTORY_ATTR_MAP["categorical"].items():
-        return_values[attr] = [(name, "") for name in search_values[key]["categoricalValues"]]
+        attr_values[attr] = [(name, "") for name in search_values[key]["categoricalValues"]]
 
-    return return_values
+    return attr_values

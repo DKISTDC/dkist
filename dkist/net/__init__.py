@@ -3,9 +3,6 @@ DKIST specific plugins for `sunpy.net` and download helpers.
 """
 import dkist.config as _config
 
-from .client import DKISTClient
-from .helpers import transfer_complete_datasets
-
 __all__ = ["DKISTClient", "conf", "transfer_complete_datasets"]
 
 
@@ -27,5 +24,12 @@ class Conf(_config.ConfigNamespace):
     dataset_path = _config.ConfigItem("/{bucket}/{primaryProposalId}/{datasetId}",
                                       "The path template to a dataset on the main endpoint.")
 
+    attr_max_age = _config.ConfigItem(7,
+                                      "The number of days beyond which to refresh search attr values from the Data Center")
+
 
 conf = Conf()
+
+# Put imports after conf so that conf is initalized before import
+from .client import DKISTClient  # noqa
+from .helpers import transfer_complete_datasets  # noqa
