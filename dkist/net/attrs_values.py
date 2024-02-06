@@ -3,6 +3,7 @@ import json
 import urllib
 import datetime as dt
 import importlib.resources
+from pathlib import Path
 
 import platformdirs
 
@@ -70,11 +71,13 @@ def fetch_values_to_file(filepath, *, timeout=1):
         f.write(data.read())
 
 
-def attempt_local_update(*, timeout=1):
+def attempt_local_update(*, timeout=1, user_file=None):
     """
     Attempt to update the local data copy of the values.
     """
-    user_file = platformdirs.user_data_path("dkist") / "api_search_values.json"
+    if user_file is None:
+        user_file = platformdirs.user_data_path("dkist") / "api_search_values.json"
+    user_file = Path(user_file)
     user_file.parent.mkdir(exist_ok=True)
 
     log.info("Fetching updated search values for the DKIST client.")
