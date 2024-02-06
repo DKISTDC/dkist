@@ -2,12 +2,13 @@
 Configuration file for the Sphinx documentation builder.
 """
 # -- stdlib imports ------------------------------------------------------------
+import datetime
 import os
 import sys
-import datetime
 import warnings
-from pkg_resources import get_distribution
+
 from packaging.version import Version
+from pkg_resources import get_distribution
 
 # -- Check for dependencies ----------------------------------------------------
 doc_requires = get_distribution("dkist").requires(extras=("docs",))
@@ -35,8 +36,8 @@ if on_rtd:
     os.environ['HIDE_PARFIVE_PROGESS'] = 'True'
 
 # -- Non stdlib imports --------------------------------------------------------
-import dkist  # NOQA
-from dkist import __version__  # NOQA
+import dkist  # noqa
+from dkist import __version__  # noqa
 
 # -- Project information -------------------------------------------------------
 project = 'DKIST'
@@ -150,7 +151,7 @@ intersphinx_mapping = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-from dkist_sphinx_theme.conf.theme import *
+from dkist_sphinx_theme.conf.theme import *  # noqa
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

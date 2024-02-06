@@ -101,7 +101,7 @@ def dataset_info_str(ds):
                 '\n')
 
     # Make sure we get rid of the extra whitespace at the end of some lines
-    return '\n'.join([l.rstrip() for l in s.splitlines()])
+    return '\n'.join([line.rstrip() for line in s.splitlines()])
 
 
 def pp_matrix(wcs):
@@ -112,7 +112,7 @@ def pp_matrix(wcs):
     ----------
     wcs : `BaseHighLevelWCS` or `BaseLowLevelWCS`
     """
-    slen = np.max([len(l) for l in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
+    slen = np.max([len(line) for line in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
     mstr = wcs.axis_correlation_matrix.astype(f"<U{slen}")
     mstr = np.insert(mstr, 0, wcs.pixel_axis_names, axis=0)
     world = [''] + list(wcs.world_axis_names)

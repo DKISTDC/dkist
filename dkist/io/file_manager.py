@@ -15,8 +15,8 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
-from typing import Any, Tuple, Union, Iterable, Optional
 from pathlib import Path
+from typing import Any, Iterable, Optional, Tuple, Union
 
 import dask.array
 import numpy as np

@@ -2,19 +2,6 @@
 requires = ["setuptools>=30.3.0", "setuptools_scm", "wheel"]
 build-backend = 'setuptools.build_meta'
 
-[tool.isort]
-line_length = 99
-skip = "docs/conf.py,.tox"
-sections = "FUTURE,STDLIB,THIRDPARTY,ASTRO,FIRSTPARTY,LOCALFOLDER"
-default_section = "THIRDPARTY"
-known_first_party = "dkist,dkist_inventory"
-known_astro = "astropy,sunpy,gwcs,asdf,ndcube,asdf_astropy"
-multi_line_output = 0
-balanced_wrapping = true
-include_trailing_comma = false
-length_sort = false
-length_sort_sections = "stdlib"
-
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]
     enabled = true

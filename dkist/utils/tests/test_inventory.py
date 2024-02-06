@@ -1,7 +1,11 @@
 from dkist.data.test import rootdir
 from dkist.net.client import DKISTQueryResponseTable
-from dkist.utils.inventory import (_path_format_table, dehumanize_inventory,
-                                   humanize_inventory, path_format_inventory)
+from dkist.utils.inventory import (
+    _path_format_table,
+    dehumanize_inventory,
+    humanize_inventory,
+    path_format_inventory,
+)
 
 
 def test_humanize_loop():

@@ -1,0 +1,39 @@
+target-version = "py39"
+line-length = 100
+exclude = [
+  ".git,",
+  "__pycache__",
+  "build",
+]
+select = ["E", "I"]
+extend-ignore = [
+  # pycodestyle (E, W)
+  "E501", # LineTooLong                             # TODO! fix
+  # pytest (PT)
+  "PT001", # Always use pytest.fixture()
+  "PT004", # Fixtures which don't return anything should have leading _
+  "PT007", # Parametrize should be lists of tuples  # TODO! fix
+  "PT011", # Too broad exception assert             # TODO! fix
+  "PT023", # Always use () on pytest decorators
+]
+
+[per-file-ignores]
+# Part of configuration, not a package.
+"setup.py" = ["INP001"]
+"conftest.py" = ["INP001"]
+# Implicit-namespace-package. The examples are not a package.
+"docs/*.py" = ["INP001"]
+"__init__.py" = ["E402", "F401", "F403"]
+"test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+# Need to import clients to register them, but don't use them in file
+"dkist/net/__init__.py" = ["F811"]
+
+[pydocstyle]
+convention = "numpy"
+
+[lint.isort]
+known-first-party = ["dkist", "dkist_inventory"]
+section-order = ["future", "standard-library", "third-party", "astro", "first-party", "local-folder"]
+
+[lint.isort.sections]
+astro = ["astropy", "sunpy", "gwcs", "asdf", "ndcube", "asdf_astropy"]

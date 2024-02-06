@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 from pathlib import Path
 
 import numpy as np
@@ -9,8 +9,13 @@ import astropy.units as u
 import gwcs
 import sunpy.map
 from astropy.io import fits
-from astropy.modeling.models import (AffineTransformation2D, Multiply,
-                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
+from astropy.modeling.models import (
+    AffineTransformation2D,
+    Multiply,
+    Pix2Sky_TAN,
+    RotateNative2Celestial,
+    Shift,
+)
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
 from sunpy.net import Fido

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union, Literal, Iterable
+from typing import Iterable, Literal, Union
 
 import numpy as np
 

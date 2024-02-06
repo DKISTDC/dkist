@@ -1,11 +1,11 @@
-import os
 import json
+import os
 import urllib.parse
 import urllib.request
-from typing import Any, List, Mapping, Iterable
-from textwrap import dedent
-from functools import partial
 from collections import defaultdict
+from functools import partial
+from textwrap import dedent
+from typing import Any, Iterable, List, Mapping
 
 import aiohttp
 import numpy as np
@@ -16,8 +16,12 @@ from astropy.table import TableAttribute
 from astropy.time import Time
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
-from sunpy.net.base_client import (BaseClient, QueryResponseRow,
-                                   QueryResponseTable, convert_row_to_table)
+from sunpy.net.base_client import (
+    BaseClient,
+    QueryResponseRow,
+    QueryResponseTable,
+    convert_row_to_table,
+)
 from sunpy.util.net import parse_header
 
 from dkist.net.attrs_values import get_search_attrs_values
@@ -90,7 +94,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            none_values = np.array(results[colname] == None)
+            none_values = np.array(results[colname] == None)  # noqa E711
             if none_values.any():
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)

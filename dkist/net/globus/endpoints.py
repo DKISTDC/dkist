@@ -2,8 +2,8 @@
 Functions for interacting with globus endpoints.
 """
 import json
-import urllib
 import pathlib
+import urllib
 import webbrowser
 from functools import lru_cache
 

@@ -3,8 +3,8 @@ Functions for working with dataset inventory.
 """
 import re
 import string
-from typing import Dict
 from collections import defaultdict
+from typing import Dict
 
 from astropy.table import Table
 

@@ -3,8 +3,8 @@ Functions and classes for searching and downloading from the data center.
 """
 import datetime
 from os import PathLike
-from typing import List, Union, Literal, Iterable, Optional
 from pathlib import Path
+from typing import Iterable, List, Literal, Optional, Union
 
 from astropy import table
 from sunpy.net.attr import or_

@@ -2,19 +2,24 @@
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
 import copy
-import json
-import time
-import pathlib
 import datetime
+import json
+import pathlib
+import time
 from os import PathLike
-from typing import List, Union, Literal
+from typing import List, Literal, Union
 
 import globus_sdk
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
-from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
-                        get_endpoint_id, get_local_endpoint_id, get_transfer_client)
+from .endpoints import (
+    auto_activate_endpoint,
+    get_data_center_endpoint_id,
+    get_endpoint_id,
+    get_local_endpoint_id,
+    get_transfer_client,
+)
 
 __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
 
