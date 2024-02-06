@@ -1,5 +1,6 @@
 from abc import ABC
-from typing import Iterable, Literal, Union
+from collections.abc import Iterable
+from typing import Literal, Union
 
 import numpy as np
 

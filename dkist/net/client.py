@@ -3,9 +3,10 @@ import os
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from functools import partial
 from textwrap import dedent
-from typing import Any, Iterable, List, Mapping
+from typing import Any
 
 import aiohttp
 import numpy as np
@@ -41,7 +42,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # Define some class properties to better format the results table.
     # TODO: remove experimentDescription from this list, when we can limit the
     # length of the field to something nicer
-    hide_keys: List[str] = [
+    hide_keys: list[str] = [
         "Storage Bucket",
         "Full Stokes",
         "asdf Filename",

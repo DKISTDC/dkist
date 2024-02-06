@@ -203,9 +203,9 @@ def main():
 
     with asdf.AsdfFile(tree) as ff:
         # ff.write_to("test.asdf")
-        filename = str(path / "aia_{}.asdf".format(time_coords[0]))
+        filename = str(path / f"aia_{time_coords[0]}.asdf")
         ff.write_to(filename)
-        print("Saved to : {}".format(filename))
+        print(f"Saved to : {filename}")
 
     # import sys; sys.exit(0)
 

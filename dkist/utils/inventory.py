@@ -4,7 +4,6 @@ Functions for working with dataset inventory.
 import re
 import string
 from collections import defaultdict
-from typing import Dict
 
 from astropy.table import Table
 
@@ -19,7 +18,7 @@ class DefaultMap(defaultdict):
         return key
 
 
-INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
+INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "asdfObjectKey": "asdf Filename",
         "boundingBox": "Bounding Box",
         "browseMovieObjectKey": "Movie Filename",
@@ -97,7 +96,7 @@ def _path_format_table(keymap=INVENTORY_KEY_MAP):
     return '\n'.join(t.pformat(max_lines=-1, html=True))
 
 
-def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
+def humanize_inventory(inventory: dict[str, str]) -> dict[str, str]:
     """
     Convert an inventory dict to have human readable keys.
     """
@@ -119,7 +118,7 @@ def path_format_inventory(human_inv):
     return t[0].response_block_map
 
 
-def dehumanize_inventory(humanized_inventory: Dict[str, str]) -> Dict[str, str]:
+def dehumanize_inventory(humanized_inventory: dict[str, str]) -> dict[str, str]:
     """
     Convert a human readable inventory dict back to the original keys.
     """

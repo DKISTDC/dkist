@@ -5,7 +5,7 @@ import json
 import pathlib
 import urllib
 import webbrowser
-from functools import lru_cache
+from functools import cache
 
 import globus_sdk
 
@@ -55,7 +55,7 @@ def get_local_endpoint_id():
     return endpoint_id
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_data_center_endpoint_id():
     """
     Query the data center for the current globus endpoint ID.

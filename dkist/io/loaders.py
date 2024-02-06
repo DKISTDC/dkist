@@ -57,7 +57,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         return self.__str__()
 
     def __str__(self):
-        return "<FITS array in {0.fileuri} shape: {0.shape} dtype: {0.dtype}>".format(self)
+        return f"<FITS array in {self.fileuri} shape: {self.shape} dtype: {self.dtype}>"
 
     @property
     def data(self):

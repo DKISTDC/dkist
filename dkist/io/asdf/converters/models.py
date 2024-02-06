@@ -125,12 +125,12 @@ class CoupledCompoundConverter(TransformConverterBase):
 
         left = node["forward"][0]
         if not isinstance(left, Model):
-            raise TypeError("Unknown model type '{0}'".format(node["forward"][0]._tag))  # pragma: no cover
+            raise TypeError("Unknown model type '{}'".format(node["forward"][0]._tag))  # pragma: no cover
 
         right = node["forward"][1]
         if (not isinstance(right, Model) and
                 not (oper == "fix_inputs" and isinstance(right, dict))):
-            raise TypeError("Unknown model type '{0}'".format(node["forward"][1]._tag))  # pragma: no cover
+            raise TypeError("Unknown model type '{}'".format(node["forward"][1]._tag))  # pragma: no cover
 
         model = CoupledCompoundModel(oper, left, right,
                                      shared_inputs=node["shared_inputs"])

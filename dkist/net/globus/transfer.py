@@ -7,7 +7,7 @@ import json
 import pathlib
 import time
 from os import PathLike
-from typing import List, Literal, Union
+from typing import Literal, Union
 
 import globus_sdk
 from tqdm.auto import tqdm
@@ -269,8 +269,8 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
         progress.close()
 
 
-def _orchestrate_transfer_task(file_list: List[PathLike],
-                               recursive: List[bool],
+def _orchestrate_transfer_task(file_list: list[PathLike],
+                               recursive: list[bool],
                                destination_path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                *,

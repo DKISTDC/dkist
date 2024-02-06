@@ -15,8 +15,9 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import dask.array
 import numpy as np
@@ -51,7 +52,7 @@ class BaseStripedExternalArray:
         return all((uri, target, dtype, shape))
 
     @staticmethod
-    def _output_shape_from_ref_array(shape, loader_array) -> Tuple[int]:
+    def _output_shape_from_ref_array(shape, loader_array) -> tuple[int]:
         # If the first dimension is one we are going to squash it.
         if shape[0] == 1:
             shape = shape[1:]
@@ -62,7 +63,7 @@ class BaseStripedExternalArray:
             return tuple(list(loader_array.shape) + list(shape))
 
     @property
-    def output_shape(self) -> Tuple[int, ...]:
+    def output_shape(self) -> tuple[int, ...]:
         """
         The final shape of the reconstructed data array.
         """

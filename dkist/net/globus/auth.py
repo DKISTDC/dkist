@@ -95,7 +95,7 @@ def get_cache_contents():
         try:
             with open(cache_file) as fd:
                 return json.load(fd)
-        except (IOError, json.JSONDecodeError):
+        except (OSError, json.JSONDecodeError):
             return {}
 
 
@@ -133,7 +133,7 @@ def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: n
     dict of tokens keyed by service name.
     """
     server = start_local_server()
-    redirect_uri = "http://{a[0]}:{a[1]}".format(a=server.server_address)
+    redirect_uri = f"http://{server.server_address[0]}:{server.server_address[1]}"
 
     client = globus_sdk.NativeAppAuthClient(client_id=client_id)
     client.oauth2_start_flow(requested_scopes=SCOPES,

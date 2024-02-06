@@ -18,7 +18,7 @@ from dkist.net.globus.auth import (
 
 def test_http_server():
     server = start_local_server()
-    redirect_uri = "http://{a[0]}:{a[1]}".format(a=server.server_address)
+    redirect_uri = f"http://{server.server_address[0]}:{server.server_address[1]}"
     inp_code = "wibble"
 
     requests.get(redirect_uri + f"?code={inp_code}")

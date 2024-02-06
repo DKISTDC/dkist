@@ -146,7 +146,7 @@ def main():
     with asdf.AsdfFile(tree) as ff:
         filename = rootdir / "EIT" / "eit_test_dataset.asdf"
         ff.write_to(filename)
-        print("Saved to : {}".format(filename))
+        print(f"Saved to : {filename}")
 
 
     ds.plot()

@@ -42,7 +42,7 @@ from dkist import __version__  # noqa
 # -- Project information -------------------------------------------------------
 project = 'DKIST'
 author = 'NSO / AURA'
-copyright = '{}, {}'.format(datetime.datetime.now().year, author)
+copyright = f'{datetime.datetime.now().year}, {author}'
 
 # The full version, including alpha/beta/rc tags
 release = __version__

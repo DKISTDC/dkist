@@ -2,9 +2,10 @@
 Functions and classes for searching and downloading from the data center.
 """
 import datetime
+from collections.abc import Iterable
 from os import PathLike
 from pathlib import Path
-from typing import Iterable, List, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from astropy import table
 from sunpy.net.attr import or_
@@ -38,7 +39,7 @@ def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponse
                                destination_endpoint: str = None,
                                progress: Union[bool, Literal["verbose"]] = True,
                                wait: bool = True,
-                               label: Optional[str] = None) -> Union[List[str], str]:
+                               label: Optional[str] = None) -> Union[list[str], str]:
     """
     Transfer one or more complete datasets to a path on a globus endpoint.
 
@@ -99,7 +100,7 @@ def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponse
         if len(datasets) > 1:
             datasets = table.vstack(datasets, metadata_conflicts="silent")
 
-    elif isinstance(datasets, str) or all((isinstance(d, str) for d in datasets)):
+    elif isinstance(datasets, str) or all(isinstance(d, str) for d in datasets):
         # If we are passed just dataset IDs as strings search for them to get the inventory records
         datasets = _get_dataset_inventory(datasets)
 
