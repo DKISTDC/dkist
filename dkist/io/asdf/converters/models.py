@@ -4,10 +4,8 @@ from asdf_astropy.converters.transform.core import TransformConverterBase, param
 
 class VaryingCelestialConverter(TransformConverterBase):
     tags = [
-        "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0",
-        "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.0.0",
-        "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0",
-        "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.0.0",
+        "asdf://dkist.nso.edu/tags/varying_celestial_transform-*",
+        "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-*",
         # Old slit tags must be kept so we can read old files, but not types as
         # we will not save slit classes any more
         "asdf://dkist.nso.edu/tags/varying_celestial_transform_slit-1.0.0",
@@ -35,16 +33,19 @@ class VaryingCelestialConverter(TransformConverterBase):
                  VaryingCelestialTransform2D,
                  VaryingCelestialTransform3D)
         ):
-            return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
+            for tag in tags:
+                if tag.startswith("asdf://dkist.nso.edu/tags/varying_celestial_transform"):
+                    return tag
         elif isinstance(
                 obj,
                 (InverseVaryingCelestialTransform,
                  InverseVaryingCelestialTransform2D,
                  InverseVaryingCelestialTransform3D)
         ):
-            return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0"
-        else:
-            raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
+            for tag in tags:
+                if tag.startswith("asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform"):
+                    return tag
+        raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import varying_celestial_transform_from_tables
@@ -92,7 +93,7 @@ class CoupledCompoundConverter(TransformConverterBase):
     ASDF serialization support for CompoundModel.
     """
     tags = [
-        "asdf://dkist.nso.edu/tags/coupled_compound_model-1.0.0",
+        "asdf://dkist.nso.edu/tags/coupled_compound_model-*",
     ]
 
     types = ["dkist.wcs.models.CoupledCompoundModel"]
@@ -141,7 +142,7 @@ class RavelConverter(TransformConverterBase):
     """
 
     tags  = [
-        "asdf://dkist.nso.edu/tags/ravel_model-1.0.0"
+        "asdf://dkist.nso.edu/tags/ravel_model-*"
     ]
 
     types = ["dkist.wcs.models.Ravel"]
@@ -161,7 +162,7 @@ class AsymmetricMappingConverter(TransformConverterBase):
     """
 
     tags  = [
-        "asdf://dkist.nso.edu/tags/asymmetric_mapping_model-1.0.0"
+        "asdf://dkist.nso.edu/tags/asymmetric_mapping_model-*"
     ]
 
     types = ["dkist.wcs.models.AsymmetricMapping"]
