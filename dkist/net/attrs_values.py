@@ -27,6 +27,13 @@ INVENTORY_ATTR_MAP = {
         "headerVersion": dattrs.HeaderVersion,
         "highLevelSoftwareVersion": dattrs.SummitSoftwareVersion,
     },
+    "range": {
+        "averageDatasetSpatialSampling": dattrs.SpatialSampling,
+        "averageDatasetSpectralSampling": dattrs.SpectralSampling,
+        "averageDatasetTemporalSampling": dattrs.TemporalSampling,
+        "exposureTime": dattrs.ExposureTime,
+        "qualityAverageFriedParameter": dattrs.FriedParameter,
+    }
 }
 
 
@@ -159,5 +166,8 @@ def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> d
     attr_values = {}
     for key, attr in INVENTORY_ATTR_MAP["categorical"].items():
         attr_values[attr] = [(name, "") for name in search_values[key]["categoricalValues"]]
+
+    for key, attr in INVENTORY_ATTR_MAP["range"].items():
+        attr_values[attr] = [(key, f"Value between {search_values[key+'Min']['minValue']:.5f} and {search_values[key+'Max']['maxValue']:.5f}")]
 
     return attr_values
