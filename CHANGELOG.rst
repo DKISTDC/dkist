@@ -1,3 +1,19 @@
+1.3.0rc2 (2024-02-19)
+=====================
+
+Features
+--------
+
+- Call the DKIST search API to automatically determine valid data search parameters and register those with the Fido client. (`#311 <https://github.com/DKISTDC/dkist/pull/311>`_)
+- Use a new feature in the DKIST datasets API to search for all datasets which intersect the given time. (`#326 <https://github.com/DKISTDC/dkist/pull/326>`_)
+
+
+Improved Documentation
+----------------------
+
+- Fix some small issues with the installation instructions. (`#323 <https://github.com/DKISTDC/dkist/pull/323>`_)
+
+
 1.3.0rc1 (2024-02-19)
 =====================
 
