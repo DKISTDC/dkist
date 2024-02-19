@@ -49,7 +49,7 @@ jobs:
 
       - name: Commit Attrs
         run: |
-          git commit -m "Update attrs values before release"
+          git commit -m "Update attrs values before release" dkist/data/api_search_values.json
 
       - name: Push
         run: git push
@@ -113,7 +113,7 @@ jobs:
 
       - name: Commit Changelog
         run: |
-          git commit -m "Render changelog for v${{ inputs.version }}"
+          git commit -m "Render changelog for v${{ inputs.version }}" -a
 
       - name: Push
         run: git push
