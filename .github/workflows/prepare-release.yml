@@ -64,7 +64,7 @@ jobs:
 
       - name: Run towncrier
         run: |
-          towncrier build --version ${{ inputs.version }} --yes
+          towncrier build --version ${{ inputs.version }} ${{ inputs.tc_keep && '--keep' || '--yes' }}
 
       - name: Commit Changelog
         run: |
