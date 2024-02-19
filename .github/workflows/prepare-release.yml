@@ -71,3 +71,5 @@ jobs:
           title: 'Prepare for release of v${{ inputs.version }}'
           body: |
             This PR renders the changelog and updates the JSON attrs before release of v${{ inputs.version }}.
+          labels: |
+            no changelog

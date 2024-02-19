@@ -4,10 +4,11 @@ on:
   # Allow manual runs through the web UI
   workflow_dispatch:
   push:
-    # Only run CI on release branches and main
+    # Only run CI on main, release branches, and pre-release auto PRs
     branches:
       - 'main'
       - '*.*'
+      - 'prepare-v*'
     tags:
       - 'v*'
       - '!*dev*'
