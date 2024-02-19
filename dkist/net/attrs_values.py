@@ -138,7 +138,7 @@ def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> d
     ----------
     allow_update
         Allow fetching updated values from the DKIST data center if they haven't
-        beed updated in the configured amount of time (7 days by default).
+        been updated in the configured amount of time (7 days by default).
     timeout
         The number of seconds to wait before timing out an update request. This
         is set low by default because this code is run at import of
