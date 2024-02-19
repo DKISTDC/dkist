@@ -44,6 +44,8 @@ jobs:
             apt:
               - graphviz
         - linux: py39-oldestdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   allowed-fail-tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
@@ -51,6 +53,8 @@ jobs:
       coverage: 'codecov'
       envs: |
         - linux: py311-devdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     needs: [tests]
@@ -63,52 +67,6 @@ jobs:
       upload_to_pypi: ${{ startsWith(github.event.ref, 'refs/tags/v') && !endsWith(github.event.ref, '.dev') }}
     secrets:
       pypi_token: ${{ secrets.PYPI_API_TOKEN }}
-
-  make_gh_release:
-    name: Make a Github release
-    needs: [publish]
-    if: startsWith(github.event.ref, 'refs/tags/v') && !endsWith(github.event.ref, '.dev')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Convert to markdown with pandoc
-        uses: docker://dalibo/pandocker:latest
-        with:
-          args: >- # allows you to break string into multiple lines
-            --wrap=none
-            -t markdown_strict
-            --output=release-changelog.md
-            --filter .github/changelog_filter.py
-            CHANGELOG.rst
-
-      - name: Capture Markdown Changelog
-        id: markdown-changelog
-        run: |
-          {
-            echo 'content<<EOF'
-            cat release-changelog.md
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Show converted changelog
-        run: |
-          echo '${{ steps.markdown-changelog.outputs.content }}'
-
-      - name: Create GitHub Release
-        uses: actions/github-script@v7
-        id: create-release
-        with:
-          script: |
-            return await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: "${{ github.ref_name }}",
-              name: "${{ github.ref_name }}",
-              body: `${{ steps.markdown-changelog.outputs.content }}`
-            });
 
   notify:
     if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'

@@ -62,9 +62,28 @@ jobs:
       - name: Install towncrier
         run: python -m pip install --upgrade towncrier
 
+      - name: Run towncrier in draft to capture the output
+        run: towncrier build --draft --version ${{ inputs.version }} --yes > release-changelog.rst
+
+      - name: Debug release-changelog.rst
+        run: cat release-changelog.rst
+
+      - name: Capture Markdown Changelog
+        id: markdown-changelog
+        run: |
+          {
+            echo 'content<<EOF'
+            cat release-changelog.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Debug md changelog
+        run: |
+          echo "${{ steps.markdown-changelog.outputs.content }}"
+
       - name: Run towncrier
         run: |
-          towncrier build --version ${{ inputs.version }} ${{ inputs.tc_keep && '--keep' || '--yes' }}
+          towncrier build --version ${{ inputs.version }} ${{ inputs.tc_keep && '--yes' || '--keep' }}
 
       - name: Commit Changelog
         run: |
@@ -77,5 +96,21 @@ jobs:
           title: 'Prepare for release of v${{ inputs.version }}'
           body: |
             This PR renders the changelog and updates the JSON attrs before release of v${{ inputs.version }}.
+
+            A draft release has been made with the changelog, release it after merge to trigger the release.
           labels: |
             no changelog
+
+      - name: Create draft GitHub Release
+        uses: actions/github-script@v7
+        id: create-release
+        with:
+          script: |
+            return await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: "${{ inputs.version }}",
+              name: "${{ inputs.version }}",
+              body: `${{ steps.markdown-changelog.outputs.content }}`
+              draft: true
+            });
