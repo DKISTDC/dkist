@@ -60,13 +60,19 @@ jobs:
           git diff-index --quiet HEAD -- || git commit -m "Update attrs values before release [skip ci]" dkist/data/api_search_values.json
 
       - name: Install towncrier
-        run: python -m pip install --upgrade towncrier
+        run: python -m pip install --upgrade towncrier pre-commit
 
       - name: Run towncrier in draft to capture the output
         run: towncrier build --draft --version ${{ inputs.version }} --yes > release-changelog.rst
 
-      - name: Debug release-changelog.rst
-        run: cat release-changelog.rst
+      - name: Convert to markdown with pandoc
+        uses: docker://pandoc/core:2.9
+        with:
+          args: >-
+            --wrap=none
+            -t markdown_strict
+            --output=release-changelog.md
+            release-changelog.rst
 
       - name: Capture Markdown Changelog
         id: markdown-changelog
@@ -77,6 +83,9 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
+      - name: Cleanup Temporary Changelog Files
+        run: rm release-changelog.md release-changelog.rst
+
       - name: Debug md changelog
         run: |
           echo "${{ steps.markdown-changelog.outputs.content }}"
@@ -85,9 +94,15 @@ jobs:
         run: |
           towncrier build --version ${{ inputs.version }} ${{ inputs.tc_keep && '--yes' || '--keep' }}
 
+      - name: Run pre-commit
+        run: |
+          git add .
+          pre-commit run || true
+          git add .
+
       - name: Commit Changelog
         run: |
-          git commit -m "Render changelog for v${{ inputs.version }}" -a
+          git commit -m "Render changelog for v${{ inputs.version }}"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -109,8 +124,8 @@ jobs:
             return await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: "${{ inputs.version }}",
-              name: "${{ inputs.version }}",
-              body: `${{ steps.markdown-changelog.outputs.content }}`
+              tag_name: "v${{ inputs.version }}",
+              name: "v${{ inputs.version }}",
+              body: `${{ steps.markdown-changelog.outputs.content }}`,
               draft: true
             });
