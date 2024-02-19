@@ -20,6 +20,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header
 
+from dkist.net.attrs_values import get_search_attrs_values
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
 from . import attrs as dattrs
@@ -266,23 +267,18 @@ class DKISTClient(BaseClient):
         """
         Known search values for DKIST data, currently manually specified.
         """
-        return {
+        return_values = {
             sattrs.Provider: [("DKIST", "Data provided by the DKIST Data Center")],
-            # instrumentNames
-            sattrs.Instrument: [("VBI", "Visible Broadband Imager"),
-                                ("VISP", "Visible Spectro-Polarimeter"),
-                                ("VTF", "Visible Tunable Filter"),
-                                ("Cryo-NIRSP", "Cryogenic Near Infrared SpectroPolarimiter"),
-                                ("DL-NIRSP", "Diffraction-Limited Near-InfraRed Spectro-Polarimeter")],
+
             # hasAllStokes
             sattrs.Physobs: [("stokes_parameters", "Stokes I, Q, U and V are provided in the dataset"),
                              ("intensity", "Only Stokes I is provided in the dataset.")],
             # isEmbargoed
             dattrs.Embargoed: [("True", "Data is subject to access restrictions."),
                                ("False", "Data is not subject to access restrictions.")],
-            # targetTypes
-            #dattrs.TargetType: [],  # This should be a controlled list.
 
             # Completeness
             sattrs.Level: [("1", "DKIST data calibrated to level 1.")],
         }
+
+        return {**return_values, **get_search_attrs_values()}

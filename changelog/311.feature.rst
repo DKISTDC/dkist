@@ -1,0 +1,1 @@
+Call the DKIST search API to automatically determine valid data search parameters and register those with the Fido client.
