@@ -2,6 +2,7 @@ name: Prepare release
 
 permissions:
   contents: write
+  pull-requests: write
 
 on:
   workflow_dispatch:
@@ -14,10 +15,6 @@ on:
         description: "Release branch name"
         required: true
         type: string
-      name:
-        description: "Release name"
-        required: false
-        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +22,6 @@ concurrency:
 
 jobs:
   pre_release_tasks:
-    name: Update attr values json
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
