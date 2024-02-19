@@ -170,4 +170,7 @@ def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> d
     for key, attr in INVENTORY_ATTR_MAP["range"].items():
         attr_values[attr] = [("all", f"Value between {search_values[key+'Min']['minValue']:.5f} and {search_values[key+'Max']['maxValue']:.5f}")]
 
+    # Time - Time attr allows times in the full range but start and end time are given separately by the DKIST API
+    attr_values[sattrs.Time] = [("time", f"Min: {search_values['startTimeMin']['minValue']}; max: {search_values['endTimeMax']['maxValue']}.")]
+
     return attr_values
