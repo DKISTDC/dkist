@@ -140,5 +140,5 @@ jobs:
               repo: context.repo.repo,
               tag_name: "v${{ inputs.version }}",
               name: release_name,
-              body: `${{ needs.make_release_commit.outputs.markdown-changelog }}`
+              body: `${{ needs.render_changelog.outputs.markdown-changelog }}`
             });
