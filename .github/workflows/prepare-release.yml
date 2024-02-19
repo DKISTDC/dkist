@@ -15,6 +15,12 @@ on:
         description: "Release branch name"
         required: true
         type: string
+        default: "main"
+      tc_keep:
+        description: "Remove towncrier fragments"
+        required: true
+        type: boolean
+        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
