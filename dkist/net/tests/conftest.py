@@ -28,7 +28,7 @@ def api_param_names():
     Excludes ones with input dependant query params
     """
     return {
-        a.Time: ('startTimeMax', 'endTimeMin'),
+        a.Time: ('endTimeMin', 'startTimeMax'),
         a.Instrument: ('instrumentNames',),
         a.Wavelength: ('wavelengthRanges',),
         a.Physobs: ('hasAllStokes',),

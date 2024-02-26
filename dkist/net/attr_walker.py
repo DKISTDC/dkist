@@ -53,8 +53,8 @@ def iterate_over_and(wlk, tree, params):
 # SunPy Attrs
 @walker.add_applier(Time)
 def _(wlk, attr, params):
-    return params.update({'startTimeMax': attr.start.isot,
-                          'endTimeMin': attr.end.isot})
+    return params.update({'endTimeMin': attr.start.isot,
+                          'startTimeMax': attr.end.isot})
 
 
 @walker.add_applier(Instrument)
