@@ -28,6 +28,29 @@ def test_search(client):
     res = client.search(a.Time("2019/01/01", "2021/01/01"))
 
 
+@pytest.mark.remote_data
+def test_search_by_time(client):
+    # Test searching by a time range that overlaps the end of the dataset
+    res = client.search(a.Time("2022/12/27 19:55", "2022/12/27 20:01"), a.Instrument("VBI"))
+    assert len(res) == 1
+    assert res[0]["Primary Proposal ID"] == "pid_1_50"
+
+    # Test searching by a time range that overlaps the start of the dataset
+    res = client.search(a.Time("2022/12/27 19:26", "2022/12/27 19:30"), a.Instrument("VBI"))
+    assert len(res) == 1
+    assert res[0]["Primary Proposal ID"] == "pid_1_50"
+
+    # Test searching by a time range completely within the dataset
+    res = client.search(a.Time("2022/12/27 19:30", "2022/12/27 19:35"), a.Instrument("VBI"))
+    assert len(res) == 1
+    assert res[0]["Primary Proposal ID"] == "pid_1_50"
+
+    # Test searching by a time range that completely contains the dataset
+    res = client.search(a.Time("2022/12/27 19:26", "2022/12/27 20:01"), a.Instrument("VBI"))
+    assert len(res) == 1
+    assert res[0]["Primary Proposal ID"] == "pid_1_50"
+
+
 @pytest.fixture
 def empty_query_response():
     return DKISTQueryResponseTable()
