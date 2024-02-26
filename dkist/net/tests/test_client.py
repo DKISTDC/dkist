@@ -39,6 +39,7 @@ def test_search_by_time(client):
         res = client.search(t, a.Instrument("VBI"))
         assert len(res) == 1
         assert res[0]["Primary Proposal ID"] == "pid_1_50"
+        assert res[0]["Start Time"].value == '2022-12-27T19:27:42.338' and res[0]["End Time"].value == '2022-12-27T20:00:09.005'
 
 @pytest.fixture
 def empty_query_response():
