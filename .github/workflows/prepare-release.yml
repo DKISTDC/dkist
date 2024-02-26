@@ -30,6 +30,14 @@ jobs:
   pre_release_tasks:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate input
+        run: |
+          if [[ ${{ inputs.version }} = v* ]]
+          then
+            echo "::error title=Invalid Version::Invalid version number given"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
