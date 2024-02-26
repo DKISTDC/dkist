@@ -166,8 +166,8 @@ def test_and_simple(query_and_simple):
     assert out == [
         {
             "instrumentNames": "VBI",
-            "execTimeMin": "2020-06-01T00:00:00.000",
-            "execTimeMax": "2020-06-02T00:00:00.000",
+            "startTimeMin": "2020-06-01T00:00:00.000",
+            "endTimeMax": "2020-06-02T00:00:00.000",
         }
     ]
 
@@ -181,12 +181,12 @@ def test_or_instrument(query_or_instrument):
     assert out == [
         {
             "instrumentNames": "VBI",
-            "execTimeMin": "2020-06-01T00:00:00.000",
-            "execTimeMax": "2020-06-02T00:00:00.000",
+            "startTimeMin": "2020-06-01T00:00:00.000",
+            "endTimeMax": "2020-06-02T00:00:00.000",
         },
         {
             "instrumentNames": "VISP",
-            "execTimeMin": "2020-06-01T00:00:00.000",
-            "execTimeMax": "2020-06-02T00:00:00.000",
+            "startTimeMin": "2020-06-01T00:00:00.000",
+            "endTimeMax": "2020-06-02T00:00:00.000",
         }
     ]
