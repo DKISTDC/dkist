@@ -56,7 +56,7 @@ class BaseStripedExternalArray:
         if shape[0] == 1:
             shape = shape[1:]
 
-        if len(loader_array) == 1:
+        if loader_array.size == 1:
             return shape
         else:
             return tuple(list(loader_array.shape) + list(shape))
@@ -99,8 +99,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._basepath = None
         self.basepath = basepath  # Use the setter to convert to a Path
         self.chunksize = chunksize
-
-        self._fileuri_array = np.array(fileuris)
+        self._fileuri_array = np.atleast_1d(np.array(fileuris))
 
         loader_array = np.empty_like(self._fileuri_array, dtype=object)
         for i, fileuri in enumerate(self._fileuri_array.flat):
