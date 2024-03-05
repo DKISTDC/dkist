@@ -39,11 +39,11 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     )
 
     if keywords["label"] is None:
-        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
+        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
-        destination_path=Path("/~"),
+        destination_path=[Path("/~/AAAA")],
         **keywords
     )
 
@@ -79,11 +79,11 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
-        destination_path=Path("/~"),
+        destination_path=[Path("/~/AAAA")],
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
@@ -113,27 +113,14 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
 
     transfer_complete_datasets(["AAAA", "BBBB"])
 
-    orchestrate_transfer_mock.assert_has_calls(
-        [
-            mocker.call(
-                [Path("/data/pm_1_10/AAAA")],
-                recursive=True,
-                destination_path=Path("/~"),
-                destination_endpoint=None,
-                progress=True,
-                wait=True,
-                label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA",
-            ),
-            mocker.call(
-                [Path("/data/pm_1_10/BBBB")],
-                recursive=True,
-                destination_path=Path("/~"),
-                destination_endpoint=None,
-                progress=True,
-                wait=True,
-                label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} BBBB",
-            ),
-        ]
+    orchestrate_transfer_mock.assert_called_once_with(
+        [Path("/data/pm_1_10/AAAA"), Path("/data/pm_1_10/BBBB")],
+        recursive=True,
+        destination_path=[Path("/~/AAAA"), Path("/~/BBBB")],
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA,BBBB",
     )
 
     get_inv_mock.assert_called_once_with(["AAAA", "BBBB"])
@@ -153,21 +140,11 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
     transfer_complete_datasets(res, label="fibble")
 
     kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
-    orchestrate_transfer_mock.assert_has_calls(
-        [
-            mocker.call(
-                [Path("/data/pm_1_10/A")],
-                recursive=True,
-                destination_path=Path("/~"),
-                **kwargs
-            ),
-            mocker.call(
-                [Path("/data/pm_2_20/B")],
-                recursive=True,
-                destination_path=Path("/~"),
-                **kwargs
-            ),
-        ]
+    orchestrate_transfer_mock.assert_called_once_with(
+        [Path("/data/pm_1_10/A"), Path("/data/pm_2_20/B")],
+        recursive=True,
+        destination_path=[Path("/~/A"), Path("/~/B")],
+        **kwargs
     )
 
 
@@ -190,7 +167,7 @@ def test_transfer_from_length_one_table(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~"),
+                destination_path=[Path("/~/A")],
                 **kwargs
             ),
         ]
@@ -216,7 +193,7 @@ def test_transfer_from_row(orchestrate_transfer_mock, mocker):
             mocker.call(
                 [Path("/data/pm_1_10/A")],
                 recursive=True,
-                destination_path=Path("/~"),
+                destination_path=[Path("/~/A")],
                 **kwargs
             ),
         ]
@@ -249,21 +226,11 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
     transfer_complete_datasets(res, label="fibble")
 
     kwargs = {"progress": True, "wait": True, "destination_endpoint": None, "label": "fibble"}
-    orchestrate_transfer_mock.assert_has_calls(
-        [
-            mocker.call(
-                [Path("/data/pm_1_10/A")],
-                recursive=True,
-                destination_path=Path("/~"),
-                **kwargs
-            ),
-            mocker.call(
-                [Path("/data/pm_2_20/B")],
-                recursive=True,
-                destination_path=Path("/~"),
-                **kwargs
-            ),
-        ]
+    orchestrate_transfer_mock.assert_called_once_with(
+        [Path("/data/pm_1_10/A"), Path("/data/pm_2_20/B")],
+        recursive=True,
+        destination_path=[Path("/~/A"), Path("/~/B")],
+        **kwargs
     )
 
 
@@ -288,11 +255,11 @@ def test_transfer_path_interpolation(orchestrate_transfer_mock, mocker):
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
-        destination_path=Path("HIT/AAAA"),
+        destination_path=[Path("HIT/AAAA")],
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} AAAA"
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
