@@ -93,6 +93,12 @@ def reproject_vbi(
     footprint = []
     for tind in tqdm.tqdm(range(uni_tds.flat[0].data.shape[0])):
         tiles = [ds[tind] for ds in cropped.flat]
+        if combine_function == "fried_parameter":
+            # Sort the tiles by the fried parameter so the first one is
+            # prioritised with the best seeing.
+            tiles = list(sorted(tiles, key=lambda d: d.headers[0]["ATMOS_R0"]))
+            combine_function = "first"
+
         arr, fp = reproject.mosaicking.reproject_and_coadd(
             tiles,
             target_celestial_wcs,
