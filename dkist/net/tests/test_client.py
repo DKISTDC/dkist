@@ -208,7 +208,7 @@ def test_can_handle_query(client, query):
     a.Level(2),
     (a.Instrument("VBI"), a.Level(0)),
     (a.Instrument("VBI"), a.Detector("test")),
-    tuple(),
+    (),
 ))
 def test_cant_handle_query(client, query):
     """Some examples of invalid queries."""

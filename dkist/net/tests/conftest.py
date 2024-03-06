@@ -32,7 +32,7 @@ def api_param_names():
         a.Instrument: ('instrumentNames',),
         a.Wavelength: ('wavelengthRanges',),
         a.Physobs: ('hasAllStokes',),
-        a.Provider: tuple(),
+        a.Provider: (),
         da.Dataset: ('datasetIds',),
         da.WavelengthBand: ('filterWavelengths',),
         da.Observable: ('observables',),

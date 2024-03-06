@@ -35,7 +35,7 @@ def create_from_or(wlk, tree):
 
 @walker.add_creator(AttrAnd, DataAttr)
 def create_new_param(wlk, tree):
-    params = dict()
+    params = {}
 
     # Use the apply dispatcher to convert the attrs to their query parameters
     wlk.apply(tree, params)

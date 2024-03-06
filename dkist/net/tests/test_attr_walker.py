@@ -124,7 +124,7 @@ def test_boundingbox(search, search_type, boundingbox_param):
 
     out = walker.create(bb_query)
     assert len(out) == 1
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     # can't verify exact coordinates, they change a bit
     for key in out[0].keys():
@@ -161,7 +161,7 @@ def test_and_simple(query_and_simple):
     out = walker.create(query_and_simple)
     assert len(out) == 1
     assert isinstance(out, list)
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     assert out == [
         {
@@ -176,7 +176,7 @@ def test_or_instrument(query_or_instrument):
     out = walker.create(query_or_instrument)
     assert len(out) == 2
     assert isinstance(out, list)
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     assert out == [
         {

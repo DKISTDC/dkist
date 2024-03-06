@@ -128,11 +128,11 @@ def test_directory_listing(mocker, transfer_client, ls_response):
                  return_value=ls_response)
 
     ls = get_directory_listing("/")
-    assert all([isinstance(a, pathlib.Path) for a in ls])
+    assert all(isinstance(a, pathlib.Path) for a in ls)
     assert len(ls) == 13
 
     ls = get_directory_listing("/", "1234")
-    assert all([isinstance(a, pathlib.Path) for a in ls])
+    assert all(isinstance(a, pathlib.Path) for a in ls)
     assert len(ls) == 13
 
 

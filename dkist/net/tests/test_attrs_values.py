@@ -175,4 +175,4 @@ def test_get_search_attrs_values(mocker, caplog_dkist, values_in_home, user_file
 
     assert isinstance(attr_values, dict)
     # Test that some known attrs are in the result
-    assert set((a.Instrument, a.dkist.HeaderVersion, a.dkist.WorkflowName)).issubset(attr_values.keys())
+    assert {a.Instrument, a.dkist.HeaderVersion, a.dkist.WorkflowName}.issubset(attr_values.keys())

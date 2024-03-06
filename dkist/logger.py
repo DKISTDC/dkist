@@ -30,7 +30,7 @@ class DKISTLogger(logging.Logger):
 
     def __init__(self, name, level=logging.NOTSET, *, capture_warning_classes=None):
         super().__init__(name, level=level)
-        self.capture_warning_classes = tuple(capture_warning_classes) if capture_warning_classes is not None else tuple()
+        self.capture_warning_classes = tuple(capture_warning_classes) if capture_warning_classes is not None else ()
 
         self.enable_warnings_capture()
 

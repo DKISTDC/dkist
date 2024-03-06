@@ -89,7 +89,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname in times:
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            if not any([v is None for v in results[colname]]):
+            if not any(v is None for v in results[colname]):
                 results[colname] = Time(results[colname])
 
         for colname, unit in units.items():
@@ -241,7 +241,7 @@ class DKISTClient(BaseClient):
         supported = set(walker.applymm.registry)
         # This function is only called with arguments of the query where they are assumed to be ANDed.
         supported.remove(attr.AttrAnd)
-        query_attrs = set(type(x) for x in query)
+        query_attrs = {type(x) for x in query}
 
         # The DKIST client only requires that one or more of the support attrs be present.
         if not query_attrs.issubset(supported) or len(query_attrs.intersection(supported)) < 1:

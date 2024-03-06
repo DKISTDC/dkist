@@ -28,7 +28,7 @@ def get_registered_values():
 
 def _generate_from_register_values(attr_type):
     possible_values = get_registered_values()[attr_type]
-    possible_values = list(map(lambda x: x[0], possible_values))
+    possible_values = [x[0] for x in possible_values]
 
     return st.builds(attr_type, st.sampled_from(possible_values))
 

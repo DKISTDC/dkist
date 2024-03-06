@@ -306,11 +306,11 @@ def test_vct_dispatch():
     varying_matrix_lt = varying_matrix_lt.reshape((2, 2, 2, 2, 2, 2))
     crval_table = list(zip(np.arange(1, 17), np.arange(17, 33))) * u.arcsec
     crval_table = crval_table.reshape((2, 2, 2, 2, 2))
-    kwargs = dict(
-        crpix=(5, 5) * u.pix,
-        cdelt=(1, 1) * u.arcsec/u.pix,
-        lon_pole=180 * u.deg,
-    )
+    kwargs = {
+        "crpix": (5, 5) * u.pix,
+        "cdelt": (1, 1) * u.arcsec/u.pix,
+        "lon_pole": 180 * u.deg,
+    }
 
     vct = varying_celestial_transform_from_tables(
         pc_table=varying_matrix_lt[0, 0, 0],
@@ -348,11 +348,11 @@ def test_vct_shape_errors():
     crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
     crval_table = crval_table.reshape((5, 3, 2))
 
-    kwargs = dict(
-        crpix=(5, 5) * u.pix,
-        cdelt=(1, 1) * u.arcsec/u.pix,
-        lon_pole=180 * u.deg,
-    )
+    kwargs = {
+        "crpix": (5, 5) * u.pix,
+        "cdelt": (1, 1) * u.arcsec/u.pix,
+        "lon_pole": 180 * u.deg,
+    }
 
     with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
         VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
@@ -454,7 +454,7 @@ def test_vct(has_units, slit, num_varying_axes):
 
     # grid2 has coordinates outside the lut boundaries and should have nans
     world2 = vct(*grid2)
-    assert np.any(np.isnan([item for item in world2]))
+    assert np.any(np.isnan(list(world2)))
 
 
 def _evaluate_ravel(array_shape, inputs, order="C"):
@@ -483,7 +483,7 @@ def _evaluate_unravel(array_shape, index, order="C"):
     curr_offset = index
     # This if test is to handle multidimensional inputs properly
     if isinstance(index, np.ndarray):
-        output_shape = tuple([len(array_shape), len(index)])
+        output_shape = (len(array_shape), len(index))
     else:
         output_shape = len(array_shape)
     indices = np.zeros(output_shape, dtype=float)

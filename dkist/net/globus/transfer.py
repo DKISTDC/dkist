@@ -139,8 +139,7 @@ def _process_task_events(task_id, prev_events, tfr_client):
     """
 
     # Convert all the events into a (key, value) tuple pair
-    events = set(map(lambda x: tuple(x.items()),
-                     tfr_client.task_event_list(task_id)))
+    events = {tuple(x.items()) for x in tfr_client.task_event_list(task_id)}
     # Drop all events we have seen before
     new_events = events.difference(prev_events)
 
@@ -158,7 +157,7 @@ def _process_task_events(task_id, prev_events, tfr_client):
     if json_events:
         json_events = tuple(map(dict, map(json_loader, map(dict, json_events))))
     else:
-        json_events = tuple()
+        json_events = ()
 
     return events, json_events, message_events
 

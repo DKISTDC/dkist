@@ -117,8 +117,8 @@ def test_process_event_list(transfer_client, mock_task_event_list):
      message_events) = _process_task_events("1234", set(), transfer_client)
 
     assert isinstance(events, set)
-    assert all([isinstance(e, tuple) for e in events])
-    assert all([all([isinstance(item, tuple) for item in e]) for e in events])
+    assert all(isinstance(e, tuple) for e in events)
+    assert all(all(isinstance(item, tuple) for item in e) for e in events)
 
     print(events)
     assert len(json_events) == 1
@@ -135,8 +135,7 @@ def test_process_event_list(transfer_client, mock_task_event_list):
 
 def test_process_event_list_message_only(transfer_client, mock_task_event_list):
     # Filter out the json event
-    prev_events = tuple(map(lambda x: tuple(x.items()),
-                            mock_task_event_list.return_value))
+    prev_events = tuple(tuple(x.items()) for x in mock_task_event_list.return_value)
     prev_events = set(prev_events[0:1])
 
     (events,
@@ -144,8 +143,8 @@ def test_process_event_list_message_only(transfer_client, mock_task_event_list):
      message_events) = _process_task_events("1234", prev_events, transfer_client)
 
     assert isinstance(events, set)
-    assert all([isinstance(e, tuple) for e in events])
-    assert all([all([isinstance(item, tuple) for item in e]) for e in events])
+    assert all(isinstance(e, tuple) for e in events)
+    assert all(all(isinstance(item, tuple) for item in e) for e in events)
 
     assert len(json_events) == 0
     assert isinstance(json_events, tuple)
