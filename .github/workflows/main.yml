@@ -38,7 +38,7 @@ jobs:
         - linux: py311
         - windows: py310-online
         - macos: py39
-        - linux: build_docs
+        - linux: build_docs-notebooks
           pytest: false
           libraries:
             apt:
