@@ -1,9 +1,9 @@
-import os
-import json
-import shutil
-import logging
 import datetime
 import importlib
+import json
+import logging
+import os
+import shutil
 from platform import system
 
 import platformdirs
@@ -12,8 +12,12 @@ import pytest
 from sunpy.net import attrs as a
 
 import dkist.data
-from dkist.net.attrs_values import (_fetch_values_to_file, _get_cached_json,
-                                    attempt_local_update, get_search_attrs_values)
+from dkist.net.attrs_values import (
+    _fetch_values_to_file,
+    _get_cached_json,
+    attempt_local_update,
+    get_search_attrs_values,
+)
 
 PACKAGE_FILE = importlib.resources.files(dkist.data) / "api_search_values.json"
 
