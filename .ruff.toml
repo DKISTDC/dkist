@@ -5,7 +5,15 @@ exclude = [
   "__pycache__",
   "build",
 ]
-select = ["F", "E", "W", "UP", "I", "C4"]
+select = [
+  "F",
+  "E",
+  "W",
+  "UP",
+  "I",
+  "C4",
+  "PT",
+]
 extend-ignore = [
   # pycodestyle (E, W)
   "E501", # LineTooLong                             # TODO! fix

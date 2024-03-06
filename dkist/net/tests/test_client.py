@@ -39,7 +39,8 @@ def test_search_by_time(client, time):
         res = client.search(time, a.Instrument("VBI"))
         assert len(res) == 1
         assert res[0]["Primary Proposal ID"] == "pid_1_50"
-        assert res[0]["Start Time"].value == '2022-12-27T19:27:42.338' and res[0]["End Time"].value == '2022-12-27T20:00:09.005'
+        assert res[0]["Start Time"].value == '2022-12-27T19:27:42.338'
+        assert res[0]["End Time"].value == '2022-12-27T20:00:09.005'
 
 @pytest.fixture
 def empty_query_response():
@@ -202,14 +203,14 @@ def test_can_handle_query(client, query):
         assert client._can_handle_query(query)
 
 
-@pytest.mark.parametrize("query", (
+@pytest.mark.parametrize("query", [
     a.Instrument("bob"),
     a.Physobs("who's got the button"),
     a.Level(2),
     (a.Instrument("VBI"), a.Level(0)),
     (a.Instrument("VBI"), a.Detector("test")),
     (),
-))
+])
 def test_cant_handle_query(client, query):
     """Some examples of invalid queries."""
     assert not client._can_handle_query(query)

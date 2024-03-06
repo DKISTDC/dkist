@@ -162,7 +162,7 @@ def test_reprs(file_manager):
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
+    return mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
                        autospec=True)
 
 
@@ -254,10 +254,10 @@ def test_length_one_first_array_axis(small_visp_dataset):
     assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
 
 
-@pytest.mark.parametrize("kwargs", (
+@pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
-))
+])
 def test_download_quality(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
     from dkist.net import conf
@@ -276,10 +276,10 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
     )
 
 
-@pytest.mark.parametrize("kwargs", (
+@pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
-))
+])
 def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
     from dkist.net import conf

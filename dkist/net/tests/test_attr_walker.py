@@ -23,7 +23,7 @@ def query_or_instrument():
     """
     return (a.Instrument("VBI") | a.Instrument("VISP")) & a.Time("2020/06/01", "2020/06/02")
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def boundingbox_params():
     """
     Create possible bounding box input coordinates and args
@@ -42,7 +42,7 @@ def boundingbox_params():
     width = 3.4 * u.deg
     height = 1.2 * u.deg
 
-    yield {
+    return {
         # bottom_left, top_right, width, height
         "bottom left vector icrs": [bottom_left_vector_icrs, None, None, None],
         "bottom left top right icrs": [bottom_left_icrs, top_right_icrs, None, None],
@@ -51,13 +51,12 @@ def boundingbox_params():
     }
 
 
-@pytest.fixture(scope="function",
-                params=["bottom left vector icrs",
+@pytest.fixture(params=["bottom left vector icrs",
                         "bottom left top right icrs",
                         "bottom left top right",
                         "bottom left width height",],)
 def boundingbox_param(request, boundingbox_params):
-    yield boundingbox_params[request.param]
+    return boundingbox_params[request.param]
 
 
 def test_walker_single(all_attrs_classes, api_param_names):
@@ -111,7 +110,7 @@ def test_walker_single(all_attrs_classes, api_param_names):
     assert not set(api_param_names[all_attrs_classes]).difference(params[0].keys())
 
 
-@pytest.mark.parametrize("search,search_type",
+@pytest.mark.parametrize(("search", "search_type"),
                          [
                              ('containing', 'rectangleContainingBoundingBox'),
                              ('contained', 'rectangleContainedByBoundingBox'),
@@ -136,7 +135,7 @@ def test_boundingbox(search, search_type, boundingbox_param):
         assert coordinate_regex.search(value)
 
 def test_args_browsemovie():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Either movieurl or movieobjectkey must be specified"):
         da.BrowseMovie()
 
 

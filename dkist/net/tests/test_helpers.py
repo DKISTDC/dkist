@@ -11,7 +11,7 @@ from dkist.net.helpers import transfer_complete_datasets
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.net.helpers._orchestrate_transfer_task", autospec=True)
+    return mocker.patch("dkist.net.helpers._orchestrate_transfer_task", autospec=True)
 
 
 @pytest.mark.parametrize(

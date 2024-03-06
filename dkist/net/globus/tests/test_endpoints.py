@@ -52,7 +52,7 @@ def test_get_transfer_client(mocker, transfer_client):
     assert isinstance(transfer_client, globus_sdk.TransferClient)
 
 
-@pytest.mark.parametrize("endpoint_id", ("12345", None))
+@pytest.mark.parametrize("endpoint_id", ["12345", None])
 def test_get_local_endpoint_id(mocker, endpoint_id):
     lgcp_mock = mocker.patch("globus_sdk.LocalGlobusConnectPersonal.endpoint_id",
                              new_callable=mocker.PropertyMock)
@@ -76,9 +76,8 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
     # Test multiple match fail
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(ValueError, match="Multiple"):
         get_endpoint_id(" ", transfer_client)
-    assert "Multiple" in str(exc.value)
 
     # Test just one result
     mock_search.return_value = {"DATA": endpoint_search["DATA"][1:2]}
@@ -87,9 +86,8 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
 
     # Test no results
     mock_search.return_value = {"DATA": []}
-    with pytest.raises(ValueError) as e_info:
+    with pytest.raises(ValueError, match="No matches"):
         get_endpoint_id(" ", transfer_client)
-    assert "No matches" in str(e_info.value)
 
 
 def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):

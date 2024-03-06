@@ -130,7 +130,7 @@ def test_attempt_local_update_error_download(mocker, caplog_dkist, tmp_homedir, 
         ("dkist", logging.ERROR, "Failed to download new attrs values."),
     ]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="This is a value error"):
         success = attempt_local_update(silence_errors=False)
 
 
@@ -155,7 +155,7 @@ def test_attempt_local_update_fail_invalid_download(mocker, tmp_path, caplog_dki
         success = attempt_local_update(user_file=json_file, silence_errors=False)
 
 
-@pytest.mark.parametrize("user_file, update_needed, allow_update, should_update", [
+@pytest.mark.parametrize(("user_file", "update_needed", "allow_update", "should_update"), [
     ("user_file", False, True, False),
     ("user_file", True, True, True),
     ("user_file", True, False, False),

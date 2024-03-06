@@ -99,7 +99,7 @@ def test_varying_transform_pc():
     assert u.allclose(vct.inverse(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
 
 
-@pytest.mark.parametrize(("pixel", "lon_shape"), (
+@pytest.mark.parametrize(("pixel", "lon_shape"), [
     ((*np.mgrid[0:10, 0:10] * u.pix, np.arange(10) * u.pix), (10, 10)),
     (np.mgrid[0:10, 0:10, 0:5] * u.pix, (10, 10, 5)),
     ((2 * u.pix, 2 * u.pix, np.arange(10) * u.pix), (10,)),
@@ -107,7 +107,7 @@ def test_varying_transform_pc():
       np.arange(10) * u.pix,
       np.arange(10)[..., None] * u.pix), (10, 10)),
     (np.mgrid[0:1024, 0:1000, 0:2] * u.pix, (1024, 1000, 2)),
-))
+])
 def test_varying_transform_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
@@ -273,7 +273,7 @@ def test_varying_transform_4d_pc_unitless():
     assert np.isnan(vct(0, 0, -10, 0)).all()
 
 
-@pytest.mark.parametrize(("pixel", "lon_shape"), (
+@pytest.mark.parametrize(("pixel", "lon_shape"), [
     ((*np.mgrid[0:5, 0:5] * u.pix, np.arange(5) * u.pix, 0 * u.pix), (5, 5)),
     (np.mgrid[0:10, 0:10, 0:5, 0:3] * u.pix, (10, 10, 5, 3)),
     ((2 * u.pix, 2 * u.pix, 0*u.pix, np.arange(3) * u.pix), (3,)),
@@ -281,7 +281,7 @@ def test_varying_transform_4d_pc_unitless():
       np.arange(10) * u.pix,
       np.arange(5)[..., None] * u.pix,
       np.arange(3)[..., None, None]), (3, 5, 10)),
-))
+])
 def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
@@ -608,14 +608,16 @@ def test_ravel_repr(ndim, order):
     array_shape = tuple(rng.integers(1, 21, ndim))
     ravel = Ravel(array_shape, order=order)
     unravel = ravel.inverse
-    assert str(array_shape) in repr(ravel) and order in repr(ravel)
-    assert str(array_shape) in repr(unravel) and order in repr(unravel)
+    assert str(array_shape) in repr(ravel)
+    assert order in repr(ravel)
+    assert str(array_shape) in repr(unravel)
+    assert order in repr(unravel)
 
 
 @pytest.mark.parametrize("array_shape", [(0, 1), (1, 0), (1,)])
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_array_shape(array_shape, ravel):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="array_shape must be at least 2D and have values >= 1"):
         ravel(array_shape)
 
 
@@ -623,7 +625,7 @@ def test_ravel_bad_array_shape(array_shape, ravel):
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_order(order, ravel):
     array_shape=(2, 2, 2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="order kwarg must be one of 'C' or 'F'"):
         ravel(array_shape, order)
 
 

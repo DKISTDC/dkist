@@ -80,15 +80,13 @@ def test_load_from_directory():
 
 
 def test_from_directory_no_asdf(tmp_path):
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="No asdf file found"):
         load_dataset(tmp_path)
-        assert "No asdf file found" in str(e)
 
 
 def test_from_not_directory():
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="does not exist"):
         load_dataset(rootdir / "notadirectory")
-        assert "directory argument" in str(e)
 
 
 def test_load_tiled_dataset():
@@ -114,15 +112,13 @@ def test_load_with_old_methods():
 
 
 def test_from_directory_not_dir():
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="asdf does not exist"):
         load_dataset(rootdir / 'EIT' / 'eit_2004-03-01T00_00_10.515000.asdf')
-        assert "must be a directory" in str(e)
 
 
 def test_load_with_invalid_input():
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(TypeError, match="Input type .* not recognised."):
         load_dataset(42)
-        assert "Input type not recognised." in str(e)
 
 
 def test_crop_few_slices(dataset_4d):

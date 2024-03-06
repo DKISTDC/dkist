@@ -49,12 +49,12 @@ def fixture_finder(request):
     return request.getfixturevalue(request.param)
 
 
-@pytest.mark.parametrize("fixture_finder", (
+@pytest.mark.parametrize("fixture_finder", [
         "asdf_path",
         "asdf_str",
         "single_asdf_in_folder",
         "single_asdf_in_folder_str",
-    ),
+    ],
     indirect=True
 )
 def test_load_single_dataset(fixture_finder):
@@ -62,10 +62,10 @@ def test_load_single_dataset(fixture_finder):
     assert isinstance(ds, Dataset)
 
 
-@pytest.mark.parametrize("fixture_finder", (
+@pytest.mark.parametrize("fixture_finder", [
         ["asdf_path", "asdf_str", "single_asdf_in_folder", "single_asdf_in_folder_str"],
         ("asdf_path", "asdf_str", "single_asdf_in_folder", "single_asdf_in_folder_str"),
-    ),
+    ],
     indirect=True
 )
 def test_load_multiple(fixture_finder):

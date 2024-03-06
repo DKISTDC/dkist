@@ -16,12 +16,12 @@ def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert simple_tiled_dataset.shape == (2, 2)
 
 
-@pytest.mark.parametrize("aslice", (np.s_[0,0],
+@pytest.mark.parametrize("aslice", [np.s_[0,0],
                                     np.s_[0],
                                     np.s_[...,0],
                                     np.s_[:,1],
                                     np.s_[1,1],
-                                    np.s_[0:2, :]))
+                                    np.s_[0:2, :]])
 def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
     assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
 
