@@ -310,48 +310,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
 
 
 class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform, ABC):
-    def _map_transform(self, x, y, z, q, crpix, cdelt, lon_pole, inverse=False):
-        # We need to broadcast the arrays together so they are all the same shape
-        bx, by, bz, bq = np.broadcast_arrays(x, y, z, q, subok=True)
-        # Convert the z coordinate into an index to the lookup tables
-        zind = self.sanitize_index(bz)
-        qind = self.sanitize_index(bq)
-
-        # Generate output arrays (ignore units for simplicity)
-        if isinstance(bx, u.Quantity):
-            x_out = np.empty_like(bx.value)
-            y_out = np.empty_like(by.value)
-        else:
-            x_out = np.empty_like(bx)
-            y_out = np.empty_like(by)
-
-        # We now loop over every unique value of z and compute the transform.
-        # This means we make the minimum number of calls possible to the transform.
-        z_range = np.unique(zind)  # raster
-        q_range = np.unique(qind)  # other: maps or meas
-        for zz in z_range:
-            for qq in q_range:
-                # Scalar parameters are reshaped to be length one arrays by modeling
-                sct = self.transform_at_index((zz, qq), crpix[0], cdelt[0], lon_pole[0])
-
-                # Call this transform for all values of x, y where z == zind and q == qind
-                mask = np.logical_and(zind == zz, qind == qq)
-                if inverse:
-                    xx, yy = sct.inverse(bx[mask], by[mask])
-                else:
-                    xx, yy = sct(bx[mask], by[mask])
-
-                if isinstance(xx, u.Quantity):
-                    x_out[mask], y_out[mask] = xx.value, yy.value
-                else:
-                    x_out[mask], y_out[mask] = xx, yy
-
-        # Put the units back
-        if isinstance(xx, u.Quantity):
-            x_out = x_out << xx.unit
-            y_out = y_out << yy.unit
-
-        return x_out, y_out
+    pass
 
 
 class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
@@ -404,52 +363,7 @@ class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
                                    inverse=True)
 
 class BaseVaryingCelestialTransform3D(BaseVaryingCelestialTransform, ABC):
-    def _map_transform(self, x, y, m, z, q, crpix, cdelt, lon_pole, inverse=False):
-        # We need to broadcast the arrays together so they are all the same shape
-        bx, by, bm, bz, bq = np.broadcast_arrays(x, y, m, z, q, subok=True)
-        # Convert the z coordinate into an index to the lookup tables
-        zind = self.sanitize_index(bz)
-        qind = self.sanitize_index(bq)
-        mind = self.sanitize_index(bm)
-
-        # Generate output arrays (ignore units for simplicity)
-        if isinstance(bx, u.Quantity):
-            x_out = np.empty_like(bx.value)
-            y_out = np.empty_like(by.value)
-        else:
-            x_out = np.empty_like(bx)
-            y_out = np.empty_like(by)
-
-        # We now loop over every unique value of z and compute the transform.
-        # This means we make the minimum number of calls possible to the transform.
-        m_range = np.unique(mind)  # raster
-        q_range = np.unique(qind)  # maps
-        z_range = np.unique(zind)  # meas
-        for mm in m_range:
-            for zz in z_range:
-                for qq in q_range:
-                    # Scalar parameters are reshaped to be length one arrays by modeling
-                    sct = self.transform_at_index((mm, zz, qq), crpix[0], cdelt[0], lon_pole[0])
-
-                    # Call this transform for all values of x, y where z == zind q == qind and m == mind
-                    mask = np.logical_and(np.logical_and(mind == mm, zind == zz), qind == qq)
-                    if inverse:
-                        xx, yy = sct.inverse(bx[mask], by[mask])
-                    else:
-                        xx, yy = sct(bx[mask], by[mask])
-
-                    if isinstance(xx, u.Quantity):
-                        x_out[mask], y_out[mask] = xx.value, yy.value
-                    else:
-                        x_out[mask], y_out[mask] = xx, yy
-
-        # Put the units back
-        if isinstance(xx, u.Quantity):
-            x_out = x_out << xx.unit
-            y_out = y_out << yy.unit
-
-        return x_out, y_out
-
+    pass
 
 
 class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
