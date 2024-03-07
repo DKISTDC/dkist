@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Union, Literal, Iterable
 from functools import cache
+from itertools import product
 
 import numpy as np
 
@@ -197,33 +198,39 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
         return sct
 
-    def _map_transform(self, x, y, z, crpix, cdelt, lon_pole, inverse=False):
+    def _map_transform(self, *arrays, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
-        bx, by, bz = np.broadcast_arrays(x, y, z, subok=True)
-        # Convert the z coordinate into an index to the lookup tables
-        zind = self.sanitize_index(bz)
+        barrays = np.broadcast_arrays(*arrays, subok=True)
+        # # Convert the z, q, and m coordinates where present into indices to the lookup tables
+        inds = []
+        for barray in barrays[2:]:
+            inds.append(self.sanitize_index(barray))
 
         # Generate output arrays (ignore units for simplicity)
-        if isinstance(bx, u.Quantity):
-            x_out = np.empty_like(bx.value)
-            y_out = np.empty_like(by.value)
+        if isinstance(barrays[0], u.Quantity):
+            x_out = np.empty_like(barrays[0].value)
+            y_out = np.empty_like(barrays[1].value)
         else:
-            x_out = np.empty_like(bx)
-            y_out = np.empty_like(by)
+            x_out = np.empty_like(barrays[0])
+            y_out = np.empty_like(barrays[1])
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
-        z_range = np.unique(zind)
-        for zzind in z_range:
+        ranges = [np.unique(ind) for ind in inds]
+        for ind in product(*ranges):
             # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(zzind, crpix[0], cdelt[0], lon_pole[0])
+            sct = self.transform_at_index(ind)
 
             # Call this transform for all values of x, y where z == zind
-            mask = zind == zzind
-            if inverse:
-                xx, yy = sct.inverse(bx[mask], by[mask])
+            masks = [inds[i] == ind[i] for i in range(len(ind))]
+            if len(masks) > 1:
+                mask = np.logical_and(*masks)
             else:
-                xx, yy = sct(bx[mask], by[mask])
+                mask = masks[0]
+            if inverse:
+                xx, yy = sct.inverse(barrays[0][mask], barrays[1][mask])
+            else:
+                xx, yy = sct(barrays[0][mask], barrays[1][mask])
 
             if isinstance(xx, u.Quantity):
                 x_out[mask], y_out[mask] = xx.value, yy.value
