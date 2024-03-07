@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Union, Literal, Iterable
+from functools import cache
 
 import numpy as np
 
@@ -155,6 +156,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
+    @cache
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
@@ -263,7 +265,7 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
         return {"x": u.pix, "y": u.pix, "z": u.pix}
 
     def evaluate(self, x, y, z, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, z, crpix, cdelt, lon_pole)
+        return self._map_transform(x, y, z, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
 
     @property
     def inverse(self):
@@ -297,7 +299,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         self.outputs = ("x", "y")
 
     def evaluate(self, lon, lat, z, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, z, crpix, cdelt, lon_pole, inverse=True)
+        return self._map_transform(lon, lat, z, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole, inverse=True)
 
 
 class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform, ABC):
@@ -362,7 +364,7 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
         return {"x": u.pix, "y": u.pix, "z": u.pix, "q": u.pix}
 
     def evaluate(self, x, y, z, q, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, z, q, crpix, cdelt, lon_pole)
+        return self._map_transform(x, y, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
 
     @property
     def inverse(self):
@@ -391,7 +393,7 @@ class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
         self.outputs = ("x", "y")
 
     def evaluate(self, lon, lat, z, q, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, z, q, crpix, cdelt, lon_pole,
+        return self._map_transform(lon, lat, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole,
                                    inverse=True)
 
 class BaseVaryingCelestialTransform3D(BaseVaryingCelestialTransform, ABC):
@@ -460,7 +462,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
         return {"x": u.pix, "y": u.pix, "m": u.pix, "z": u.pix, "q": u.pix}
 
     def evaluate(self, x, y, m, z, q, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, m, z, q, crpix, cdelt, lon_pole)
+        return self._map_transform(x, y, m, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
 
     @property
     def inverse(self):
@@ -489,7 +491,7 @@ class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
         self.outputs = ("x", "y")
 
     def evaluate(self, lon, lat, m, z, q, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, m, z, q, crpix, cdelt, lon_pole,
+        return self._map_transform(lon, lat, m, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole,
                                    inverse=True)
 
 class CoupledCompoundModel(CompoundModel):
