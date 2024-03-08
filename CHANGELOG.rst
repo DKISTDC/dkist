@@ -1,3 +1,18 @@
+1.4.0 (2024-02-26)
+==================
+
+Bug Fixes
+---------
+
+- Correct Fido time searching to use `endTimeMin` and `startTimeMax` (in the correct order) so that searching returns any dataset with a partially or completely overlapping time range. (`#336 <https://github.com/DKISTDC/dkist/pull/336>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Adjust file loading to support single-frame datasets with no time axis. (`#335 <https://github.com/DKISTDC/dkist/pull/335>`_)
+
+
 1.3.0 (2024-02-19)
 ==================
 

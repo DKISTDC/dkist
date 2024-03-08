@@ -23,6 +23,8 @@ def stack_loader_array(loader_array, chunksize):
     # If the chunksize sin't specified then use the whole array shape
     chunksize = chunksize or loader_array.flat[0].shape
 
+    if loader_array.size == 1:
+        return tuple(loader_to_dask(loader_array, chunksize))[0]
     if len(loader_array.shape) == 1:
         return da.stack(loader_to_dask(loader_array, chunksize))
     stacks = []
@@ -38,9 +40,10 @@ def loader_to_dask(loader_array, chunksize):
     This is done so that an explicit ``meta=`` argument can be provided to
     prevent loading data from disk.
     """
-
-    if len(loader_array.shape) != 1:
+    if loader_array.size != 1 and len(loader_array.shape) != 1:
         raise ValueError("Can only be used on one dimensional arrays")
+
+    loader_array = np.atleast_1d(loader_array)
 
     # The meta argument to from array is used to determine properties of the
     # array, such as dtype. We explicitly specify it here to prevent dask
