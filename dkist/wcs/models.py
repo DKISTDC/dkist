@@ -245,6 +245,16 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
         return x_out, y_out
 
+    def evaluate(self, *inputs):
+        # This method has to be able to take an arbitrary number of arrays but also accept not being given kwargs
+        # Fortunately we know how many arrays to expect from the number of inputs
+        # Anything extra is therefore a kwarg
+        arrays = inputs[:self.n_inputs]
+        kwargs = inputs[self.n_inputs:]
+        keys = ["crpix", "cdelt", "lon_pole"]
+        kwargs = dict(zip(keys, kwargs))
+        return self._map_transform(*arrays, **kwargs)
+
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     """
@@ -271,9 +281,6 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     def input_units(self):
         # NB: x and y are normally on the detector and z is typically the number of raster steps
         return {"x": u.pix, "y": u.pix, "z": u.pix}
-
-    def evaluate(self, x, y, z, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, z, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
 
     @property
     def inverse(self):
@@ -326,9 +333,6 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     def input_units(self):
         return {"x": u.pix, "y": u.pix, "z": u.pix, "q": u.pix}
 
-    def evaluate(self, x, y, z, q, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
-
     @property
     def inverse(self):
         ivct = InverseVaryingCelestialTransform2D(
@@ -374,9 +378,6 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     @property
     def input_units(self):
         return {"x": u.pix, "y": u.pix, "m": u.pix, "z": u.pix, "q": u.pix}
-
-    def evaluate(self, x, y, m, z, q, crpix, cdelt, lon_pole):
-        return self._map_transform(x, y, m, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole)
 
     @property
     def inverse(self):
