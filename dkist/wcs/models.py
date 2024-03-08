@@ -187,6 +187,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
+        print(f"Generating transform at {ind=}")
         sct = generate_celestial_transform(
             crpix=crpix,
             cdelt=cdelt,
