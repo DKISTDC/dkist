@@ -157,6 +157,13 @@ class BaseVaryingCelestialTransform(Model, ABC):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
+        self.inputs = ["x", "y", "z", "q", "m"][:self.n_inputs]
+        self.outputs = ("lon", "lat")
+
+        if len(self.table_shape) != self.n_inputs-2:
+            raise ValueError(f"This model can only be constructed with a {self.n_inputs-2}-dimensional lookup table.")
+
+
     # @cache
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
@@ -275,14 +282,6 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     n_inputs = 3
     n_outputs = 2
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("x", "y", "z")
-        self.outputs = ("lon", "lat")
-
-        if len(self.table_shape) != 1:
-            raise ValueError("This model can only be constructed with a one dimensional lookup table.")
-
     @property
     def inverse(self):
         ivct = InverseVaryingCelestialTransform(
@@ -322,14 +321,6 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     n_outputs = 2
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("x", "y", "z", "q")
-        self.outputs = ("lon", "lat")
-
-        if len(self.table_shape) != 2:
-            raise ValueError("This model can only be constructed with a two dimensional lookup table.")
-
     @property
     def inverse(self):
         ivct = InverseVaryingCelestialTransform2D(
@@ -363,14 +354,6 @@ class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
 class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     n_outputs = 2
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("x", "y", "m", "z", "q")
-        self.outputs = ("lon", "lat")
-
-        if len(self.table_shape) != 3:
-            raise ValueError("This model can only be constructed with a three dimensional lookup table.")
 
     @property
     def inverse(self):
