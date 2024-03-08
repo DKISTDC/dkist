@@ -255,6 +255,12 @@ class BaseVaryingCelestialTransform(Model, ABC):
         kwargs = dict(zip(keys, kwargs))
         return self._map_transform(*arrays, **kwargs)
 
+    @property
+    def input_units(self):
+        # NB: x and y are normally on the detector and z is typically the number of raster steps
+        dims = ["x", "y", "z", "q", "m"]
+        return {d: u.pix for d in dims[:self.n_inputs]}
+
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     """
@@ -276,11 +282,6 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
 
         if len(self.table_shape) != 1:
             raise ValueError("This model can only be constructed with a one dimensional lookup table.")
-
-    @property
-    def input_units(self):
-        # NB: x and y are normally on the detector and z is typically the number of raster steps
-        return {"x": u.pix, "y": u.pix, "z": u.pix}
 
     @property
     def inverse(self):
@@ -330,10 +331,6 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
             raise ValueError("This model can only be constructed with a two dimensional lookup table.")
 
     @property
-    def input_units(self):
-        return {"x": u.pix, "y": u.pix, "z": u.pix, "q": u.pix}
-
-    @property
     def inverse(self):
         ivct = InverseVaryingCelestialTransform2D(
             crpix=self.crpix,
@@ -374,10 +371,6 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
 
         if len(self.table_shape) != 3:
             raise ValueError("This model can only be constructed with a three dimensional lookup table.")
-
-    @property
-    def input_units(self):
-        return {"x": u.pix, "y": u.pix, "m": u.pix, "z": u.pix, "q": u.pix}
 
     @property
     def inverse(self):
