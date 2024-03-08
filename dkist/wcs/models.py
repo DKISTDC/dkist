@@ -310,11 +310,7 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
         return self._map_transform(lon, lat, z, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole, inverse=True)
 
 
-class BaseVaryingCelestialTransform2D(BaseVaryingCelestialTransform, ABC):
-    pass
-
-
-class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
+class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     n_outputs = 2
 
@@ -346,7 +342,7 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
         return ivct
 
 
-class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
+class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     n_outputs = 2
 
@@ -363,11 +359,7 @@ class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
         return self._map_transform(lon, lat, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole,
                                    inverse=True)
 
-class BaseVaryingCelestialTransform3D(BaseVaryingCelestialTransform, ABC):
-    pass
-
-
-class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
+class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     n_outputs = 2
 
@@ -399,7 +391,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
         return ivct
 
 
-class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
+class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     n_outputs = 2
 
