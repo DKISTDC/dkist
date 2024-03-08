@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import Union, Literal, Iterable
-from functools import cache
+# from functools import cache
 from itertools import product
 
 import numpy as np
@@ -157,7 +157,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
-    @cache
+    # @cache
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
@@ -220,7 +220,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         ranges = [np.unique(ind) for ind in inds]
         for ind in product(*ranges):
             # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(ind)
+            sct = self.transform_at_index(ind, crpix=crpix[0], cdelt=cdelt[0], lon_pole=lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
             masks = [inds[i] == ind[i] for i in range(len(ind))]
