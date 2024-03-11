@@ -14,6 +14,7 @@ import parfive
 import astropy.units as u
 from astropy.table import TableAttribute
 from astropy.time import Time
+
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,

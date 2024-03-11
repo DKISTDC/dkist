@@ -3,13 +3,14 @@ import numpy as np
 import asdf
 import astropy.units as u
 import gwcs
-import sunpy.map
 from astropy.io import fits
 from astropy.modeling.models import (AffineTransformation2D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.table import Table
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
+
+import sunpy.map
 from sunpy.time import parse_time
 
 from dkist_inventory.asdf_generator import references_from_filenames

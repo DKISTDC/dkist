@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from astropy.io import fits
+
 from sunpy.util.decorators import add_common_docstring
 
 from dkist import log
