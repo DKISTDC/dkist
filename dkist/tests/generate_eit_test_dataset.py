@@ -13,10 +13,6 @@ from gwcs import coordinate_frames as cf
 import sunpy.map
 from sunpy.time import parse_time
 
-from dkist_inventory.asdf_generator import references_from_filenames
-from dkist_inventory.header_parsing import HeaderParser
-from dkist_inventory.transforms import generate_lookup_table
-
 
 def map_to_transform(smap):
     # crval1u, crval2u = smap.reference_coordinate.Tx, smap.reference_coordinate.Ty
@@ -60,6 +56,9 @@ def map_to_transform(smap):
 
 def main():
     from dkist.data.test import rootdir
+    from dkist_inventory.asdf_generator import references_from_filenames
+    from dkist_inventory.header_parsing import HeaderParser
+    from dkist_inventory.transforms import generate_lookup_table
     files = list((rootdir / "EIT").glob("*.fits"))
 
     files.sort()

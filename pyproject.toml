@@ -55,6 +55,7 @@ tests = [
   "pytest-httpserver",
   "hypothesis",
   "tox",
+  "pydot",
 ]
 docs = [
   "sphinx",

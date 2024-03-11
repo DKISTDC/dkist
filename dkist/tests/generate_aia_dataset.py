@@ -20,7 +20,6 @@ from sunpy.net.jsoc import JSOCClient
 from sunpy.time import parse_time
 
 from dkist import load_dataset
-from dkist.asdf_maker.helpers import generate_lookup_table
 
 
 def map_to_transform(smap):
@@ -93,6 +92,8 @@ def references_from_filenames(filename_array, relative_to=None):
 
 
 def main():
+    from dkist_inventory.transforms import generate_lookup_table
+
     path = Path('~/sunpy/data/jsocflare/').expanduser()
     files = glob.glob(str(path / '*.fits'))
 
