@@ -1,29 +1,35 @@
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    # This should be before any formatting hooks like isort
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.2.2"
     hooks:
-      - id: check-yaml
-      - id: check-ast
-      - id: debug-statements
-      - id: check-added-large-files
-        args: ['--maxkb=750']
-      - id: check-case-conflict
-      - id: trailing-whitespace
-        exclude: ".*(.fits|.asdf)"
-      - id: mixed-line-ending
-        files: ".*.py"
-      - id: end-of-file-fixer
-        exclude: ".*(.fits|.asdf|.json)"
-  -  repo: https://github.com/pycqa/flake8
-     rev: 7.0.0
-     hooks:
-       - id: flake8
-         additional_dependencies: [flake8-docstrings]
-         args: ['--select', 'E101,W191,W291,W292,W293,W391,E111,E112,E113,E901,E902,F401']
-  - repo: https://github.com/pycqa/isort
+      - id: ruff
+        args: ["--fix"]
+  - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        additional_dependencies: [toml]
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|dkist/extern)$"
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-ast
+      - id: check-case-conflict
+      - id: trailing-whitespace
+        exclude: ".*(.fits|.asdf)"
+      - id: check-yaml
+      - id: debug-statements
+      - id: check-added-large-files
+        args: ["--enforce-all", "--maxkb=1054"]
+      - id: end-of-file-fixer
+        exclude: ".*(.fits|.asdf|.json)"
+      - id: mixed-line-ending
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*)$"
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        args: [ "--write-changes" ]
 ci:
   autofix_prs: false
+  autoupdate_schedule: "weekly"
