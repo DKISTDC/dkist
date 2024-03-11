@@ -16,14 +16,10 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 __all__ = [
     "CoupledCompoundModel",
-    "InverseVaryingCelestialTransform",
-    "InverseVaryingCelestialTransform2D",
-    "InverseVaryingCelestialTransform3D",
     "VaryingCelestialTransform",
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
     "BaseVaryingCelestialTransform",
-    "BaseVaryingCelestialTransform2D",
     "generate_celestial_transform",
     "AsymmetricMapping",
     "varying_celestial_transform_from_tables",
@@ -309,26 +305,14 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     n_outputs = 2
 
 
-class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
-    pass
-
-
 class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     n_outputs = 2
 
 
-class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
-    pass
-
-
 class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     n_outputs = 2
-
-
-class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform):
-    pass
 
 
 class CoupledCompoundModel(CompoundModel):
@@ -511,9 +495,6 @@ varying_celestial_transform_dict = {
     (1, False): VaryingCelestialTransform,
     (2, False): VaryingCelestialTransform2D,
     (3, False): VaryingCelestialTransform3D,
-    (1,  True): InverseVaryingCelestialTransform,
-    (2,  True): InverseVaryingCelestialTransform2D,
-    (3,  True): InverseVaryingCelestialTransform3D,
 }
 
 def varying_celestial_transform_from_tables(
