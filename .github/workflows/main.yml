@@ -36,14 +36,14 @@ jobs:
       envs: |
         - linux: py312
         - linux: py311
-        - windows: py310-online
-        - macos: py39
+        - windows: py311-online
+        - macos: py310
         - linux: build_docs-notebooks
           pytest: false
           libraries:
             apt:
               - graphviz
-        - linux: py39-oldestdeps
+        - linux: py310-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
