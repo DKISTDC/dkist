@@ -16,20 +16,20 @@ repos:
       - id: check-ast
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*(.fits|.asdf)"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|.hdr|.asdf)"
       - id: check-yaml
       - id: debug-statements
       - id: check-added-large-files
         args: ["--enforce-all", "--maxkb=1054"]
       - id: end-of-file-fixer
-        exclude: ".*(.fits|.asdf|.json)"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json|.asdf)$|^CITATION.rst$"
       - id: mixed-line-ending
-        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*)$"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.asdf|.json|.hdr)$"
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.6
     hooks:
       - id: codespell
-        args: [ "--write-changes" ]
+        # args: [ "--write-changes" ]
 ci:
   autofix_prs: false
   autoupdate_schedule: "weekly"

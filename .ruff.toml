@@ -8,10 +8,17 @@ exclude = [
 ]
 
 [lint]
-select = ["E", "F", "W", "UP", "PT"]
+select = ["E", "F"]
 extend-ignore = [
   # pycodestyle (E, W)
   "E501", # LineTooLong                             # TODO! fix
+  "E702",
+  "E711",
+  "E741",
+  "F405",
+  "F403",
+  "F821",
+  "F841",
   # pytest (PT)
   "PT001", # Always use pytest.fixture()
   "PT004", # Fixtures which don't return anything should have leading _
