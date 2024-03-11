@@ -228,7 +228,9 @@ def dataset(array, identity_gwcs):
     assert ds.data is array
     assert ds.wcs is identity_gwcs
 
-    ds._file_manager = FileManager.from_parts(['test1.fits'], 0, 'float', array.shape,
+    # Construct the filename here as a scalar array to make sure that works as
+    # it's what dkist-inventory does
+    ds._file_manager = FileManager.from_parts(np.array('test1.fits'), 0, 'float', array.shape,
                                               loader=AstropyFITSLoader)
 
     return ds

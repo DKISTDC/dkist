@@ -159,10 +159,10 @@ class BaseVaryingCelestialTransform(Model, ABC):
         self.projection = projection
 
         if self.is_inverse:
-            self.inputs = ["lon", "lat", "z", "q", "m"][:self.n_inputs]
+            self.inputs = ("lon", "lat", "z", "q", "m")[:self.n_inputs]
             self.outputs = ("x", "y")
         else:
-            self.inputs = ["x", "y", "z", "q", "m"][:self.n_inputs]
+            self.inputs = ("x", "y", "z", "q", "m")[:self.n_inputs]
             self.outputs = ("lon", "lat")
 
         if len(self.table_shape) != self.n_inputs-2:
