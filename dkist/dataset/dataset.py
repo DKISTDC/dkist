@@ -191,7 +191,7 @@ class Dataset(NDCube):
     @property
     def inventory(self):
         """
-        Convenience attribute to acces the inventory metadata.
+        Convenience attribute to access the inventory metadata.
         """
         return self.meta['inventory']
 

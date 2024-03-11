@@ -146,7 +146,7 @@ def main():
     arr = np.array((inds, seconds, waves)).T
     sorter = np.lexsort((arr[:, 1], arr[:, 2]))
 
-    # Using this double-sorted array get the list indicies
+    # Using this double-sorted array get the list indices
     list_sorter = np.array(arr[sorter][:, 0], dtype=int)
 
     # Calculate the desired shape of the output array

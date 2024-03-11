@@ -63,10 +63,10 @@ Select the preview movie, `BEOGN.mp4`, by clicking the checkbox next to it, then
 You can check the progress of your transfer by going to the "Activity" tab, which shows both active and previous transfers.
 Various useful information is displayed here but for now the most important is whether the transfer task has failed or succeeded.
 In either case Globus will also send an email to your registered email address when the task finishes.
-Of course in this trivial example this is unneccessary, but if you're transfering a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
+Of course in this trivial example this is unnecessary, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
 You do not need to leave the web app open for the transfer to continue, but remember that you do need to have GCP running - so if you stop it then your data download will stop as well.
 
-If you try transfering the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
+If you try transferring the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
 This is to save download time and avoid duplication.
 
 ## Dataset and downloading
@@ -86,7 +86,7 @@ files = Fido.fetch(res)
 ds = dkist.load_dataset(files[0])
 ```
 
-As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the datset even before downloading any.
+As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the dataset even before downloading any.
 
 ```{code-cell} ipython
 print(ds.files)
@@ -118,7 +118,7 @@ But remember that whatever path you specify must be accessible by Globus Connect
 ---
 tags: [skip-execution]
 ---
-ds[0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail
+ds[0].files.download(path="~/somewhere/globus/can't/reach/")  # will hang for a while and then fail
 ```
 
 The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`.
