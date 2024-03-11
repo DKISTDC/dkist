@@ -145,20 +145,25 @@ class BaseVaryingCelestialTransform(Model, ABC):
             ind = ind.value
         return np.array(np.round(ind), dtype=int)
 
-    def __init__(self, *args, crval_table=None, pc_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
+    def __init__(self, *args, crval_table=None, pc_table=None, projection=m.Pix2Sky_TAN(), inverse=False, **kwargs):
         super().__init__(*args, **kwargs)
         (
             self.table_shape,
             self.pc_table,
-            self.crval_table
+            self.crval_table,
         ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table))
+        self.is_inverse = inverse
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
         self.projection = projection
 
-        self.inputs = ["x", "y", "z", "q", "m"][:self.n_inputs]
-        self.outputs = ("lon", "lat")
+        if self.is_inverse:
+            self.inputs = ["lon", "lat", "z", "q", "m"][:self.n_inputs]
+            self.outputs = ("x", "y")
+        else:
+            self.inputs = ["x", "y", "z", "q", "m"][:self.n_inputs]
+            self.outputs = ("lon", "lat")
 
         if len(self.table_shape) != self.n_inputs-2:
             raise ValueError(f"This model can only be constructed with a {self.n_inputs-2}-dimensional lookup table.")
@@ -260,13 +265,34 @@ class BaseVaryingCelestialTransform(Model, ABC):
         kwargs = inputs[self.n_inputs:]
         keys = ["crpix", "cdelt", "lon_pole"]
         kwargs = dict(zip(keys, kwargs))
-        return self._map_transform(*arrays, **kwargs)
+        return self._map_transform(*arrays, inverse=self.is_inverse, **kwargs)
 
     @property
     def input_units(self):
         # NB: x and y are normally on the detector and z is typically the number of raster steps
-        dims = ["x", "y", "z", "q", "m"]
-        return {d: u.pix for d in dims[:self.n_inputs]}
+        if self.is_inverse:
+            dims = ["z", "q", "m"]
+            {d: u.pix for d in dims[:self.n_inputs]}
+            units = {"lon": u.deg, "lat": u.deg}
+            for d in dims[:self.n_inputs-2]:
+                units[d] = u.pix
+            return units
+        else:
+            dims = ["x", "y", "z", "q", "m"]
+            return {d: u.pix for d in dims[:self.n_inputs]}
+
+    @property
+    def inverse(self):
+        ivct = self.__class__(
+            crpix=self.crpix,
+            cdelt=self.cdelt,
+            lon_pole=self.lon_pole,
+            pc_table=self.pc_table,
+            crval_table=self.crval_table,
+            projection=self.projection,
+            inverse=True
+        )
+        return ivct
 
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
@@ -282,108 +308,28 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     n_inputs = 3
     n_outputs = 2
 
-    @property
-    def inverse(self):
-        ivct = InverseVaryingCelestialTransform(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return ivct
-
 
 class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
-    """
-    The inverse of VaryingCelestialTransform.
-
-    This inverse still depends on the pixel coordinate ``z`` to index the lookup tables.
-    """
-    n_inputs = 3
-    n_outputs = 2
-
-    @property
-    def input_units(self):
-        return {"lon": u.deg, "lat": u.deg, "z": u.pix}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("lon", "lat", "z")
-        self.outputs = ("x", "y")
-
-    def evaluate(self, lon, lat, z, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, z, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole, inverse=True)
+    pass
 
 
 class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     n_outputs = 2
 
-    @property
-    def inverse(self):
-        ivct = InverseVaryingCelestialTransform2D(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return ivct
-
 
 class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
-    n_inputs = 4
-    n_outputs = 2
+    pass
 
-    @property
-    def input_units(self):
-        return {"lon": u.deg, "lat": u.deg, "z": u.pix, "q": u.pix}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("lon", "lat", "z", "q")
-        self.outputs = ("x", "y")
-
-    def evaluate(self, lon, lat, z, q, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole,
-                                   inverse=True)
 
 class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     n_outputs = 2
 
-    @property
-    def inverse(self):
-        ivct = InverseVaryingCelestialTransform3D(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return ivct
-
 
 class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform):
-    n_inputs = 5
-    n_outputs = 2
+    pass
 
-    @property
-    def input_units(self):
-        return {"lon": u.deg, "lat": u.deg, "m": u.pix, "z": u.pix, "q": u.pix}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.inputs = ("lon", "lat", "m", "z", "q")
-        self.outputs = ("x", "y")
-
-    def evaluate(self, lon, lat, m, z, q, crpix, cdelt, lon_pole, **kwargs):
-        return self._map_transform(lon, lat, m, z, q, crpix=crpix, cdelt=cdelt, lon_pole=lon_pole,
-                                   inverse=True)
 
 class CoupledCompoundModel(CompoundModel):
     """
