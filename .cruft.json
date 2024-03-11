@@ -11,7 +11,7 @@
       "author_email": "stuart@cadair.com",
       "project_url": "https://github.com/DKISTDC/dkist",
       "license": "BSD 3-Clause",
-      "minimum_python_version": "3.9",
+      "minimum_python_version": "3.10",
       "use_compiled_extensions": "n",
       "enable_dynamic_dev_versions": "y",
       "include_example_code": "n",
