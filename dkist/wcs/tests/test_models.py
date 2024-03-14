@@ -334,29 +334,6 @@ def test_vct_dispatch():
         )
 
 
-def test_vct_shape_errors():
-    pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
-    pc_table = pc_table.reshape((5, 3, 2, 2))
-
-    crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
-    crval_table = crval_table.reshape((5, 3, 2))
-
-    kwargs = dict(
-        crpix=(5, 5) * u.pix,
-        cdelt=(1, 1) * u.arcsec/u.pix,
-        lon_pole=180 * u.deg,
-    )
-
-    with pytest.raises(ValueError, match="only be constructed with a 1-dimensional"):
-        VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
-
-    with pytest.raises(ValueError, match="only be constructed with a 2-dimensional"):
-        VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
-
-    with pytest.raises(ValueError, match="only be constructed with a 3-dimensional"):
-        VaryingCelestialTransform3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
-
-
 @pytest.mark.parametrize("slit", [-1, np.nan, 3, 10])
 def test_vct_slit_bounds(slit):
     crpix=[0, 0]

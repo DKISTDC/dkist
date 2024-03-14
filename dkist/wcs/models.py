@@ -163,10 +163,6 @@ class VaryingCelestialTransform(Model, ABC):
             self.inputs = ("x", "y", "z", "q", "m")[:self.n_inputs]
             self.outputs = ("lon", "lat")
 
-        if len(self.table_shape) != self.n_inputs-2:
-            raise ValueError(f"This model can only be constructed with a {self.n_inputs-2}-dimensional lookup table.")
-
-
     # @cache
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
