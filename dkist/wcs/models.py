@@ -94,7 +94,7 @@ def generate_celestial_transform(
     return shift | rot | scale | projection | skyrot
 
 
-class BaseVaryingCelestialTransform(Model, ABC):
+class VaryingCelestialTransform(Model, ABC):
     """
     Shared components between the forward and reverse varying celestial transforms.
     """
@@ -107,6 +107,10 @@ class BaseVaryingCelestialTransform(Model, ABC):
     crpix = Parameter()
     cdelt = Parameter()
     lon_pole = Parameter(default=180)
+
+    n_outputs = 2
+    # This needs to be defined at instantiation time but we can ignore it later
+    n_inputs = 5
 
     @staticmethod
     def _validate_table_shapes(pc_table, crval_table):
@@ -149,6 +153,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             self.crval_table,
         ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table))
         self.is_inverse = inverse
+        self.n_inputs = len(self.table_shape) + 2
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
@@ -289,30 +294,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
             inverse=True
         )
         return ivct
-
-
-class VaryingCelestialTransform(BaseVaryingCelestialTransform):
-    """
-    A celestial transform which can vary it's pointing and rotation with time.
-
-    This model stores a lookup table for the reference pixel ``crval_table``
-    and the rotation matrix ``pc_table`` which are indexed with a third pixel
-    index (z).
-
-    The other parameters (``crpix``, ``cdelt``, and ``lon_pole``) are fixed.
-    """
-    n_inputs = 3
-    n_outputs = 2
-
-
-class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
-    n_inputs = 4
-    n_outputs = 2
-
-
-class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
-    n_inputs = 5
-    n_outputs = 2
 
 
 class CoupledCompoundModel(CompoundModel):
