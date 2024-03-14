@@ -6,9 +6,7 @@ from asdf.testing.helpers import roundtrip_object
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
-from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
-                              InverseVaryingCelestialTransform2D, Ravel, Unravel,
-                              VaryingCelestialTransform, VaryingCelestialTransform2D,
+from dkist.wcs.models import (CoupledCompoundModel, Ravel, Unravel, VaryingCelestialTransform,
                               varying_celestial_transform_from_tables)
 
 
@@ -24,7 +22,7 @@ def test_roundtrip_vct():
     new_vct = roundtrip_object(vct)
     assert isinstance(new_vct, VaryingCelestialTransform)
     new_ivct = roundtrip_object(vct.inverse)
-    assert isinstance(new_ivct, InverseVaryingCelestialTransform)
+    assert isinstance(new_ivct, VaryingCelestialTransform)
 
     assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
     assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)
@@ -43,15 +41,15 @@ def test_roundtrip_vct_2d():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
-                                      cdelt=(1, 1) * u.arcsec/u.pix,
-                                      crval_table=(0, 0) * u.arcsec,
-                                      pc_table=varying_matrix_lt,
-                                      lon_pole=180 * u.deg)
+    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                    cdelt=(1, 1) * u.arcsec/u.pix,
+                                    crval_table=(0, 0) * u.arcsec,
+                                    pc_table=varying_matrix_lt,
+                                    lon_pole=180 * u.deg)
     new_vct = roundtrip_object(vct)
-    assert isinstance(new_vct, VaryingCelestialTransform2D)
+    assert isinstance(new_vct, VaryingCelestialTransform)
     new_ivct = roundtrip_object(vct.inverse)
-    assert isinstance(new_ivct, InverseVaryingCelestialTransform2D)
+    assert isinstance(new_ivct, VaryingCelestialTransform)
 
     assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
     assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)

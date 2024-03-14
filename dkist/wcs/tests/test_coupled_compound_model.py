@@ -8,7 +8,7 @@ from astropy.modeling import CompoundModel, Model
 from astropy.modeling.separable import separability_matrix
 
 from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, varying_celestial_transform_from_tables)
+                              varying_celestial_transform_from_tables)
 
 
 @pytest.fixture
@@ -31,11 +31,11 @@ def vct_2d_pc():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    return VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
-                                       cdelt=(1, 1) * u.arcsec/u.pix,
-                                       crval_table=(0, 0) * u.arcsec,
-                                       pc_table=varying_matrix_lt,
-                                       lon_pole=180 * u.deg)
+    return VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+                                     cdelt=(1, 1) * u.arcsec/u.pix,
+                                     crval_table=(0, 0) * u.arcsec,
+                                     pc_table=varying_matrix_lt,
+                                     lon_pole=180 * u.deg)
 
 
 def test_coupled_init_error():

@@ -17,9 +17,6 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 __all__ = [
     "CoupledCompoundModel",
     "VaryingCelestialTransform",
-    "VaryingCelestialTransform2D",
-    "VaryingCelestialTransform3D",
-    "BaseVaryingCelestialTransform",
     "generate_celestial_transform",
     "AsymmetricMapping",
     "varying_celestial_transform_from_tables",
@@ -474,8 +471,11 @@ class AsymmetricMapping(m.Mapping):
 varying_celestial_transform_dict = {
     # Map (num_dims, inverse) to class
     (1, False): VaryingCelestialTransform,
-    (2, False): VaryingCelestialTransform2D,
-    (3, False): VaryingCelestialTransform3D,
+    (2, False): VaryingCelestialTransform,
+    (3, False): VaryingCelestialTransform,
+    (1, True): VaryingCelestialTransform,
+    (2, True): VaryingCelestialTransform,
+    (3, True): VaryingCelestialTransform,
 }
 
 def varying_celestial_transform_from_tables(
@@ -487,12 +487,12 @@ def varying_celestial_transform_from_tables(
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
         slit: Union[None, Literal[0, 1]] = None,
-) -> BaseVaryingCelestialTransform:
+) -> VaryingCelestialTransform:
     """
-    Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
+    Generate a `.VaryingCelestialTransform` based on the dimensionality of the tables.
     """
 
-    table_shape, _, _ = BaseVaryingCelestialTransform._validate_table_shapes(
+    table_shape, _, _ = VaryingCelestialTransform._validate_table_shapes(
         pc_table,
         crval_table,
     )

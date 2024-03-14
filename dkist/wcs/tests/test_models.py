@@ -11,7 +11,6 @@ from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransform3D,
                               generate_celestial_transform,
                               varying_celestial_transform_from_tables)
 
@@ -227,7 +226,7 @@ def test_varying_transform_4d_pc():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
 
-    vct = VaryingCelestialTransform2D(
+    vct = VaryingCelestialTransform(
         crpix=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
@@ -251,7 +250,7 @@ def test_varying_transform_4d_pc_unitless():
     varying_matrix_lt = np.array([rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)])
     varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
 
-    vct = VaryingCelestialTransform2D(
+    vct = VaryingCelestialTransform(
         crpix=(5, 5),
         cdelt=(1, 1),
         crval_table=(0, 0),
@@ -280,7 +279,7 @@ def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    vct = VaryingCelestialTransform2D(
+    vct = VaryingCelestialTransform(
         crpix=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
@@ -318,14 +317,14 @@ def test_vct_dispatch():
         crval_table=crval_table[0, 0],
         **kwargs,
     )
-    assert isinstance(vct_2d, VaryingCelestialTransform2D)
+    assert isinstance(vct_2d, VaryingCelestialTransform)
 
     vct_3d = varying_celestial_transform_from_tables(
         pc_table=varying_matrix_lt[0],
         crval_table=crval_table[0],
         **kwargs
     )
-    assert isinstance(vct_3d, VaryingCelestialTransform3D)
+    assert isinstance(vct_3d, VaryingCelestialTransform)
 
     with pytest.raises(ValueError, match="Only 1D, 2D and 3D lookup tables are supported."):
         varying_celestial_transform_from_tables(
