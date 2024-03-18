@@ -49,7 +49,7 @@ def test_roundtrip_vct_2d():
     new_vct = roundtrip_object(vct)
     assert isinstance(new_vct, VaryingCelestialTransform2D)
     new_ivct = roundtrip_object(vct.inverse)
-    assert isinstance(new_ivct, InverseVaryingCelestialTransform2D)
+    assert isinstance(new_ivct, VaryingCelestialTransform2D)
 
     assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
     assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)

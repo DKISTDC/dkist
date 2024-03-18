@@ -529,6 +529,7 @@ def varying_celestial_transform_from_tables(
         pc_table=pc_table,
         lon_pole=lon_pole,
         projection=projection,
+        inverse=inverse
     )
 
     # For slit models we duplicate one of the spatial pixel inputs to also be
