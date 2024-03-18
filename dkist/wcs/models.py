@@ -17,6 +17,9 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 __all__ = [
     "CoupledCompoundModel",
     "VaryingCelestialTransform",
+    "VaryingCelestialTransform2D",
+    "VaryingCelestialTransform3D",
+    "BaseVaryingCelestialTransform",
     "generate_celestial_transform",
     "AsymmetricMapping",
     "varying_celestial_transform_from_tables",
@@ -91,7 +94,7 @@ def generate_celestial_transform(
     return shift | rot | scale | projection | skyrot
 
 
-class VaryingCelestialTransform(Model, ABC):
+class BaseVaryingCelestialTransform(Model, ABC):
     """
     Shared components between the forward and reverse varying celestial transforms.
     """
@@ -106,8 +109,6 @@ class VaryingCelestialTransform(Model, ABC):
     lon_pole = Parameter(default=180)
 
     n_outputs = 2
-    # This needs to be defined at instantiation time but we can ignore it later
-    n_inputs = 5
 
     @staticmethod
     def _validate_table_shapes(pc_table, crval_table):
@@ -150,7 +151,6 @@ class VaryingCelestialTransform(Model, ABC):
             self.crval_table,
         ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table))
         self.is_inverse = inverse
-        self.n_inputs = len(self.table_shape) + 2
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
@@ -287,6 +287,27 @@ class VaryingCelestialTransform(Model, ABC):
             inverse=True
         )
         return ivct
+
+
+class VaryingCelestialTransform(BaseVaryingCelestialTransform):
+    """
+    A celestial transform which can vary it's pointing and rotation with time.
+
+    This model stores a lookup table for the reference pixel ``crval_table``
+    and the rotation matrix ``pc_table`` which are indexed with a third pixel
+    index (z).
+
+    The other parameters (``crpix``, ``cdelt``, and ``lon_pole``) are fixed.
+    """
+    n_inputs = 3
+
+
+class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
+    n_inputs = 4
+
+
+class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
+    n_inputs = 5
 
 
 class CoupledCompoundModel(CompoundModel):
@@ -467,11 +488,11 @@ class AsymmetricMapping(m.Mapping):
 varying_celestial_transform_dict = {
     # Map (num_dims, inverse) to class
     (1, False): VaryingCelestialTransform,
-    (2, False): VaryingCelestialTransform,
-    (3, False): VaryingCelestialTransform,
+    (2, False): VaryingCelestialTransform2D,
+    (3, False): VaryingCelestialTransform3D,
     (1, True): VaryingCelestialTransform,
-    (2, True): VaryingCelestialTransform,
-    (3, True): VaryingCelestialTransform,
+    (2, True): VaryingCelestialTransform2D,
+    (3, True): VaryingCelestialTransform3D,
 }
 
 def varying_celestial_transform_from_tables(
@@ -483,12 +504,12 @@ def varying_celestial_transform_from_tables(
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
         slit: Union[None, Literal[0, 1]] = None,
-) -> VaryingCelestialTransform:
+) -> BaseVaryingCelestialTransform:
     """
-    Generate a `.VaryingCelestialTransform` based on the dimensionality of the tables.
+    Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
     """
 
-    table_shape, _, _ = VaryingCelestialTransform._validate_table_shapes(
+    table_shape, _, _ = BaseVaryingCelestialTransform._validate_table_shapes(
         pc_table,
         crval_table,
     )
