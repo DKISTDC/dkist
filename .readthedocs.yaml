@@ -9,6 +9,12 @@ build:
       - git fetch --unshallow || true
     pre_install:
       - git update-index --assume-unchanged .rtd-environment.yml docs/conf.py
+    pre_build:
+      - parfive https://dkist-data-us-east.s3.amazonaws.com/BKPLX_stokesI.tar https://dkist-data-us-east.s3.amazonaws.com/AJQWW_single_mosaic.tar
+      - tar -xv -f BKPLX_stokesI.tar --directory dkist_data/BKPLX
+      - tar -xv -f AJQWW_single_moasic.tar --directory dkist_data/AJQWW
+      - pwd
+      - echo $HOME
 
 conda:
   environment: .rtd-environment.yml
