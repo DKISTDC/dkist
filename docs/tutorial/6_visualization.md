@@ -28,8 +28,8 @@ import dkist.net
 ```
 
 ```{code-cell} python
-res = Fido.search(a.dkist.Dataset("AGLKO"))
-asdf_file = Fido.fetch(res)[0]
+res = Fido.search(a.dkist.Dataset("BKPLX"))
+asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
 
 ds = dkist.load_dataset(asdf_file)
 ```
@@ -83,9 +83,6 @@ You can also use `plot_axes` to create a line plot, by specifying only one axis 
 So to plot a spectrum at a fixed Stokes, time and raster location we can tell plot to use the dispersion axis as the x axis.
 
 ```{code-cell} ipython
----
-tags: [skip-execution]
----
 ds.plot(plot_axes=[None, None, 'x', None])
 plt.show()
 ```
@@ -94,6 +91,9 @@ It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
 ```{code-cell} ipython
+---
+tags: [skip-execution]
+---
 ds[0, :, 400, :].plot()
 plt.show()
 ```
@@ -101,12 +101,10 @@ plt.show()
 ## More advanced plotting
 
 For the next few examples we'll go back to using some VBI data.
-Let's use 'AWEMA', which we used in a previous session.
-We haven't actually downloaded the full data for this dataset yet, but the plotting will all still work anyway, and you can download the data later on or in the background if you would like to see the full plots.
 
 ```{code-cell} ipython
-res = Fido.search(a.dkist.Dataset("AWEMA"))
-asdf_file = Fido.fetch(res)[0]
+res = Fido.search(a.dkist.Dataset("AJQWW"))
+asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
 
 ds = dkist.load_dataset(asdf_file)[0, 0]
 ```
