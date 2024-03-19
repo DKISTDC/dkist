@@ -13,9 +13,9 @@ build:
       - pwd
       - echo $HOME
       - parfive https://dkist-data-us-east.s3.amazonaws.com/BKPLX_stokesI.tar https://dkist-data-us-east.s3.amazonaws.com/AJQWW_single_mosaic.tar
-      - mkdir -p dkist_data/BKPLX dkist_data/AJQWW
-      - tar -xv -f BKPLX_stokesI.tar --directory dkist_data/BKPLX
-      - tar -xv -f AJQWW_single_moasic.tar --directory dkist_data/AJQWW
+      - mkdir -p $HOME/dkist_data/BKPLX $HOME/dkist_data/AJQWW
+      - tar -xv -f BKPLX_stokesI.tar --directory $HOME/dkist_data/BKPLX
+      - tar -xv -f AJQWW_single_mosaic.tar --directory $HOME/dkist_data/AJQWW
 
 conda:
   environment: .rtd-environment.yml
