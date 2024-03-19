@@ -22,12 +22,11 @@ dependencies = [
   # Some of these schema dependencies are minimums because we generated asdf
   # files with them unpinned so they are now required to read generated asdf
   # files.
-  "asdf>=2.11.2",  # Pick up jsonschema bug fix
-  "asdf-astropy>=0.2.0",
-  "asdf-coordinates-schemas>=0.1.0",
-  "asdf-standard>=1.0.3",
-  "asdf-transform-schemas>=0.3.0",
-  "asdf-unit-schemas>=0.1.0",
+  "asdf>=2.14.4"
+  "asdf-astropy>=0.6.0"
+  "asdf-coordinates-schemas>=0.3.0"
+  "asdf-standard>=1.1.0"
+  "asdf-transform-schemas>=0.5.0"
   "asdf-wcs-schemas>=0.3.0",
   "astropy>=5.3",
   "dask[array]>=2021.8.0",
