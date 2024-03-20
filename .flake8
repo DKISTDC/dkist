@@ -22,7 +22,7 @@ exclude =
     __pycache__
     docs/conf.py
     build
-    __init__.py
+    dkist/__init__.py
     extern
     sphinx
     conftest.py
