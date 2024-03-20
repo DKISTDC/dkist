@@ -115,6 +115,9 @@ Next we need to calculate the optimal WCS for the output:
 reference_wcs, shape_out = find_optimal_celestial_wcs(
     [f.wcs for f in first_tiles],
     auto_rotate=True,
+    # We drop the output resolution by a factor of 10 to reduce memory
+    # remove this line to run at the native resolution of the input data
+    resolution=0.1*u.arcsec,
 )
 
 # Due to a bug in reproject we need to reverse the direction of the longitude axis
