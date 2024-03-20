@@ -73,6 +73,7 @@ jobs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
       coverage: 'codecov'
+      posargs: '--color=yes'
       envs: |
         - linux: py311-devdeps
     secrets:
