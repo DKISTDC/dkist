@@ -13,6 +13,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
   self
   installation
   tutorial/index
+  howto_guides/index
   topic_guides/index
   reference
   whatsnew/index
