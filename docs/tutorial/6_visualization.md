@@ -73,8 +73,6 @@ Plotting a raster scan of VISP data is currently very slow due to known performa
 ```
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
-
 ds.plot(plot_axes=[None, 'y', None, 'x'])
 plt.show()
 ```
