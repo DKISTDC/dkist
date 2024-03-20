@@ -15,7 +15,7 @@ authors = [
   { name = "NSO / AURA", email = "stuart@cadair.com" },
 ]
 dependencies = [
-  "aiohttp>=3.6",
+  "aiohttp>=3.8",
   # Provide minimum deps for all asdf packages used to generate or read asdf
   # files so that we test with these minimums and also generate asdf's with
   # them
