@@ -5,9 +5,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.5
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -31,10 +31,9 @@ This will mean we won't have access to the data arrays in the FITS files, but ev
 We can construct a `Dataset` by providing a path to an ASDF file.
 Here we shall first fetch an ASDF file with Fido and then pass it to `dkist.load_dataset`:
 
-```{code-cell} ipython
----
-tags: [keep-inputs]
----
+```{code-cell} ipython3
+:tags: [keep-inputs]
+
 from astropy.time import Time
 
 import dkist
@@ -42,18 +41,17 @@ import dkist.net
 from sunpy.net import Fido, attrs as a
 ```
 
-```{code-cell} ipython
-# Create DKIST Fido client instance
-res = Fido.search(a.dkist.Dataset('AGLKO')) # This is the dataset selected in the previous tutorial.
-files = Fido.fetch(res)
+```{code-cell} ipython3
+res = Fido.search(a.dkist.Dataset('BKPLX'))
+files = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
 files
 ```
 
 Remember that the file we have downloaded is a single ASDF file, **not** the whole dataset.
 We can use this file to construct the `Dataset`:
 
-```{code-cell} ipython
-ds = dkist.load_dataset(files[0])
+```{code-cell} ipython3
+ds = dkist.load_dataset(files)
 ```
 
 Now we have a `Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
@@ -61,7 +59,7 @@ This may sound unhelpful but we'll see how it can be very powerful.
 
 Let's have a look at the basic representation of the `Dataset`.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds
 ```
 
@@ -93,13 +91,13 @@ This means that you can easily convert from a position in the array to a locatio
 To achieve this, `Dataset` tracks the pixel and world coordinates independently in the `wcs` (World Coordinate System) attribute.
 The output above tells us that we have a 4-dimensional pixel grid and a 5-dimensional world grid:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.wcs.pixel_n_dim, ds.wcs.world_n_dim
 ```
 
 The next few lines tell us about the data array and the pixel dimensions.
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.data
 ```
 
@@ -108,7 +106,7 @@ This tells us that the data are (or will be) stored in a dask array, and the arr
 
 We can get the corresponding **pixel** axis names with:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.wcs.pixel_axis_names
 ```
 
@@ -118,13 +116,13 @@ This is because they are in *pixel* order rather than *array* order.
 Next we see the description of the world coordinates.
 This information is also accessible through the `wcs` attribute:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.wcs.world_axis_names
 ```
 
 This tells us the names of the physical axes, each of which corresponds to a type of phyical observation (lon/lat, time, wavelength, etc.) and has its own units.
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.wcs.world_axis_physical_types, ds.wcs.world_axis_units
 ```
 
@@ -132,13 +130,13 @@ You will have noticed that the pixel and world coordinates have different number
 This is because in this dataset the detector is not aligned with the solar latitude/longitude coordinate system, so any change in position along the detector slit will be equivalent to a change in both latitude and longitude.
 To see this, we can look at the physical coordinates which correspond to each array axis, just as we did for the world axes.
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.array_axis_physical_types
 ```
 
 The final piece of output is the axis correlation matrix which summarises which pixel and world axes correspond to each other:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.wcs.axis_correlation_matrix
 ```
 
@@ -152,7 +150,7 @@ A useful feature of the `Dataset` class, which it inherits from `NDCube` is the 
 
 For example, to extract the Stokes I component of the dataset we would do:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds[0]
 ```
 
@@ -160,25 +158,16 @@ this is because the stokes axis is the first array axis, and the "I" profile is 
 
 Note how we have dropped a world coordinate, this information is preserved in the `.global_coords` attribute, which contains the coordinate information which applies to the whole dataset:
 
-```{code-cell} python
+```{code-cell} ipython3
 ds[0].global_coords
 ```
 
 We can also slice the data further, as we would for a normal numpy array.
 So for instance we can select a small section of the image in Stokes I at some arbitrary wavelength:
 
-```{code-cell} python
-cropped = ds[0, 400:850, 100, 950:1600]
+```{code-cell} ipython3
+cropped = ds[0, 200:300, 100, 950:1600]
 cropped
 ```
 
 Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.
-
-Finally, we can plot our cropped dataset to show the feature we were looking at.
-
-```{code-cell} python
-import matplotlib.pyplot as plt
-
-cropped.plot()
-plt.show()
-```
