@@ -1,0 +1,1 @@
+`dkist.net.transfer_complete_datasets` will now only create one Globus task for all datasets it downloads.
