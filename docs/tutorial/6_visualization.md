@@ -69,7 +69,7 @@ If instead we want to plot the image formed by the raster scan at a particular w
 +++
 
 ```{warning}
-Plotting a raster scan of VISP data is currently very slow due to known performance issues in how varying poiting over the raster is handled. See issue [#256](https://github.com/DKISTDC/dkist/issues/256) for more details.
+Plotting a raster scan of VISP data is currently very slow due to known performance issues in how varying pointing over the raster is handled. See issue [#256](https://github.com/DKISTDC/dkist/issues/256) for more details.
 ```
 
 ```{code-cell} ipython3
