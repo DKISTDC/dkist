@@ -33,17 +33,27 @@ jobs:
     with:
       default_python: '3.10'
       coverage: 'codecov'
+      posargs: '--color=yes'
       envs: |
         - linux: py312
         - linux: py311
         - windows: py311-online
         - macos: py310
+        - linux: py310-oldestdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      default_python: '3.10'
+      coverage: 'codecov'
+      envs: |
         - linux: build_docs-notebooks
           pytest: false
           libraries:
             apt:
               - graphviz
-        - linux: py310-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
