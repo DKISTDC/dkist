@@ -23,6 +23,9 @@ select = [
   # "RET",  # TODO! fix
   # "SIM",  # TODO! fix
   "TID",
+  # "PTH",  # TODO! fix
+  "NPY",
+  "RUF",
 ]
 extend-ignore = [
   # pycodestyle (E, W)
@@ -42,6 +45,10 @@ extend-ignore = [
   "PT023", # Always use () on pytest decorators
   # pyupgrade
   "UP038", # Use | in isinstance - not compatible with models and is slower
+  # Ruff
+  "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
+  "RUF013",  # PEP 484 prohibits implicit `Optional`
+  "RUF015",  # Prefer `next(iter(...))` over single element slice
 ]
 
 [lint.per-file-ignores]

@@ -24,7 +24,7 @@ import numpy as np
 from parfive import Downloader
 
 try:
-    from numpy.typing import DTypeLike, NDArray  # NOQA
+    from numpy.typing import DTypeLike, NDArray
 except ImportError:
     NDArray = DTypeLike = Iterable
 

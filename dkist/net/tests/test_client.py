@@ -1,6 +1,6 @@
 import json
 
-import hypothesis.strategies as st  # noqa
+import hypothesis.strategies as st
 import parfive
 import pytest
 from hypothesis import HealthCheck, given, settings
@@ -12,7 +12,7 @@ from sunpy.tests.helpers import no_vso
 
 import dkist.net
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
-from dkist.net.tests import strategies as dst  # noqa
+from dkist.net.tests import strategies as dst
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
 

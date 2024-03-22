@@ -14,7 +14,7 @@ def all_dkist_attrs_classes(request):
     return getattr(da, request.param)
 
 
-@pytest.fixture(params=da.__all__ + ["Time", "Instrument", "Wavelength", "Physobs"])
+@pytest.fixture(params=[*da.__all__, "Time", "Instrument", "Wavelength", "Physobs"])
 def all_attrs_classes(request):
     at = getattr(da, request.param, None)
     return at or getattr(a, request.param)

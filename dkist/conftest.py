@@ -36,7 +36,7 @@ def caplog_dkist(caplog):
 
 @pytest.fixture
 def array():
-    shape = 2**np.random.randint(2, 7, size=2)
+    shape = 2**np.random.randint(2, 7, size=2)  # noqa: NPY002
     x = np.ones(np.prod(shape)) + 10
     x = x.reshape(shape)
     return da.from_array(x, tuple(shape))
@@ -190,7 +190,7 @@ def identity_gwcs_5d_stokes(identity_gwcs_4d):
     stokes_frame = cf.StokesFrame(axes_order=(4,))
     stokes_model = generate_lookup_table([1, 2, 3, 4] * u.one, interpolation="nearest")
     transform = identity_gwcs_4d.forward_transform
-    frame = cf.CompositeFrame(identity_gwcs_4d.output_frame.frames + [stokes_frame])
+    frame = cf.CompositeFrame([*identity_gwcs_4d.output_frame.frames, stokes_frame])
 
     detector_frame = cf.CoordinateFrame(name="detector", naxes=5,
                                         axes_order=(0, 1, 2, 3, 4),

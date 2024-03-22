@@ -132,9 +132,9 @@ class BaseVaryingCelestialTransform(Model, ABC):
             table_shape = crval_table.shape[:-1]
 
         if pc_table.shape == (2, 2):
-            pc_table = np.broadcast_to(pc_table, list(table_shape) + [2, 2], subok=True)
+            pc_table = np.broadcast_to(pc_table, [*list(table_shape), 2, 2], subok=True)
         if crval_table.shape == (2,):
-            crval_table = np.broadcast_to(crval_table, list(table_shape) + [2], subok=True)
+            crval_table = np.broadcast_to(crval_table, [*list(table_shape), 2], subok=True)
 
         return table_shape, pc_table, crval_table
 

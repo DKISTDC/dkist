@@ -115,7 +115,7 @@ def pp_matrix(wcs):
     slen = np.max([len(line) for line in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
     mstr = wcs.axis_correlation_matrix.astype(f"<U{slen}")
     mstr = np.insert(mstr, 0, wcs.pixel_axis_names, axis=0)
-    world = [""] + list(wcs.world_axis_names)
+    world = ["", *list(wcs.world_axis_names)]
     mstr = np.insert(mstr, 0, world, axis=1)
     for i, col in enumerate(mstr.T):
         wid = np.max([len(a) for a in col])

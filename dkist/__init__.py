@@ -30,5 +30,5 @@ def write_default_config(overwrite=False):
 
 
 # Do internal imports last (so logger etc is initialised)
-from dkist.dataset import Dataset, TiledDataset, load_dataset  # noqa
-from dkist.utils.sysinfo import system_info  # noqa
+from dkist.dataset import Dataset, TiledDataset, load_dataset
+from dkist.utils.sysinfo import system_info

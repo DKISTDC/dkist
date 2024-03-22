@@ -92,7 +92,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            none_values = np.array(results[colname] == None)  # noqa E711
+            none_values = np.array(results[colname] == None)  # E711
             if none_values.any():
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
