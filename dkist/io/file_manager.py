@@ -59,8 +59,8 @@ class BaseStripedExternalArray:
 
         if loader_array.size == 1:
             return shape
-        else:
-            return tuple(list(loader_array.shape) + list(shape))
+
+        return tuple(list(loader_array.shape) + list(shape))
 
     @property
     def output_shape(self) -> tuple[int, ...]:

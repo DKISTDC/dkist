@@ -185,7 +185,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
-        sct = generate_celestial_transform(
+        return generate_celestial_transform(
             crpix=crpix,
             cdelt=cdelt,
             pc=self.pc_table[ind],
@@ -194,7 +194,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
             projection=self.projection,
         )
 
-        return sct
 
     def _map_transform(self, x, y, z, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
@@ -268,7 +267,7 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform(
+        return InverseVaryingCelestialTransform(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -276,7 +275,6 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
@@ -367,7 +365,7 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform2D(
+        return InverseVaryingCelestialTransform2D(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -375,7 +373,6 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform2D):
@@ -465,7 +462,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform3D(
+        return InverseVaryingCelestialTransform3D(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -473,7 +470,6 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform3D):

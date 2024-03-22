@@ -227,8 +227,7 @@ class Dataset(NDCube):
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
         prefix = object.__repr__(self)
-        output = dedent(f"{prefix}\n{self.__str__()}")
-        return output
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     def __str__(self):
         return dataset_info_str(self)

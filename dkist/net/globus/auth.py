@@ -91,12 +91,12 @@ def get_cache_contents():
     cache_file = get_cache_file_path()
     if not cache_file.exists():
         return {}
-    else:
-        try:
-            with open(cache_file) as fd:
-                return json.load(fd)
-        except (OSError, json.JSONDecodeError):
-            return {}
+
+    try:
+        with open(cache_file) as fd:
+            return json.load(fd)
+    except (OSError, json.JSONDecodeError):
+        return {}
 
 
 def save_auth_cache(auth_cache):

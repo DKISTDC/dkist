@@ -79,8 +79,8 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         """
         if self.basepath:
             return self.basepath / self.fileuri
-        else:
-            return Path(self.fileuri)
+
+        return Path(self.fileuri)
 
 
 @add_common_docstring(append=common_parameters)
@@ -105,5 +105,5 @@ class AstropyFITSLoader(BaseFITSLoader):
             hdu = hdul[self.target]
             if hasattr(hdu, "section"):
                 return hdu.section[slc]
-            else:
-                return hdu.data[slc]
+
+            return hdu.data[slc]

@@ -464,8 +464,7 @@ def _evaluate_ravel(array_shape, inputs, order="C"):
         inputs = inputs[::-1]
         rounded_inputs = rounded_inputs[::-1]
     offsets = np.cumprod(array_shape[1:][::-1])[::-1]
-    result = np.dot(offsets, rounded_inputs[:-1]) + inputs[-1]
-    return result
+    return np.dot(offsets, rounded_inputs[:-1]) + inputs[-1]
 
 
 def _evaluate_unravel(array_shape, index, order="C"):

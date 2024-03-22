@@ -21,8 +21,7 @@ select = [
   "PT",
   "Q",
   "RSE",
-  # "RET",  # TODO! fix
-  # "SIM",  # TODO! fix
+  "RET",
   "TID",
   "PTH",
   "NPY",
@@ -46,6 +45,9 @@ extend-ignore = [
   "PT023", # Always use () on pytest decorators
   # pyupgrade
   "UP038", # Use | in isinstance - not compatible with models and is slower
+  # Returns (RET)
+  "RET502",  # Do not implicitly return None in function able to return non-None value
+  "RET503",  # Missing explicit return at the end of function able to return non-None value
   # Pathlib (PTH)
   "PTH123",  # open() should be replaced by Path.open()
   # Ruff

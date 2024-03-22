@@ -123,8 +123,8 @@ def _load_from_path(path: Path):
         if not path.exists():
             raise ValueError(f"{path} does not exist.")
         return _load_from_asdf(path)
-    else:
-        return _load_from_directory(path)
+
+    return _load_from_directory(path)
 
 
 def _load_from_directory(directory):
@@ -137,7 +137,8 @@ def _load_from_directory(directory):
 
     if not asdf_files:
         raise ValueError(f"No asdf file found in directory {base_path}.")
-    elif len(asdf_files) > 1:
+
+    if len(asdf_files) > 1:
         return _load_from_iterable(asdf_files)
 
     asdf_file = asdf_files[0]
@@ -183,8 +184,7 @@ def _known_types_docs():
 
 def _formatted_types_docstring(known_types):
     lines = [f"| `{fqn}` - {doc}" for fqn, doc in known_types.items()]
-    docstring = "\n        ".join(lines)
-    return docstring
+    return "\n        ".join(lines)
 
 
 load_dataset.__doc__ = load_dataset.__doc__.format(types_list=_formatted_types_docstring(_known_types_docs()),

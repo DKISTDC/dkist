@@ -36,15 +36,16 @@ class VaryingCelestialConverter(TransformConverterBase):
                  VaryingCelestialTransform3D)
         ):
             return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
-        elif isinstance(
+
+        if isinstance(
                 obj,
                 (InverseVaryingCelestialTransform,
                  InverseVaryingCelestialTransform2D,
                  InverseVaryingCelestialTransform3D)
         ):
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0"
-        else:
-            raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
+
+        raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import varying_celestial_transform_from_tables
@@ -129,10 +130,9 @@ class CoupledCompoundConverter(TransformConverterBase):
                 not (oper == "fix_inputs" and isinstance(right, dict))):
             raise TypeError("Unknown model type '{}'".format(node["forward"][1]._tag))  # pragma: no cover
 
-        model = CoupledCompoundModel(oper, left, right,
+        return CoupledCompoundModel(oper, left, right,
                                      shared_inputs=node["shared_inputs"])
 
-        return model
 
 
 class RavelConverter(TransformConverterBase):
