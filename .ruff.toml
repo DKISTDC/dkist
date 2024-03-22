@@ -5,6 +5,7 @@ exclude = [
   "__pycache__",
   "build",
   "dkist/version.py",
+  "dkist/_dev/",
 ]
 
 [lint]
@@ -23,7 +24,7 @@ select = [
   # "RET",  # TODO! fix
   # "SIM",  # TODO! fix
   "TID",
-  # "PTH",  # TODO! fix
+  "PTH",
   "NPY",
   "RUF",
 ]
@@ -45,6 +46,8 @@ extend-ignore = [
   "PT023", # Always use () on pytest decorators
   # pyupgrade
   "UP038", # Use | in isinstance - not compatible with models and is slower
+  # Pathlib (PTH)
+  "PTH123",  # open() should be replaced by Path.open()
   # Ruff
   "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
   "RUF013",  # PEP 484 prohibits implicit `Optional`
@@ -63,6 +66,7 @@ extend-ignore = [
 ]
 "__init__.py" = ["E402", "F401", "F403"]
 "test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+"dkist/logger.py" = ["PTH"]
 
 [lint.flake8-import-conventions.extend-aliases]
 "astropy.units" = "u"

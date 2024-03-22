@@ -1,5 +1,4 @@
 import os
-import glob
 from pathlib import Path
 
 import numpy as np
@@ -95,7 +94,7 @@ def main():
     from dkist_inventory.transforms import generate_lookup_table
 
     path = Path("~/sunpy/data/jsocflare/").expanduser()
-    files = glob.glob(str(path / "*.fits"))
+    files = path.glob("*.fits")
 
     # requestid = 'JSOC_20180831_1097'
     requestid = None
