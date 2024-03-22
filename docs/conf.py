@@ -158,6 +158,8 @@ html_static_path = ['_static']
 
 html_css_files = ['css/dkist.css']
 
+html_favicon = "_static/img/favico.ico"
+
 html_theme_options = {
     "sst_logo": "img/nso_logo.png",
     "logo": {
