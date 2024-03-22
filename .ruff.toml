@@ -14,6 +14,7 @@ select = [
   "W",
   "UP",
   "C4",
+  "ICN",
   "PT",
 ]
 extend-ignore = [
@@ -48,6 +49,10 @@ extend-ignore = [
 ]
 "__init__.py" = ["E402", "F401", "F403"]
 "test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+
+[lint.flake8-import-conventions.extend-aliases]
+"astropy.units" = "u"
+"sunpy.net.attrs" = "a"
 
 [lint.pydocstyle]
 convention = "numpy"

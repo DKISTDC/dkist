@@ -17,7 +17,7 @@ from astropy.table import TableAttribute
 from astropy.time import Time
 
 from sunpy.net import attr
-from sunpy.net import attrs as sattrs
+from sunpy.net import attrs as sattrs  # noqa: ICN001
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header

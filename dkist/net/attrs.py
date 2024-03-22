@@ -3,7 +3,7 @@ Search attributes which are specific to the `dkist.net.DKISTClient`.
 
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
-import astropy.units as _u
+import astropy.units as _u  # noqa: ICN001
 
 import sunpy.net._attrs as _sunpy_attrs
 from sunpy.coordinates.frames import Helioprojective as _Helioprojective

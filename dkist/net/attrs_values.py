@@ -7,7 +7,7 @@ from pathlib import Path
 
 import platformdirs
 
-from sunpy.net import attrs as sattrs
+from sunpy.net import attrs as sattrs  # noqa: ICN001
 
 import dkist.data
 from dkist import log
