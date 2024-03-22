@@ -13,7 +13,6 @@ select = [
   "E",
   "W",
   "UP",
-  "I",
   "C4",
   "PT",
 ]
@@ -33,6 +32,8 @@ extend-ignore = [
   "PT007", # Parametrize should be lists of tuples  # TODO! fix
   "PT011", # Too broad exception assert             # TODO! fix
   "PT023", # Always use () on pytest decorators
+  # pyupgrade
+  "UP038", # Use | in isinstance - not compatible with models and is slower
 ]
 
 [lint.per-file-ignores]
