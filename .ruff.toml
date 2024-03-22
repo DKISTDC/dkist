@@ -15,6 +15,8 @@ select = [
   "UP",
   "C4",
   "ICN",
+  "G",
+  "INP",
   "PT",
 ]
 extend-ignore = [
