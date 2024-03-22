@@ -1,19 +1,91 @@
 [build-system]
-requires = ["setuptools>=30.3.0", "setuptools_scm", "wheel"]
-build-backend = 'setuptools.build_meta'
+requires = [
+  "setuptools>=62.1",
+  "setuptools_scm[toml]>=6.2",
+  "wheel",]
+build-backend = "setuptools.build_meta"
 
-[tool.isort]
-line_length = 99
-skip = "docs/conf.py,.tox"
-sections = "FUTURE,STDLIB,THIRDPARTY,ASTRO,FIRSTPARTY,LOCALFOLDER"
-default_section = "THIRDPARTY"
-known_first_party = "dkist,dkist_inventory"
-known_astro = "astropy,sunpy,gwcs,asdf,ndcube,asdf_astropy"
-multi_line_output = 0
-balanced_wrapping = true
-include_trailing_comma = false
-length_sort = false
-length_sort_sections = "stdlib"
+[project]
+name = "dkist"
+description = "DKIST User Tools"
+requires-python = ">=3.10"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { file = "licenses/LICENSE.rst", content-type = "text/plain" }
+authors = [
+  { name = "NSO / AURA", email = "stuart@cadair.com" },
+]
+dependencies = [
+  "aiohttp>=3.8",
+  # Provide minimum deps for all asdf packages used to generate or read asdf
+  # files so that we test with these minimums and also generate asdf's with
+  # them
+  # Some of these schema dependencies are minimums because we generated asdf
+  # files with them unpinned so they are now required to read generated asdf
+  # files.
+  "asdf>=2.11.2",  # Pick up jsonschema bug fix
+  "asdf-astropy>=0.2.0",
+  "asdf-coordinates-schemas>=0.1.0",
+  "asdf-standard>=1.0.3",
+  "asdf-transform-schemas>=0.3.0",
+  "asdf-unit-schemas>=0.1.0",
+  "asdf-wcs-schemas>=0.3.0",
+  "astropy>=5.3",
+  "dask[array]>=2021.8.0",
+  "globus-sdk>=3.0",
+  "gwcs>=0.19.0",
+  "matplotlib>=3.5",
+  "ndcube[plotting,reproject]>=2.0",
+  "numpy>=1.22",
+  "parfive[ftp]>=1.5",
+  "platformdirs>=3.0",
+  "sunpy[net,asdf]>=4.0.7",
+  "tqdm>=4.63",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+  "pytest",
+  "pytest-doctestplus",
+  "pytest-cov",
+  "pytest-remotedata",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-mpl",
+  "pytest-httpserver",
+  "hypothesis",
+  "tox",
+  "pydot",
+]
+docs = [
+  "sphinx",
+  "sphinx-astropy",
+  "sphinx-gallery",
+  "sphinx-changelog",
+  "pytest",
+  "sphinx_autodoc_typehints",
+  "dkist-sphinx-theme>=1.1.2",
+  "sphinx-design",
+  "myst-nb",
+  "ipywidgets",
+  "accessible-pygments",
+]
+
+[project.urls]
+repository = "https://github.com/DKISTDC/dkist"
+
+[project.entry-points]
+'asdf.extensions' = {dkist = 'dkist.io.asdf.entry_points:get_extensions'}
+'asdf.resource_mappings' = {dkist = 'dkist.io.asdf.entry_points:get_resource_mappings'}
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+
+[tool.setuptools_scm]
+write_to = "dkist/_version.py"
 
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]

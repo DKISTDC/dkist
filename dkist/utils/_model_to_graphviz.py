@@ -1,5 +1,5 @@
 """
-This module vizualises compound models by rendering them as a graphviz graph.
+This module visualises compound models by rendering them as a graphviz graph.
 
 It is provided as a helper module which is useful for debugging complex compound models.
 

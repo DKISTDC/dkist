@@ -3,18 +3,15 @@ import numpy as np
 import asdf
 import astropy.units as u
 import gwcs
-import sunpy.map
 from astropy.io import fits
 from astropy.modeling.models import (AffineTransformation2D, Multiply,
                                      Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.table import Table
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
-from sunpy.time import parse_time
 
-from dkist_inventory.asdf_generator import references_from_filenames
-from dkist_inventory.header_parsing import HeaderParser
-from dkist_inventory.transforms import generate_lookup_table
+import sunpy.map
+from sunpy.time import parse_time
 
 
 def map_to_transform(smap):
@@ -59,6 +56,9 @@ def map_to_transform(smap):
 
 def main():
     from dkist.data.test import rootdir
+    from dkist_inventory.asdf_generator import references_from_filenames
+    from dkist_inventory.header_parsing import HeaderParser
+    from dkist_inventory.transforms import generate_lookup_table
     files = list((rootdir / "EIT").glob("*.fits"))
 
     files.sort()

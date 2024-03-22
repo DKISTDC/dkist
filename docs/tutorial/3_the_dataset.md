@@ -112,11 +112,11 @@ We can get the corresponding **pixel** axis names with:
 ds.wcs.pixel_axis_names
 ```
 
-Note that these are in reverse order compared to the `ds` output ealier.
+Note that these are in reverse order compared to the `ds` output earlier.
 This is because they are in *pixel* order rather than *array* order.
 
 Next we see the description of the world coordinates.
-This information is also accessable through the `wcs` attribute:
+This information is also accessible through the `wcs` attribute:
 
 ```{code-cell} python
 ds.wcs.world_axis_names
