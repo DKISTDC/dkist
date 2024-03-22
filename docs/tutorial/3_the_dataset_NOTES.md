@@ -162,7 +162,7 @@ ds
 ```
 
 ```{error}
-Due to a known issue with the VBI level 1 FITS headers, the ordering of these tiles in the array are likley incorrect.
+Due to a known issue with the VBI level 1 FITS headers, the ordering of these tiles in the array are likely incorrect.
 ```
 
 The `TiledDataset` stores the FITS headers for all the files of the individual `Dataset`s in the `combined_headers` attribute.

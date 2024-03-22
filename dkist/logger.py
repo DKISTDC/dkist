@@ -1,7 +1,7 @@
 """
 This module contains helpers to use the Python logger to show messages to users.
 
-It is heavily insipired by Astropy's logger, but implemented independantly
+It is heavily insipired by Astropy's logger, but implemented independently
 because Astropy warn you against directly using theirs.
 
 This module sets up the following things:

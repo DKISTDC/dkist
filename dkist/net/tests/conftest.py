@@ -25,7 +25,7 @@ def api_param_names():
     """
     A mapping of attrs to param names in the query string.
 
-    Excludes ones with input dependant query params
+    Excludes ones with input dependent query params
     """
     return {
         a.Time: ('endTimeMin', 'startTimeMax'),

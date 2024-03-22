@@ -4,6 +4,7 @@ Search attributes which are specific to the `dkist.net.DKISTClient`.
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
 import astropy.units as _u
+
 import sunpy.net._attrs as _sunpy_attrs
 from sunpy.coordinates.frames import Helioprojective as _Helioprojective
 from sunpy.coordinates.utils import get_rectangle_coordinates as _get_rectangle_coordinates

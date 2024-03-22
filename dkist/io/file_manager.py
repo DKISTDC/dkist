@@ -336,7 +336,7 @@ class FileManager(BaseFileManager):
         Returns
         -------
         results: `parfive.Results`
-            A `~parfive.Results` obejct containing the filepath of the
+            A `~parfive.Results` object containing the filepath of the
             downloaded file if the download was successful, and any errors if it
             was not.
         """
@@ -364,7 +364,7 @@ class FileManager(BaseFileManager):
         Returns
         -------
         results: `parfive.Results`
-            A `~parfive.Results` obejct containing the filepath of the
+            A `~parfive.Results` object containing the filepath of the
             downloaded file if the download was successful, and any errors if it
             was not.
         """

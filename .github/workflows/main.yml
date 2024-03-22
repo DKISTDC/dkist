@@ -33,24 +33,47 @@ jobs:
     with:
       default_python: '3.10'
       coverage: 'codecov'
+      posargs: '--color=yes'
       envs: |
         - linux: py312
         - linux: py311
-        - windows: py310-online
-        - macos: py39
+        - windows: py311-online
+        - macos: py310
+        - linux: py310-oldestdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      default_python: '3.10'
+      coverage: 'codecov'
+      envs: |
         - linux: build_docs-notebooks
           pytest: false
           libraries:
             apt:
               - graphviz
-        - linux: py39-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  sdist_verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install -U --user build
+      - run: python -m build . --sdist
+      - run: python -m pip install -U --user twine
+      - run: python -m twine check dist/*
 
   allowed-fail-tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
       coverage: 'codecov'
+      posargs: '--color=yes'
       envs: |
         - linux: py311-devdeps
     secrets:

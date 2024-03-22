@@ -108,7 +108,7 @@ def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_er
     except Exception as err:
         log.error("Failed to download new attrs values.")
         log.debug(str(err))
-        # If an error has occured then remove the local file so it isn't
+        # If an error has occurred then remove the local file so it isn't
         # corrupted or invalid.
         user_file.unlink(missing_ok=True)
         if not silence_errors:
