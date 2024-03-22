@@ -15,9 +15,9 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
-from collections.abc import Iterable
+from typing import Any
 from pathlib import Path
-from typing import Any, Optional, Union
+from collections.abc import Iterable
 
 import dask.array
 import numpy as np
@@ -126,7 +126,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         return self._basepath
 
     @basepath.setter
-    def basepath(self, value: Optional[Union[os.PathLike, str]]):
+    def basepath(self, value: os.PathLike | str | None):
         self._basepath = Path(value).expanduser() if value is not None else None
 
     @property
@@ -154,7 +154,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     # class.
     __slots__ = ["parent", "parent_slice"]
 
-    def __init__(self, parent: StripedExternalArray, aslice: Union[tuple, slice, int]):
+    def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
         self.parent = parent
         self.parent_slice = tuple(aslice)
 

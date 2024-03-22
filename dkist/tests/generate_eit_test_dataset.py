@@ -4,13 +4,8 @@ import asdf
 import astropy.units as u
 import gwcs
 from astropy.io import fits
-from astropy.modeling.models import (
-    AffineTransformation2D,
-    Multiply,
-    Pix2Sky_TAN,
-    RotateNative2Celestial,
-    Shift,
-)
+from astropy.modeling.models import (AffineTransformation2D, Multiply,
+                                     Pix2Sky_TAN, RotateNative2Celestial, Shift)
 from astropy.table import Table
 from astropy.time import Time
 from gwcs import coordinate_frames as cf

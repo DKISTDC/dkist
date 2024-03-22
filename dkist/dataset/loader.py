@@ -1,6 +1,6 @@
 import importlib.resources as importlib_resources
-from functools import singledispatch
 from pathlib import Path
+from functools import singledispatch
 
 from parfive import Results
 

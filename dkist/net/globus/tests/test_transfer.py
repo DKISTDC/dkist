@@ -1,18 +1,14 @@
 import os
-from collections import namedtuple
 from pathlib import Path
 from unittest import mock
+from collections import namedtuple
 
 import pytest
 from globus_sdk import GlobusHTTPResponse
 from globus_sdk.services.transfer.response.iterable import IterableTransferResponse
 
-from dkist.net.globus.transfer import (
-    _get_speed,
-    _orchestrate_transfer_task,
-    _process_task_events,
-    start_transfer_from_file_list,
-)
+from dkist.net.globus.transfer import (_get_speed, _orchestrate_transfer_task,
+                                       _process_task_events, start_transfer_from_file_list)
 
 
 @pytest.fixture

@@ -6,13 +6,9 @@ import pytest
 
 import dkist.net
 from dkist.data.test import rootdir
-from dkist.net.globus.endpoints import (
-    get_data_center_endpoint_id,
-    get_directory_listing,
-    get_endpoint_id,
-    get_local_endpoint_id,
-    get_transfer_client,
-)
+from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directory_listing,
+                                        get_endpoint_id, get_local_endpoint_id,
+                                        get_transfer_client)
 
 
 @pytest.fixture

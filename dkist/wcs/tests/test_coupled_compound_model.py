@@ -7,12 +7,8 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel, Model
 from astropy.modeling.separable import separability_matrix
 
-from dkist.wcs.models import (
-    CoupledCompoundModel,
-    VaryingCelestialTransform,
-    VaryingCelestialTransform2D,
-    varying_celestial_transform_from_tables,
-)
+from dkist.wcs.models import (CoupledCompoundModel, VaryingCelestialTransform,
+                              VaryingCelestialTransform2D, varying_celestial_transform_from_tables)
 
 
 @pytest.fixture

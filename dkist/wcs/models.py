@@ -1,6 +1,6 @@
 from abc import ABC
+from typing import Literal
 from collections.abc import Iterable
-from typing import Literal, Union
 
 import numpy as np
 
@@ -32,11 +32,11 @@ __all__ = [
 
 
 def generate_celestial_transform(
-        crpix: Union[Iterable[float], u.Quantity],
-        cdelt: Union[Iterable[float], u.Quantity],
-        pc: Union[ArrayLike, u.Quantity],
-        crval: Union[Iterable[float], u.Quantity],
-        lon_pole: Union[float, u.Quantity] = None,
+        crpix: Iterable[float] | u.Quantity,
+        cdelt: Iterable[float] | u.Quantity,
+        pc: ArrayLike | u.Quantity,
+        crval: Iterable[float] | u.Quantity,
+        lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
 ) -> CompoundModel:
     """
@@ -679,14 +679,14 @@ varying_celestial_transform_dict = {
 }
 
 def varying_celestial_transform_from_tables(
-        crpix: Union[Iterable[float], u.Quantity],
-        cdelt: Union[Iterable[float], u.Quantity],
-        pc_table: Union[ArrayLike, u.Quantity],
-        crval_table: Union[Iterable[float], u.Quantity],
-        lon_pole: Union[float, u.Quantity] = None,
+        crpix: Iterable[float] | u.Quantity,
+        cdelt: Iterable[float] | u.Quantity,
+        pc_table: ArrayLike | u.Quantity,
+        crval_table: Iterable[float] | u.Quantity,
+        lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
-        slit: Union[None, Literal[0, 1]] = None,
+        slit: None | Literal[0, 1] = None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.

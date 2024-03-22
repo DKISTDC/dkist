@@ -6,15 +6,9 @@ import importlib.resources as importlib_resources
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
-from dkist.io.asdf.converters import (
-    AsymmetricMappingConverter,
-    CoupledCompoundConverter,
-    DatasetConverter,
-    FileManagerConverter,
-    RavelConverter,
-    TiledDatasetConverter,
-    VaryingCelestialConverter,
-)
+from dkist.io.asdf.converters import (AsymmetricMappingConverter, CoupledCompoundConverter,
+                                      DatasetConverter, FileManagerConverter, RavelConverter,
+                                      TiledDatasetConverter, VaryingCelestialConverter)
 
 
 def get_resource_mappings():

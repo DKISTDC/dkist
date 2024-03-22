@@ -3,8 +3,8 @@ A pandoc filter which returns only the content between the start of the file
 and the second top level heading.
 """
 import io
-import json
 import sys
+import json
 
 if __name__ == '__main__':
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')

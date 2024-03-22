@@ -23,14 +23,11 @@ class VaryingCelestialConverter(TransformConverterBase):
     ]
 
     def select_tag(self, obj, tags, ctx):
-        from dkist.wcs.models import (
-            InverseVaryingCelestialTransform,
-            InverseVaryingCelestialTransform2D,
-            InverseVaryingCelestialTransform3D,
-            VaryingCelestialTransform,
-            VaryingCelestialTransform2D,
-            VaryingCelestialTransform3D,
-        )
+        from dkist.wcs.models import (InverseVaryingCelestialTransform,
+                                      InverseVaryingCelestialTransform2D,
+                                      InverseVaryingCelestialTransform3D,
+                                      VaryingCelestialTransform, VaryingCelestialTransform2D,
+                                      VaryingCelestialTransform3D)
 
         if isinstance(
                 obj,

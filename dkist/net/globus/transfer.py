@@ -2,24 +2,19 @@
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
 import copy
-import datetime
 import json
-import pathlib
 import time
+import pathlib
+import datetime
 from os import PathLike
-from typing import Literal, Union
+from typing import Literal
 
 import globus_sdk
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
-from .endpoints import (
-    auto_activate_endpoint,
-    get_data_center_endpoint_id,
-    get_endpoint_id,
-    get_local_endpoint_id,
-    get_transfer_client,
-)
+from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
+                        get_endpoint_id, get_local_endpoint_id, get_transfer_client)
 
 __all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
 
@@ -273,7 +268,7 @@ def _orchestrate_transfer_task(file_list: list[PathLike],
                                destination_path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                *,
-                               progress: Union[bool, Literal["verbose"]] = True,
+                               progress: bool | Literal['verbose'] = True,
                                wait: bool = True,
                                label=None):
     """
