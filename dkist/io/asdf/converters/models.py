@@ -23,9 +23,9 @@ class VaryingCelestialConverter(TransformConverterBase):
     ]
 
     def select_tag(self, obj, tags, ctx):
-        if not obj.is_inverse:
+        if not obj._is_inverse:
             return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
-        elif obj.is_inverse:
+        elif obj._is_inverse:
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0"
         else:
             raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
