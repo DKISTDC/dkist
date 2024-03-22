@@ -377,7 +377,7 @@ def test_vct_slit_bounds(slit):
             slit=slit,
         )
 
-@pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id="1D"), pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 def test_vct(has_units, slit, num_varying_axes):
@@ -419,8 +419,8 @@ def test_vct(has_units, slit, num_varying_axes):
         atol *= u.pix
         for i in range(num_sensor_axes):
             sensor_axis_pts[i] *= u.pix
-    grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing='ij')
-    grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing='ij')
+    grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing="ij")
+    grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing="ij")
     # the portion of the grid due to the varying axes coordinates
     varying_axes_grid = grid[num_sensor_axes:]
 
@@ -490,7 +490,7 @@ def _evaluate_unravel(array_shape, index, order="C"):
     return tuple(indices)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 @pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
 def test_ravel_model(ndim, has_units, input_type):
@@ -530,7 +530,7 @@ def test_ravel_model(ndim, has_units, input_type):
             assert np.allclose(round_trip, expected_ravel)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 @pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
 def test_raveled_tabular1d(ndim, has_units, input_type):
@@ -579,7 +579,7 @@ def test_raveled_tabular1d(ndim, has_units, input_type):
             assert np.allclose(raveled_tab.inverse.inverse(*inputs), expected_ravel)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_ordering(ndim, order):
     rng = default_rng()
@@ -595,7 +595,7 @@ def test_ravel_ordering(ndim, order):
         assert int(ravel_value) == values[tuple(inputs)]
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_repr(ndim, order):
     rng = default_rng()

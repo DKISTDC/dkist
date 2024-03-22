@@ -341,7 +341,7 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
         url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
@@ -369,7 +369,7 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
         url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath

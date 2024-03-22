@@ -17,12 +17,12 @@ from urllib.parse import parse_qs, urlparse
 import globus_sdk
 import platformdirs
 
-CLIENT_ID = 'dd2d62af-0b44-4e2e-9454-1092c94b46b3'
-SCOPES = ('urn:globus:auth:scope:transfer.api.globus.org:all',
-          'openid')
+CLIENT_ID = "dd2d62af-0b44-4e2e-9454-1092c94b46b3"
+SCOPES = ("urn:globus:auth:scope:transfer.api.globus.org:all",
+          "openid")
 
 
-__all__ = ['ensure_globus_authorized', 'get_refresh_token_authorizer']
+__all__ = ["ensure_globus_authorized", "get_refresh_token_authorizer"]
 
 
 class AuthenticationError(Exception):
@@ -47,18 +47,18 @@ class RedirectHTTPServer(HTTPServer):
 class RedirectHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(b'You\'re all set, you can close this window!')
+        self.wfile.write(b"You\'re all set, you can close this window!")
 
-        code = parse_qs(urlparse(self.path).query).get('code', [''])[0]
+        code = parse_qs(urlparse(self.path).query).get("code", [""])[0]
         self.server.return_code(code)
 
     def log_message(self, format, *args):
         return
 
 
-def start_local_server(listen=('localhost', 0)):
+def start_local_server(listen=("localhost", 0)):
     """
     Start a server which will listen for the OAuth2 callback.
 
@@ -182,15 +182,15 @@ def get_refresh_token_authorizer(force_reauth=False):
 
     auth_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
 
-    transfer_tokens = tokens['transfer.api.globus.org']
+    transfer_tokens = tokens["transfer.api.globus.org"]
 
     authorizers = {}
     for scope, transfer_tokens in tokens.items():
         authorizers[scope] = globus_sdk.RefreshTokenAuthorizer(
-            transfer_tokens['refresh_token'],
+            transfer_tokens["refresh_token"],
             auth_client,
-            access_token=transfer_tokens['access_token'],
-            expires_at=transfer_tokens['expires_at_seconds'],
+            access_token=transfer_tokens["access_token"],
+            expires_at=transfer_tokens["expires_at_seconds"],
             on_refresh=save_auth_cache)
 
     return authorizers

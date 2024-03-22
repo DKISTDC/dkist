@@ -9,7 +9,7 @@ from dkist import net
 from dkist.data.test import rootdir
 from dkist.io.file_manager import FileManager, StripedExternalArray, StripedExternalArrayView
 
-eitdir = Path(rootdir) / 'EIT'
+eitdir = Path(rootdir) / "EIT"
 
 
 @pytest.fixture
@@ -179,7 +179,7 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('/~'),
+        destination_path=Path("/~"),
         destination_endpoint=None,
         progress=True,
         wait=True,
@@ -211,7 +211,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('/test'),
+        destination_path=Path("/test"),
         **keywords
     )
 
@@ -232,7 +232,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('~/test_dataset/'),
+        destination_path=Path("~/test_dataset/"),
         destination_endpoint=None,
         progress=True,
         wait=True,

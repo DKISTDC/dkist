@@ -68,7 +68,7 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     transfer_client = get_transfer_client()
 
     # Test exact display name match
-    endpoint_id = get_endpoint_id('NCAR Data Sharing Service', transfer_client)
+    endpoint_id = get_endpoint_id("NCAR Data Sharing Service", transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
     # Test multiple match fail
@@ -93,7 +93,7 @@ def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
                                new_callable=mocker.PropertyMock)
     get_ep_mock.return_value = {"DATA": endpoint_search["DATA"][1:2]}
 
-    endpoint_id = get_endpoint_id('dd1ee92a-6d04-11e5-ba46-22000b92c6ec', transfer_client)
+    endpoint_id = get_endpoint_id("dd1ee92a-6d04-11e5-ba46-22000b92c6ec", transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
 

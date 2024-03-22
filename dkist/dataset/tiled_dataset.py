@@ -13,7 +13,7 @@ from astropy.table import vstack
 
 from .dataset import Dataset
 
-__all__ = ['TiledDataset']
+__all__ = ["TiledDataset"]
 
 
 class TiledDataset(Collection):

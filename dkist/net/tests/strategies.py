@@ -44,7 +44,7 @@ def _supported_attr_types():
 
 @st.composite
 def _browse_movie(draw):
-    return a.dkist.BrowseMovie(**draw(st.dictionaries(st.sampled_from(('movieurl', 'movieobjectkey')),
+    return a.dkist.BrowseMovie(**draw(st.dictionaries(st.sampled_from(("movieurl", "movieobjectkey")),
                                st.text(), min_size=1)))
 
 

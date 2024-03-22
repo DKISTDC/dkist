@@ -31,14 +31,14 @@ def boundingbox_params():
     for inputs to the bounding box tests.
     """
     bottom_left_icrs = SkyCoord(ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
-                                obstime='2021-01-02T12:34:56')
+                                obstime="2021-01-02T12:34:56")
     top_right_icrs = SkyCoord(ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km),
-                              obstime='2021-01-02T12:34:56')
+                              obstime="2021-01-02T12:34:56")
     bottom_left_vector_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                         ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
-                                       obstime='2021-01-02T12:34:56')
-    bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
-    top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
+                                       obstime="2021-01-02T12:34:56")
+    bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame="heliographic_stonyhurst", obstime="2021-01-02T12:34:56")
+    top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame="heliographic_stonyhurst", obstime="2021-01-02T12:34:56")
 
     width = 3.4 * u.deg
     height = 1.2 * u.deg
@@ -91,14 +91,14 @@ def test_walker_single(all_attrs_classes, api_param_names):
 
     elif issubclass(all_attrs_classes, da.BrowseMovie):
         at = all_attrs_classes(movieurl="klsdjalkjd", movieobjectkey="lkajsd")
-        api_param_names[all_attrs_classes] = ('browseMovieUrl', 'browseMovieObjectKey')
+        api_param_names[all_attrs_classes] = ("browseMovieUrl", "browseMovieObjectKey")
 
     elif issubclass(all_attrs_classes, da.BoundingBox):
         bottom_left = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                    ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
-                                  obstime='2021-01-02T12:34:56')
+                                  obstime="2021-01-02T12:34:56")
         at = all_attrs_classes(bottom_left=bottom_left)
-        api_param_names[all_attrs_classes] = ('rectangleContainingBoundingBox',)
+        api_param_names[all_attrs_classes] = ("rectangleContainingBoundingBox",)
 
     if not at:
         pytest.skip(f"Not testing {all_attrs_classes!r}")
@@ -113,9 +113,9 @@ def test_walker_single(all_attrs_classes, api_param_names):
 
 @pytest.mark.parametrize(("search", "search_type"),
                          [
-                             ('containing', 'rectangleContainingBoundingBox'),
-                             ('contained', 'rectangleContainedByBoundingBox'),
-                             ('intersecting', 'rectangleIntersectingBoundingBox'),
+                             ("containing", "rectangleContainingBoundingBox"),
+                             ("contained", "rectangleContainedByBoundingBox"),
+                             ("intersecting", "rectangleIntersectingBoundingBox"),
                          ]
                          )
 def test_boundingbox(search, search_type, boundingbox_param):
@@ -132,7 +132,7 @@ def test_boundingbox(search, search_type, boundingbox_param):
 
     for value in out[0].values():
         # want to make sure the value is of the format (flt, flt), (flt, flt)
-        coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
+        coordinate_regex = re.compile(r"^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$")
         assert coordinate_regex.search(value)
 
 def test_args_browsemovie():

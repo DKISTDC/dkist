@@ -12,7 +12,7 @@ from dkist.utils.decorators import deprecated
 
 from .utils import dataset_info_str
 
-__all__ = ['Dataset']
+__all__ = ["Dataset"]
 
 
 class FileManagerDescriptor(NDCubeLinkedDescriptor):
@@ -152,7 +152,7 @@ class Dataset(NDCube):
             file_idx.append(slc)
         grid = np.mgrid[tuple(file_idx)]
         file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
-        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order='F')
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order="F")
 
         # Explicitly create new header table to ensure consistency
         # Otherwise would return a reference sometimes and a new table others
@@ -193,7 +193,7 @@ class Dataset(NDCube):
         """
         Convenience attribute to access the inventory metadata.
         """
-        return self.meta['inventory']
+        return self.meta["inventory"]
 
     """
     Dataset loading and saving routines.

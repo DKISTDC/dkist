@@ -16,7 +16,7 @@ from tqdm.notebook import tqdm as tqdm_notebook
 from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
                         get_endpoint_id, get_local_endpoint_id, get_transfer_client)
 
-__all__ = ['watch_transfer_progress', 'start_transfer_from_file_list']
+__all__ = ["watch_transfer_progress", "start_transfer_from_file_list"]
 
 
 def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, file_list,
@@ -145,7 +145,7 @@ def _process_task_events(task_id, prev_events, tfr_client):
 
     def json_loader(x):
         """Modify the event so the json is a dict."""
-        x['details'] = json.loads(x['details'])
+        x["details"] = json.loads(x["details"])
         return x
 
     # If some of the events are json events, load the json.
@@ -161,8 +161,8 @@ def _get_speed(event):
     """
     A helper function to extract the speed from an event.
     """
-    if event.get('code', "").lower() == "progress" and isinstance(event['details'], dict):
-        return event['details'].get("mbps")
+    if event.get("code", "").lower() == "progress" and isinstance(event["details"], dict):
+        return event["details"].get("mbps")
 
 
 def get_progress_bar(*args, **kwargs):  # pragma: no cover
@@ -171,10 +171,10 @@ def get_progress_bar(*args, **kwargs):  # pragma: no cover
     """
     notebook = tqdm is tqdm_notebook
     if not notebook:
-        kwargs['bar_format'] = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]'
+        kwargs["bar_format"] = "{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]"
     else:
         # TODO: Both having this and not having it breaks things.
-        kwargs['total'] = kwargs.get("total", 1e9) or 1e9
+        kwargs["total"] = kwargs.get("total", 1e9) or 1e9
     return tqdm(*args, **kwargs)
 
 
@@ -211,13 +211,13 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
              json_events,
              message_events) = _process_task_events(task_id, prev_events, tfr_client)
 
-            if ('code', 'STARTED') not in prev_events and not started:
+            if ("code", "STARTED") not in prev_events and not started:
                 started = True
                 progress.write("PENDING: Starting Transfer")
 
             # Print status messages if verbose or if they are errors
             for event in message_events:
-                if event['is_error'] or verbose:
+                if event["is_error"] or verbose:
                     progress.write(f"{event['code']}: {event['details']}")
 
             for event in json_events:
@@ -244,9 +244,9 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
 
             # Get the status of the task to see how many files we have processed.
             task = tfr_client.get_task(task_id)
-            status = task['status']
-            progress.total = task['files']
-            progress.update((task['files_skipped'] + task['files_transferred']) - progress.n)
+            status = task["status"]
+            progress.total = task["files"]
+            progress.update((task["files_skipped"] + task["files_transferred"]) - progress.n)
 
             # If the status of the task is not active we are finished.
             if status != "ACTIVE":
@@ -268,7 +268,7 @@ def _orchestrate_transfer_task(file_list: list[PathLike],
                                destination_path: PathLike = "/~/",
                                destination_endpoint: str = None,
                                *,
-                               progress: bool | Literal['verbose'] = True,
+                               progress: bool | Literal["verbose"] = True,
                                wait: bool = True,
                                label=None):
     """

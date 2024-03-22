@@ -77,7 +77,7 @@ def references_from_filenames(filename_array, relative_to=None):
         with fits.open(filepath) as hdul:
             hdu_index = 1
             hdu = hdul[hdu_index]
-            dtype = BITPIX2DTYPE[hdu.header['BITPIX']]
+            dtype = BITPIX2DTYPE[hdu.header["BITPIX"]]
             shape = tuple(reversed(hdu.shape))
 
             # Convert paths to relative paths
@@ -94,8 +94,8 @@ def references_from_filenames(filename_array, relative_to=None):
 def main():
     from dkist_inventory.transforms import generate_lookup_table
 
-    path = Path('~/sunpy/data/jsocflare/').expanduser()
-    files = glob.glob(str(path / '*.fits'))
+    path = Path("~/sunpy/data/jsocflare/").expanduser()
+    files = glob.glob(str(path / "*.fits"))
 
     # requestid = 'JSOC_20180831_1097'
     requestid = None
@@ -107,11 +107,11 @@ def main():
                 requestid, path=str(path), overwrite=False).wait()
             files = []
             for f in filesd.values():
-                files.append(f['path'])
+                files.append(f["path"])
         else:
             results = Fido.search(
-                a.jsoc.Time('2017-09-06T12:00:00', '2017-09-06T12:02:00'),
-                a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Segment('image'),
+                a.jsoc.Time("2017-09-06T12:00:00", "2017-09-06T12:02:00"),
+                a.jsoc.Series("aia.lev1_euv_12s"), a.jsoc.Segment("image"),
                 a.jsoc.Notify("stuart@cadair.com"))
 
             print(results)
@@ -134,13 +134,13 @@ def main():
     for i, filepath in enumerate(files):
         with fits.open(filepath) as hdul:
             header = hdul[1].header
-        time = parse_time(header['DATE-OBS'])
+        time = parse_time(header["DATE-OBS"])
         if i == 0:
             start_time = time
         inds.append(i)
         times.append(time)
         seconds.append((time - start_time).total_seconds())
-        waves.append(header['WAVELNTH'])
+        waves.append(header["WAVELNTH"])
 
     # Construct an array and sort it by wavelength and time
     arr = np.array((inds, seconds, waves)).T
@@ -173,7 +173,7 @@ def main():
     wave_frame = cf.SpectralFrame(axes_order=(3, ), unit=u.AA, name="wavelength", axes_names=("wavelength", ))
     time_frame = cf.TemporalFrame(
         axes_order=(2, ), unit=u.s, reference_time=Time(time_coords[0]), name="time", axes_names=("time", ))
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name="helioprojective",
                                   reference_frame=smap0.coordinate_frame,
                                   axes_names=("helioprojective longitude", "helioprojective latitude"))
 
@@ -194,8 +194,8 @@ def main():
     ea = references_from_filenames(cube, relative_to=str(path))
 
     tree = {
-        'gwcs': wcs,
-        'dataset': ea,
+        "gwcs": wcs,
+        "dataset": ea,
     }
 
     with asdf.AsdfFile(tree) as ff:

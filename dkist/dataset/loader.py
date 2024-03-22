@@ -156,7 +156,7 @@ def _load_from_asdf(filepath):
         with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                            lazy_load=False, copy_arrays=True) as ff:
-                ds = ff.tree['dataset']
+                ds = ff.tree["dataset"]
                 if isinstance(ds, TiledDataset):
                     for sub in ds.flat:
                         sub.files.basepath = base_path
@@ -183,7 +183,7 @@ def _known_types_docs():
 
 def _formatted_types_docstring(known_types):
     lines = [f"| `{fqn}` - {doc}" for fqn, doc in known_types.items()]
-    docstring = '\n        '.join(lines)
+    docstring = "\n        ".join(lines)
     return docstring
 
 

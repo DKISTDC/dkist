@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from astropy.table import Table
 
-__all__ = ['dehumanize_inventory', 'humanize_inventory', 'INVENTORY_KEY_MAP']
+__all__ = ["dehumanize_inventory", "humanize_inventory", "INVENTORY_KEY_MAP"]
 
 
 class DefaultMap(defaultdict):
@@ -77,9 +77,9 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
 
 
 def _key_clean(key):
-    key = re.sub('[%s]' % re.escape(string.punctuation), '_', key)
-    key = key.replace(' ', '_')
-    key = ''.join(char for char in key
+    key = re.sub("[%s]" % re.escape(string.punctuation), "_", key)
+    key = key.replace(" ", "_")
+    key = "".join(char for char in key
                     if char.isidentifier() or char.isnumeric())
     return key.lower()
 
@@ -92,8 +92,8 @@ def path_format_keys(keymap):
 
 
 def _path_format_table(keymap=INVENTORY_KEY_MAP):
-    t = Table({'Inventory Keyword': list(keymap.keys()), 'Path Key': path_format_keys(keymap)})
-    return '\n'.join(t.pformat(max_lines=-1, html=True))
+    t = Table({"Inventory Keyword": list(keymap.keys()), "Path Key": path_format_keys(keymap)})
+    return "\n".join(t.pformat(max_lines=-1, html=True))
 
 
 def humanize_inventory(inventory: dict[str, str]) -> dict[str, str]:

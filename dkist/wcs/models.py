@@ -744,7 +744,7 @@ class Ravel(Model):
 
     @property
     def input_units(self):
-        return {f'x{idx}': u.pix for idx in range(self.n_inputs)}
+        return {f"x{idx}": u.pix for idx in range(self.n_inputs)}
 
     @property
     def outputs(self):
@@ -756,9 +756,9 @@ class Ravel(Model):
 
     @property
     def return_units(self):
-        return {'y': u.pix}
+        return {"y": u.pix}
 
-    def __init__(self, array_shape, order='C', **kwargs):
+    def __init__(self, array_shape, order="C", **kwargs):
         if len(array_shape) < 2 or np.prod(array_shape) < 1:
             raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = tuple(array_shape)
@@ -767,8 +767,8 @@ class Ravel(Model):
         self.order = order
         super().__init__(**kwargs)
         # super dunder init sets inputs and outputs to default values so set what we want here
-        self.inputs = tuple([f'x{idx}' for idx in range(self.n_inputs)])
-        self.outputs = 'y',
+        self.inputs = tuple([f"x{idx}" for idx in range(self.n_inputs)])
+        self.outputs = "y",
 
     def evaluate(self, *inputs_):
         """Evaluate the forward ravel for a given tuple of pixel values."""
@@ -817,7 +817,7 @@ class Unravel(Model):
 
     @property
     def input_units(self):
-        return {'x': u.pix}
+        return {"x": u.pix}
 
     @property
     def n_outputs(self):
@@ -833,9 +833,9 @@ class Unravel(Model):
 
     @property
     def return_units(self):
-        return {f'y{idx}': u.pix for idx in range(self.n_outputs)}
+        return {f"y{idx}": u.pix for idx in range(self.n_outputs)}
 
-    def __init__(self, array_shape, order='C', **kwargs):
+    def __init__(self, array_shape, order="C", **kwargs):
         if len(array_shape) < 2 or np.prod(array_shape) < 1:
             raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = array_shape
@@ -844,8 +844,8 @@ class Unravel(Model):
         self.order = order
         super().__init__(**kwargs)
         # super dunder init sets inputs and outputs to default values so set what we want here
-        self.inputs = 'x',
-        self.outputs = tuple([f'y{idx}' for idx in range(self.n_outputs)])
+        self.inputs = "x",
+        self.outputs = tuple([f"y{idx}" for idx in range(self.n_outputs)])
 
     def evaluate(self, input_):
         """Evaluate the reverse ravel (unravel) for a given pixel value."""

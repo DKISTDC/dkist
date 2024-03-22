@@ -12,7 +12,7 @@ def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert 5 not in simple_tiled_dataset
     assert all(isinstance(t, Dataset) for t in simple_tiled_dataset.flat)
     assert all(t.shape == (2,) for t in simple_tiled_dataset)
-    assert simple_tiled_dataset.inventory is dataset.meta['inventory']
+    assert simple_tiled_dataset.inventory is dataset.meta["inventory"]
     assert simple_tiled_dataset.shape == (2, 2)
 
 
@@ -27,8 +27,8 @@ def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
 
 
 def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
-    assert len(simple_tiled_dataset.combined_headers) == len(dataset.meta['headers']) * 4
-    assert simple_tiled_dataset.combined_headers.colnames == dataset.meta['headers'].colnames
+    assert len(simple_tiled_dataset.combined_headers) == len(dataset.meta["headers"]) * 4
+    assert simple_tiled_dataset.combined_headers.colnames == dataset.meta["headers"].colnames
 
 
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
@@ -36,20 +36,20 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
         TiledDataset(np.array((dataset, dataset_4d)))
 
     with pytest.raises(ValueError, match="physical types do not match"):
-        TiledDataset(np.array((dataset, dataset_4d)), inventory=dataset.meta['inventory'])
+        TiledDataset(np.array((dataset, dataset_4d)), inventory=dataset.meta["inventory"])
 
     ds2 = copy.deepcopy(dataset)
-    ds2.meta['inventory'] = {'hello': 'world'}
+    ds2.meta["inventory"] = {"hello": "world"}
     with pytest.raises(ValueError, match="inventory records of all the datasets"):
-        TiledDataset(np.array((dataset, ds2)), dataset.meta['inventory'])
+        TiledDataset(np.array((dataset, ds2)), dataset.meta["inventory"])
 
 
 def test_tiled_dataset_from_components(dataset):
     shape = (2, 2)
     file_managers = [dataset._file_manager] * 4
     wcses = [dataset.wcs] * 4
-    header_tables = [dataset.meta['headers']] * 4
-    inventory = dataset.meta['inventory']
+    header_tables = [dataset.meta["headers"]] * 4
+    inventory = dataset.meta["inventory"]
 
     tiled_ds = TiledDataset._from_components(shape, file_managers, wcses, header_tables, inventory)
     assert isinstance(tiled_ds, TiledDataset)
@@ -57,5 +57,5 @@ def test_tiled_dataset_from_components(dataset):
     assert all(isinstance(t, Dataset) for t in tiled_ds.flat)
     for ds, fm, headers in zip(tiled_ds.flat, file_managers, header_tables):
         assert ds.files == fm
-        assert ds.meta['inventory'] is inventory
-        assert ds.meta['headers'] is headers
+        assert ds.meta["inventory"] is inventory
+        assert ds.meta["headers"] is headers

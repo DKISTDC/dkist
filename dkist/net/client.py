@@ -111,7 +111,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         total_available_results = 0
         new_results = defaultdict(list)
         for response in responses:
-            total_available_results += response.get('recordCount', 0)
+            total_available_results += response.get("recordCount", 0)
             for result in response["searchResults"]:
                 for key, value in result.items():
                     new_results[INVENTORY_KEY_MAP[key]].append(value)
@@ -177,8 +177,8 @@ class DKISTClient(BaseClient):
 
         results = []
         for url_parameters in queries:
-            if 'pageSize' not in url_parameters:
-                url_parameters.update({'pageSize': conf.default_page_size})
+            if "pageSize" not in url_parameters:
+                url_parameters.update({"pageSize": conf.default_page_size})
             # TODO make this accept and concatenate multiple wavebands in a search
             query_string = urllib.parse.urlencode(url_parameters, doseq=True)
             full_url = f"{self._dataset_search_url}?{query_string}"
@@ -202,7 +202,7 @@ class DKISTClient(BaseClient):
             cdheader = resp.headers.get("Content-Disposition", None)
             if cdheader:
                 _, params = parse_header(cdheader)
-                name = params.get('filename', "")
+                name = params.get("filename", "")
 
         return str(path).format(file=name, **row.response_block_map)
 
@@ -262,7 +262,7 @@ class DKISTClient(BaseClient):
 
     @classmethod
     def _attrs_module(cls):
-        return 'dkist', 'dkist.net.attrs'
+        return "dkist", "dkist.net.attrs"
 
     @classmethod
     def register_values(cls):
