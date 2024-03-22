@@ -4,6 +4,7 @@ import pytest
 
 import astropy.units as u
 from astropy.coordinates import ICRS, SkyCoord
+
 from sunpy.net import attr
 from sunpy.net import attrs as a
 

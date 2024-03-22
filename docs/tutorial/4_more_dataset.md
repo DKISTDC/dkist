@@ -84,7 +84,7 @@ plt.show()
 
 ## Tracking files
 
-`Dataset` tracks information about the individual files that make up the datset in the `files` attribute.
+`Dataset` tracks information about the individual files that make up the dataset in the `files` attribute.
 
 ```{code-cell} ipython
 ds.files

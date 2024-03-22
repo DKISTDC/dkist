@@ -9,6 +9,7 @@ from hypothesis import HealthCheck, assume, settings
 
 import astropy.units as u
 from astropy.time import Time
+
 from sunpy.net import attr
 from sunpy.net import attrs as a
 from sunpy.net.attr import AttrAnd

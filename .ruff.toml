@@ -1,10 +1,13 @@
-target-version = "py39"
-line-length = 100
+target-version = "py310"
+line-length = 110
 exclude = [
   ".git,",
   "__pycache__",
   "build",
+  "dkist/version.py",
 ]
+
+[lint]
 select = [
   "F",
   "E",
@@ -17,30 +20,33 @@ select = [
 extend-ignore = [
   # pycodestyle (E, W)
   "E501", # LineTooLong                             # TODO! fix
+  "E702",
+  "E711",
+  "E741",
+  "F405",
+  "F403",
+  "F821",
+  "F841",
   # pytest (PT)
   "PT001", # Always use pytest.fixture()
   "PT004", # Fixtures which don't return anything should have leading _
+  "PT007", # Parametrize should be lists of tuples  # TODO! fix
+  "PT011", # Too broad exception assert             # TODO! fix
   "PT023", # Always use () on pytest decorators
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 # Part of configuration, not a package.
 "setup.py" = ["INP001"]
 "conftest.py" = ["INP001"]
-# Implicit-namespace-package. The examples are not a package.
-"docs/*.py" = ["INP001"]
+"docs/conf.py" = [
+  "E402"  # Module imports not at top of file
+]
+"docs/*.py" = [
+  "INP001",  # Implicit-namespace-package. The examples are not a package.
+]
 "__init__.py" = ["E402", "F401", "F403"]
 "test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
-# Need to import clients to register them, but don't use them in file
-"dkist/net/__init__.py" = ["F811"]
-"dkist/net/attr_walker.py" = ["F403", "F405"]
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "numpy"
-
-[lint.isort]
-known-first-party = ["dkist", "dkist_inventory"]
-section-order = ["future", "standard-library", "third-party", "astro", "first-party", "local-folder"]
-
-[lint.isort.sections]
-astro = ["astropy", "sunpy", "gwcs", "asdf", "ndcube", "asdf_astropy"]

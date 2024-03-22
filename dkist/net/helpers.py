@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 from astropy import table
+
 from sunpy.net.attr import or_
 from sunpy.net.base_client import QueryResponseRow
 from sunpy.net.fido_factory import UnifiedResponse

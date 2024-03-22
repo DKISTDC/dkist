@@ -7,7 +7,6 @@ import numpy as np
 import asdf
 import astropy.units as u
 import gwcs
-import sunpy.map
 from astropy.io import fits
 from astropy.modeling.models import (
     AffineTransformation2D,
@@ -18,13 +17,14 @@ from astropy.modeling.models import (
 )
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
+
+import sunpy.map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 from sunpy.net.jsoc import JSOCClient
 from sunpy.time import parse_time
 
 from dkist import load_dataset
-from dkist.asdf_maker.helpers import generate_lookup_table
 
 
 def map_to_transform(smap):
@@ -97,6 +97,8 @@ def references_from_filenames(filename_array, relative_to=None):
 
 
 def main():
+    from dkist_inventory.transforms import generate_lookup_table
+
     path = Path('~/sunpy/data/jsocflare/').expanduser()
     files = glob.glob(str(path / '*.fits'))
 
@@ -149,7 +151,7 @@ def main():
     arr = np.array((inds, seconds, waves)).T
     sorter = np.lexsort((arr[:, 1], arr[:, 2]))
 
-    # Using this double-sorted array get the list indicies
+    # Using this double-sorted array get the list indices
     list_sorter = np.array(arr[sorter][:, 0], dtype=int)
 
     # Calculate the desired shape of the output array

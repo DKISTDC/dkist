@@ -30,6 +30,6 @@ class Conf(_config.ConfigNamespace):
 
 conf = Conf()
 
-# Put imports after conf so that conf is initalized before import
+# Put imports after conf so that conf is initialized before import
 from .client import DKISTClient  # noqa
 from .helpers import transfer_complete_datasets  # noqa

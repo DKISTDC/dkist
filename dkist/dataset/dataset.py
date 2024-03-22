@@ -4,6 +4,7 @@ import numpy as np
 
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
+
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.file_manager import FileManager
@@ -190,7 +191,7 @@ class Dataset(NDCube):
     @property
     def inventory(self):
         """
-        Convenience attribute to acces the inventory metadata.
+        Convenience attribute to access the inventory metadata.
         """
         return self.meta['inventory']
 

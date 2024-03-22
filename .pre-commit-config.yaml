@@ -1,24 +1,35 @@
 repos:
-  # This should be before any formatting hooks like isort
+    # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.15"
+    rev: "v0.2.2"
     hooks:
       - id: ruff
         args: ["--fix"]
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|dkist/extern)$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      - id: check-yaml
       - id: check-ast
-      - id: debug-statements
-      - id: check-added-large-files
-        args: ['--maxkb=750']
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*(.fits|.asdf)"
-      - id: mixed-line-ending
-        files: ".*.py"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|.hdr|.asdf)"
+      - id: check-yaml
+      - id: debug-statements
+      - id: check-added-large-files
+        args: ["--enforce-all", "--maxkb=1054"]
       - id: end-of-file-fixer
-        exclude: ".*(.fits|.asdf|.json)"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json|.asdf)$|^CITATION.rst$"
+      - id: mixed-line-ending
+        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.asdf|.json|.hdr)$"
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        args: [ "--write-changes" ]
 ci:
   autofix_prs: false
+  autoupdate_schedule: "weekly"

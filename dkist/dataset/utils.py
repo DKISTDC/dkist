@@ -125,7 +125,7 @@ def pp_matrix(wcs):
 
 def extract_pc_matrix(headers, naxes=None):
     """
-    Given an astropy table of headers extract one or more PC matricies.
+    Given an astropy table of headers extract one or more PC matrices.
     """
     if naxes is None:
         naxes = headers[0]["NAXIS"]

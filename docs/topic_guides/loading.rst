@@ -6,7 +6,7 @@ Loading and Working with Level One Data
 As we saw in the :ref:`dkist:topic-guides:downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
 The `dkist.Dataset` class provides access to all the components of the dataset, and is a slightly customised `ndcube.NDCube` object, so all functionality provided by ndcube is applicable to the ``Dataset`` class.
 
-This section of the guide will cover things specifc to the `~dkist.Dataset` class, but will not cover the basics which are in the `ndcube documentation <https://docs.sunpy.org/projects/ndcube>`__.
+This section of the guide will cover things specific to the `~dkist.Dataset` class, but will not cover the basics which are in the `ndcube documentation <https://docs.sunpy.org/projects/ndcube>`__.
 In particular we recommend you read the following sections of the ``ndcube`` documentation:
 
 * :ref:`ndcube:ndcube`

@@ -102,7 +102,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
     Shared components between the forward and reverse varying celestial transforms.
     """
 
-    # This prevents Model from broadcasting the paramters to the inputs
+    # This prevents Model from broadcasting the parameters to the inputs
     standard_broadcasting = False
     _separable = False
     _input_units_allow_dimensionless = True
