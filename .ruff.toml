@@ -20,6 +20,9 @@ select = [
   "PT",
   "Q",
   "RSE",
+  # "RET",  # TODO! fix
+  # "SIM",  # TODO! fix
+  "TID",
 ]
 extend-ignore = [
   # pycodestyle (E, W)

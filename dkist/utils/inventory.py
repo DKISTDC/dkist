@@ -112,7 +112,7 @@ def path_format_inventory(human_inv):
     Given a single humanized inventory record return a dict for formatting paths.
     """
     # Putting this here because of circular imports
-    from ..net.client import DKISTQueryResponseTable as Table
+    from dkist.net.client import DKISTQueryResponseTable as Table
 
     t = Table.from_results([{"searchResults": [human_inv]}], client=None)
     return t[0].response_block_map
