@@ -19,6 +19,7 @@ select = [
   "INP",
   "PT",
   "Q",
+  "RSE",
 ]
 extend-ignore = [
   # pycodestyle (E, W)
