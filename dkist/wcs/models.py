@@ -340,51 +340,14 @@ class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
     n_inputs = 3
     _is_inverse = True
 
-    @property
-    def inverse(self):
-        vct = VaryingCelestialTransform(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return vct
-
-
 class InverseVaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     n_inputs = 4
     _is_inverse = True
-
-    @property
-    def inverse(self):
-        vct = VaryingCelestialTransform2D(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return vct
 
 
 class InverseVaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     n_inputs = 5
     _is_inverse = True
-
-    @property
-    def inverse(self):
-        vct = VaryingCelestialTransform3D(
-            crpix=self.crpix,
-            cdelt=self.cdelt,
-            lon_pole=self.lon_pole,
-            pc_table=self.pc_table,
-            crval_table=self.crval_table,
-            projection=self.projection,
-        )
-        return vct
 
 
 class CoupledCompoundModel(CompoundModel):
