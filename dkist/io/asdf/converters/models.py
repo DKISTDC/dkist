@@ -23,29 +23,10 @@ class VaryingCelestialConverter(TransformConverterBase):
     ]
 
     def select_tag(self, obj, tags, ctx):
-        from dkist.wcs.models import (InverseVaryingCelestialTransform,
-                                      InverseVaryingCelestialTransform2D,
-                                      InverseVaryingCelestialTransform3D,
-                                      VaryingCelestialTransform, VaryingCelestialTransform2D,
-                                      VaryingCelestialTransform3D)
-
-        if isinstance(
-                obj,
-                (VaryingCelestialTransform,
-                 VaryingCelestialTransform2D,
-                 VaryingCelestialTransform3D)
-        ):
-            return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
-
-        if isinstance(
-                obj,
-                (InverseVaryingCelestialTransform,
-                 InverseVaryingCelestialTransform2D,
-                 InverseVaryingCelestialTransform3D)
-        ):
+        if obj._is_inverse:
             return "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.1.0"
 
-        raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
+        return "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.1.0"
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import varying_celestial_transform_from_tables
