@@ -348,13 +348,13 @@ def test_vct_shape_errors():
         lon_pole=180 * u.deg,
     )
 
-    with pytest.raises(ValueError, match="only be constructed with a one dimensional"):
+    with pytest.raises(ValueError, match="only be constructed with a 1-dimensional"):
         VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
 
-    with pytest.raises(ValueError, match="only be constructed with a two dimensional"):
+    with pytest.raises(ValueError, match="only be constructed with a 2-dimensional"):
         VaryingCelestialTransform2D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
-    with pytest.raises(ValueError, match="only be constructed with a three dimensional"):
+    with pytest.raises(ValueError, match="only be constructed with a 3-dimensional"):
         VaryingCelestialTransform3D(crval_table=crval_table[0], pc_table=pc_table[0], **kwargs)
 
 
