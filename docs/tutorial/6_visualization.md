@@ -108,7 +108,7 @@ For the next few examples we'll go back to using some VBI data.
 res = Fido.search(a.dkist.Dataset("AJQWW"))
 asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
 
-# We extract the top left tile of the VBI moasic
+# We extract the top left tile of the VBI mosaic
 ds = dkist.load_dataset(asdf_file)[0, 0]
 ```
 

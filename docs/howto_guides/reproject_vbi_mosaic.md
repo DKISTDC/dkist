@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-# Stitching a VBI Moasic with `reproject`
+# Stitching a VBI Mosaic with `reproject`
 
 The [reproject](https://reproject.readthedocs.io/) package is an Astropy-affiliated package for regridding data.
 A number of different algorithms are implemented in the package, with different trade-offs for speed and accuracy.
@@ -70,6 +70,7 @@ first_tiles = [tile[0] for tile in ds.flat]
 :tags: [skip-execution]
 
 for i, tile in enumerate(first_tiles):
+    # Wait for only the last download to finish
     tile.files.download(wait=i == len(first_tiles) - 1)
 ```
 
@@ -87,14 +88,6 @@ fig.tight_layout()
 ```
 
 ## Regridding with Reproject
-
-First, we need the most recent version of reproject (released on Friday) for this to work, so let's check:
-
-```{code-cell} ipython3
-import reproject
-```
-
-Now import everything we need for it to run
 
 ```{code-cell} ipython3
 from reproject.mosaicking import find_optimal_celestial_wcs, reproject_and_coadd
@@ -144,5 +137,3 @@ plt.figure(figsize=(10,10))
 stitched = NDCube(arr, reference_wcs)
 stitched.plot()
 ```
-
-We can see some small artifacting which can be hidden by using the `match_background=True` keyword argument to `reproject_and_coadd`.

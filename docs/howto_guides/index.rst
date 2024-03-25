@@ -8,4 +8,4 @@ These How-To Guides will guide you through a specific task.
 .. toctree::
   :maxdepth: 1
 
-  reproject_vbi_moasic
+  reproject_vbi_mosaic

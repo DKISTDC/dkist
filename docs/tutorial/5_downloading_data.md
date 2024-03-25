@@ -75,7 +75,7 @@ But remember that whatever path you specify must be accessible by Globus Connect
 ```{code-cell} ipython3
 :tags: [skip-execution]
 
-ds[0, 0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail
+ds[0, 0].files.download(path="~/not/really/a/path/")  # will hang for a while and then fail
 ```
 
 The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`.
