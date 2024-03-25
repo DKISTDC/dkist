@@ -14,6 +14,12 @@ kernelspec:
 
 # Stitching a VBI Mosaic with `reproject`
 
+```{note}
+You will need the reproject and shapely packages installed to run this notebook.
+
+If you have installed `dkist` with pip you may need to run `pip install 'reproject[all]'` to install shapely as an optional dependency for reproject. If you installed with conda you may need to run `conda install shapely`.
+```
+
 The [reproject](https://reproject.readthedocs.io/) package is an Astropy-affiliated package for regridding data.
 A number of different algorithms are implemented in the package, with different trade-offs for speed and accuracy.
 Reprojecting a single spatial image such as an AIA image is well supported and demonstrated in the [sunpy gallery](https://docs.sunpy.org/en/latest/generated/gallery/index.html#combining-co-aligning-and-reprojecting-images).
