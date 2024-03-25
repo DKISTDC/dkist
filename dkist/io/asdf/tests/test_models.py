@@ -6,8 +6,10 @@ from asdf.testing.helpers import roundtrip_object
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 
-from dkist.wcs.models import (CoupledCompoundModel, Ravel, Unravel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, varying_celestial_transform_from_tables)
+from dkist.wcs.models import (CoupledCompoundModel, InverseVaryingCelestialTransform,
+                              InverseVaryingCelestialTransform2D, Ravel, Unravel,
+                              VaryingCelestialTransform, VaryingCelestialTransform2D,
+                              varying_celestial_transform_from_tables)
 
 
 def test_roundtrip_vct():
@@ -22,7 +24,7 @@ def test_roundtrip_vct():
     new_vct = roundtrip_object(vct)
     assert isinstance(new_vct, VaryingCelestialTransform)
     new_ivct = roundtrip_object(vct.inverse)
-    assert isinstance(new_ivct, VaryingCelestialTransform)
+    assert isinstance(new_ivct, InverseVaryingCelestialTransform)
 
     assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
     assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)
@@ -49,7 +51,7 @@ def test_roundtrip_vct_2d():
     new_vct = roundtrip_object(vct)
     assert isinstance(new_vct, VaryingCelestialTransform2D)
     new_ivct = roundtrip_object(vct.inverse)
-    assert isinstance(new_ivct, VaryingCelestialTransform2D)
+    assert isinstance(new_ivct, InverseVaryingCelestialTransform2D)
 
     assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
     assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)

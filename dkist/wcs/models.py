@@ -103,6 +103,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
     standard_broadcasting = False
     _separable = False
     _input_units_allow_dimensionless = True
+    _is_inverse = False
 
     crpix = Parameter()
     cdelt = Parameter()
@@ -150,7 +151,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
             self.pc_table,
             self.crval_table,
         ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table))
-        self._is_inverse = False
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
