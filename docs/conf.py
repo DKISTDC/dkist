@@ -140,46 +140,7 @@ intersphinx_mapping = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-#from dkist_sphinx_theme.conf.theme import *
-
-html_theme = "sunpy"
-
-html_static_path = ['_static']
-
-html_css_files = ['css/dkist.css']
-
-html_favicon = "_static/img/favico.ico"
-
-html_theme_options = {
-    "sst_logo": "img/nso_logo.png",
-    "logo": {
-        "image_light": "_static/img/dkist-logo-v5-blue-text.png",
-        "image_dark": "_static/img/dkist-logo-v5-white-text.png",
-    },
-    "sst_site_root": "https://docs.dkist.nso.edu/",
-    "sst_project_name": "DKIST Documentation",
-    "footer_links": [
-        ("DKIST Home Page", "https://nso.edu/telescopes/dki-solar-telescope/", 3),
-        ("Help Desk", "https://nso.atlassian.net/servicedesk/customer/portals", 3),
-        ("Chat", "https://app.element.io/#/room/#dki-solar-telescope:openastronomy.org", 3),
-    ],
-    "navbar_links": [
-        ("Python Tools", "https://docs.dkist.nso.edu/projects/python-tools/", 3),
-        ("Data Products", "https://docs.dkist.nso.edu/projects/data-products/", 3),
-        ("Calibration", [
-            ("Home", "https://docs.dkist.nso.edu/en/latest/calibration.html", 3),
-            ("Core", "https://docs.dkist.nso.edu/projects/core", 3),
-            ("Common", "https://docs.dkist.nso.edu/projects/common", 3),
-            ("VBI", "https://docs.dkist.nso.edu/projects/vbi", 3),
-            ("VISP", "https://docs.dkist.nso.edu/projects/visp", 3),
-            ("Polarization, Analysis and Calibration", "https://docs.dkist.nso.edu/projects/pac", 3),
-            ("Math", "https://docs.dkist.nso.edu/projects/math", 3),
-        ]),
-    ],
-    "external_links": [
-        {"name": "Data Portal", "url": "https://dkist.data.nso.edu"},
-    ]
-}
+from dkist_sphinx_theme.conf.theme import *
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
