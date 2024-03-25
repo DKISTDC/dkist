@@ -1,6 +1,5 @@
 from abc import ABC
 from typing import Union, Literal, Iterable
-# from functools import cache
 from itertools import product
 
 import numpy as np
@@ -16,6 +15,9 @@ from astropy.modeling import CompoundModel, Model, Parameter, separable
 
 __all__ = [
     "CoupledCompoundModel",
+    "InverseVaryingCelestialTransform",
+    "InverseVaryingCelestialTransform2D",
+    "InverseVaryingCelestialTransform3D",
     "VaryingCelestialTransform",
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
