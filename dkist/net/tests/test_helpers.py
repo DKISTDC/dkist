@@ -11,7 +11,7 @@ from dkist.net.helpers import transfer_complete_datasets
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.net.helpers._orchestrate_transfer_task", autospec=True)
+    return mocker.patch("dkist.net.helpers._orchestrate_transfer_task", autospec=True)
 
 
 @pytest.mark.parametrize(
@@ -31,8 +31,8 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
-                'Wavelength Max': 856,
-                'Wavelength Min': 854,
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
             }
         ]),
         **keywords
@@ -49,7 +49,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
 
 
 def test_transfer_unavailable_data(mocker):
-    get_inv_mock = mocker.patch(
+    mocker.patch(
         "dkist.net.client.DKISTClient.search",
         autospec=True,
         return_value=[],
@@ -68,8 +68,8 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
-                'Wavelength Max': 856,
-                'Wavelength Min': 854,
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
             }
         ]),
     )
@@ -98,15 +98,15 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
-                'Wavelength Max': 856,
-                'Wavelength Min': 854,
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
             },
             {
                 "Dataset ID": "BBBB",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
-                'Wavelength Max': 856,
-                'Wavelength Min': 854,
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
             }
         ]),
     )
@@ -145,8 +145,8 @@ def test_transfer_from_table(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A", "B"],
             "Primary Proposal ID": ["pm_1_10", "pm_2_20"],
             "Storage Bucket": ["data", "data"],
-            'Wavelength Max': [856, 856],
-            'Wavelength Min': [854, 854],
+            "Wavelength Max": [856, 856],
+            "Wavelength Min": [854, 854],
         },
     )
 
@@ -177,8 +177,8 @@ def test_transfer_from_length_one_table(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A"],
             "Primary Proposal ID": ["pm_1_10"],
             "Storage Bucket": ["data"],
-            'Wavelength Max': [856],
-            'Wavelength Min': [854],
+            "Wavelength Max": [856],
+            "Wavelength Min": [854],
         },
     )
 
@@ -203,8 +203,8 @@ def test_transfer_from_row(orchestrate_transfer_mock, mocker):
             "Dataset ID": ["A"],
             "Primary Proposal ID": ["pm_1_10"],
             "Storage Bucket": ["data"],
-            'Wavelength Max': [856],
-            'Wavelength Min': [854],
+            "Wavelength Max": [856],
+            "Wavelength Min": [854],
         },
     )
 
@@ -230,8 +230,8 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
                 "Dataset ID": ["A"],
                 "Primary Proposal ID": ["pm_1_10"],
                 "Storage Bucket": ["data"],
-            'Wavelength Max': [856],
-            'Wavelength Min': [854],
+            "Wavelength Max": [856],
+            "Wavelength Min": [854],
             },
         ),
         DKISTQueryResponseTable(
@@ -239,8 +239,8 @@ def test_transfer_from_UnifiedResponse(orchestrate_transfer_mock, mocker):
                 "Dataset ID": ["B"],
                 "Primary Proposal ID": ["pm_2_20"],
                 "Storage Bucket": ["data"],
-            'Wavelength Max': [856],
-            'Wavelength Min': [854],
+            "Wavelength Max": [856],
+            "Wavelength Min": [854],
             },
         ),
     )
@@ -276,8 +276,8 @@ def test_transfer_path_interpolation(orchestrate_transfer_mock, mocker):
                 "Dataset ID": "AAAA",
                 "Primary Proposal ID": "pm_1_10",
                 "Storage Bucket": "data",
-                'Wavelength Max': 856,
-                'Wavelength Min': 854,
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
                 "Instrument": "HIT",  # Highly Imaginary Telescope
             }
         ]),

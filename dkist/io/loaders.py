@@ -14,7 +14,7 @@ from sunpy.util.decorators import add_common_docstring
 
 from dkist import log
 
-__all__ = ['BaseFITSLoader', 'AstropyFITSLoader']
+__all__ = ["BaseFITSLoader", "AstropyFITSLoader"]
 
 
 common_parameters = """
@@ -58,7 +58,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         return self.__str__()
 
     def __str__(self):
-        return "<FITS array in {0.fileuri} shape: {0.shape} dtype: {0.dtype}>".format(self)
+        return f"<FITS array in {self.fileuri} shape: {self.shape} dtype: {self.dtype}>"
 
     @property
     def data(self):
@@ -79,8 +79,8 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         """
         if self.basepath:
             return self.basepath / self.fileuri
-        else:
-            return Path(self.fileuri)
+
+        return Path(self.fileuri)
 
 
 @add_common_docstring(append=common_parameters)
@@ -105,5 +105,5 @@ class AstropyFITSLoader(BaseFITSLoader):
             hdu = hdul[self.target]
             if hasattr(hdu, "section"):
                 return hdu.section[slc]
-            else:
-                return hdu.data[slc]
+
+            return hdu.data[slc]

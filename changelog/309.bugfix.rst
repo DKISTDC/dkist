@@ -1,0 +1,1 @@
+Fix broadcasting issues during pixel -> world conversion for models with a Ravel component.

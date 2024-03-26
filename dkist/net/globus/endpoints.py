@@ -5,13 +5,13 @@ import json
 import urllib
 import pathlib
 import webbrowser
-from functools import lru_cache
+from functools import cache
 
 import globus_sdk
 
 from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
-__all__ = ['get_data_center_endpoint_id', 'get_endpoint_id', 'get_directory_listing']
+__all__ = ["get_data_center_endpoint_id", "get_endpoint_id", "get_directory_listing"]
 
 
 def get_transfer_client(force_reauth=False):
@@ -27,7 +27,7 @@ def get_transfer_client(force_reauth=False):
     -------
     `globus_sdk.TransferClient`
     """
-    auth = get_refresh_token_authorizer(force_reauth)['transfer.api.globus.org']
+    auth = get_refresh_token_authorizer(force_reauth)["transfer.api.globus.org"]
     return globus_sdk.TransferClient(authorizer=auth)
 
 
@@ -55,7 +55,7 @@ def get_local_endpoint_id():
     return endpoint_id
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_data_center_endpoint_id():
     """
     Query the data center for the current globus endpoint ID.
@@ -93,7 +93,7 @@ def get_endpoint_id(endpoint, tfr_client):
     tr = None
 
     # If there is a space in the endpoint it's not an id
-    if ' ' not in endpoint:
+    if " " not in endpoint:
         try:
             tr = tfr_client.get_endpoint(endpoint)
             return endpoint
@@ -106,17 +106,17 @@ def get_endpoint_id(endpoint, tfr_client):
 
     responses = tr.data["DATA"]
 
-    if len(responses) > 1:
-        display_names = [a['display_name'] for a in responses]
-        # If we have one and only one exact display name match use that
-        if display_names.count(endpoint) == 1:
-            return responses[display_names.index(endpoint)]['id']
-        raise ValueError(f"Multiple matches for endpoint '{endpoint}': {display_names}")
-
-    elif len(responses) == 0:
+    if len(responses) == 0:
         raise ValueError(f"No matches found for endpoint '{endpoint}'")
 
-    return responses[0]['id']
+    if len(responses) > 1:
+        display_names = [a["display_name"] for a in responses]
+        # If we have one and only one exact display name match use that
+        if display_names.count(endpoint) == 1:
+            return responses[display_names.index(endpoint)]["id"]
+        raise ValueError(f"Multiple matches for endpoint '{endpoint}': {display_names}")
+
+    return responses[0]["id"]
 
 
 @ensure_globus_authorized
@@ -134,11 +134,11 @@ def auto_activate_endpoint(endpoint_id, tfr_client):  # pragma: no cover
 
     """
     activation = tfr_client.endpoint_get_activation_requirements(endpoint_id)
-    needs_activation = bool(activation['DATA'])
-    activated = activation['activated']
+    needs_activation = bool(activation["DATA"])
+    activated = activation["activated"]
     if needs_activation and not activated:
         r = tfr_client.endpoint_autoactivate(endpoint_id)
-        if r['code'] == "AutoActivationFailed":
+        if r["code"] == "AutoActivationFailed":
             webbrowser.open(f"https://app.globus.org/file-manager?origin_id={endpoint_id}",
                             new=1)
             input("Press Return after completing activation in your webbrowser...")
@@ -180,6 +180,6 @@ def get_directory_listing(path, endpoint=None):
         auto_activate_endpoint(endpoint_id, tc)
 
     response = tc.operation_ls(endpoint_id, path=path.as_posix())
-    names = [r['name'] for r in response]
+    names = [r["name"] for r in response]
 
     return [path / n for n in names]

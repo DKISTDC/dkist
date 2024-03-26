@@ -9,7 +9,7 @@ from dkist import net
 from dkist.data.test import rootdir
 from dkist.io.file_manager import FileManager, StripedExternalArray, StripedExternalArrayView
 
-eitdir = Path(rootdir) / 'EIT'
+eitdir = Path(rootdir) / "EIT"
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def loader_array(file_manager):
 def test_load_and_slicing(file_manager, loader_array):
     ext_shape = np.array(loader_array, dtype=object).shape
     assert file_manager._striped_external_array.loader_array.shape == ext_shape
-    assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert file_manager.output_shape == (*list(ext_shape), 128, 128)
 
     array = file_manager._generate_array().compute()
     assert isinstance(array, np.ndarray)
@@ -41,7 +41,7 @@ def test_load_and_slicing(file_manager, loader_array):
     sliced_manager = file_manager[5:8]
     ext_shape = np.array(loader_array[5:8], dtype=object).shape
     assert sliced_manager._striped_external_array.loader_array.shape == ext_shape
-    assert sliced_manager.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert sliced_manager.output_shape == (*list(ext_shape), 128, 128)
 
 
 def test_filenames(file_manager, loader_array):
@@ -52,7 +52,7 @@ def test_filenames(file_manager, loader_array):
 def test_dask(file_manager, loader_array):
     ext_shape = np.array(loader_array, dtype=object).shape
     assert file_manager._striped_external_array.loader_array.shape == ext_shape
-    assert file_manager.output_shape == tuple(list(ext_shape) + [128, 128])
+    assert file_manager.output_shape == (*list(ext_shape), 128, 128)
 
     assert isinstance(file_manager._generate_array(), da.Array)
     assert_allclose(file_manager._generate_array(), np.array(file_manager._generate_array()))
@@ -162,16 +162,14 @@ def test_reprs(file_manager):
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    yield mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
+    return mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
                        autospec=True)
 
 
 def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
-                                           folder / "test_dataset.mp4",
-                                           folder / "test_dataset.pdf"]
+    file_list = [*dataset.files.filenames, folder / "test_dataset.asdf", folder / "test_dataset.mp4", folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download()
@@ -179,7 +177,7 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('/~'),
+        destination_path=Path("/~"),
         destination_endpoint=None,
         progress=True,
         wait=True,
@@ -201,9 +199,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
 
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
-                                           folder / "test_dataset.mp4",
-                                           folder / "test_dataset.pdf"]
+    file_list = [*dataset.files.filenames, folder / "test_dataset.asdf", folder / "test_dataset.mp4", folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(path="/test/", **keywords)
@@ -211,7 +207,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('/test'),
+        destination_path=Path("/test"),
         **keywords
     )
 
@@ -222,9 +218,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
 def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
-    file_list = dataset.files.filenames + [folder / "test_dataset.asdf",
-                                           folder / "test_dataset.mp4",
-                                           folder / "test_dataset.pdf"]
+    file_list = [*dataset.files.filenames, folder / "test_dataset.asdf", folder / "test_dataset.mp4", folder / "test_dataset.pdf"]
     file_list = [base_path / fn for fn in file_list]
 
     dataset.files.download(path="~/{dataset_id}")
@@ -232,7 +226,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
     orchestrate_transfer_mock.assert_called_once_with(
         file_list,
         recursive=False,
-        destination_path=Path('~/test_dataset/'),
+        destination_path=Path("~/test_dataset/"),
         destination_endpoint=None,
         progress=True,
         wait=True,
@@ -254,10 +248,10 @@ def test_length_one_first_array_axis(small_visp_dataset):
     assert len(small_visp_dataset[:, 5, 5].files.filenames) == 3
 
 
-@pytest.mark.parametrize("kwargs", (
+@pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
-))
+])
 def test_download_quality(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
     from dkist.net import conf
@@ -276,10 +270,10 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
     )
 
 
-@pytest.mark.parametrize("kwargs", (
+@pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
-))
+])
 def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
     from dkist.net import conf

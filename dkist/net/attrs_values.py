@@ -7,7 +7,7 @@ from pathlib import Path
 
 import platformdirs
 
-from sunpy.net import attrs as sattrs
+from sunpy.net import attrs as sattrs  # noqa: ICN001
 
 import dkist.data
 from dkist import log
@@ -118,7 +118,7 @@ def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_er
 
     # Test that the file we just saved can be parsed as json
     try:
-        with open(user_file, "r") as f:
+        with open(user_file) as f:
             json.load(f)
     except Exception:
         log.error("Downloaded file is not valid JSON.")
@@ -158,7 +158,7 @@ def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> d
         log.debug("No update to attr values needed.")
         log.debug("Using attr values from %s", local_path)
 
-    with open(local_path, "r") as f:
+    with open(local_path) as f:
         search_values = json.load(f)
 
     search_values = {param["parameterName"]: param["values"] for param in search_values["parameterValues"]}

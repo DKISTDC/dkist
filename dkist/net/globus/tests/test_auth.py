@@ -13,7 +13,7 @@ from dkist.net.globus.auth import (ensure_globus_authorized, get_cache_contents,
 
 def test_http_server():
     server = start_local_server()
-    redirect_uri = "http://{a[0]}:{a[1]}".format(a=server.server_address)
+    redirect_uri = f"http://{server.server_address[0]}:{server.server_address[1]}"
     inp_code = "wibble"
 
     requests.get(redirect_uri + f"?code={inp_code}")
@@ -74,7 +74,7 @@ def test_save_auth_cache(mocker, tmpdir):
     assert bool(statinfo.mode & stat.S_IRUSR)
     assert bool(statinfo.mode & stat.S_IWUSR)
 
-    if platform.system() != 'Windows':
+    if platform.system() != "Windows":
         # Test that neither "Group" or "Other" have read permissions
         assert not bool(statinfo.mode & stat.S_IRGRP)
         assert not bool(statinfo.mode & stat.S_IROTH)
@@ -94,12 +94,12 @@ def test_get_refresh_token_authorizer(mocker):
     }
 
     mocker.patch("dkist.net.globus.auth.get_cache_contents", return_value=cache)
-    auth = get_refresh_token_authorizer()['transfer.api.globus.org']
+    auth = get_refresh_token_authorizer()["transfer.api.globus.org"]
     assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
     assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 
     mocker.patch("dkist.net.globus.auth.do_native_app_authentication", return_value=cache)
-    auth = get_refresh_token_authorizer(force_reauth=True)['transfer.api.globus.org']
+    auth = get_refresh_token_authorizer(force_reauth=True)["transfer.api.globus.org"]
     assert isinstance(auth, globus_sdk.RefreshTokenAuthorizer)
     assert auth.access_token == cache["transfer.api.globus.org"]["access_token"]
 

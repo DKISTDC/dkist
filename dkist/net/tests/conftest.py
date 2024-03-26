@@ -14,7 +14,7 @@ def all_dkist_attrs_classes(request):
     return getattr(da, request.param)
 
 
-@pytest.fixture(params=da.__all__ + ['Time', 'Instrument', 'Wavelength', 'Physobs'])
+@pytest.fixture(params=[*da.__all__, "Time", "Instrument", "Wavelength", "Physobs"])
 def all_attrs_classes(request):
     at = getattr(da, request.param, None)
     return at or getattr(a, request.param)
@@ -28,32 +28,32 @@ def api_param_names():
     Excludes ones with input dependent query params
     """
     return {
-        a.Time: ('endTimeMin', 'startTimeMax'),
-        a.Instrument: ('instrumentNames',),
-        a.Wavelength: ('wavelengthRanges',),
-        a.Physobs: ('hasAllStokes',),
-        a.Provider: tuple(),
-        da.Dataset: ('datasetIds',),
-        da.WavelengthBand: ('filterWavelengths',),
-        da.Observable: ('observables',),
-        da.Experiment: ('primaryExperimentIds',),
-        da.Proposal: ('primaryProposalIds',),
-        da.TargetType: ('targetTypes',),
-        da.Recipe: ('recipeId',),
-        da.Embargoed: ('isEmbargoed',),
-        da.FriedParameter: ('qualityAverageFriedParameterMin', 'qualityAverageFriedParameterMax'),
-        da.PolarimetricAccuracy: ('qualityAveragePolarimetricAccuracyMin', 'qualityAveragePolarimetricAccuracyMax'),
-        da.ExposureTime: ('exposureTimeMin', 'exposureTimeMax'),
-        da.EmbargoEndTime: ('embargoEndDateMin', 'embargoEndDateMax'),
-        da.SpectralSampling: ('averageDatasetSpectralSamplingMin', 'averageDatasetSpectralSamplingMax'),
-        da.SpatialSampling: ('averageDatasetSpatialSamplingMin', 'averageDatasetSpatialSamplingMax'),
-        da.TemporalSampling: ('averageDatasetTemporalSamplingMin', 'averageDatasetTemporalSamplingMax'),
-        da.Page: ('pageNumber',),
-        da.PageSize: ('pageSize',),
-        da.SummitSoftwareVersion: ('highLevelSoftwareVersion',),
-        da.WorkflowName: ('workflowName',),
-        da.WorkflowVersion: ('workflowVersion',),
-        da.ObservingProgramExecutionID: ('observingProgramExecutionId',),
-        da.InstrumentProgramExecutionID: ('instrumentProgramExecutionId',),
-        da.HeaderVersion: ('headerVersion',),
+        a.Time: ("endTimeMin", "startTimeMax"),
+        a.Instrument: ("instrumentNames",),
+        a.Wavelength: ("wavelengthRanges",),
+        a.Physobs: ("hasAllStokes",),
+        a.Provider: (),
+        da.Dataset: ("datasetIds",),
+        da.WavelengthBand: ("filterWavelengths",),
+        da.Observable: ("observables",),
+        da.Experiment: ("primaryExperimentIds",),
+        da.Proposal: ("primaryProposalIds",),
+        da.TargetType: ("targetTypes",),
+        da.Recipe: ("recipeId",),
+        da.Embargoed: ("isEmbargoed",),
+        da.FriedParameter: ("qualityAverageFriedParameterMin", "qualityAverageFriedParameterMax"),
+        da.PolarimetricAccuracy: ("qualityAveragePolarimetricAccuracyMin", "qualityAveragePolarimetricAccuracyMax"),
+        da.ExposureTime: ("exposureTimeMin", "exposureTimeMax"),
+        da.EmbargoEndTime: ("embargoEndDateMin", "embargoEndDateMax"),
+        da.SpectralSampling: ("averageDatasetSpectralSamplingMin", "averageDatasetSpectralSamplingMax"),
+        da.SpatialSampling: ("averageDatasetSpatialSamplingMin", "averageDatasetSpatialSamplingMax"),
+        da.TemporalSampling: ("averageDatasetTemporalSamplingMin", "averageDatasetTemporalSamplingMax"),
+        da.Page: ("pageNumber",),
+        da.PageSize: ("pageSize",),
+        da.SummitSoftwareVersion: ("highLevelSoftwareVersion",),
+        da.WorkflowName: ("workflowName",),
+        da.WorkflowVersion: ("workflowVersion",),
+        da.ObservingProgramExecutionID: ("observingProgramExecutionId",),
+        da.InstrumentProgramExecutionID: ("instrumentProgramExecutionId",),
+        da.HeaderVersion: ("headerVersion",),
     }

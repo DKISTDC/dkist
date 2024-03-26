@@ -29,7 +29,7 @@ def get_registered_values():
 
 def _generate_from_register_values(attr_type):
     possible_values = get_registered_values()[attr_type]
-    possible_values = list(map(lambda x: x[0], possible_values))
+    possible_values = [x[0] for x in possible_values]
 
     return st.builds(attr_type, st.sampled_from(possible_values))
 
@@ -44,7 +44,7 @@ def _supported_attr_types():
 
 @st.composite
 def _browse_movie(draw):
-    return a.dkist.BrowseMovie(**draw(st.dictionaries(st.sampled_from(('movieurl', 'movieobjectkey')),
+    return a.dkist.BrowseMovie(**draw(st.dictionaries(st.sampled_from(("movieurl", "movieobjectkey")),
                                st.text(), min_size=1)))
 
 

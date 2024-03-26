@@ -47,16 +47,16 @@ def model_to_subgraph(model, inputs=None, outputs=None):
         label = model.__class__.name
 
     subgraph = pydot.Subgraph(f"{id(model)}_subgraph", label=label)
-    model_node = pydot.Node(name=id(model), label=label, shape='box')
+    model_node = pydot.Node(name=id(model), label=label, shape="box")
     subgraph.add_node(model_node)
 
     for inp, label in zip(inputs, input_labels):
-        input_node = pydot.Node(name=inp, label=label, shape='none')
+        input_node = pydot.Node(name=inp, label=label, shape="none")
         subgraph.add_node(input_node)
         subgraph.add_edge(pydot.Edge(input_node, model_node))
 
     for out, label in zip(outputs, output_labels):
-        output_node = pydot.Node(name=out, label=label, shape='none')
+        output_node = pydot.Node(name=out, label=label, shape="none")
         subgraph.add_node(output_node)
         subgraph.add_edge(pydot.Edge(model_node, output_node))
 
@@ -136,7 +136,7 @@ def recursively_find_node(top, name):
         return node
 
     for sg in top.get_subgraph_list():
-        labels = [n.get_label() for n in sg.get_node_list()]
+        [n.get_label() for n in sg.get_node_list()]
         if node := recursively_find_node(sg, name):
             return node
 

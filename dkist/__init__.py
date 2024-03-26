@@ -14,7 +14,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-__all__ = ['TiledDataset', 'Dataset', 'load_dataset', 'system_info']
+__all__ = ["TiledDataset", "Dataset", "load_dataset", "system_info"]
 
 
 def write_default_config(overwrite=False):
@@ -30,5 +30,5 @@ def write_default_config(overwrite=False):
 
 
 # Do internal imports last (so logger etc is initialised)
-from dkist.dataset import Dataset, TiledDataset, load_dataset  # noqa
-from dkist.utils.sysinfo import system_info  # noqa
+from dkist.dataset import Dataset, TiledDataset, load_dataset
+from dkist.utils.sysinfo import system_info

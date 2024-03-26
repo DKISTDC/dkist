@@ -21,31 +21,13 @@ class VaryingCelestialConverter(TransformConverterBase):
     ]
 
     def select_tag(self, obj, tags, ctx):
-        from dkist.wcs.models import (InverseVaryingCelestialTransform,
-                                      InverseVaryingCelestialTransform2D,
-                                      InverseVaryingCelestialTransform3D,
-                                      VaryingCelestialTransform, VaryingCelestialTransform2D,
-                                      VaryingCelestialTransform3D)
+        tag_pattern = "asdf://dkist.nso.edu/tags/varying_celestial_transform"
+        if obj._is_inverse:
+            tag_pattern = "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform"
 
-        if isinstance(
-                obj,
-                (VaryingCelestialTransform,
-                 VaryingCelestialTransform2D,
-                 VaryingCelestialTransform3D)
-        ):
-            for tag in tags:
-                if tag.startswith("asdf://dkist.nso.edu/tags/varying_celestial_transform"):
-                    return tag
-        elif isinstance(
-                obj,
-                (InverseVaryingCelestialTransform,
-                 InverseVaryingCelestialTransform2D,
-                 InverseVaryingCelestialTransform3D)
-        ):
-            for tag in tags:
-                if tag.startswith("asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform"):
-                    return tag
-        raise ValueError(f"Unsupported object: {obj}")  # pragma: no cover
+        for tag in tags:
+            if tag.startswith(tag_pattern):
+                return tag
 
     def from_yaml_tree_transform(self, node, tag, ctx):
         from dkist.wcs.models import varying_celestial_transform_from_tables
@@ -123,17 +105,16 @@ class CoupledCompoundConverter(TransformConverterBase):
 
         left = node["forward"][0]
         if not isinstance(left, Model):
-            raise TypeError("Unknown model type '{0}'".format(node["forward"][0]._tag))  # pragma: no cover
+            raise TypeError("Unknown model type '{}'".format(node["forward"][0]._tag))  # pragma: no cover
 
         right = node["forward"][1]
         if (not isinstance(right, Model) and
                 not (oper == "fix_inputs" and isinstance(right, dict))):
-            raise TypeError("Unknown model type '{0}'".format(node["forward"][1]._tag))  # pragma: no cover
+            raise TypeError("Unknown model type '{}'".format(node["forward"][1]._tag))  # pragma: no cover
 
-        model = CoupledCompoundModel(oper, left, right,
+        return CoupledCompoundModel(oper, left, right,
                                      shared_inputs=node["shared_inputs"])
 
-        return model
 
 
 class RavelConverter(TransformConverterBase):
