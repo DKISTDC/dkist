@@ -12,7 +12,6 @@ from astropy.modeling.models import (AffineTransformation2D, Multiply,
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
 
-import sunpy.map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 from sunpy.net.jsoc import JSOCClient
@@ -91,6 +90,8 @@ def references_from_filenames(filename_array, relative_to=None):
 
 
 def main():
+    import sunpy.map
+
     from dkist_inventory.transforms import generate_lookup_table
 
     path = Path("~/sunpy/data/jsocflare/").expanduser()

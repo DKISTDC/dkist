@@ -10,7 +10,6 @@ from astropy.table import Table
 from astropy.time import Time
 from gwcs import coordinate_frames as cf
 
-import sunpy.map
 from sunpy.time import parse_time
 
 
@@ -55,6 +54,8 @@ def map_to_transform(smap):
 
 
 def main():
+    import sunpy.map
+
     from dkist.data.test import rootdir
     from dkist_inventory.asdf_generator import references_from_filenames
     from dkist_inventory.header_parsing import HeaderParser
