@@ -24,26 +24,26 @@ def query_or_instrument():
     """
     return (a.Instrument("VBI") | a.Instrument("VISP")) & a.Time("2020/06/01", "2020/06/02")
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def boundingbox_params():
     """
     Create possible bounding box input coordinates and args
     for inputs to the bounding box tests.
     """
     bottom_left_icrs = SkyCoord(ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
-                                obstime='2021-01-02T12:34:56')
+                                obstime="2021-01-02T12:34:56")
     top_right_icrs = SkyCoord(ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km),
-                              obstime='2021-01-02T12:34:56')
+                              obstime="2021-01-02T12:34:56")
     bottom_left_vector_icrs = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                         ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
-                                       obstime='2021-01-02T12:34:56')
-    bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
-    top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame='heliographic_stonyhurst', obstime='2021-01-02T12:34:56')
+                                       obstime="2021-01-02T12:34:56")
+    bottom_left = SkyCoord(1 * u.deg, 1 * u.deg, frame="heliographic_stonyhurst", obstime="2021-01-02T12:34:56")
+    top_right = SkyCoord(2 * u.deg, 2 * u.deg, frame="heliographic_stonyhurst", obstime="2021-01-02T12:34:56")
 
     width = 3.4 * u.deg
     height = 1.2 * u.deg
 
-    yield {
+    return {
         # bottom_left, top_right, width, height
         "bottom left vector icrs": [bottom_left_vector_icrs, None, None, None],
         "bottom left top right icrs": [bottom_left_icrs, top_right_icrs, None, None],
@@ -52,13 +52,12 @@ def boundingbox_params():
     }
 
 
-@pytest.fixture(scope="function",
-                params=["bottom left vector icrs",
+@pytest.fixture(params=["bottom left vector icrs",
                         "bottom left top right icrs",
                         "bottom left top right",
                         "bottom left width height",],)
 def boundingbox_param(request, boundingbox_params):
-    yield boundingbox_params[request.param]
+    return boundingbox_params[request.param]
 
 
 def test_walker_single(all_attrs_classes, api_param_names):
@@ -92,14 +91,14 @@ def test_walker_single(all_attrs_classes, api_param_names):
 
     elif issubclass(all_attrs_classes, da.BrowseMovie):
         at = all_attrs_classes(movieurl="klsdjalkjd", movieobjectkey="lkajsd")
-        api_param_names[all_attrs_classes] = ('browseMovieUrl', 'browseMovieObjectKey')
+        api_param_names[all_attrs_classes] = ("browseMovieUrl", "browseMovieObjectKey")
 
     elif issubclass(all_attrs_classes, da.BoundingBox):
         bottom_left = SkyCoord([ICRS(ra=1 * u.deg, dec=2 * u.deg, distance=150000000 * u.km),
                                    ICRS(ra=3 * u.deg, dec=4 * u.deg, distance=150000000 * u.km)],
-                                  obstime='2021-01-02T12:34:56')
+                                  obstime="2021-01-02T12:34:56")
         at = all_attrs_classes(bottom_left=bottom_left)
-        api_param_names[all_attrs_classes] = ('rectangleContainingBoundingBox',)
+        api_param_names[all_attrs_classes] = ("rectangleContainingBoundingBox",)
 
     if not at:
         pytest.skip(f"Not testing {all_attrs_classes!r}")
@@ -112,11 +111,11 @@ def test_walker_single(all_attrs_classes, api_param_names):
     assert not set(api_param_names[all_attrs_classes]).difference(params[0].keys())
 
 
-@pytest.mark.parametrize("search,search_type",
+@pytest.mark.parametrize(("search", "search_type"),
                          [
-                             ('containing', 'rectangleContainingBoundingBox'),
-                             ('contained', 'rectangleContainedByBoundingBox'),
-                             ('intersecting', 'rectangleIntersectingBoundingBox'),
+                             ("containing", "rectangleContainingBoundingBox"),
+                             ("contained", "rectangleContainedByBoundingBox"),
+                             ("intersecting", "rectangleIntersectingBoundingBox"),
                          ]
                          )
 def test_boundingbox(search, search_type, boundingbox_param):
@@ -125,7 +124,7 @@ def test_boundingbox(search, search_type, boundingbox_param):
 
     out = walker.create(bb_query)
     assert len(out) == 1
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     # can't verify exact coordinates, they change a bit
     for key in out[0].keys():
@@ -133,11 +132,11 @@ def test_boundingbox(search, search_type, boundingbox_param):
 
     for value in out[0].values():
         # want to make sure the value is of the format (flt, flt), (flt, flt)
-        coordinate_regex = re.compile(r'^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$')
+        coordinate_regex = re.compile(r"^(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))(,)(\()(-?\d+)(\.\d+)?(,)(-?\d+)(\.\d+)?(\))$")
         assert coordinate_regex.search(value)
 
 def test_args_browsemovie():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Either movieurl or movieobjectkey must be specified"):
         da.BrowseMovie()
 
 
@@ -162,7 +161,7 @@ def test_and_simple(query_and_simple):
     out = walker.create(query_and_simple)
     assert len(out) == 1
     assert isinstance(out, list)
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     assert out == [
         {
@@ -177,7 +176,7 @@ def test_or_instrument(query_or_instrument):
     out = walker.create(query_or_instrument)
     assert len(out) == 2
     assert isinstance(out, list)
-    assert all([isinstance(a, dict) for a in out])
+    assert all(isinstance(a, dict) for a in out)
 
     assert out == [
         {

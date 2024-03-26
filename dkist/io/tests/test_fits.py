@@ -10,7 +10,7 @@ from dkist.data.test import rootdir
 from dkist.io.file_manager import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
-eitdir = Path(rootdir) / 'EIT'
+eitdir = Path(rootdir) / "EIT"
 
 
 @pytest.fixture

@@ -3,8 +3,9 @@ Functions and classes for searching and downloading from the data center.
 """
 import datetime
 from os import PathLike
-from typing import List, Union, Literal, Iterable, Optional
+from typing import Literal
 from pathlib import Path
+from collections.abc import Iterable
 
 from astropy import table
 
@@ -20,7 +21,7 @@ from dkist.utils.inventory import path_format_inventory
 __all__ = ["transfer_complete_datasets"]
 
 
-def _get_dataset_inventory(dataset_id: Union[str, Iterable[str]]) -> DKISTQueryResponseTable:  # pragma: no cover
+def _get_dataset_inventory(dataset_id: str | Iterable[str]) -> DKISTQueryResponseTable:  # pragma: no cover
     """
     Do a search for a single dataset id
     """
@@ -34,12 +35,12 @@ def _get_dataset_inventory(dataset_id: Union[str, Iterable[str]]) -> DKISTQueryR
     return results
 
 
-def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponseRow, DKISTQueryResponseTable, UnifiedResponse],
+def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow | DKISTQueryResponseTable | UnifiedResponse,
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
-                               progress: Union[bool, Literal["verbose"]] = True,
+                               progress: bool | Literal["verbose"] = True,
                                wait: bool = True,
-                               label: Optional[str] = None) -> Union[List[str], str]:
+                               label: str | None = None) -> list[str] | str:
     """
     Transfer one or more complete datasets to a path on a globus endpoint.
 
@@ -100,7 +101,7 @@ def transfer_complete_datasets(datasets: Union[str, Iterable[str], QueryResponse
         if len(datasets) > 1:
             datasets = table.vstack(datasets, metadata_conflicts="silent")
 
-    elif isinstance(datasets, str) or all((isinstance(d, str) for d in datasets)):
+    elif isinstance(datasets, str) or all(isinstance(d, str) for d in datasets):
         # If we are passed just dataset IDs as strings search for them to get the inventory records
         datasets = _get_dataset_inventory(datasets)
 

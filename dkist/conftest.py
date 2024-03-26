@@ -36,7 +36,7 @@ def caplog_dkist(caplog):
 
 @pytest.fixture
 def array():
-    shape = 2**np.random.randint(2, 7, size=2)
+    shape = 2**np.random.randint(2, 7, size=2)  # noqa: NPY002
     x = np.ones(np.prod(shape)) + 10
     x = x.reshape(shape)
     return da.from_array(x, tuple(shape))
@@ -65,7 +65,7 @@ def identity_gwcs():
     """
     identity = m.Multiply(1*u.arcsec/u.pixel) & m.Multiply(1*u.arcsec/u.pixel)
     sky_frame = cf.CelestialFrame(axes_order=(0, 1),
-                                  name='helioprojective',
+                                  name="helioprojective",
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   unit=(u.arcsec, u.arcsec),
                                   axis_physical_types=("custom:pos.helioprojective.lat",
@@ -89,7 +89,7 @@ def identity_gwcs_3d():
     identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.nm / u.pixel))
 
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name="helioprojective",
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"),
                                   unit=(u.arcsec, u.arcsec),
@@ -118,7 +118,7 @@ def identity_gwcs_3d_temporal():
     identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.s / u.pixel))
 
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name="helioprojective",
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   axes_names=("longitude", "latitude"),
                                   unit=(u.arcsec, u.arcsec),
@@ -145,7 +145,7 @@ def identity_gwcs_4d():
     """
     identity = (TwoDScale(1 * u.arcsec / u.pixel) &
                 m.Multiply(1 * u.nm/u.pixel) & m.Multiply(1 * u.s/u.pixel))
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name="helioprojective",
                                   reference_frame=Helioprojective(obstime="2018-01-01"),
                                   unit=(u.arcsec, u.arcsec),
                                   axis_physical_types=("custom:pos.helioprojective.lon", "custom:pos.helioprojective.lat"))
@@ -168,7 +168,7 @@ def identity_gwcs_4d():
 
 
 # This function lives in dkist_inventory, but is copied here to avoid a test dep
-def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pix, **kwargs):
+def generate_lookup_table(lookup_table, interpolation="linear", points_unit=u.pix, **kwargs):
     if not isinstance(lookup_table, u.Quantity):
         raise TypeError("lookup_table must be a Quantity.")
 
@@ -176,9 +176,9 @@ def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pi
     points = (np.arange(lookup_table.size) - 0) * points_unit
 
     kwargs = {
-        'bounds_error': False,
-        'fill_value': np.nan,
-        'method': interpolation,
+        "bounds_error": False,
+        "fill_value": np.nan,
+        "method": interpolation,
         **kwargs
         }
 
@@ -188,9 +188,9 @@ def generate_lookup_table(lookup_table, interpolation='linear', points_unit=u.pi
 @pytest.fixture
 def identity_gwcs_5d_stokes(identity_gwcs_4d):
     stokes_frame = cf.StokesFrame(axes_order=(4,))
-    stokes_model = generate_lookup_table([1, 2, 3, 4] * u.one, interpolation='nearest')
+    stokes_model = generate_lookup_table([1, 2, 3, 4] * u.one, interpolation="nearest")
     transform = identity_gwcs_4d.forward_transform
-    frame = cf.CompositeFrame(identity_gwcs_4d.output_frame.frames + [stokes_frame])
+    frame = cf.CompositeFrame([*identity_gwcs_4d.output_frame.frames, stokes_frame])
 
     detector_frame = cf.CoordinateFrame(name="detector", naxes=5,
                                         axes_order=(0, 1, 2, 3, 4),
@@ -209,17 +209,17 @@ def identity_gwcs_5d_stokes(identity_gwcs_4d):
 @pytest.fixture
 def dataset(array, identity_gwcs):
     meta = {
-        'inventory': {
-            'bucket': 'data',
-            'datasetId': 'test_dataset',
-            'primaryProposalId': 'test_proposal',
-            'asdfObjectKey': 'test_proposal/test_dataset/test_dataset.asdf',
-            'browseMovieObjectKey': 'test_proposal/test_dataset/test_dataset.mp4',
-            'qualityReportObjectKey': 'test_proposal/test_dataset/test_dataset.pdf',
-            'wavelengthMin': 0,
-            'wavelengthMax': 0,
+        "inventory": {
+            "bucket": "data",
+            "datasetId": "test_dataset",
+            "primaryProposalId": "test_proposal",
+            "asdfObjectKey": "test_proposal/test_dataset/test_dataset.asdf",
+            "browseMovieObjectKey": "test_proposal/test_dataset/test_dataset.mp4",
+            "qualityReportObjectKey": "test_proposal/test_dataset/test_dataset.pdf",
+            "wavelengthMin": 0,
+            "wavelengthMax": 0,
         },
-        'headers': Table()
+        "headers": Table()
     }
 
     identity_gwcs.array_shape = array.shape
@@ -231,7 +231,7 @@ def dataset(array, identity_gwcs):
 
     # Construct the filename here as a scalar array to make sure that works as
     # it's what dkist-inventory does
-    ds._file_manager = FileManager.from_parts(np.array('test1.fits'), 0, 'float', array.shape,
+    ds._file_manager = FileManager.from_parts(np.array("test1.fits"), 0, "float", array.shape,
                                               loader=AstropyFITSLoader)
 
     return ds
@@ -239,7 +239,7 @@ def dataset(array, identity_gwcs):
 
 @pytest.fixture
 def empty_meta():
-    return {'inventory': {}, 'headers': {}}
+    return {"inventory": {}, "headers": {}}
 
 
 @pytest.fixture
@@ -270,16 +270,16 @@ def dataset_4d(identity_gwcs_4d, empty_meta):
 def eit_dataset():
     eitdir = Path(rootdir) / "EIT"
     with asdf.open(eitdir / "eit_test_dataset.asdf") as f:
-        return f.tree['dataset']
+        return f.tree["dataset"]
 
 
 @pytest.fixture
 def simple_tiled_dataset(dataset):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
     for ds in datasets:
-        ds.meta['inventory'] = dataset.meta['inventory']
+        ds.meta["inventory"] = dataset.meta["inventory"]
     dataset_array = np.array(datasets).reshape((2,2))
-    return TiledDataset(dataset_array, dataset.meta['inventory'])
+    return TiledDataset(dataset_array, dataset.meta["inventory"])
 
 
 @pytest.fixture
@@ -303,7 +303,7 @@ def small_visp_dataset():
 
     vispdir = Path(rootdir) / "small_visp"
     with asdf.open(vispdir / "test_visp.asdf") as f:
-        return f.tree['dataset']
+        return f.tree["dataset"]
 
 
 @pytest.fixture(scope="session")

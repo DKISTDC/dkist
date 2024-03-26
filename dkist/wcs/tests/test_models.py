@@ -93,7 +93,7 @@ def test_varying_transform_pc():
     assert u.allclose(vct.inverse(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
 
 
-@pytest.mark.parametrize(("pixel", "lon_shape"), (
+@pytest.mark.parametrize(("pixel", "lon_shape"), [
     ((*np.mgrid[0:10, 0:10] * u.pix, np.arange(10) * u.pix), (10, 10)),
     (np.mgrid[0:10, 0:10, 0:5] * u.pix, (10, 10, 5)),
     ((2 * u.pix, 2 * u.pix, np.arange(10) * u.pix), (10,)),
@@ -101,7 +101,7 @@ def test_varying_transform_pc():
       np.arange(10) * u.pix,
       np.arange(10)[..., None] * u.pix), (10, 10)),
     (np.mgrid[0:1024, 0:1000, 0:2] * u.pix, (1024, 1000, 2)),
-))
+])
 def test_varying_transform_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
@@ -267,7 +267,7 @@ def test_varying_transform_4d_pc_unitless():
     assert np.isnan(vct(0, 0, -10, 0)).all()
 
 
-@pytest.mark.parametrize(("pixel", "lon_shape"), (
+@pytest.mark.parametrize(("pixel", "lon_shape"), [
     ((*np.mgrid[0:5, 0:5] * u.pix, np.arange(5) * u.pix, 0 * u.pix), (5, 5)),
     (np.mgrid[0:10, 0:10, 0:5, 0:3] * u.pix, (10, 10, 5, 3)),
     ((2 * u.pix, 2 * u.pix, 0*u.pix, np.arange(3) * u.pix), (3,)),
@@ -275,7 +275,7 @@ def test_varying_transform_4d_pc_unitless():
       np.arange(10) * u.pix,
       np.arange(5)[..., None] * u.pix,
       np.arange(3)[..., None, None]), (3, 5, 10)),
-))
+])
 def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
@@ -300,11 +300,11 @@ def test_vct_dispatch():
     varying_matrix_lt = varying_matrix_lt.reshape((2, 2, 2, 2, 2, 2))
     crval_table = list(zip(np.arange(1, 17), np.arange(17, 33))) * u.arcsec
     crval_table = crval_table.reshape((2, 2, 2, 2, 2))
-    kwargs = dict(
-        crpix=(5, 5) * u.pix,
-        cdelt=(1, 1) * u.arcsec/u.pix,
-        lon_pole=180 * u.deg,
-    )
+    kwargs = {
+        "crpix": (5, 5) * u.pix,
+        "cdelt": (1, 1) * u.arcsec/u.pix,
+        "lon_pole": 180 * u.deg,
+    }
 
     vct = varying_celestial_transform_from_tables(
         pc_table=varying_matrix_lt[0, 0, 0],
@@ -342,11 +342,11 @@ def test_vct_shape_errors():
     crval_table = list(zip(np.arange(1, 16), np.arange(16, 31))) * u.arcsec
     crval_table = crval_table.reshape((5, 3, 2))
 
-    kwargs = dict(
-        crpix=(5, 5) * u.pix,
-        cdelt=(1, 1) * u.arcsec/u.pix,
-        lon_pole=180 * u.deg,
-    )
+    kwargs = {
+        "crpix": (5, 5) * u.pix,
+        "cdelt": (1, 1) * u.arcsec/u.pix,
+        "lon_pole": 180 * u.deg,
+    }
 
     with pytest.raises(ValueError, match="only be constructed with a 1-dimensional"):
         VaryingCelestialTransform(crval_table=crval_table, pc_table=pc_table, **kwargs)
@@ -377,7 +377,7 @@ def test_vct_slit_bounds(slit):
             slit=slit,
         )
 
-@pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id='1D'), pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id="1D"), pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 def test_vct(has_units, slit, num_varying_axes):
@@ -419,8 +419,8 @@ def test_vct(has_units, slit, num_varying_axes):
         atol *= u.pix
         for i in range(num_sensor_axes):
             sensor_axis_pts[i] *= u.pix
-    grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing='ij')
-    grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing='ij')
+    grid = np.meshgrid(*sensor_axis_pts, *varying_axis_pts, indexing="ij")
+    grid2 = np.meshgrid(*sensor_axis_pts, *varying_axis_pts_1, indexing="ij")
     # the portion of the grid due to the varying axes coordinates
     varying_axes_grid = grid[num_sensor_axes:]
 
@@ -448,7 +448,7 @@ def test_vct(has_units, slit, num_varying_axes):
 
     # grid2 has coordinates outside the lut boundaries and should have nans
     world2 = vct(*grid2)
-    assert np.any(np.isnan([item for item in world2]))
+    assert np.any(np.isnan(list(world2)))
 
 
 def _evaluate_ravel(array_shape, inputs, order="C"):
@@ -464,8 +464,7 @@ def _evaluate_ravel(array_shape, inputs, order="C"):
         inputs = inputs[::-1]
         rounded_inputs = rounded_inputs[::-1]
     offsets = np.cumprod(array_shape[1:][::-1])[::-1]
-    result = np.dot(offsets, rounded_inputs[:-1]) + inputs[-1]
-    return result
+    return np.dot(offsets, rounded_inputs[:-1]) + inputs[-1]
 
 
 def _evaluate_unravel(array_shape, index, order="C"):
@@ -477,7 +476,7 @@ def _evaluate_unravel(array_shape, index, order="C"):
     curr_offset = index
     # This if test is to handle multidimensional inputs properly
     if isinstance(index, np.ndarray):
-        output_shape = tuple([len(array_shape), len(index)])
+        output_shape = (len(array_shape), len(index))
     else:
         output_shape = len(array_shape)
     indices = np.zeros(output_shape, dtype=float)
@@ -490,7 +489,7 @@ def _evaluate_unravel(array_shape, index, order="C"):
     return tuple(indices)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 @pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
 def test_ravel_model(ndim, has_units, input_type):
@@ -530,7 +529,7 @@ def test_ravel_model(ndim, has_units, input_type):
             assert np.allclose(round_trip, expected_ravel)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
 @pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
 def test_raveled_tabular1d(ndim, has_units, input_type):
@@ -579,7 +578,7 @@ def test_raveled_tabular1d(ndim, has_units, input_type):
             assert np.allclose(raveled_tab.inverse.inverse(*inputs), expected_ravel)
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_ordering(ndim, order):
     rng = default_rng()
@@ -595,21 +594,23 @@ def test_ravel_ordering(ndim, order):
         assert int(ravel_value) == values[tuple(inputs)]
 
 
-@pytest.mark.parametrize("ndim", [pytest.param(2, id='2D'), pytest.param(3, id='3D')])
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_repr(ndim, order):
     rng = default_rng()
     array_shape = tuple(rng.integers(1, 21, ndim))
     ravel = Ravel(array_shape, order=order)
     unravel = ravel.inverse
-    assert str(array_shape) in repr(ravel) and order in repr(ravel)
-    assert str(array_shape) in repr(unravel) and order in repr(unravel)
+    assert str(array_shape) in repr(ravel)
+    assert order in repr(ravel)
+    assert str(array_shape) in repr(unravel)
+    assert order in repr(unravel)
 
 
 @pytest.mark.parametrize("array_shape", [(0, 1), (1, 0), (1,)])
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_array_shape(array_shape, ravel):
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="array_shape must be at least 2D and have values >= 1"):
         ravel(array_shape)
 
 
@@ -617,7 +618,7 @@ def test_ravel_bad_array_shape(array_shape, ravel):
 @pytest.mark.parametrize("ravel", [Ravel, Unravel])
 def test_ravel_bad_order(order, ravel):
     array_shape=(2, 2, 2)
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="order kwarg must be one of 'C' or 'F'"):
         ravel(array_shape, order)
 
 

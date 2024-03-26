@@ -2,12 +2,13 @@
 Configuration file for the Sphinx documentation builder.
 """
 # -- stdlib imports ------------------------------------------------------------
+import datetime
 import os
 import sys
-import datetime
 import warnings
-from pkg_resources import get_distribution
+
 from packaging.version import Version
+from pkg_resources import get_distribution
 
 # -- Check for dependencies ----------------------------------------------------
 doc_requires = get_distribution("dkist").requires(extras=("docs",))
@@ -15,7 +16,7 @@ missing_requirements = []
 for requirement in doc_requires:
     try:
         get_distribution(requirement)
-    except Exception as e:
+    except Exception:
         missing_requirements.append(requirement.name)
 if missing_requirements:
     print(
@@ -26,22 +27,22 @@ if missing_requirements:
 
 # -- Read the Docs Specific Configuration --------------------------------------
 # This needs to be done before sunpy is imported
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 if on_rtd:
-    os.environ['SUNPY_CONFIGDIR'] = '/home/docs/'
-    os.environ['HOME'] = '/home/docs/'
-    os.environ['LANG'] = 'C'
-    os.environ['LC_ALL'] = 'C'
-    os.environ['HIDE_PARFIVE_PROGESS'] = 'True'
+    os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
+    os.environ["HOME"] = "/home/docs/"
+    os.environ["LANG"] = "C"
+    os.environ["LC_ALL"] = "C"
+    os.environ["HIDE_PARFIVE_PROGESS"] = "True"
 
 # -- Non stdlib imports --------------------------------------------------------
-import dkist  # NOQA
-from dkist import __version__  # NOQA
+import dkist  # noqa
+from dkist import __version__
 
 # -- Project information -------------------------------------------------------
-project = 'DKIST'
-author = 'NSO / AURA'
-copyright = '{}, {}'.format(datetime.datetime.now().year, author)
+project = "DKIST"
+author = "NSO / AURA"
+copyright = f"{datetime.datetime.now().year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 release = __version__
@@ -54,30 +55,30 @@ if is_release:
 
 # Suppress warnings about overriding directives as we overload some of the
 # doctest extensions.
-suppress_warnings = ['app.add_directive', ]
+suppress_warnings = ["app.add_directive", ]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'matplotlib.sphinxext.plot_directive',
-    'sphinx_automodapi.automodapi',
-    'sphinx_automodapi.smart_resolver',
-    'sphinx_changelog',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.doctest',
-    'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
-    'sphinx_autodoc_typehints',  # must be loaded after napoleon
-    'sunpy.util.sphinx.doctest',
-    'sunpy.util.sphinx.generate',
-    'myst_nb',
-    'sphinx_design',
+    "matplotlib.sphinxext.plot_directive",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
+    "sphinx_changelog",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinx_autodoc_typehints",  # must be loaded after napoleon
+    "sunpy.util.sphinx.doctest",
+    "sunpy.util.sphinx.generate",
+    "myst_nb",
+    "sphinx_design",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -90,20 +91,20 @@ extensions = [
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'jupyter_execute', '**/*_NOTES.md']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "jupyter_execute", "**/*_NOTES.md"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-source_suffix = '.rst'
+source_suffix = ".rst"
 
-myst_enable_extensions = ['colon_fence', 'dollarmath', 'substitution']
+myst_enable_extensions = ["colon_fence", "dollarmath", "substitution"]
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents. Set to the "smart" one.
-default_role = 'obj'
+default_role = "obj"
 
 napoleon_use_rtype = False
 
@@ -139,11 +140,11 @@ intersphinx_mapping = {
     ),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
-    "sunpy": ('https://docs.sunpy.org/en/stable/', None),
-    "ndcube": ('https://docs.sunpy.org/projects/ndcube/en/latest/', None),
-    "gwcs": ('https://gwcs.readthedocs.io/en/latest/', None),
-    "asdf": ('https://asdf.readthedocs.io/en/latest/', None),
-    "dask": ('https://dask.pydata.org/en/latest/', None),
+    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/latest/", None),
+    "gwcs": ("https://gwcs.readthedocs.io/en/latest/", None),
+    "asdf": ("https://asdf.readthedocs.io/en/latest/", None),
+    "dask": ("https://dask.pydata.org/en/latest/", None),
 }
 
 # -- Options for HTML output ---------------------------------------------------
@@ -159,12 +160,12 @@ from dkist_sphinx_theme.conf.theme import *
 graphviz_output_format = "svg"
 
 graphviz_dot_args = [
-    '-Nfontsize=10',
-    '-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif',
-    '-Efontsize=10',
-    '-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif',
-    '-Gfontsize=10',
-    '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
+    "-Nfontsize=10",
+    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Efontsize=10",
+    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Gfontsize=10",
+    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif"
 ]
 
 # Use a high-contrast code style from accessible-pygments
@@ -175,7 +176,7 @@ pygments_style = "github-light"
 # -- MyST_NB -------------------------------------------------------------------
 nb_execution_allow_errors = False
 nb_execution_in_temp = True
-nb_execution_mode = 'auto'
+nb_execution_mode = "auto"
 nb_execution_timeout = 300
-nb_output_stderr = 'show'
+nb_output_stderr = "show"
 nb_execution_show_tb = True

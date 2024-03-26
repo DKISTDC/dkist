@@ -1,6 +1,7 @@
 from abc import ABC
-from typing import Union, Literal, Iterable
+from typing import Literal
 from itertools import product
+from collections.abc import Iterable
 
 import numpy as np
 
@@ -31,11 +32,11 @@ __all__ = [
 
 
 def generate_celestial_transform(
-        crpix: Union[Iterable[float], u.Quantity],
-        cdelt: Union[Iterable[float], u.Quantity],
-        pc: Union[ArrayLike, u.Quantity],
-        crval: Union[Iterable[float], u.Quantity],
-        lon_pole: Union[float, u.Quantity] = None,
+        crpix: Iterable[float] | u.Quantity,
+        cdelt: Iterable[float] | u.Quantity,
+        pc: ArrayLike | u.Quantity,
+        crval: Iterable[float] | u.Quantity,
+        lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
 ) -> CompoundModel:
     """
@@ -134,9 +135,9 @@ class BaseVaryingCelestialTransform(Model, ABC):
             table_shape = crval_table.shape[:-1]
 
         if pc_table.shape == (2, 2):
-            pc_table = np.broadcast_to(pc_table, list(table_shape) + [2, 2], subok=True)
+            pc_table = np.broadcast_to(pc_table, [*list(table_shape), 2, 2], subok=True)
         if crval_table.shape == (2,):
-            crval_table = np.broadcast_to(crval_table, list(table_shape) + [2], subok=True)
+            crval_table = np.broadcast_to(crval_table, [*list(table_shape), 2], subok=True)
 
         return table_shape, pc_table, crval_table
 
@@ -197,7 +198,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
-        sct = generate_celestial_transform(
+        return generate_celestial_transform(
             crpix=crpix,
             cdelt=cdelt,
             pc=self.pc_table[ind],
@@ -206,7 +207,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
             projection=self.projection,
         )
 
-        return sct
 
     def _map_transform(self, *arrays, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
@@ -274,9 +274,9 @@ class BaseVaryingCelestialTransform(Model, ABC):
             for d in dims[:self.n_inputs-2]:
                 units[d] = u.pix
             return units
-        else:
-            dims = ["x", "y", "z", "q", "m"]
-            return {d: u.pix for d in dims[:self.n_inputs]}
+
+        dims = ["x", "y", "z", "q", "m"]
+        return {d: u.pix for d in dims[:self.n_inputs]}
 
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
@@ -293,7 +293,7 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform(
+        return InverseVaryingCelestialTransform(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -301,7 +301,6 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
@@ -309,7 +308,7 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform2D(
+        return InverseVaryingCelestialTransform2D(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -317,7 +316,6 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
@@ -325,7 +323,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
 
     @property
     def inverse(self):
-        ivct = InverseVaryingCelestialTransform3D(
+        return InverseVaryingCelestialTransform3D(
             crpix=self.crpix,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
@@ -333,7 +331,6 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
             crval_table=self.crval_table,
             projection=self.projection,
         )
-        return ivct
 
 
 class InverseVaryingCelestialTransform(BaseVaryingCelestialTransform):
@@ -536,14 +533,14 @@ varying_celestial_transform_dict = {
 }
 
 def varying_celestial_transform_from_tables(
-        crpix: Union[Iterable[float], u.Quantity],
-        cdelt: Union[Iterable[float], u.Quantity],
-        pc_table: Union[ArrayLike, u.Quantity],
-        crval_table: Union[Iterable[float], u.Quantity],
-        lon_pole: Union[float, u.Quantity] = None,
+        crpix: Iterable[float] | u.Quantity,
+        cdelt: Iterable[float] | u.Quantity,
+        pc_table: ArrayLike | u.Quantity,
+        crval_table: Iterable[float] | u.Quantity,
+        lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
-        slit: Union[None, Literal[0, 1]] = None,
+        slit: None | Literal[0, 1] = None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -601,7 +598,7 @@ class Ravel(Model):
 
     @property
     def input_units(self):
-        return {f'x{idx}': u.pix for idx in range(self.n_inputs)}
+        return {f"x{idx}": u.pix for idx in range(self.n_inputs)}
 
     @property
     def outputs(self):
@@ -613,9 +610,9 @@ class Ravel(Model):
 
     @property
     def return_units(self):
-        return {'y': u.pix}
+        return {"y": u.pix}
 
-    def __init__(self, array_shape, order='C', **kwargs):
+    def __init__(self, array_shape, order="C", **kwargs):
         if len(array_shape) < 2 or np.prod(array_shape) < 1:
             raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = tuple(array_shape)
@@ -624,8 +621,8 @@ class Ravel(Model):
         self.order = order
         super().__init__(**kwargs)
         # super dunder init sets inputs and outputs to default values so set what we want here
-        self.inputs = tuple([f'x{idx}' for idx in range(self.n_inputs)])
-        self.outputs = 'y',
+        self.inputs = tuple([f"x{idx}" for idx in range(self.n_inputs)])
+        self.outputs = "y",
 
     def evaluate(self, *inputs_):
         """Evaluate the forward ravel for a given tuple of pixel values."""
@@ -675,7 +672,7 @@ class Unravel(Model):
 
     @property
     def input_units(self):
-        return {'x': u.pix}
+        return {"x": u.pix}
 
     @property
     def n_outputs(self):
@@ -691,9 +688,9 @@ class Unravel(Model):
 
     @property
     def return_units(self):
-        return {f'y{idx}': u.pix for idx in range(self.n_outputs)}
+        return {f"y{idx}": u.pix for idx in range(self.n_outputs)}
 
-    def __init__(self, array_shape, order='C', **kwargs):
+    def __init__(self, array_shape, order="C", **kwargs):
         if len(array_shape) < 2 or np.prod(array_shape) < 1:
             raise ValueError("array_shape must be at least 2D and have values >= 1")
         self.array_shape = array_shape
@@ -702,8 +699,8 @@ class Unravel(Model):
         self.order = order
         super().__init__(**kwargs)
         # super dunder init sets inputs and outputs to default values so set what we want here
-        self.inputs = 'x',
-        self.outputs = tuple([f'y{idx}' for idx in range(self.n_outputs)])
+        self.inputs = "x",
+        self.outputs = tuple([f"y{idx}" for idx in range(self.n_outputs)])
 
     def evaluate(self, input_):
         """Evaluate the reverse ravel (unravel) for a given pixel value."""
