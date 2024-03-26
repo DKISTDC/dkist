@@ -29,7 +29,7 @@ repos:
     rev: v2.2.6
     hooks:
       - id: codespell
-        args: [ "--write-changes" ]
+        args: [ "--write-changes", "-D", "-", "-D", ".codespell-dict.txt"]
 ci:
   autofix_prs: false
   autoupdate_schedule: "weekly"

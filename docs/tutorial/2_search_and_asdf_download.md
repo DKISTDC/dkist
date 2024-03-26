@@ -49,7 +49,7 @@ Because we only specified one attr, and it was unique to the dkist client (it st
 If we only want VBI datasets, that are unembargoed, between a specific time range we can use multiple attrs:
 
 ```{code-cell} python
-Fido.search(a.Time("2022-06-02 17:00:00", "2022-06-02 18:00:00") & a.Instrument.vbi & a.dkist.Embargoed(False))
+Fido.search(a.Time("2023/10/16 18:45", "2023/10/16 18:48") & a.Instrument.vbi & a.dkist.Embargoed(False))
 ```
 
 Note how the `a.Time` and `a.Instrument` attrs are not prefixed with `dkist`.
@@ -57,10 +57,10 @@ These are general attrs which can be used to search multiple clients.
 
 So far the returned results have had to match all the attrs provided, because we have used the `&` (logical and) operator to join them.
 If we want results that match either one of multiple options we can use the `|` operator.
-Let's also restrict our search to a particular proposal, `pid_1_123`.
+Let's also restrict our search to a particular proposal, `pid_2_114`.
 
 ```{code-cell} python
-res = Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False) & a.dkist.Proposal("pid_1_123"))
+res = Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False) & a.dkist.Proposal("pid_2_114"))
 res
 ```
 
@@ -107,7 +107,7 @@ Note that you can also pass more than one result to be downloaded.
 A simple example of both of these is:
 
 ```{code-cell} python
-Fido.fetch(visp[:3], path="~/sunpy/data/{instrument}/{dataset_id}/")
+Fido.fetch(visp[:3], path="~/dkist_data/{instrument}/{dataset_id}/")
 ```
 
 This will put each of our ASDF files in a directory named with the corresponding Dataset ID and Instrument.
