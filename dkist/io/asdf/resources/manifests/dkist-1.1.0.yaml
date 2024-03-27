@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
-id: asdf://dkist.nso.edu/dkist/manifests/dkist-1.1.0
-extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
+id: asdf://dkist.nso.edu/manifests/dkist-1.1.0
+extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.1.0
 title: DKIST extension
 description: ASDF schemas and tags for DKIST classes.
 
