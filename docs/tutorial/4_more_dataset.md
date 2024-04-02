@@ -18,9 +18,13 @@ kernelspec:
 Firstly we need to re-create our dataset object from the last tutorial.
 
 ```{code-cell} ipython
+from sunpy.net import Fido, attrs as a
 import dkist
+import dkist.net
 
-ds = dkist.load_dataset("~/sunpy/data/VISP/AGLKO")
+res = Fido.search(a.dkist.Dataset('BKPLX'))
+files = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
+ds = dkist.load_dataset(files)
 ```
 
 The `Dataset` object allows us to do some basic inspection of the dataset as a whole without having to download the entire thing, using the metadata in the FITS headers.
