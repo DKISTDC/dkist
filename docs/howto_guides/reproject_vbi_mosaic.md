@@ -15,7 +15,7 @@ kernelspec:
 # Stitching a VBI Mosaic with `reproject`
 
 ```{note}
-You will need the reproject and shapely packages installed to run this notebook.
+You will need the reproject and shapely packages installed to run this guide.
 
 If you have installed `dkist` with pip you may need to run `pip install 'reproject[all]'` to install shapely as an optional dependency for reproject. If you installed with conda you may need to run `conda install shapely`.
 ```
@@ -23,12 +23,13 @@ If you have installed `dkist` with pip you may need to run `pip install 'reproje
 The [reproject](https://reproject.readthedocs.io/) package is an Astropy-affiliated package for regridding data.
 A number of different algorithms are implemented in the package, with different trade-offs for speed and accuracy.
 Reprojecting a single spatial image such as an AIA image is well supported and demonstrated in the [sunpy gallery](https://docs.sunpy.org/en/latest/generated/gallery/index.html#combining-co-aligning-and-reprojecting-images).
-When working with DKIST data, there are normally many spatial frames inside a dataset, and reprojecting them all can be very computationally expensive.
 
-We are going to use the example of using reproject's {obj}`reproject.mosaicking.reproject_and_coadd` function to stitch a mosaic of VBI frames, in a way which could be extended to be flux conserving.
+We are going to use the example of using reproject's {obj}`reproject.mosaicking.reproject_and_coadd` function to stitch a mosaic of VBI frames.
 
 
 ## Obtaining some data
+
+First, we must obtain the VBI data needed for the rest of the guide.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -46,24 +47,16 @@ res = Fido.search(a.dkist.Dataset("AJQWW"), )
 res
 ```
 
-Let's download a VBI dataset, which has good seeing:
-
 ```{code-cell} ipython3
 asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
 asdf_file
 ```
 
-This gives us a `TiledDataset` object, which as we have already seen is like an array of `Dataset` objects.
+This gives us a {obj}`dkist.TiledDataset` object, which is an array of {obj}`dkist.Dataset` objects.
 
 ```{code-cell} ipython3
 ds = dkist.load_dataset(asdf_file)
 ds
-```
-
-This mosaic is 3 x 3:
-
-```{code-cell} ipython3
-ds.shape
 ```
 
 To start off, let's just download the first frame of each tile.
