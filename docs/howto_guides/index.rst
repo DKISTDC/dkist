@@ -14,3 +14,5 @@ If you're starting fresh you might want to check out the :ref:`dkist:tutorial:in
    replacing_asdfs
    asdf_version_requirements
    config
+   reproject_vbi_mosaic
+   bounding_boxes_from_dataset
