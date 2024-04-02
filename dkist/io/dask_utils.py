@@ -20,7 +20,7 @@ def stack_loader_array(loader_array, chunksize):
     -------
     array : `dask.array.Array`
     """
-    # If the chunksize sin't specified then use the whole array shape
+    # If the chunksize isn't specified then use the whole array shape
     chunksize = chunksize or loader_array.flat[0].shape
 
     if loader_array.size == 1:
