@@ -33,6 +33,11 @@ def stack_loader_array(loader_array, chunksize):
     return da.stack(stacks)
 
 
+def _partial_to_array(loader, *, meta, chunks):
+    # Set the name of the array to the filename, that should be unique within the array
+    return da.from_array(loader, meta=meta, chunks=chunks, name=loader.fileuri)
+
+
 def loader_to_dask(loader_array, chunksize):
     """
     Map a call to `dask.array.from_array` onto all the elements in ``loader_array``.
@@ -50,6 +55,6 @@ def loader_to_dask(loader_array, chunksize):
     # trying to auto calculate it by reading from the actual array on disk.
     meta = np.zeros((0,), dtype=loader_array[0].dtype)
 
-    to_array = partial(da.from_array, meta=meta, chunks=chunksize, name=False)
+    to_array = partial(_partial_to_array, meta=meta, chunks=chunksize)
 
     return map(to_array, loader_array)
