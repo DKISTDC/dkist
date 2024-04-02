@@ -15,6 +15,8 @@ on:
       - '!*pre*'
       - '!*post*'
   pull_request:
+  release:
+    types: [published]
   schedule:
     #        ┌───────── minute (0 - 59)
     #        │ ┌───────── hour (0 - 23)
