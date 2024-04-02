@@ -50,6 +50,6 @@ def loader_to_dask(loader_array, chunksize):
     # trying to auto calculate it by reading from the actual array on disk.
     meta = np.zeros((0,), dtype=loader_array[0].dtype)
 
-    to_array = partial(da.from_array, meta=meta, chunks=chunksize)
+    to_array = partial(da.from_array, meta=meta, chunks=chunksize, name=False)
 
     return map(to_array, loader_array)
