@@ -133,11 +133,11 @@ def test_coupled_sep_2d_extra(vct_2d_pc, linear_time):
 def test_coupled_slit_no_repeat(linear_time):
     pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
-    kwargs = dict(crpix=(5, 5) * u.pix,
-                  cdelt=(1, 1) * u.arcsec/u.pix,
-                  crval_table=(0, 0) * u.arcsec,
-                  lon_pole=180 * u.deg,
-                  slit=1)
+    kwargs = {"crpix": (5, 5) * u.pix,
+              "cdelt": (1, 1) * u.arcsec/u.pix,
+              "crval_table": (0, 0) * u.arcsec,
+              "lon_pole": 180 * u.deg,
+              "slit": 1}
 
     vct_slit = varying_celestial_transform_from_tables(pc_table=pc_table, **kwargs)
 
@@ -152,11 +152,11 @@ def test_coupled_slit_with_repeat(linear_time):
     pc_table = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     pc_table = pc_table.reshape((5, 3, 2, 2))
 
-    kwargs = dict(crpix=(5, 5) * u.pix,
-                  cdelt=(1, 1) * u.arcsec/u.pix,
-                  crval_table=(0, 0) * u.arcsec,
-                  lon_pole=180 * u.deg,
-                  slit=1)
+    kwargs = {"crpix": (5, 5) * u.pix,
+              "cdelt": (1, 1) * u.arcsec/u.pix,
+              "crval_table": (0, 0) * u.arcsec,
+              "lon_pole": 180 * u.deg,
+              "slit": 1}
 
     vct_slit = varying_celestial_transform_from_tables(pc_table=pc_table, **kwargs)
 

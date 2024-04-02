@@ -78,15 +78,15 @@ def main():
         with fits.open(filepath) as hdul:
             header = hdul[0].header
             headers.append(dict(header))
-            headers[-1].pop('')
-            headers[-1].pop('COMMENT')
-            headers[-1].pop('HISTORY')
+            headers[-1].pop("")
+            headers[-1].pop("COMMENT")
+            headers[-1].pop("HISTORY")
             headers[-1]["DNAXIS"] = 3
             headers[-1]["DNAXIS3"] = len(files)
             headers[-1]["DAAXES"] = 2
             headers[-1]["DEAXES"] = 1
             headers[-1]["DINDEX3"] = i + 1
-        time = parse_time(header['DATE-OBS'])
+        time = parse_time(header["DATE-OBS"])
         if i == 0:
             start_time = time
         inds.append(i)
@@ -104,7 +104,7 @@ def main():
 
     hcubemodel = spatial & timemodel
 
-    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name='helioprojective',
+    sky_frame = cf.CelestialFrame(axes_order=(0, 1), name="helioprojective",
                                   reference_frame=smap0.coordinate_frame,
                                   axes_names=("helioprojective longitude", "helioprojective latitude"))
     time_frame = cf.TemporalFrame(axes_order=(2, ), unit=u.s,
@@ -135,13 +135,13 @@ def main():
     ds._file_manager = ac
 
     tree = {
-        'dataset': ds
+        "dataset": ds
     }
 
     with asdf.AsdfFile(tree) as ff:
         filename = rootdir / "EIT" / "eit_test_dataset.asdf"
         ff.write_to(filename)
-        print("Saved to : {}".format(filename))
+        print(f"Saved to : {filename}")
 
 
     ds.plot()

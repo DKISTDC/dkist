@@ -24,14 +24,13 @@ class FileManagerConverter(Converter):
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
 
-        file_manager = FileManager.from_parts(node["fileuris"],
+        return FileManager.from_parts(node["fileuris"],
                                               node["target"],
                                               node["datatype"],
                                               node["shape"],
                                               chunksize=node.get("chunksize", None),
                                               loader=AstropyFITSLoader,
                                               basepath=base_path)
-        return file_manager
 
     def to_yaml_tree(self, obj, tag, ctx):
         node = {}

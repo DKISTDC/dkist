@@ -3,7 +3,7 @@ from functools import partial
 import dask.array as da
 import numpy as np
 
-__all__ = ['stack_loader_array']
+__all__ = ["stack_loader_array"]
 
 
 def stack_loader_array(loader_array, chunksize):

@@ -25,7 +25,7 @@ def tagobj(request):
 
 @pytest.fixture
 def file_manager():
-    return FileManager.from_parts(['test1.fits', 'test2.fits'], 0, 'float', (10, 10),
+    return FileManager.from_parts(["test1.fits", "test2.fits"], 0, "float", (10, 10),
                                   loader=AstropyFITSLoader)
 
 
@@ -72,7 +72,7 @@ def test_roundtrip_tiled_dataset(simple_tiled_dataset):
                          ],
                          indirect=True)
 def test_save_dataset_without_file_schema(tagobj, tmp_path):
-    tree = {'dataset': tagobj}
+    tree = {"dataset": tagobj}
     with asdf.AsdfFile(tree) as afile:
         afile.write_to(tmp_path / "test.asdf")
 
@@ -81,7 +81,7 @@ def test_asdf_tags(dataset, tmp_path):
     """
     Test the tags and extensions used when saving a dataset.
     """
-    tree = {'dataset': dataset}
+    tree = {"dataset": dataset}
     with asdf.AsdfFile(tree) as afile:
         afile.write_to(tmp_path / "test.asdf")
 
@@ -100,7 +100,7 @@ def test_asdf_tags(dataset, tmp_path):
                          ],
                          indirect=True)
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
-    tree = {'dataset': tagobj}
+    tree = {"dataset": tagobj}
     with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to(Path(tmpdir / "test.asdf"))
@@ -111,7 +111,7 @@ def test_read_all_schema_versions(eit_dataset_asdf_path):
     This test validates that we can successfully read a full and valid Dataset
     object from files with all versions of the dataset schema.
     """
-    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+    with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"):
         # Firstly verify that the tag versions in the test filename are the ones used in the file
         with asdf.open(eit_dataset_asdf_path, _force_raw_types=True) as afile:
             assert afile["dataset"]._tag.rsplit("/")[-1] in str(eit_dataset_asdf_path)

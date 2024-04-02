@@ -1,6 +1,6 @@
 import json
 
-import hypothesis.strategies as st  # noqa
+import hypothesis.strategies as st
 import parfive
 import pytest
 from hypothesis import HealthCheck, given, settings
@@ -12,7 +12,7 @@ from sunpy.tests.helpers import no_vso
 
 import dkist.net
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
-from dkist.net.tests import strategies as dst  # noqa
+from dkist.net.tests import strategies as dst
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
 
@@ -25,7 +25,7 @@ def client():
 @pytest.mark.remote_data
 def test_search(client):
     # TODO: Write an online test to verify real behaviour once there is stable data
-    res = client.search(a.Time("2019/01/01", "2021/01/01"))
+    client.search(a.Time("2019/01/01", "2021/01/01"))
 
 
 @pytest.mark.remote_data
@@ -39,7 +39,8 @@ def test_search_by_time(client, time):
         res = client.search(time, a.Instrument("VBI"))
         assert len(res) == 1
         assert res[0]["Primary Proposal ID"] == "pid_1_50"
-        assert res[0]["Start Time"].value == '2022-12-27T19:27:42.338' and res[0]["End Time"].value == '2022-12-27T20:00:09.005'
+        assert res[0]["Start Time"].value == "2022-12-27T19:27:42.338"
+        assert res[0]["End Time"].value == "2022-12-27T20:00:09.005"
 
 @pytest.fixture
 def empty_query_response():
@@ -98,8 +99,8 @@ def example_api_response():
 @pytest.fixture
 def expected_table_keys():
     translated_keys = set(INVENTORY_KEY_MAP.values())
-    removed_keys = {'Wavelength Min', 'Wavelength Max'}
-    added_keys = {'Wavelength'}
+    removed_keys = {"Wavelength Min", "Wavelength Max"}
+    added_keys = {"Wavelength"}
     expected_keys = translated_keys - removed_keys
     expected_keys.update(added_keys)
     return expected_keys
@@ -134,14 +135,14 @@ def test_query_response_from_results_unknown_field(empty_query_response, example
     This test asserts that if the API starts returning new fields we don't error, they get passed though verbatim.
     """
     dclient = DKISTClient()
-    example_api_response["searchResults"][0].update({'spamEggs': 'Some Spam'})
+    example_api_response["searchResults"][0].update({"spamEggs": "Some Spam"})
     qr = DKISTQueryResponseTable.from_results([example_api_response], client=dclient)
 
     assert len(qr) == 1
     assert isinstance(qr.client, DKISTClient)
     assert qr.client is dclient
     assert isinstance(qr[0], QueryResponseRow)
-    assert set(qr.colnames).difference(expected_table_keys) == {'spamEggs'}
+    assert set(qr.colnames).difference(expected_table_keys) == {"spamEggs"}
     assert set(qr.colnames).isdisjoint(INVENTORY_KEY_MAP.keys())
 
 
@@ -202,14 +203,14 @@ def test_can_handle_query(client, query):
         assert client._can_handle_query(query)
 
 
-@pytest.mark.parametrize("query", (
+@pytest.mark.parametrize("query", [
     a.Instrument("bob"),
     a.Physobs("who's got the button"),
     a.Level(2),
     (a.Instrument("VBI"), a.Level(0)),
     (a.Instrument("VBI"), a.Detector("test")),
-    tuple(),
-))
+    (),
+])
 def test_cant_handle_query(client, query):
     """Some examples of invalid queries."""
     assert not client._can_handle_query(query)
@@ -220,7 +221,7 @@ def test_cant_handle_query(client, query):
 @given(st.one_of(dst.query_and(), dst.query_or(), dst.query_or_composite()))
 def test_fido_valid(mocker, mocked_client, query):
     # Test that Fido is passing through our queries to our client
-    mocked_search = mocker.patch('dkist.net.client.DKISTClient.search')
+    mocked_search = mocker.patch("dkist.net.client.DKISTClient.search")
     mocked_search.return_value = DKISTQueryResponseTable()
 
     Fido.search(query)
@@ -240,7 +241,7 @@ def test_fetch_with_headers(httpserver, tmpdir, mocked_client):
                                   headers={"Content-Disposition": "attachment; filename=abcd.asdf"}
                               )
 
-    response = DKISTQueryResponseTable({'Dataset ID': ['abcd']})
+    response = DKISTQueryResponseTable({"Dataset ID": ["abcd"]})
     with dkist.net.conf.set_temp("download_endpoint", httpserver.url_for("/download")):
         downloader = parfive.Downloader()
         mocked_client.fetch(response, downloader=downloader, path=tmpdir / "{file}")

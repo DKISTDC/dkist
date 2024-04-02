@@ -2,10 +2,11 @@ import os
 import json
 import urllib.parse
 import urllib.request
-from typing import Any, List, Mapping, Iterable
+from typing import Any
 from textwrap import dedent
 from functools import partial
 from collections import defaultdict
+from collections.abc import Mapping, Iterable
 
 import aiohttp
 import numpy as np
@@ -16,7 +17,7 @@ from astropy.table import TableAttribute
 from astropy.time import Time
 
 from sunpy.net import attr
-from sunpy.net import attrs as sattrs
+from sunpy.net import attrs as sattrs  # noqa: ICN001
 from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header
@@ -38,7 +39,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     # Define some class properties to better format the results table.
     # TODO: remove experimentDescription from this list, when we can limit the
     # length of the field to something nicer
-    hide_keys: List[str] = [
+    hide_keys: list[str] = [
         "Storage Bucket",
         "Full Stokes",
         "asdf Filename",
@@ -85,13 +86,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
         for colname in times:
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            if not any([v is None for v in results[colname]]):
+            if not any(v is None for v in results[colname]):
                 results[colname] = Time(results[colname])
 
         for colname, unit in units.items():
             if colname not in results.colnames:
                 continue  # pragma: no cover
-            none_values = np.array(results[colname] == None)
+            none_values = np.array(results[colname] == None)  # E711
             if none_values.any():
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
@@ -110,7 +111,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
         total_available_results = 0
         new_results = defaultdict(list)
         for response in responses:
-            total_available_results += response.get('recordCount', 0)
+            total_available_results += response.get("recordCount", 0)
             for result in response["searchResults"]:
                 for key, value in result.items():
                     new_results[INVENTORY_KEY_MAP[key]].append(value)
@@ -176,8 +177,8 @@ class DKISTClient(BaseClient):
 
         results = []
         for url_parameters in queries:
-            if 'pageSize' not in url_parameters:
-                url_parameters.update({'pageSize': conf.default_page_size})
+            if "pageSize" not in url_parameters:
+                url_parameters.update({"pageSize": conf.default_page_size})
             # TODO make this accept and concatenate multiple wavebands in a search
             query_string = urllib.parse.urlencode(url_parameters, doseq=True)
             full_url = f"{self._dataset_search_url}?{query_string}"
@@ -201,7 +202,7 @@ class DKISTClient(BaseClient):
             cdheader = resp.headers.get("Content-Disposition", None)
             if cdheader:
                 _, params = parse_header(cdheader)
-                name = params.get('filename', "")
+                name = params.get("filename", "")
 
         return str(path).format(file=name, **row.response_block_map)
 
@@ -237,7 +238,7 @@ class DKISTClient(BaseClient):
         supported = set(walker.applymm.registry)
         # This function is only called with arguments of the query where they are assumed to be ANDed.
         supported.remove(attr.AttrAnd)
-        query_attrs = set(type(x) for x in query)
+        query_attrs = {type(x) for x in query}
 
         # The DKIST client only requires that one or more of the support attrs be present.
         if not query_attrs.issubset(supported) or len(query_attrs.intersection(supported)) < 1:
@@ -261,7 +262,7 @@ class DKISTClient(BaseClient):
 
     @classmethod
     def _attrs_module(cls):
-        return 'dkist', 'dkist.net.attrs'
+        return "dkist", "dkist.net.attrs"
 
     @classmethod
     def register_values(cls):

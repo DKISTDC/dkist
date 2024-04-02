@@ -12,7 +12,7 @@ from dkist.utils.decorators import deprecated
 
 from .utils import dataset_info_str
 
-__all__ = ['Dataset']
+__all__ = ["Dataset"]
 
 
 class FileManagerDescriptor(NDCubeLinkedDescriptor):
@@ -57,7 +57,7 @@ class Dataset(NDCube):
         Uncertainty in the dataset. Should have an attribute uncertainty_type
         that defines what kind of uncertainty is stored, for example "std"
         for standard deviation or "var" for variance. A metaclass defining such
-        an interface is `~astropy.nddata.NDUncertainty` - but isn’t mandatory.
+        an interface is `~astropy.nddata.NDUncertainty` - but isn't mandatory.
         If the uncertainty has no such attribute the uncertainty is stored as
         `~astropy.nddata.UnknownUncertainty`.
         Defaults to None.
@@ -152,7 +152,7 @@ class Dataset(NDCube):
             file_idx.append(slc)
         grid = np.mgrid[tuple(file_idx)]
         file_idx = tuple(grid[i].ravel() for i in range(grid.shape[0]))
-        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order='F')
+        flat_idx = np.ravel_multi_index(file_idx[::-1], files_shape[::-1], order="F")
 
         # Explicitly create new header table to ensure consistency
         # Otherwise would return a reference sometimes and a new table others
@@ -193,7 +193,7 @@ class Dataset(NDCube):
         """
         Convenience attribute to access the inventory metadata.
         """
-        return self.meta['inventory']
+        return self.meta["inventory"]
 
     """
     Dataset loading and saving routines.
@@ -227,8 +227,7 @@ class Dataset(NDCube):
         Overload the NDData repr because it does not play nice with the dask delayed io.
         """
         prefix = object.__repr__(self)
-        output = dedent(f"{prefix}\n{self.__str__()}")
-        return output
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     def __str__(self):
         return dataset_info_str(self)

@@ -5,10 +5,28 @@ exclude = [
   "__pycache__",
   "build",
   "dkist/version.py",
+  "dkist/_dev/",
 ]
 
 [lint]
-select = ["E", "F"]
+select = [
+  "F",
+  "E",
+  "W",
+  "UP",
+  "C4",
+  "ICN",
+  "G",
+  "INP",
+  "PT",
+  "Q",
+  "RSE",
+  "RET",
+  "TID",
+  "PTH",
+  "NPY",
+  "RUF",
+]
 extend-ignore = [
   # pycodestyle (E, W)
   "E501", # LineTooLong                             # TODO! fix
@@ -25,6 +43,17 @@ extend-ignore = [
   "PT007", # Parametrize should be lists of tuples  # TODO! fix
   "PT011", # Too broad exception assert             # TODO! fix
   "PT023", # Always use () on pytest decorators
+  # pyupgrade
+  "UP038", # Use | in isinstance - not compatible with models and is slower
+  # Returns (RET)
+  "RET502",  # Do not implicitly return None in function able to return non-None value
+  "RET503",  # Missing explicit return at the end of function able to return non-None value
+  # Pathlib (PTH)
+  "PTH123",  # open() should be replaced by Path.open()
+  # Ruff
+  "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
+  "RUF013",  # PEP 484 prohibits implicit `Optional`
+  "RUF015",  # Prefer `next(iter(...))` over single element slice
 ]
 
 [lint.per-file-ignores]
@@ -39,6 +68,11 @@ extend-ignore = [
 ]
 "__init__.py" = ["E402", "F401", "F403"]
 "test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+"dkist/logger.py" = ["PTH"]
+
+[lint.flake8-import-conventions.extend-aliases]
+"astropy.units" = "u"
+"sunpy.net.attrs" = "a"
 
 [lint.pydocstyle]
 convention = "numpy"

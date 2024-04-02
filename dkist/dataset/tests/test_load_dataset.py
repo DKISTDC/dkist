@@ -49,12 +49,12 @@ def fixture_finder(request):
     return request.getfixturevalue(request.param)
 
 
-@pytest.mark.parametrize("fixture_finder", (
+@pytest.mark.parametrize("fixture_finder", [
         "asdf_path",
         "asdf_str",
         "single_asdf_in_folder",
         "single_asdf_in_folder_str",
-    ),
+    ],
     indirect=True
 )
 def test_load_single_dataset(fixture_finder):
@@ -62,16 +62,16 @@ def test_load_single_dataset(fixture_finder):
     assert isinstance(ds, Dataset)
 
 
-@pytest.mark.parametrize("fixture_finder", (
+@pytest.mark.parametrize("fixture_finder", [
         ["asdf_path", "asdf_str", "single_asdf_in_folder", "single_asdf_in_folder_str"],
         ("asdf_path", "asdf_str", "single_asdf_in_folder", "single_asdf_in_folder_str"),
-    ),
+    ],
     indirect=True
 )
 def test_load_multiple(fixture_finder):
     datasets = load_dataset(fixture_finder)
     assert isinstance(datasets, list)
-    assert all([isinstance(ds, Dataset) for ds in datasets])
+    assert all(isinstance(ds, Dataset) for ds in datasets)
 
 
 def test_load_from_results(asdf_path, asdf_str):
@@ -82,14 +82,14 @@ def test_load_from_results(asdf_path, asdf_str):
     res = Results([asdf_str, asdf_str])
     ds = load_dataset(res)
     assert isinstance(ds, list)
-    assert all([isinstance(ds, Dataset) for ds in ds])
+    assert all(isinstance(ds, Dataset) for ds in ds)
 
 
 def test_multiple_from_dir(multiple_asdf_in_folder):
     ds = load_dataset(multiple_asdf_in_folder)
     assert isinstance(ds, list)
     assert len(ds) == 2
-    assert all([isinstance(d, Dataset) for d in ds])
+    assert all(isinstance(d, Dataset) for d in ds)
 
 
 def test_tiled_dataset(asdf_tileddataset_path):

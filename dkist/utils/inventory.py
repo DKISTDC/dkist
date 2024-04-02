@@ -3,12 +3,11 @@ Functions for working with dataset inventory.
 """
 import re
 import string
-from typing import Dict
 from collections import defaultdict
 
 from astropy.table import Table
 
-__all__ = ['dehumanize_inventory', 'humanize_inventory', 'INVENTORY_KEY_MAP']
+__all__ = ["dehumanize_inventory", "humanize_inventory", "INVENTORY_KEY_MAP"]
 
 
 class DefaultMap(defaultdict):
@@ -19,7 +18,7 @@ class DefaultMap(defaultdict):
         return key
 
 
-INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
+INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "asdfObjectKey": "asdf Filename",
         "boundingBox": "Bounding Box",
         "browseMovieObjectKey": "Movie Filename",
@@ -78,9 +77,9 @@ INVENTORY_KEY_MAP: Dict[str, str] = DefaultMap(None, {
 
 
 def _key_clean(key):
-    key = re.sub('[%s]' % re.escape(string.punctuation), '_', key)
-    key = key.replace(' ', '_')
-    key = ''.join(char for char in key
+    key = re.sub("[%s]" % re.escape(string.punctuation), "_", key)
+    key = key.replace(" ", "_")
+    key = "".join(char for char in key
                     if char.isidentifier() or char.isnumeric())
     return key.lower()
 
@@ -93,11 +92,11 @@ def path_format_keys(keymap):
 
 
 def _path_format_table(keymap=INVENTORY_KEY_MAP):
-    t = Table({'Inventory Keyword': list(keymap.keys()), 'Path Key': path_format_keys(keymap)})
-    return '\n'.join(t.pformat(max_lines=-1, html=True))
+    t = Table({"Inventory Keyword": list(keymap.keys()), "Path Key": path_format_keys(keymap)})
+    return "\n".join(t.pformat(max_lines=-1, html=True))
 
 
-def humanize_inventory(inventory: Dict[str, str]) -> Dict[str, str]:
+def humanize_inventory(inventory: dict[str, str]) -> dict[str, str]:
     """
     Convert an inventory dict to have human readable keys.
     """
@@ -113,13 +112,13 @@ def path_format_inventory(human_inv):
     Given a single humanized inventory record return a dict for formatting paths.
     """
     # Putting this here because of circular imports
-    from ..net.client import DKISTQueryResponseTable as Table
+    from dkist.net.client import DKISTQueryResponseTable as Table
 
     t = Table.from_results([{"searchResults": [human_inv]}], client=None)
     return t[0].response_block_map
 
 
-def dehumanize_inventory(humanized_inventory: Dict[str, str]) -> Dict[str, str]:
+def dehumanize_inventory(humanized_inventory: dict[str, str]) -> dict[str, str]:
     """
     Convert a human readable inventory dict back to the original keys.
     """

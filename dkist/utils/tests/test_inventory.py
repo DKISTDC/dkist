@@ -114,7 +114,7 @@ def test_path_format_table():
         "qualityReportObjectKey": "Quality Report Filename",
     }
     table = _path_format_table(test_keymap)
-    table = table[table.find('\n')+1:]
+    table = table[table.find("\n")+1:]
 
     assert table == output
 

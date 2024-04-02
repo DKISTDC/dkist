@@ -15,15 +15,16 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
-from typing import Any, Tuple, Union, Iterable, Optional
+from typing import Any
 from pathlib import Path
+from collections.abc import Iterable
 
 import dask.array
 import numpy as np
 from parfive import Downloader
 
 try:
-    from numpy.typing import DTypeLike, NDArray  # NOQA
+    from numpy.typing import DTypeLike, NDArray
 except ImportError:
     NDArray = DTypeLike = Iterable
 
@@ -51,18 +52,18 @@ class BaseStripedExternalArray:
         return all((uri, target, dtype, shape))
 
     @staticmethod
-    def _output_shape_from_ref_array(shape, loader_array) -> Tuple[int]:
+    def _output_shape_from_ref_array(shape, loader_array) -> tuple[int]:
         # If the first dimension is one we are going to squash it.
         if shape[0] == 1:
             shape = shape[1:]
 
         if loader_array.size == 1:
             return shape
-        else:
-            return tuple(list(loader_array.shape) + list(shape))
+
+        return tuple(list(loader_array.shape) + list(shape))
 
     @property
-    def output_shape(self) -> Tuple[int, ...]:
+    def output_shape(self) -> tuple[int, ...]:
         """
         The final shape of the reconstructed data array.
         """
@@ -125,7 +126,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         return self._basepath
 
     @basepath.setter
-    def basepath(self, value: Optional[Union[os.PathLike, str]]):
+    def basepath(self, value: os.PathLike | str | None):
         self._basepath = Path(value).expanduser() if value is not None else None
 
     @property
@@ -153,7 +154,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     # class.
     __slots__ = ["parent", "parent_slice"]
 
-    def __init__(self, parent: StripedExternalArray, aslice: Union[tuple, slice, int]):
+    def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
         self.parent = parent
         self.parent_slice = tuple(aslice)
 
@@ -340,7 +341,7 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
         url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
@@ -368,7 +369,7 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta['inventory']['datasetId']
+        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
         url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
