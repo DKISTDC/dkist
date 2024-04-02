@@ -1,0 +1,1 @@
+Fix a performance regression when dask>=2024.2.1 is installed.

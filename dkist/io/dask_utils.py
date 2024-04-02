@@ -20,7 +20,7 @@ def stack_loader_array(loader_array, chunksize):
     -------
     array : `dask.array.Array`
     """
-    # If the chunksize sin't specified then use the whole array shape
+    # If the chunksize isn't specified then use the whole array shape
     chunksize = chunksize or loader_array.flat[0].shape
 
     if loader_array.size == 1:
@@ -31,6 +31,11 @@ def stack_loader_array(loader_array, chunksize):
     for i in range(loader_array.shape[0]):
         stacks.append(stack_loader_array(loader_array[i], chunksize))
     return da.stack(stacks)
+
+
+def _partial_to_array(loader, *, meta, chunks):
+    # Set the name of the array to the filename, that should be unique within the array
+    return da.from_array(loader, meta=meta, chunks=chunks, name=loader.fileuri)
 
 
 def loader_to_dask(loader_array, chunksize):
@@ -50,6 +55,6 @@ def loader_to_dask(loader_array, chunksize):
     # trying to auto calculate it by reading from the actual array on disk.
     meta = np.zeros((0,), dtype=loader_array[0].dtype)
 
-    to_array = partial(da.from_array, meta=meta, chunks=chunksize)
+    to_array = partial(_partial_to_array, meta=meta, chunks=chunksize)
 
     return map(to_array, loader_array)
