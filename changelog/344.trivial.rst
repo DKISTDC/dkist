@@ -1,1 +1,0 @@
-Refactor various subclasses of VaryingCelestialTransform to centralise the calculations in preparation for improving performance.
