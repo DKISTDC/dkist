@@ -1,3 +1,31 @@
+1.5.0 (2024-04-03)
+==================
+
+Features
+--------
+
+- Our minimum Python version is now 3.10 inline with `SPEC-0 <https://scientific-python.org/specs/spec-0000/>`__. (`#347 <https://github.com/DKISTDC/dkist/pull/347>`_)
+
+
+Bug Fixes
+---------
+
+- Fix broadcasting issues during pixel -> world conversion for models with a Ravel component. (`#309 <https://github.com/DKISTDC/dkist/pull/309>`_)
+- Fix a performance regression when dask>=2024.2.1 is installed. (`#361 <https://github.com/DKISTDC/dkist/pull/361>`_)
+
+
+Improved Documentation
+----------------------
+
+- Add a how to guide describing how to reproject VBI data. Also migrate tutorial to the latest DDT datasets. (`#349 <https://github.com/DKISTDC/dkist/pull/349>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Refactor various subclasses of VaryingCelestialTransform to centralise the calculations in preparation for improving performance. (`#344 <https://github.com/DKISTDC/dkist/pull/344>`_)
+
+
 1.4.0 (2024-02-26)
 ==================
 
