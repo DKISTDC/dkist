@@ -32,6 +32,7 @@ __all__ = [
 
 
 def generate_celestial_transform(
+        transform,
         crpix: Iterable[float] | u.Quantity,
         cdelt: Iterable[float] | u.Quantity,
         pc: ArrayLike | u.Quantity,
@@ -90,11 +91,12 @@ def generate_celestial_transform(
         lon_pole = u.Quantity(lon_pole)
         pc = u.Quantity(pc)
 
-    shift = m.Shift(-crpix[0]) & m.Shift(-crpix[1])
-    scale = m.Multiply(cdelt[0]) & m.Multiply(cdelt[1])
-    rot = m.AffineTransformation2D(pc, translation=translation)
-    skyrot = m.RotateNative2Celestial(crval[0], crval[1], lon_pole)
-    return shift | rot | scale | projection | skyrot
+    new_params = [-crpix[0], -crpix[1], pc, translation, cdelt[0], cdelt[1], crval[0], crval[1], lon_pole]
+
+    for name, val in zip(transform.param_names, new_params):
+        setattr(transform, name, val)
+
+    return transform
 
 
 class BaseVaryingCelestialTransform(Model, ABC):
@@ -169,6 +171,12 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if len(self.table_shape) != self.n_inputs-2:
             raise ValueError(f"This model can only be constructed with a {self.n_inputs-2}-dimensional lookup table.")
 
+        shift = m.Shift(0) & m.Shift(0)
+        rot = m.AffineTransformation2D(np.array([[0, 0], [0, 0]]), translation=np.array([0, 0]))
+        scale = m.Multiply(0) & m.Multiply(0)
+        skyrot = m.RotateNative2Celestial(0, 0, 180)
+        self._transform = shift | rot | scale | projection | skyrot
+
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
@@ -199,6 +207,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
         return generate_celestial_transform(
+            self._transform,
             crpix=crpix,
             cdelt=cdelt,
             pc=self.pc_table[ind],
