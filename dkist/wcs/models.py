@@ -108,6 +108,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
     standard_broadcasting = False
     _separable = False
     _input_units_allow_dimensionless = True
+    _input_units_strict = True
     _is_inverse = False
 
     crpix = Parameter()
