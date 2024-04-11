@@ -274,6 +274,9 @@ class BaseVaryingCelestialTransform(Model, ABC):
         kwargs = dict(zip(keys, kwargs))
 
         # This will almost universally not be the way to put the units back but it works for the plot profiling so it'll do for now
+        if self._is_inverse:
+            return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs) * u.pix
+
         return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs) * u.deg
 
     @property
