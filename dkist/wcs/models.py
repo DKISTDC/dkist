@@ -211,8 +211,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
             self._transform,
             crpix=crpix,
             cdelt=cdelt,
-            pc=self.pc_table[ind],
-            crval=self.crval_table[ind],
+            pc=self.pc_table[ind].value,
+            crval=self.crval_table[ind].value,
             lon_pole=lon_pole,
             projection=self.projection,
         )
@@ -228,11 +228,13 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
         # Generate output arrays (ignore units for simplicity)
         if isinstance(barrays[0], u.Quantity):
-            x_out = np.empty_like(barrays[0].value)
-            y_out = np.empty_like(barrays[1].value)
-        else:
-            x_out = np.empty_like(barrays[0])
-            y_out = np.empty_like(barrays[1])
+            arrays = [arr.value for arr in barrays]
+            crpix = crpix.value
+            cdelt = cdelt.to(u.deg/u.pix).value
+            lon_pole = lon_pole.value
+
+        x_out = np.empty_like(arrays[0])
+        y_out = np.empty_like(arrays[1])
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
@@ -248,19 +250,19 @@ class BaseVaryingCelestialTransform(Model, ABC):
             else:
                 mask = masks[0]
             if inverse:
-                xx, yy = sct.inverse(barrays[0][mask], barrays[1][mask])
+                xx, yy = sct.inverse(arrays[0][mask], arrays[1][mask])
             else:
-                xx, yy = sct(barrays[0][mask], barrays[1][mask])
+                xx, yy = sct(arrays[0][mask], arrays[1][mask])
 
-            if isinstance(xx, u.Quantity):
-                x_out[mask], y_out[mask] = xx.value, yy.value
-            else:
-                x_out[mask], y_out[mask] = xx, yy
+            x_out[mask], y_out[mask] = xx, yy
 
         # Put the units back
-        if isinstance(xx, u.Quantity):
-            x_out = x_out << xx.unit
-            y_out = y_out << yy.unit
+        if self._is_inverse:
+            x_out = x_out << u.pix
+            y_out = y_out << u.pix
+        else:
+            x_out = x_out << u.deg
+            y_out = y_out << u.deg
 
         return x_out, y_out
 
