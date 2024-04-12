@@ -211,8 +211,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
             self._transform,
             crpix=crpix,
             cdelt=cdelt,
-            pc=self.pc_table[ind].value,
-            crval=self.crval_table[ind].value,
+            pc=self.pc_table[ind],
+            crval=self.crval_table[ind],
             lon_pole=lon_pole,
             projection=self.projection,
         )
@@ -265,7 +265,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
         return x_out, y_out
 
     def evaluate(self, *inputs):
-        inputs = [i.value if isinstance(i, u.Quantity) else i for i in inputs]
         # This method has to be able to take an arbitrary number of arrays but also accept not being given kwargs
         # Fortunately we know how many arrays to expect from the number of inputs
         # Anything extra is therefore a kwarg
@@ -273,12 +272,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         kwargs = inputs[self.n_inputs:]
         keys = ["crpix", "cdelt", "lon_pole"]
         kwargs = dict(zip(keys, kwargs))
-
-        # This will almost universally not be the way to put the units back but it works for the plot profiling so it'll do for now
-        if self._is_inverse:
-            return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs) * u.pix
-
-        return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs) * u.deg
+        return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs)
 
     @property
     def input_units(self):
