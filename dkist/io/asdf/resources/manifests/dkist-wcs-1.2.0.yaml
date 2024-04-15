@@ -1,6 +1,6 @@
 %YAML 1.1
 ---
-id: asdf://dkist.nso.edu/dkist/manifests/dkist-wcs-1.2.0
+id: asdf://dkist.nso.edu/manifests/dkist-wcs-1.2.0
 extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-wcs-1.2.0
 title: DKIST WCS extension
 description: ASDF schemas and tags for models and WCS related classes.

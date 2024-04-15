@@ -1,0 +1,27 @@
+%YAML 1.1
+---
+id: asdf://dkist.nso.edu/manifests/dkist-wcs-1.3.0
+extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-wcs-1.3.0
+asdf_standard_requirement:
+  gte: 1.6.0
+
+title: DKIST WCS extension
+description: ASDF schemas and tags for models and WCS related classes.
+
+tags:
+  # the tag version does not match the schema version
+  - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.1.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/varying_celestial_transform-1.2.0"
+
+  # the varying_celestial_transform schema is reused here
+  - schema_uri: "asdf://dkist.nso.edu/schemas/varying_celestial_transform-1.1.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/inverse_varying_celestial_transform-1.2.0"
+
+  - schema_uri: "asdf://dkist.nso.edu/schemas/coupled_compound_model-1.1.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/coupled_compound_model-1.1.0"
+
+  - schema_uri: "asdf://dkist.nso.edu/schemas/ravel_model-1.1.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/ravel_model-1.1.0"
+
+  - schema_uri: "asdf://dkist.nso.edu/schemas/asymmetric_mapping_model-1.1.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/asymmetric_mapping_model-1.1.0"
