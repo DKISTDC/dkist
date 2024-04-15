@@ -1,7 +1,7 @@
 repos:
     # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.3.4"
+    rev: "v0.3.5"
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -11,7 +11,7 @@ repos:
       - id: isort
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|dkist/extern)$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
@@ -29,7 +29,7 @@ repos:
     rev: v2.2.6
     hooks:
       - id: codespell
-        args: [ "--write-changes" ]
+        args: [ "--write-changes", "-D", "-", "-D", ".codespell-dict.txt"]
 ci:
   autofix_prs: false
   autoupdate_schedule: "weekly"

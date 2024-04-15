@@ -122,29 +122,18 @@ typehints_defaults = "comma"
 # -- Options for intersphinx extension -----------------------------------------
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "python": (
-        "https://docs.python.org/3/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
-    ),
-    "numpy": (
-        "https://numpy.org/doc/stable/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
-    ),
-    "scipy": (
-        "https://docs.scipy.org/doc/scipy/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
-    ),
-    "matplotlib": (
-        "https://matplotlib.org/stable/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/matplotlib.inv"),
-    ),
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
-    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/latest/", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
     "gwcs": ("https://gwcs.readthedocs.io/en/latest/", None),
-    "asdf": ("https://asdf.readthedocs.io/en/latest/", None),
-    "dask": ("https://dask.pydata.org/en/latest/", None),
+    "asdf": ("https://asdf.readthedocs.io/en/stable/", None),
+    "dask": ("https://dask.pydata.org/en/stable/", None),
+    "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
 }
 
 # -- Options for HTML output ---------------------------------------------------

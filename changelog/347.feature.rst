@@ -1,1 +1,0 @@
-Our minimum Python version is now 3.10 inline with `SPEC-0 <https://scientific-python.org/specs/spec-0000/>`__.

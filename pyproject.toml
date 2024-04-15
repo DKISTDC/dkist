@@ -68,6 +68,7 @@ docs = [
   "myst-nb",
   "ipywidgets",
   "accessible-pygments",
+  "reproject[all]",
 ]
 
 [project.urls]

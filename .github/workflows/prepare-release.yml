@@ -64,7 +64,7 @@ jobs:
 
       - name: Commit Attrs
         run: |
-          git update-index --refresh
+          git update-index --refresh || true
           git diff-index --quiet HEAD -- || git commit -m "Update attrs values before release [skip ci]" dkist/data/api_search_values.json
 
       - name: Install towncrier
