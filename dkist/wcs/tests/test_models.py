@@ -76,7 +76,7 @@ def test_varying_transform_no_lon_pole_unit():
     )
     trans5 = vct.transform_at_index(5)
     assert isinstance(trans5, CompoundModel)
-    assert u.allclose(trans5.right.lon_pole, 180 * u.deg)
+    assert u.allclose(trans5.right.lon_pole, 180)
 
 
 def test_varying_transform_pc():
@@ -96,7 +96,7 @@ def test_varying_transform_pc():
     # Verify that we have the 5th matrix in the series
     affine = next(filter(lambda sm: isinstance(sm, m.AffineTransformation2D), trans5.traverse_postorder()))
     assert isinstance(affine, m.AffineTransformation2D)
-    assert u.allclose(affine.matrix, varying_matrix_lt[5])
+    assert u.allclose(affine.matrix, varying_matrix_lt[5].value)
     # x.shape=(1,), y.shape=(1,), z.shape=(1,)
     pixel = (0*u.pix, 0*u.pix, 5*u.pix)
     world = vct(*pixel)
@@ -175,8 +175,8 @@ def test_varying_transform_crval():
     # Verify that we have the 2nd crval pair in the series
     crval1 = trans2.right.lon
     crval2 = trans2.right.lat
-    assert u.allclose(crval1, crval_table[2][0])
-    assert u.allclose(crval2, crval_table[2][1])
+    assert u.allclose(crval1, crval_table[2][0].to_value(u.deg))
+    assert u.allclose(crval2, crval_table[2][1].to_value(u.deg))
 
     pixel = (0*u.pix, 0*u.pix, 2*u.pix)
     world = vct(*pixel)
@@ -286,7 +286,7 @@ def test_varying_transform_4d_pc_unitless():
     ((np.arange(10) * u.pix,
       np.arange(10) * u.pix,
       np.arange(5)[..., None] * u.pix,
-      np.arange(3)[..., None, None]), (3, 5, 10)),
+      np.arange(3)[..., None, None] * u.pix), (3, 5, 10)),
 ])
 def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
