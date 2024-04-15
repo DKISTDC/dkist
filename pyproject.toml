@@ -53,6 +53,7 @@ tests = [
   "pytest-mock",
   "pytest-mpl",
   "pytest-httpserver",
+  "pytest-filter-subpackage",
   "hypothesis",
   "tox",
   "pydot",
