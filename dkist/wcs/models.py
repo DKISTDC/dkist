@@ -75,6 +75,10 @@ def generate_celestial_transform(
     # TODO: Note this assumption is only valid for certain projections.
     if lon_pole is None:
         lon_pole = 180
+    # If we're not using units but lon_pole is specified we need to strip the units
+    # But it also might be a Parameter
+    elif not spatial_unit and hasattr(lon_pole, "unit"):
+        lon_pole = u.Quantity(lon_pole, unit=u.deg).value
     if spatial_unit is not None:
         # Lon pole should always have the units of degrees
         lon_pole = u.Quantity(lon_pole, unit=u.deg)
@@ -207,16 +211,24 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
+        if isinstance(self.pc_table, u.Quantity):
+            pc = self.pc_table[ind].value
+        else:
+            pc = self.pc_table[ind]
+        if isinstance(self.crval_table, u.Quantity):
+            crval = self.crval_table[ind].to_value(u.deg)
+        else:
+            crval = self.crval_table[ind]
+
         return generate_celestial_transform(
             self._transform,
             crpix=crpix,
             cdelt=cdelt,
-            pc=self.pc_table[ind].value,
-            crval=self.crval_table[ind].value,
+            pc=pc,
+            crval=crval,
             lon_pole=lon_pole,
             projection=self.projection,
         )
-
 
     def _map_transform(self, *arrays, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
@@ -256,13 +268,14 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
             x_out[mask], y_out[mask] = xx, yy
 
-        # Put the units back
-        if self._is_inverse:
-            x_out = x_out << u.pix
-            y_out = y_out << u.pix
-        else:
-            x_out = x_out << u.deg
-            y_out = y_out << u.deg
+        # Put the units back if we started with some
+        if isinstance(barrays[0], u.Quantity):
+            if self._is_inverse:
+                x_out = x_out << u.pix
+                y_out = y_out << u.pix
+            else:
+                x_out = x_out << u.deg
+                y_out = y_out << u.deg
 
         return x_out, y_out
 
