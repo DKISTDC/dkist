@@ -19,19 +19,17 @@ concurrency:
 
 jobs:
   benchmarks:
-    steps:
-      - name: Run benchmark
-        uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
-        with:
-          default_python: '3.10'
-          envs: |
-            - linux: benchmark-main
-      - name: Push results
-        run: |
-          cp {toxinidir}/.tmp/benchmark-main/.benchmarks/Linux-CPython-3.11-64bit/0001_main.json .tox/benchmark-main/tmp/dkist-benchmarks/main.json
-          cd .tox/benchmark-main/tmp/dkist-benchmarks
-          git add main.json
-          git commit -m "Update benchmark data for main"
-          git push origin main
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+      with:
+        default_python: '3.10'
+        envs: |
+          - linux: benchmark-main
+      # run: |
+      #   cp {toxinidir}/.tmp/benchmark-main/.benchmarks/Linux-CPython-3.11-64bit/0001_main.json .tox/benchmark-main/tmp/dkist-benchmarks/main.json
+      #   cd .tox/benchmark-main/tmp/dkist-benchmarks
+      #   git add main.json
+      #   git commit -m "Update benchmark data for main"
+      #   git push origin main
+      # secrets:
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
