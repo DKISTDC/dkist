@@ -20,7 +20,23 @@ concurrency:
 jobs:
   benchmarks:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    container:
+      volumes:
+        - ~:/github
     with:
       default_python: '3.10'
       envs: |
         - linux: benchmark-main
+
+  update-repo:
+    runs-on: ubuntu-latest
+    container:
+      volumes:
+        - ~:/github
+    needs: [benchmarks]
+    run: |
+      git clone https://github.com/DKISTDC/dkist-benchmarks.git /github/dkist-benchmarks
+      cd /dkist-benchmarks
+      git add main.json
+      git commit -m "Update benchmark data for main"
+      git push origin main
