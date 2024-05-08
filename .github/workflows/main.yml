@@ -42,7 +42,6 @@ jobs:
         - windows: py311-online
         - macos: py310
         - linux: py310-oldestdeps
-        - linux: benchmarks
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
