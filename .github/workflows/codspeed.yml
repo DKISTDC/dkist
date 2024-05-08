@@ -20,4 +20,4 @@ jobs:
         uses: CodspeedHQ/action@v2
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: "pytest -vvv -r fEs --pyargs dkist -k test_benchmarks --benchmark-autosave"
+          run: "pytest -vvv -r fEs --pyargs dkist --codspeed"
