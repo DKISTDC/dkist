@@ -328,4 +328,4 @@ def large_visp_dataset(large_visp_dataset_file):
     # ds.generate_files(vispdir)
     # dataset_from_fits(vispdir, "test_visp.asdf")
 
-    return load_dataset(large_visp_dataset_file / "test_visp.asdf")
+    return load_dataset(large_visp_dataset_file)
