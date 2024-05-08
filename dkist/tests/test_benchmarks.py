@@ -14,7 +14,14 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
-@pytest.mark.parametrize("axes", [[None, "x", "y", None], [None, "y", "x", None]])
+@pytest.mark.parametrize("axes", [
+    ["y", "x", None, None],
+    ["y", None, "x", None],
+    ["y", None, None, "x"],
+    [None, "y", "x", None],
+    [None, "y", None, "x"],
+    [None, None, "y", "x"],
+])
 def test_plot_dataset(benchmark, axes, large_visp_dataset):
     @benchmark
     def plot_and_save_fig(ds=large_visp_dataset, axes=axes):
