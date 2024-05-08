@@ -17,13 +17,7 @@ from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestia
 
 
 def test_generate_celestial():
-    shift = m.Shift(0) & m.Shift(0)
-    rot = m.AffineTransformation2D(np.array([[0, 0], [0, 0]]), translation=np.array([0, 0]))
-    scale = m.Multiply(0) & m.Multiply(0)
-    projection = m.Pix2Sky_TAN()
-    skyrot = m.RotateNative2Celestial(0, 0, 180)
     tfrm = generate_celestial_transform(
-        shift | rot | scale | projection | skyrot,
         crpix=[0, 0] * u.pix,
         crval=[0, 0] * u.arcsec,
         cdelt=[1, 1] * u.arcsec/u.pix,
@@ -48,13 +42,7 @@ def test_generate_celestial():
 
 
 def test_generate_celestial_unitless():
-    shift = m.Shift(0) & m.Shift(0)
-    rot = m.AffineTransformation2D(np.array([[0, 0], [0, 0]]), translation=np.array([0, 0]))
-    scale = m.Multiply(0) & m.Multiply(0)
-    projection = m.Pix2Sky_TAN()
-    skyrot = m.RotateNative2Celestial(0, 0, 180)
     tfrm = generate_celestial_transform(
-        shift | rot | scale | projection | skyrot,
         crpix=[0, 0],
         crval=[0, 0],
         cdelt=[1, 1],
