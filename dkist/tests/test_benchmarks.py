@@ -24,6 +24,7 @@ def test_load_asdf(benchmark, tmp_path_factory):
 @pytest.mark.benchmark
 @pytest.mark.parametrize("axes", [[None, "x", "y", None], [None, "y", "x", None]])
 def test_plot_dataset(benchmark, axes, large_visp_dataset):
-
-    large_visp_dataset.plot(plot_axes=[None, "y", "x", None])
-    plt.savefig("plot_profiling")
+    @benchmark
+    def plot_and_save_fig(ds=large_visp_dataset, axes=axes):
+        ds.plot(plot_axes=axes)
+        plt.savefig()
