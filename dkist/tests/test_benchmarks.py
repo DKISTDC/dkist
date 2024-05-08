@@ -1,11 +1,8 @@
-import gzip
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pytest
 
 from dkist import load_dataset
-from dkist.data.test import rootdir
 
 
 @pytest.mark.benchmark
