@@ -1,7 +1,8 @@
 import gzip
 from pathlib import Path
-import pytest
+
 import matplotlib.pyplot as plt
+import pytest
 
 from dkist import load_dataset
 from dkist.data.test import rootdir
@@ -21,8 +22,8 @@ def test_load_asdf(benchmark, tmp_path_factory):
 
 
 @pytest.mark.benchmark
-@pytest.mark.parametrize("axes", [[None, 'x', 'y', None], [None, 'y', 'x', None]])
+@pytest.mark.parametrize("axes", [[None, "x", "y", None], [None, "y", "x", None]])
 def test_plot_dataset(benchmark, axes, large_visp_dataset):
 
-    large_visp_dataset.plot(plot_axes=[None, 'y', 'x', None])
-    plt.savefig('plot_profiling')
+    large_visp_dataset.plot(plot_axes=[None, "y", "x", None])
+    plt.savefig("plot_profiling")
