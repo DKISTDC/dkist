@@ -1,0 +1,23 @@
+name: codspeed-benchmarks
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install .[tests] pytest-codspeed
+      - name: Run benchmarks
+        uses: CodspeedHQ/action@v2
+        with:
+          token: ${{ secrets.CODSPEED_TOKEN }}
+          run: "pytest -vvv -r fEs --pyargs dkist --codspeed"
