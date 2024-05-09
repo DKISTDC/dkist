@@ -9,7 +9,7 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
     benchmark(load_dataset, large_visp_dataset_file)
 
 
-@pytest.mark.benchmark
+@pytest.mark.benchmark(min_rounds=2)
 @pytest.mark.parametrize("axes", [
     ["y", "x", None, None],
     ["y", None, "x", None],
