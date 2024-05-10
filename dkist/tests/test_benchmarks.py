@@ -37,5 +37,4 @@ def test_plot_dataset(benchmark, axes, large_visp_dataset):
     @benchmark
     def plot_and_save_fig(ds=large_visp_dataset, axes=axes):
         ds.plot(plot_axes=axes)
-        plt.savefig("tmpplot")
-        plt.close()
+    plt.close()
