@@ -28,9 +28,9 @@ def test_pixel_to_world(benchmark, large_visp_dataset):
 @pytest.mark.parametrize("axes", [
     [None, "y", "x", None],
 ])
-def test_plot_dataset(benchmark, axes, large_visp_dataset):
+def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
     @benchmark
-    def plot_and_save_fig(ds=large_visp_dataset, axes=axes):
+    def plot_and_save_fig(ds=visp_dataset_no_headers, axes=axes):
         ds.plot(plot_axes=axes)
         plt.savefig("tmpplot")
         plt.close()
