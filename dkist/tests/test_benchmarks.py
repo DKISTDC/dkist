@@ -30,7 +30,7 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers, large_visp_dataset):
     [None, "y", "x", None],
 ])
 def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
-    @benchmark
+    @benchmark.pedantic(rounds=1, iterations=1)
     def plot_and_save_fig(ds=visp_dataset_no_headers, axes=axes):
         ds.plot(plot_axes=axes)
         plt.savefig("tmpplot")
