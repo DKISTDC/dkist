@@ -50,13 +50,13 @@ def generate_celestial_transform(
     ----------
     crpix
         The reference pixel (a length two array).
-    crval
-        The world coordinate at the reference pixel (a length two array).
     cdelt
         The sample interval along the pixel axis
     pc
         The rotation matrix for the affine transform. If specifying parameters
         with units this should have celestial (``u.deg``) units.
+    crval
+        The world coordinate at the reference pixel (a length two array).
     lon_pole
         The longitude of the celestial pole, defaults to 180 degrees.
     projection
@@ -97,6 +97,53 @@ def generate_celestial_transform(
     return shift | rot | scale | projection | skyrot
 
 
+def update_celestial_transform_parameters(
+        transform,
+        crpix: Iterable[float] | u.Quantity,
+        cdelt: Iterable[float] | u.Quantity,
+        pc: ArrayLike | u.Quantity,
+        crval: Iterable[float] | u.Quantity,
+        lon_pole: float | u.Quantity,
+) -> CompoundModel:
+    """
+    Update an existing transform with new parameter values.
+
+    .. warning::
+        This assumes that the type (quantity vs not quantity) and units of the
+        new parameters are valid for the model.
+
+    Parameters
+    ----------
+    crpix
+        The reference pixel (a length two array).
+    cdelt
+        The sample interval along the pixel axis
+    pc
+        The rotation matrix for the affine transform. If specifying parameters
+        with units this should have celestial (``u.deg``) units.
+    crval
+        The world coordinate at the reference pixel (a length two array).
+    lon_pole
+        The longitude of the celestial pole, defaults to 180 degrees.
+    """
+    new_params = [
+        -crpix[0],
+        -crpix[1],
+        pc,
+        transform[2].translation.value,
+        cdelt[0],
+        cdelt[1],
+        crval[0],
+        crval[1],
+        lon_pole
+    ]
+
+    for name, val in zip(transform.param_names, new_params):
+        setattr(transform, name, val)
+
+    return transform
+
+
 class BaseVaryingCelestialTransform(Model, ABC):
     """
     Shared components between the forward and reverse varying celestial transforms.
@@ -106,6 +153,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
     standard_broadcasting = False
     _separable = False
     _input_units_allow_dimensionless = True
+    _input_units_strict = True
     _is_inverse = False
 
     crpix = Parameter()
@@ -169,6 +217,15 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if len(self.table_shape) != self.n_inputs-2:
             raise ValueError(f"This model can only be constructed with a {self.n_inputs-2}-dimensional lookup table.")
 
+        self._transform = generate_celestial_transform(
+            crpix=[0, 0],
+            cdelt=[1, 1],
+            pc=np.identity(2),
+            crval=[0, 0],
+            lon_pole=180,
+            projection=projection,
+        )
+
     def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
@@ -176,7 +233,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         Parameters
         ----------
         zind : int
-          The index to the lookup table.Q
+          The index to the lookup table.
 
         **kwargs
           The keyword arguments are optional and if not specified will be read
@@ -187,26 +244,59 @@ class BaseVaryingCelestialTransform(Model, ABC):
         `astropy.modeling.CompoundModel`
 
         """
-        # If we are being called from inside evaluate we can skip the lookup
-        crpix = crpix if crpix is not None else self.crpix
-        cdelt = cdelt if cdelt is not None else self.cdelt
-        lon_pole = lon_pole if lon_pole is not None else self.lon_pole
-
+        # If we are out of bounds of the lookup table return a constant model
         fill_val = np.nan
-        if isinstance(crpix, u.Quantity):
-            fill_val = np.nan * u.deg
         if (np.array(ind) > np.array(self.table_shape) - 1).any() or (np.array(ind) < 0).any():
             return m.Const1D(fill_val) & m.Const1D(fill_val)
 
-        return generate_celestial_transform(
+        # The self._transform is always unitless and always in degrees.
+        # So we need to strip down the parameters to be in the correct units
+
+        # If we are being called from inside evaluate we can skip the lookup
+        # but we have to handle both dimensionless and unitful parameters
+        if crpix is None:
+            if self.crpix.unit is not None:
+                crpix = u.Quantity(self.crpix)
+            else:
+                crpix = self.crpix.value
+        if cdelt is None:
+            if self.cdelt.unit is not None:
+                cdelt = u.Quantity(self.cdelt)
+            else:
+                cdelt = self.cdelt.value
+        if lon_pole is None:
+            if self.lon_pole.unit is not None:
+                lon_pole = u.Quantity(self.lon_pole)
+            else:
+                lon_pole = self.lon_pole.value
+
+        if isinstance(self.pc_table, u.Quantity):
+            pc = self.pc_table[ind].to_value(u.pix)
+        else:
+            pc = self.pc_table[ind]
+
+        if isinstance(self.crval_table, u.Quantity):
+            crval = self.crval_table[ind].to_value(u.deg)
+        else:
+            crval = self.crval_table[ind]
+
+        if isinstance(crpix, u.Quantity):
+            crpix = crpix.to_value(u.pix)
+
+        if isinstance(cdelt, u.Quantity):
+            cdelt = cdelt.to_value(u.deg / u.pix)
+
+        if isinstance(lon_pole, u.Quantity):
+            lon_pole = lon_pole.to_value(u.deg)
+
+        return update_celestial_transform_parameters(
+            self._transform,
             crpix=crpix,
             cdelt=cdelt,
-            pc=self.pc_table[ind],
-            crval=self.crval_table[ind],
+            pc=pc,
+            crval=crval,
             lon_pole=lon_pole,
-            projection=self.projection,
         )
-
 
     def _map_transform(self, *arrays, crpix, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
@@ -216,13 +306,13 @@ class BaseVaryingCelestialTransform(Model, ABC):
         for barray in barrays[2:]:
             inds.append(self.sanitize_index(barray))
 
-        # Generate output arrays (ignore units for simplicity)
         if isinstance(barrays[0], u.Quantity):
-            x_out = np.empty_like(barrays[0].value)
-            y_out = np.empty_like(barrays[1].value)
-        else:
-            x_out = np.empty_like(barrays[0])
-            y_out = np.empty_like(barrays[1])
+            # Because we have set input_units_strict to True we can assume that
+            # all inputs have the correct units for the transform
+            arrays = [arr.value for arr in barrays]
+
+        x_out = np.empty_like(arrays[0])
+        y_out = np.empty_like(arrays[1])
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
@@ -238,19 +328,20 @@ class BaseVaryingCelestialTransform(Model, ABC):
             else:
                 mask = masks[0]
             if inverse:
-                xx, yy = sct.inverse(barrays[0][mask], barrays[1][mask])
+                xx, yy = sct.inverse(arrays[0][mask], arrays[1][mask])
             else:
-                xx, yy = sct(barrays[0][mask], barrays[1][mask])
+                xx, yy = sct(arrays[0][mask], arrays[1][mask])
 
-            if isinstance(xx, u.Quantity):
-                x_out[mask], y_out[mask] = xx.value, yy.value
+            x_out[mask], y_out[mask] = xx, yy
+
+        # Put the units back if we started with some
+        if isinstance(barrays[0], u.Quantity):
+            if self._is_inverse:
+                x_out = x_out << u.pix
+                y_out = y_out << u.pix
             else:
-                x_out[mask], y_out[mask] = xx, yy
-
-        # Put the units back
-        if isinstance(xx, u.Quantity):
-            x_out = x_out << xx.unit
-            y_out = y_out << yy.unit
+                x_out = x_out << u.deg
+                y_out = y_out << u.deg
 
         return x_out, y_out
 
