@@ -25,15 +25,13 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers, large_visp_dataset):
     benchmark(ds.wcs.pixel_to_world_values, *pxcoords)
 
 
-def plot_and_save_fig(ds, axes):
-    ds.plot(plot_axes=axes)
-    plt.savefig("tmpplot")
-    plt.close()
-
-
 @pytest.mark.benchmark
 @pytest.mark.parametrize("axes", [
-    [None, "y", "x", None],
+    ["y", None, None, "x"],
 ])
 def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
-    benchmark.pedantic(plot_and_save_fig, args=[visp_dataset_no_headers, axes], rounds=1, iterations=1)
+    @benchmark
+    def plot_and_save_fig(ds=visp_dataset_no_headers, axes=axes):
+        ds.plot(plot_axes=axes)
+        plt.savefig("tmpplot")
+        plt.close()
