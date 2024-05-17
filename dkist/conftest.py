@@ -329,3 +329,12 @@ def large_visp_dataset(large_visp_dataset_file):
     # dataset_from_fits(vispdir, "test_visp.asdf")
 
     return load_dataset(large_visp_dataset_file)
+
+
+@pytest.fixture(scope="session")
+def visp_dataset_no_headers(tmp_path_factory):
+    vispdir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "visp_no_headers.asdf.gz", mode="rb") as gfo:
+        with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(vispdir / "test_visp_no_headers.asdf")
