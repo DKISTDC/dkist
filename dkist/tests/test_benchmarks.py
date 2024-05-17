@@ -27,7 +27,7 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers, large_visp_dataset):
 
 @pytest.mark.benchmark
 @pytest.mark.parametrize("axes", [
-    ["y", None, None, "x"],
+    [None, "y", "x", None],
 ])
 def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
     @benchmark
