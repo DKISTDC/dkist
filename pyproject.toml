@@ -85,6 +85,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
+exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
 write_to = "dkist/_version.py"
