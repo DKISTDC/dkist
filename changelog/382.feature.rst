@@ -1,1 +1,0 @@
-Add GitHub workflow and dependencies for Codspeed, to benchmark PRs against main.

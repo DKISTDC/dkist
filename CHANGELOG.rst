@@ -1,3 +1,20 @@
+1.6.0 (2024-05-20)
+==================
+
+Features
+--------
+
+- Update ASDF schemas for upcoming ASDF standard 1.6.0. (`#324 <https://github.com/DKISTDC/dkist/pull/324>`_)
+- Improve performance of ``VaryingCelestialTransform`` classes by not creating a new transform for every set of parameters but instead update the parameters on a single model. (`#370 <https://github.com/DKISTDC/dkist/pull/370>`_)
+- Add GitHub workflow and dependencies for Codspeed, to benchmark PRs against main. (`#382 <https://github.com/DKISTDC/dkist/pull/382>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Run plotting benchmarks fewer times for more manageable CI, and add a benchmark for generate_celestial_transform. (`#383 <https://github.com/DKISTDC/dkist/pull/383>`_)
+
+
 1.5.0 (2024-04-03)
 ==================
 
