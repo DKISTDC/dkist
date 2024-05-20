@@ -11,7 +11,7 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
-def test_pixel_to_world(benchmark, visp_dataset_no_headers, large_visp_dataset):
+def test_pixel_to_world(benchmark, visp_dataset_no_headers):
     ds = visp_dataset_no_headers
     # pxcoords2 = []
     # for size in ds2.wcs.pixel_shape:
