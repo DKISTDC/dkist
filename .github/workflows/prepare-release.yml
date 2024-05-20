@@ -130,12 +130,13 @@ jobs:
         id: create-release
         with:
           script: |
+            let changelog = steps.markdown-changelog.outputs.content.replace(/`/g, '\\`');
             return await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: "v${{ inputs.version }}",
               name: "v${{ inputs.version }}",
-              body: `${{ steps.markdown-changelog.outputs.content }}`,
+              body: `${{ changelog }}`,
               draft: true,
               prerelease: ${{ inputs.pre_release }}
             });
