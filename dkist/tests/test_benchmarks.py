@@ -20,9 +20,9 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 def test_pixel_to_world(benchmark, visp_dataset_no_headers):
     ds = visp_dataset_no_headers
 
-    pxcoords = np.mgrid[:ds.wcs.pixel_shape[0]:5,
-                        :ds.wcs.pixel_shape[1]:5,
-                        :ds.wcs.pixel_shape[2]:5,
+    pxcoords = np.mgrid[:ds.wcs.pixel_shape[0]:50,
+                        :ds.wcs.pixel_shape[1]:50,
+                        :ds.wcs.pixel_shape[2]:50,
                         :ds.wcs.pixel_shape[3]:5]
 
     benchmark(ds.wcs.pixel_to_world_values, *pxcoords)
