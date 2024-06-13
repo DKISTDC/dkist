@@ -125,4 +125,4 @@ class FitsioFITSLoader(BaseFITSLoader):
         data = fitsio.read(self.absolute_uri)
         log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
-        return data
+        return data[slc]
