@@ -13,7 +13,7 @@ class FileManagerConverter(Converter):
 
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.io.file_manager import FileManager
-        from dkist.io.loaders import AstropyFITSLoader
+        from dkist.io.loaders import FitsioFITSLoader
 
         url = urlparse(ctx.url or ".")
         if url.scheme not in ("file", ""):
@@ -29,7 +29,7 @@ class FileManagerConverter(Converter):
                                               node["datatype"],
                                               node["shape"],
                                               chunksize=node.get("chunksize", None),
-                                              loader=AstropyFITSLoader,
+                                              loader=FitsioFITSLoader,
                                               basepath=base_path)
 
     def to_yaml_tree(self, obj, tag, ctx):

@@ -12,7 +12,7 @@ from asdf.testing.helpers import roundtrip_object
 import dkist
 from dkist.data.test import rootdir
 from dkist.io import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.loaders import FitsioFITSLoader
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def tagobj(request):
 @pytest.fixture
 def file_manager():
     return FileManager.from_parts(["test1.fits", "test2.fits"], 0, "float", (10, 10),
-                                  loader=AstropyFITSLoader)
+                                  loader=FitsioFITSLoader)
 
 
 def test_roundtrip_file_manager(file_manager):
