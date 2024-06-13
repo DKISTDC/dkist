@@ -6,6 +6,7 @@ minimise (virtual) memory usage and the number of open files.
 import abc
 from pathlib import Path
 
+import fitsio
 import numpy as np
 
 from astropy.io import fits
@@ -14,7 +15,7 @@ from sunpy.util.decorators import add_common_docstring
 
 from dkist import log
 
-__all__ = ["BaseFITSLoader", "AstropyFITSLoader"]
+__all__ = ["BaseFITSLoader", "AstropyFITSLoader", "FitsioFITSLoader"]
 
 
 common_parameters = """
@@ -107,3 +108,21 @@ class AstropyFITSLoader(BaseFITSLoader):
                 return hdu.section[slc]
 
             return hdu.data[slc]
+
+@add_common_docstring(append=common_parameters)
+class FitsioFITSLoader(BaseFITSLoader):
+    """
+    Resolve an `~asdf.ExternalArrayReference` to a FITS file using `fitsio`.
+    """
+
+    def __getitem__(self, slc):
+        if not self.absolute_uri.exists():
+            log.debug("File %s does not exist.", self.absolute_uri)
+            # Use np.broadcast_to to generate an array of the correct size, but
+            # which only uses memory for one value.
+            return np.broadcast_to(np.nan, self.shape) * np.nan
+
+        data = fitsio.read(self.absolute_uri)
+        log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
+
+        return data
