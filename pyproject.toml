@@ -48,7 +48,6 @@ tests = [
   "pytest-doctestplus",
   "pytest-cov",
   "pytest-remotedata",
-  "pytest-cov",
   "pytest-mock",
   "pytest-mpl",
   "pytest-httpserver",
@@ -85,6 +84,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
+exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
 write_to = "dkist/_version.py"
