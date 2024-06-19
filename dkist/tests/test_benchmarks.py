@@ -35,8 +35,6 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
 
 
 @pytest.mark.benchmark
-def test_dataset_compute_data(benchmark, visp_dataset_no_headers):
-    slice_ = np.s_[:, :50, :50, :50]
-    data = visp_dataset_no_headers.data[slice_]
+def test_dataset_compute_data(benchmark, small_visp_dataset):
 
-    benchmark(data.compute)
+    benchmark(small_visp_dataset.data.compute)
