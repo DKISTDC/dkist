@@ -11,11 +11,8 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
-def test_pixel_to_world(benchmark, visp_dataset_no_headers, large_visp_dataset):
+def test_pixel_to_world(benchmark, visp_dataset_no_headers):
     ds = visp_dataset_no_headers
-    # pxcoords2 = []
-    # for size in ds2.wcs.pixel_shape:
-    #     pxcoords2.append(np.arange(size))
 
     pxcoords = np.mgrid[:ds.wcs.pixel_shape[0]:50,
                         :ds.wcs.pixel_shape[1]:50,
@@ -35,3 +32,9 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
         ds.plot(plot_axes=axes)
         plt.savefig("tmpplot")
         plt.close()
+
+
+@pytest.mark.benchmark
+def test_dataset_compute_data(benchmark, small_visp_dataset):
+
+    benchmark(small_visp_dataset.data.compute)
