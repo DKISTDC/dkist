@@ -77,7 +77,7 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
 
 
 def _key_clean(key):
-    key = re.sub("[%s]" % re.escape(string.punctuation), "_", key)
+    key = re.sub(f"[{re.escape(string.punctuation)}]", "_", key)
     key = key.replace(" ", "_")
     key = "".join(char for char in key
                     if char.isidentifier() or char.isnumeric())
