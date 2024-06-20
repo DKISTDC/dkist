@@ -341,9 +341,6 @@ def visp_dataset_no_headers(tmp_path_factory):
 
 
 @pytest.fixture
-def large_visp_dataset_file(tmp_path_factory):
-    vispdir = tmp_path_factory.mktemp("data")
-    with gzip.open(Path(rootdir) / "small_real_visp" / "small_real_visp.asdf.gz", mode="rb") as gfo:
-        with open(vispdir / "test_visp.asdf", mode="wb") as afo:
-            afo.write(gfo.read())
-    return vispdir / "test_visp.asdf"
+def real_visp(tmp_path_factory):
+    vispdir = Path.home() / "dkist_data" / "BKPLX"
+    return load_dataset(vispdir)
