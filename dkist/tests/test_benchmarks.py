@@ -36,5 +36,5 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
 
 @pytest.mark.benchmark
 def test_dataset_compute_data(benchmark, real_visp):
-
-    benchmark(real_visp.data.compute)
+    ds = real_visp[0, :5]
+    benchmark(ds.data.compute)
