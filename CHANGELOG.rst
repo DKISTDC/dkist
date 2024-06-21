@@ -378,7 +378,7 @@ Bug Fixes
 Trivial/Internal Changes
 ------------------------
 
-- Migate to the asdf 2.8+ ``Converter`` interface, this bumps various
+- Migrate to the asdf 2.8+ ``Converter`` interface, this bumps various
   dependencies but should have no effect on reading or writing asdf files. (`#152 <https://github.com/DKISTDC/dkist/pull/152>`_)
 
 

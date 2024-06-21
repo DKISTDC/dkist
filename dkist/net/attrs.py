@@ -301,10 +301,10 @@ class BoundingBox(_DataAttr):
         bottom_left = bottom_left.transform_to(_Helioprojective(observer="earth"))
         top_right = top_right.transform_to(_Helioprojective(observer="earth"))
 
-        self.hpc_bounding_box_arcsec = ((bottom_left.Tx.to_value(_u.arcsec),
-                                         bottom_left.Ty.to_value(_u.arcsec)),
-                                        (top_right.Tx.to_value(_u.arcsec),
-                                         top_right.Ty.to_value(_u.arcsec)))
+        self.hpc_bounding_box_arcsec = ((float(bottom_left.Tx.to_value(_u.arcsec)),
+                                         float(bottom_left.Ty.to_value(_u.arcsec))),
+                                        (float(top_right.Tx.to_value(_u.arcsec)),
+                                         float(top_right.Ty.to_value(_u.arcsec))))
 
         self.search_type = search
 
