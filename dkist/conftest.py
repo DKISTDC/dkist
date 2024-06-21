@@ -22,7 +22,7 @@ from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.loaders import FitsioFITSLoader
 
 
 @pytest.fixture
@@ -232,7 +232,7 @@ def dataset(array, identity_gwcs):
     # Construct the filename here as a scalar array to make sure that works as
     # it's what dkist-inventory does
     ds._file_manager = FileManager.from_parts(np.array("test1.fits"), 0, "float", array.shape,
-                                              loader=AstropyFITSLoader)
+                                              loader=FitsioFITSLoader)
 
     return ds
 
@@ -338,3 +338,9 @@ def visp_dataset_no_headers(tmp_path_factory):
         with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
+
+
+@pytest.fixture(scope="session")
+def real_visp(tmp_path_factory):
+    vispdir = Path.home() / "dkist_data" / "BKPLX"
+    return load_dataset(vispdir)

@@ -8,7 +8,7 @@ import asdf
 
 from dkist.data.test import rootdir
 from dkist.io.file_manager import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.loaders import FitsioFITSLoader
 
 eitdir = Path(rootdir) / "EIT"
 
@@ -34,7 +34,7 @@ def relative_ac(relative_ear):
                                   relative_ear.target,
                                   relative_ear.dtype,
                                   relative_ear.shape,
-                                  loader=AstropyFITSLoader,
+                                  loader=FitsioFITSLoader,
                                   basepath=eitdir)
 
 
@@ -49,7 +49,7 @@ def absolute_ac(absolute_ear):
                                   absolute_ear.target,
                                   absolute_ear.dtype,
                                   absolute_ear.shape,
-                                  loader=AstropyFITSLoader,
+                                  loader=FitsioFITSLoader,
                                   basepath=eitdir)
 
 
