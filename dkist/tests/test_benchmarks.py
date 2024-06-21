@@ -40,3 +40,11 @@ def test_dataset_compute_data_full_files(benchmark, real_visp):
     benchmark(ds.data.compute)
 
     assert not np.isnan(ds.data.compute()).any()
+
+
+@pytest.mark.benchmark
+def test_dataset_compute_data_partial_files(benchmark, real_visp):
+    ds = real_visp[0, :15, :100, :100]
+    benchmark(ds.data.compute)
+
+    assert not np.isnan(ds.data.compute()).any()
