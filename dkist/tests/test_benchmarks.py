@@ -38,3 +38,5 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
 def test_dataset_compute_data_full_files(benchmark, real_visp):
     ds = real_visp[0, :15]
     benchmark(ds.data.compute)
+
+    assert not np.isnan(ds.data.compute()).any()
