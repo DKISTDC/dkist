@@ -15,7 +15,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install .[tests] pytest-codspeed fitsio
+      - run: python -m pip install .[tests] pytest-codspeed 'numpy<2' fitsio
+      - run: |
+          parfive https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/BKPLX_stokesI.tar
+          mkdir -p $HOME/dkist_data/BKPLX
+          tar -xv -f BKPLX_stokesI.tar --directory $HOME/dkist_data/BKPLX
       - name: Run benchmarks
         uses: CodspeedHQ/action@v2
         with:
