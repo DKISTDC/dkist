@@ -10,6 +10,13 @@ __all__ = ["dataset_info_str"]
 
 
 def dataset_info_str(ds):
+    # Check for an attribute that only appears on TiledDataset
+    # Not using isinstance to avoid circular import
+    is_tiled = hasattr(ds, "combined_headers")
+    dstype = type(ds).__name__
+    if is_tiled:
+        tile_shape = ds.shape
+        ds = ds[0, 0]
     wcs = ds.wcs.low_level_wcs
 
     # Pixel dimensions table
@@ -18,7 +25,11 @@ def dataset_info_str(ds):
     if instr:
         instr += " "
 
-    s = f"This {instr}Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions\n\n"
+    if is_tiled:
+        s = f"This {dstype} consists of an array of {tile_shape} Dataset objects\n\n"
+        s += f"Each {instr}Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions\n\n"
+    else:
+        s = f"This {instr}Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions\n\n"
     s += f"{ds.data}\n\n"
 
     array_shape = wcs.array_shape or (0,)
