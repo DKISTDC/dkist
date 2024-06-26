@@ -4,6 +4,7 @@ import urllib
 import datetime as dt
 import importlib.resources
 from pathlib import Path
+from urllib.error import URLError
 
 import platformdirs
 
@@ -105,6 +106,11 @@ def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_er
     try:
         _fetch_values_to_file(user_file, timeout=timeout)
         success = True
+    except URLError as urlerr:
+        # If the new file isn't downloaded just because of no internet access then keep the old one
+        log.warning("Unable to attempt download. Previous attrs file will be kept but may be outdated.")
+
+        return success
     except Exception as err:
         log.error("Failed to download new attrs values.")
         log.debug(str(err))
