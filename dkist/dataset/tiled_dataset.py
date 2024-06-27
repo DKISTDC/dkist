@@ -128,7 +128,7 @@ class TiledDataset(Collection):
     def plot(self):
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
-            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1)#, projection=tile.wcs)
+            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
             ax.set_title(f"MINDEX1={tile.headers[0]['MINDEX1']}, MINDEX2={tile.headers[0]['MINDEX2']}")
             tile.plot(axes=ax)
 
