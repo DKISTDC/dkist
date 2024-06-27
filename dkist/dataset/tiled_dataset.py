@@ -127,6 +127,13 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
+    @property
+    def tiles_shape(self):
+        """
+        The shape of each individual tile in the TiledDataset.
+        """
+        return [[tile.shape for tile in row] for row in self]
+
     def plot(self, slice_index: int, share_zscale=False, **kwargs):
         vmin, vmax = np.inf, 0
         fig = plt.figure()
