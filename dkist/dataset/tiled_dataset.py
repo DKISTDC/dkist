@@ -125,12 +125,12 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
-    def plot(self):
+    def plot(self, slice_index: int):
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
-            ax.set_title(f"MINDEX1={tile.headers[0]['MINDEX1']}, MINDEX2={tile.headers[0]['MINDEX2']}")
-            tile[0].plot(axes=ax)
+            ax.set_title(f"MINDEX1={tile.headers[slice_index]['MINDEX1']}, MINDEX2={tile.headers[slice_index]['MINDEX2']}")
+            tile[slice_index].plot(axes=ax)
             if i != 3:
                 ax.set_ylabel(" ")
             if i != 7:
