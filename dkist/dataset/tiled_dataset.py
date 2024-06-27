@@ -7,6 +7,7 @@ not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
 from collections.abc import Collection
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from astropy.table import vstack
@@ -124,5 +125,16 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
-    # TODO: def plot()
+    def plot(self, slice_index: int, **kwargs):
+        fig = plt.figure()
+        for i, tile in enumerate(self.flat):
+            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
+            ax.set_title(f"MINDEX1={tile.headers[slice_index]['MINDEX1']}, MINDEX2={tile.headers[slice_index]['MINDEX2']}")
+            tile[slice_index].plot(axes=ax, **kwargs)
+            if i != 3:
+                ax.set_ylabel(" ")
+            if i != 7:
+                ax.set_xlabel(" ")
+        return fig
+
     # TODO: def regrid()
