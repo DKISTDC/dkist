@@ -67,3 +67,8 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
         assert ds.meta["headers"] is headers
+
+
+def test_repr(simple_tiled_dataset):
+    r = repr(simple_tiled_dataset)
+    assert str(simple_tiled_dataset[0, 0].data) in r
