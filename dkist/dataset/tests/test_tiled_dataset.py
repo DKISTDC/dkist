@@ -28,6 +28,14 @@ def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
     assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
 
 
+@pytest.mark.parametrize("aslice", [np.s_[0, :100, 100:200]])
+def test_tiled_dataset_slice_tiles(large_tiled_dataset, aslice):
+    sliced = large_tiled_dataset.slice_tiles(aslice)
+    for i, tile in enumerate(sliced.flat):
+        # This will throw an AttributeError if you do tile.shape and I don't know why
+        assert tile.data.shape == (100, 100)
+
+
 def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
     assert len(simple_tiled_dataset.combined_headers) == len(dataset.meta["headers"]) * 4
     assert simple_tiled_dataset.combined_headers.colnames == dataset.meta["headers"].colnames
