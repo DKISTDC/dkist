@@ -83,3 +83,7 @@ def test_tileddataset_plot(share_zscale):
     fig = plt.figure(figsize=(600, 800))
     ds.plot(0, share_zscale=share_zscale)
     return plt.gcf()
+
+def test_repr(simple_tiled_dataset):
+    r = repr(simple_tiled_dataset)
+    assert str(simple_tiled_dataset[0, 0].data) in r
