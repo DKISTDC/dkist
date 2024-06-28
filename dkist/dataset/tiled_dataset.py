@@ -160,6 +160,13 @@ class TiledDataset(Collection):
         fig.suptitle(f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
 
+    def slice_tiles(self, slice_):
+        new_data = np.empty_like(self._data)
+        for i, row in enumerate(self._data):
+            for j, tile in enumerate(row):
+                new_data[i, j] = self[i, j][slice_]
+        return type(self)(new_data, self.inventory)
+
     # TODO: def regrid()
 
     def __repr__(self):
