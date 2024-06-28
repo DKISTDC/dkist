@@ -133,6 +133,13 @@ class TiledDataset(Collection):
         """
         return [[tile.shape for tile in row] for row in self]
 
+    def slice_tiles(self, slice_):
+        new_data = np.empty_like(self._data)
+        for i, row in enumerate(self._data):
+            for j, tile in enumerate(row):
+                new_data[i, j] = self[i, j][slice_]
+        return type(self)(new_data, self.inventory)
+
     # TODO: def plot()
     # TODO: def regrid()
 
