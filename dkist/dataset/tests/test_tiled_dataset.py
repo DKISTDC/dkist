@@ -72,3 +72,7 @@ def test_tiled_dataset_from_components(dataset):
 def test_repr(simple_tiled_dataset):
     r = repr(simple_tiled_dataset)
     assert str(simple_tiled_dataset[0, 0].data) in r
+
+
+def test_tiles_shape(simple_tiled_dataset):
+    assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]
