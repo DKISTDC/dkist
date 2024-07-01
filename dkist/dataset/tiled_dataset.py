@@ -131,7 +131,7 @@ class TiledDataset(Collection):
         """
         The shape of each individual tile in the TiledDataset.
         """
-        return [[tile.shape for tile in row] for row in self]
+        return [[tile.data.shape for tile in row] for row in self]
 
     def slice_tiles(self, slice_):
         new_data = np.empty_like(self._data)
