@@ -87,3 +87,7 @@ def test_tileddataset_plot(share_zscale):
 def test_repr(simple_tiled_dataset):
     r = repr(simple_tiled_dataset)
     assert str(simple_tiled_dataset[0, 0].data) in r
+
+
+def test_tiles_shape(simple_tiled_dataset):
+    assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]
