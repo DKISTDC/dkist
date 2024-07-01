@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+from textwrap import dedent
 from collections.abc import Collection
 
 import numpy as np
@@ -12,6 +13,7 @@ import numpy as np
 from astropy.table import vstack
 
 from .dataset import Dataset
+from .utils import dataset_info_str
 
 __all__ = ["TiledDataset"]
 
@@ -124,5 +126,29 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
+    @property
+    def tiles_shape(self):
+        """
+        The shape of each individual tile in the TiledDataset.
+        """
+        return [[tile.data.shape for tile in row] for row in self]
+
+    def slice_tiles(self, slice_):
+        new_data = np.empty_like(self._data)
+        for i, row in enumerate(self._data):
+            for j, tile in enumerate(row):
+                new_data[i, j] = self[i, j][slice_]
+        return type(self)(new_data, self.inventory)
+
     # TODO: def plot()
     # TODO: def regrid()
+
+    def __repr__(self):
+        """
+        Overload the NDData repr because it does not play nice with the dask delayed io.
+        """
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
+
+    def __str__(self):
+        return dataset_info_str(self)
