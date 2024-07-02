@@ -84,7 +84,7 @@ def _key_clean(key):
     return key.lower()
 
 
-def path_format_keys(keymap):
+def path_format_keys(keymap=INVENTORY_KEY_MAP):
     """
     Return a list of all valid keys for path formatting.
     """
