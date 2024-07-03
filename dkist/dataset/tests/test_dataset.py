@@ -65,16 +65,11 @@ def test_wcs_roundtrip_3d(dataset_3d):
     assert_quantity_allclose(p[2], p2[2])
 
 
-def test_dimensions(dataset, dataset_3d):
-    for ds in [dataset, dataset_3d]:
-        assert_quantity_allclose(ds.dimensions, ds.data.shape*u.pix)
-
-
 def test_load_from_directory():
     ds = load_dataset(rootdir / "EIT")
     assert isinstance(ds.data, da.Array)
     assert isinstance(ds.wcs, gwcs.WCS)
-    assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+    assert_quantity_allclose(ds.data.shape, (11, 128, 128))
     assert ds.files.basepath == Path(rootdir / "EIT")
 
 
@@ -99,14 +94,14 @@ def test_load_with_old_methods():
         ds = Dataset.from_directory(rootdir / "EIT")
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
-        assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+        assert_quantity_allclose(ds.data.shape, (11, 128, 128))
         assert ds.files.basepath == Path(rootdir / "EIT")
 
     with pytest.warns(DKISTDeprecationWarning):
         ds = Dataset.from_asdf(rootdir / "EIT" / "eit_test_dataset.asdf")
         assert isinstance(ds.data, da.Array)
         assert isinstance(ds.wcs, gwcs.WCS)
-        assert_quantity_allclose(ds.dimensions, (11, 128, 128)*u.pix)
+        assert_quantity_allclose(ds.data.shape, (11, 128, 128))
         assert ds.files.basepath == Path(rootdir / "EIT")
 
 
