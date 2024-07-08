@@ -131,10 +131,16 @@ class TiledDataset(Collection):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
             ax.set_title(f"MINDEX1={tile.headers[slice_index]['MINDEX1']}, MINDEX2={tile.headers[slice_index]['MINDEX2']}")
             tile[slice_index].plot(axes=ax, **kwargs)
-            if i != 3:
-                ax.set_ylabel(" ")
-            if i != 7:
-                ax.set_xlabel(" ")
+            if i == 0:
+                xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
+                ylabel = ax.coords[1].get_axislabel() or ax.coords[1]._get_default_axislabel()
+                for coord in ax.coords:
+                    if "b" in coord.axislabels.get_visible_axes():
+                        fig.supxlabel(xlabel, y=0.05)
+                    if "l" in coord.axislabels.get_visible_axes():
+                        fig.supylabel(ylabel, x=0.05)
+            ax.set_ylabel(" ")
+            ax.set_xlabel(" ")
         return fig
 
     # TODO: def regrid()
