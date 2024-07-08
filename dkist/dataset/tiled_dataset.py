@@ -129,7 +129,6 @@ class TiledDataset(Collection):
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
-            ax.set_title(f"MINDEX1={tile.headers[slice_index]['MINDEX1']}, MINDEX2={tile.headers[slice_index]['MINDEX2']}")
             tile[slice_index].plot(axes=ax, **kwargs)
             if i == 0:
                 xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
@@ -141,6 +140,8 @@ class TiledDataset(Collection):
                         fig.supylabel(ylabel, x=0.05)
             ax.set_ylabel(" ")
             ax.set_xlabel(" ")
+        timestamp = self[0, 0].axis_world_coords(0)[-1].iso[slice_index]
+        fig.suptitle(f"TiledDataset {self.inventory['datasetId']} at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
 
     # TODO: def regrid()
