@@ -125,7 +125,8 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
-    def plot(self, slice_index: int, **kwargs):
+    def plot(self, slice_index: int, share_scale=False, **kwargs):
+        vmin, vmax = np.inf, 0
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
@@ -138,8 +139,14 @@ class TiledDataset(Collection):
                         fig.supxlabel(xlabel, y=0.05)
                     if "l" in coord.axislabels.get_visible_axes():
                         fig.supylabel(ylabel, x=0.05)
+            axmin, axmax = ax.get_images()[0].get_clim()
+            vmin = axmin if axmin < vmin else vmin
+            vmax = axmax if axmax > vmax else vmax
             ax.set_ylabel(" ")
             ax.set_xlabel(" ")
+        if share_scale:
+            for ax in fig.get_axes():
+                ax.get_images()[0].set_clim(vmin, vmax)
         timestamp = self[0, 0].axis_world_coords(0)[-1].iso[slice_index]
         fig.suptitle(f"TiledDataset {self.inventory['datasetId']} at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
