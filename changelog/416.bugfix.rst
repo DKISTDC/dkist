@@ -1,0 +1,1 @@
+Fix an issue which triggered dask to use a very slow code path when stacking arrays of FITS files.
