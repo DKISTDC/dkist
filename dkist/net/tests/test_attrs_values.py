@@ -125,7 +125,7 @@ def test_attempt_local_update_error_download(mocker, caplog_dkist, tmp_homedir, 
         success = attempt_local_update(silence_net_errors=False)
 
 
-def _definately_not_json(timeout):
+def _definitely_not_json(timeout):
     return b"alskdjalskdjaslkdj!!"
 
 
@@ -133,7 +133,7 @@ def test_attempt_local_update_fail_invalid_json(mocker, user_file, tmp_path, cap
     # test that the file is removed after
     json_file = tmp_path / "api_search_values.json"
     mocker.patch("dkist.net.attrs_values._fetch_values",
-                 new_callable=lambda: _definately_not_json)
+                 new_callable=lambda: _definitely_not_json)
     with pytest.raises(UserCacheMissing):
         success = attempt_local_update(user_file=json_file)
 
