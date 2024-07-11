@@ -57,4 +57,4 @@ def loader_to_dask(loader_array, chunksize):
 
     to_array = partial(_partial_to_array, meta=meta, chunks=chunksize)
 
-    return map(to_array, loader_array)
+    return list(map(to_array, loader_array))
