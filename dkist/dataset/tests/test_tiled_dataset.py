@@ -1,5 +1,6 @@
 import copy
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
@@ -59,3 +60,10 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
         assert ds.meta["headers"] is headers
+
+
+@pytest.mark.mpl_image_compare
+@pytest.mark.parametrize("share_scale", [True, False])
+def test_plot(large_tiled_dataset, share_scale):
+    large_tiled_dataset.plot(0, share_scale=share_scale)
+    return plt.gcf()
