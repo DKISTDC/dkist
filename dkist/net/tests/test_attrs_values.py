@@ -5,6 +5,7 @@ import logging
 import datetime
 import importlib
 from platform import system
+from urllib.error import URLError
 
 import platformdirs
 import pytest
@@ -12,7 +13,7 @@ import pytest
 from sunpy.net import attrs as a
 
 import dkist.data
-from dkist.net.attrs_values import (_fetch_values_to_file, _get_cached_json,
+from dkist.net.attrs_values import (UserCacheMissing, _fetch_values, _get_cached_json,
                                     attempt_local_update, get_search_attrs_values)
 
 PACKAGE_FILE = importlib.resources.files(dkist.data) / "api_search_values.json"
@@ -79,31 +80,25 @@ def test_get_cached_json_local_not_quite_out_of_date(tmp_homedir, values_in_home
 
 
 @pytest.mark.remote_data
-def test_fetch_values_to_file(tmp_path):
-    json_file = tmp_path / "api_search_values.json"
+def test_fetch_values_to_file():
+    data = _fetch_values()
+    assert isinstance(data, bytes)
 
-    assert json_file.exists() is False
-    _fetch_values_to_file(json_file)
-    assert json_file.exists() is True
-
-    # Check we can load the file as json and it looks very roughly like what we
-    # would expect from the API response
-    with open(json_file) as f:
-        data = json.load(f)
-    assert "parameterValues" in data.keys()
-    assert isinstance(data["parameterValues"], list)
+    jdata = json.loads(data)
+    assert "parameterValues" in jdata.keys()
+    assert isinstance(jdata["parameterValues"], list)
 
 
-def _local_fetch_values(user_file, *, timeout):
-    user_file.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(PACKAGE_FILE, user_file)
+def _local_fetch_values(timeout):
+    with open(PACKAGE_FILE, "rb") as fobj:
+        return fobj.read()
 
 
 def test_attempt_local_update(mocker, tmp_path, caplog_dkist):
     json_file = tmp_path / "api_search_values.json"
-    mocker.patch("dkist.net.attrs_values._fetch_values_to_file",
+    mocker.patch("dkist.net.attrs_values._fetch_values",
                  new_callable=lambda: _local_fetch_values)
-    success = attempt_local_update(user_file=json_file, silence_errors=False)
+    success = attempt_local_update(user_file=json_file, silence_net_errors=False)
     assert success
 
     assert caplog_dkist.record_tuples == [
@@ -116,39 +111,50 @@ def raise_error(*args, **kwargs):
 
 
 def test_attempt_local_update_error_download(mocker, caplog_dkist, tmp_homedir, user_file):
-    mocker.patch("dkist.net.attrs_values._fetch_values_to_file",
+    mocker.patch("dkist.net.attrs_values._fetch_values",
                  side_effect=raise_error)
-    success = attempt_local_update(silence_errors=True)
+    success = attempt_local_update(silence_net_errors=True)
     assert not success
 
     assert caplog_dkist.record_tuples == [
         ("dkist", logging.INFO, f"Fetching updated search values for the DKIST client to {user_file}"),
-        ("dkist", logging.ERROR, "Failed to download new attrs values."),
+        ("dkist", logging.ERROR, "Failed to download new dkist attrs values. attr values for dkist may be outdated."),
     ]
 
     with pytest.raises(ValueError, match="This is a value error"):
-        success = attempt_local_update(silence_errors=False)
+        success = attempt_local_update(silence_net_errors=False)
 
 
-def _definately_not_json(user_file, *, timeout):
-    with open(user_file, "w") as f:
-        f.write("This is not json")
+def _definately_not_json(timeout):
+    return b"alskdjalskdjaslkdj!!"
 
 
-def test_attempt_local_update_fail_invalid_download(mocker, tmp_path, caplog_dkist):
+def test_attempt_local_update_fail_invalid_json(mocker, user_file, tmp_path, caplog_dkist):
+    # test that the file is removed after
     json_file = tmp_path / "api_search_values.json"
-    mocker.patch("dkist.net.attrs_values._fetch_values_to_file",
+    mocker.patch("dkist.net.attrs_values._fetch_values",
                  new_callable=lambda: _definately_not_json)
-    success = attempt_local_update(user_file=json_file, silence_errors=True)
-    assert not success
+    with pytest.raises(UserCacheMissing):
+        success = attempt_local_update(user_file=json_file)
 
-    assert caplog_dkist.record_tuples == [
-        ("dkist", logging.INFO, f"Fetching updated search values for the DKIST client to {json_file}"),
-        ("dkist", logging.ERROR, "Downloaded file is not valid JSON."),
-    ]
+    assert json_file.exists()
 
-    with pytest.raises(json.JSONDecodeError):
-        success = attempt_local_update(user_file=json_file, silence_errors=False)
+
+def test_get_search_attrs_values_fail_invalid_download(mocker, user_file, values_in_home, tmp_path, caplog_dkist):
+    """
+    Given: An existing cache file
+    When: JSON is invalid
+    Then: File is removed, and attr values are still loaded
+    """
+    mocker.patch("dkist.net.attrs_values._fetch_values",
+                 new_callable=lambda: _definately_not_json)
+    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
+    os.utime(user_file, (ten_ago, ten_ago))
+
+    attr_values = get_search_attrs_values()
+    assert not user_file.exists()
+
+    assert {a.Instrument, a.dkist.HeaderVersion, a.dkist.WorkflowName}.issubset(attr_values.keys())
 
 
 @pytest.mark.parametrize(("user_file", "update_needed", "allow_update", "should_update"), [
@@ -172,3 +178,22 @@ def test_get_search_attrs_values(mocker, caplog_dkist, values_in_home, user_file
     assert isinstance(attr_values, dict)
     # Test that some known attrs are in the result
     assert {a.Instrument, a.dkist.HeaderVersion, a.dkist.WorkflowName}.issubset(attr_values.keys())
+
+
+def _fetch_values_urlerror(*args):
+    raise URLError("it hates you")
+
+
+def test_failed_download(mocker, caplog_dkist, user_file, values_in_home):
+    mock = mocker.patch("dkist.net.attrs_values._fetch_values",
+                        new_callable=lambda: _fetch_values_urlerror)
+
+    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
+    os.utime(user_file, (ten_ago, ten_ago))
+
+    attr_values = get_search_attrs_values(allow_update=True)
+
+    assert caplog_dkist.record_tuples == [
+        ("dkist", logging.INFO, f"Fetching updated search values for the DKIST client to {user_file}"),
+        ("dkist", logging.ERROR, "Failed to download new dkist attrs values. attr values for dkist may be outdated."),
+    ]
