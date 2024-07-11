@@ -148,7 +148,7 @@ def test_get_search_attrs_values_fail_invalid_download(mocker, user_file, values
     Then: File is removed, and attr values are still loaded
     """
     mocker.patch("dkist.net.attrs_values._fetch_values",
-                 new_callable=lambda: _definately_not_json)
+                 new_callable=lambda: _definitely_not_json)
     ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
     os.utime(user_file, (ten_ago, ten_ago))
 
