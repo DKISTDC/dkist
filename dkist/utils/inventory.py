@@ -72,7 +72,8 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "headerVersion": "Header Specification Version",
         "headerDocumentationUrl": "Header Documentation URL",
         "infoUrl": "Info URL",
-        "calibrationDocumentationUrl": "Calibration Documentation URL"
+        "calibrationDocumentationUrl": "Calibration Documentation URL",
+        "status": "Status",
 })
 
 
