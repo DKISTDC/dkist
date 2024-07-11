@@ -137,7 +137,8 @@ def test_attempt_local_update_fail_invalid_json(mocker, user_file, tmp_path, cap
     with pytest.raises(UserCacheMissing):
         success = attempt_local_update(user_file=json_file)
 
-    assert json_file.exists()
+    # File should have been deleted if the update has got as far as returning this error
+    assert not json_file.exists()
 
 
 def test_get_search_attrs_values_fail_invalid_download(mocker, user_file, values_in_home, tmp_path, caplog_dkist):
