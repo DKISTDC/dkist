@@ -1,0 +1,1 @@
+Add "status" to the list of know dataset inventory fields.
