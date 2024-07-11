@@ -1,3 +1,18 @@
+1.7.0 (2024-07-11)
+==================
+
+Features
+--------
+
+- Add "status" to the list of know dataset inventory fields. (`#417 <https://github.com/DKISTDC/dkist/pull/417>`_)
+
+
+Bug Fixes
+---------
+
+- Catch URLError when trying to download attr values in tests so that the existing file isn't assumed to be corrupted and therefore deleted. (`#407 <https://github.com/DKISTDC/dkist/pull/407>`_)
+
+
 1.6.0 (2024-05-20)
 ==================
 
