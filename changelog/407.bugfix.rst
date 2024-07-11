@@ -1,1 +1,0 @@
-Catch URLError when trying to download attr values in tests so that the existing file isn't assumed to be corrupted and therefore deleted.
