@@ -37,6 +37,12 @@ INVENTORY_ATTR_MAP = {
 }
 
 
+class UserCacheMissing(Exception):
+    """
+    An exception for when we have deleted the user cache.
+    """
+
+
 def _get_file_age(path: Path) -> dt.timedelta:
     last_modified = dt.datetime.fromtimestamp(path.stat().st_mtime)
     now = dt.datetime.now()
@@ -65,15 +71,19 @@ def _get_cached_json() -> list[Path, bool]:
     return return_file, update_needed
 
 
-def _fetch_values_to_file(filepath: Path, *, timeout: int = 1):
+def _fetch_values(timeout: int = 1) -> bytes:
+    """
+    Make a request for new values.
+
+    This is a separate function mostly for mocking it in the tests.
+    """
     data = urllib.request.urlopen(
         net_conf.dataset_endpoint + net_conf.dataset_search_values_path, timeout=timeout
     )
-    with open(filepath, "wb") as f:
-        f.write(data.read())
+    return data.read()
 
 
-def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_errors: bool = True) -> bool:
+def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_net_errors: bool = True) -> bool:
     """
     Attempt to update the local data copy of the values.
 
@@ -86,8 +96,8 @@ def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_er
     user_file
         The file to save the updated attrs JSON to. If `None` platformdirs will
         be used to get the user data path.
-    silence_errors
-        If `True` catch all errors in this function.
+    silence_net_errors
+        If `True` catch all errors caused by downloading new values in this function.
 
     Returns
     -------
@@ -97,37 +107,35 @@ def attempt_local_update(*, timeout: int = 1, user_file: Path = None, silence_er
     if user_file is None:
         user_file = platformdirs.user_data_path("dkist") / "api_search_values.json"
     user_file = Path(user_file)
-    user_file.parent.mkdir(exist_ok=True, parents=True)
+    if not user_file.exists():
+        user_file.parent.mkdir(exist_ok=True, parents=True)
 
     log.info(f"Fetching updated search values for the DKIST client to {user_file}")
 
-    success = False
     try:
-        _fetch_values_to_file(user_file, timeout=timeout)
-        success = True
+        data = _fetch_values(timeout)
     except Exception as err:
-        log.error("Failed to download new attrs values.")
+        log.error("Failed to download new dkist attrs values. attr values for dkist may be outdated.")
         log.debug(str(err))
-        # If an error has occurred then remove the local file so it isn't
-        # corrupted or invalid.
-        user_file.unlink(missing_ok=True)
-        if not silence_errors:
+        if not silence_net_errors:
             raise
+        return False
 
-        return success
-
-    # Test that the file we just saved can be parsed as json
     try:
+        # Save the data
+        with open(user_file, "wb") as f:
+            f.write(data)
+
+        # Test that the file we just saved can be parsed as json
         with open(user_file) as f:
             json.load(f)
-    except Exception:
-        log.error("Downloaded file is not valid JSON.")
-        user_file.unlink(missing_ok=True)
-        if not silence_errors:
-            raise
-        success = False
 
-    return success
+        return True
+
+    except Exception as err:
+        log.error("Downloaded file could not be saved or is not valid JSON, removing cached file.")
+        user_file.unlink(missing_ok=True)
+        raise UserCacheMissing from err
 
 
 def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> dict:
@@ -152,11 +160,15 @@ def get_search_attrs_values(*, allow_update: bool = True, timeout: int = 1) -> d
     """
     local_path, update_needed = _get_cached_json()
     if allow_update and update_needed:
-        attempt_local_update(timeout=timeout)
+        try:
+            attempt_local_update(timeout=timeout)
+        except UserCacheMissing:
+            # if we have deleted the user cache we must use the file shipped with the package
+            local_path = importlib.resources.files(dkist.data) / "api_search_values.json"
 
     if not update_needed:
-        log.debug("No update to attr values needed.")
-        log.debug("Using attr values from %s", local_path)
+        log.debug("No update to dkist attr values needed.")
+        log.debug("Using dkist attr values from %s", local_path)
 
     with open(local_path) as f:
         search_values = json.load(f)
