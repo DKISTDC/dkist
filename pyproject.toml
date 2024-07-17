@@ -48,12 +48,12 @@ tests = [
   "pytest-doctestplus",
   "pytest-cov",
   "pytest-remotedata",
-  "pytest-cov",
   "pytest-mock",
   "pytest-mpl",
   "pytest-httpserver",
   "pytest-filter-subpackage",
   "pytest-benchmark",
+  "pytest-xdist",
   "hypothesis",
   "tox",
   "pydot",
@@ -85,6 +85,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
+exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
 write_to = "dkist/_version.py"
@@ -101,6 +102,12 @@ write_to = "dkist/_version.py"
 
   [ tool.gilesbot.milestones ]
     enabled = false
+
+  [ tool.gilesbot.circleci_artifacts]
+    enabled = true
+
+  [ tool.gilesbot.circleci_artifacts.figure_report]
+    url = ".tmp/py312-figure/figure_test_images/fig_comparison.html"
 
 [tool.towncrier]
     package = "dkist"

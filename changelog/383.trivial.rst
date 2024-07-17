@@ -1,1 +1,0 @@
-Run plotting benchmarks fewer times for more manageable CI, and add a benchmark for generate_celestial_transform.

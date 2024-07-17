@@ -1,3 +1,35 @@
+1.7.0 (2024-07-11)
+==================
+
+Features
+--------
+
+- Add "status" to the list of know dataset inventory fields. (`#417 <https://github.com/DKISTDC/dkist/pull/417>`_)
+
+
+Bug Fixes
+---------
+
+- Catch URLError when trying to download attr values in tests so that the existing file isn't assumed to be corrupted and therefore deleted. (`#407 <https://github.com/DKISTDC/dkist/pull/407>`_)
+
+
+1.6.0 (2024-05-20)
+==================
+
+Features
+--------
+
+- Update ASDF schemas for upcoming ASDF standard 1.6.0. (`#324 <https://github.com/DKISTDC/dkist/pull/324>`_)
+- Improve performance of ``VaryingCelestialTransform`` classes by not creating a new transform for every set of parameters but instead update the parameters on a single model. (`#370 <https://github.com/DKISTDC/dkist/pull/370>`_)
+- Add GitHub workflow and dependencies for Codspeed, to benchmark PRs against main. (`#382 <https://github.com/DKISTDC/dkist/pull/382>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Run plotting benchmarks fewer times for more manageable CI, and add a benchmark for generate_celestial_transform. (`#383 <https://github.com/DKISTDC/dkist/pull/383>`_)
+
+
 1.5.0 (2024-04-03)
 ==================
 
@@ -361,7 +393,7 @@ Bug Fixes
 Trivial/Internal Changes
 ------------------------
 
-- Migate to the asdf 2.8+ ``Converter`` interface, this bumps various
+- Migrate to the asdf 2.8+ ``Converter`` interface, this bumps various
   dependencies but should have no effect on reading or writing asdf files. (`#152 <https://github.com/DKISTDC/dkist/pull/152>`_)
 
 

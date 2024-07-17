@@ -72,12 +72,13 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "headerVersion": "Header Specification Version",
         "headerDocumentationUrl": "Header Documentation URL",
         "infoUrl": "Info URL",
-        "calibrationDocumentationUrl": "Calibration Documentation URL"
+        "calibrationDocumentationUrl": "Calibration Documentation URL",
+        "status": "Status",
 })
 
 
 def _key_clean(key):
-    key = re.sub("[%s]" % re.escape(string.punctuation), "_", key)
+    key = re.sub(f"[{re.escape(string.punctuation)}]", "_", key)
     key = key.replace(" ", "_")
     key = "".join(char for char in key
                     if char.isidentifier() or char.isnumeric())
