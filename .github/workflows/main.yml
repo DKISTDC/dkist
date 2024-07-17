@@ -94,7 +94,7 @@ jobs:
       test_extras: tests
       test_command: pytest --pyargs dkist
       # We have to work around a github runner bug here: https://github.com/actions/runner/issues/2788#issuecomment-2145922705
-      upload_to_pypi: ${{ startsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), 'refs/tags/v') && !endsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name, '.dev') }}
+      upload_to_pypi: ${{ startsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), 'refs/tags/v') && !endsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), '.dev') }}
     secrets:
       pypi_token: ${{ secrets.PYPI_API_TOKEN }}
 
