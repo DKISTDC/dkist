@@ -338,3 +338,21 @@ def visp_dataset_no_headers(tmp_path_factory):
         with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
+
+
+@pytest.fixture(scope="session")
+def croppable_visp_dataset(tmp_path_factory):
+    vispdir = tmp_path_factory.mktemp("data")
+    # This asdf file is for dataset ID BKEWK
+    with gzip.open(Path(rootdir) / "croppable_visp.asdf.gz", mode="rb") as gfo:
+        with open(vispdir / "croppable_visp.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(vispdir / "croppable_visp.asdf")
+
+
+@pytest.fixture(scope="session")
+def croppable_cryo_dataset():
+    with gzip.open(Path(rootdir) / "croppable_cryo.asdf.gz", mode="rb") as gfo:
+        with open(rootdir / "croppable_cryo.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(Path(rootdir) / "croppable_cryo.asdf")
