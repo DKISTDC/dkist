@@ -130,7 +130,7 @@ def update_celestial_transform_parameters(
         -crpix[0],
         -crpix[1],
         pc,
-        transform[2].translation.value * pc.unit if hasattr(pc, "unit") else transform[2].translation.value,
+        transform[2].translation.quantity if hasattr(pc, "unit") else transform[2].translation.value,
         cdelt[0],
         cdelt[1],
         crval[0],
