@@ -1,7 +1,6 @@
 """
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
-import copy
 import json
 import time
 import pathlib
@@ -19,43 +18,50 @@ from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
 __all__ = ["watch_transfer_progress", "start_transfer_from_file_list"]
 
 
-def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, file_list,
-                                  src_base_path=None, recursive=False, label=None):
+def start_transfer_from_file_list(
+    src_endpoint: str,
+    dst_endpoint: str,
+    dst_base_path: PathLike,
+    file_list: list[PathLike],
+    src_base_path: PathLike = None,
+    recursive: bool | list[bool] = False,
+    label: str = None
+) -> str:
     """
     Start a new transfer task for a list of files.
 
     Parameters
     ----------
-    src_endpoint : `str`
+    src_endpoint
         The endpoint to copy file from. Can be any identifier accepted by
         `~dkist.net.globus.get_endpoint_id`.
 
-    dst_endpoint : `str`
+    dst_endpoint
         The endpoint to copy file to. Can be any identifier accepted by
         `~dkist.net.globus.get_endpoint_id`.
 
-    dst_base_path : `~pathlib.Path`
+    dst_base_path
         The destination path, must be accessible from the endpoint, will be
         created if it does not exist.
 
-    file_list : `list`
+    file_list
         The list of file paths on the ``src_endpoint`` to transfer to the ``dst_endpoint``.
 
-    src_base_path : `~pathlib.Path`, optional
+    src_base_path
         The path prefix on the items in ``file_list`` to be stripped before
         copying to ``dst_base_path``. i.e. if the file path in ``path_list`` is
         ``/spam/eggs/filename.fits`` and ``src_base_path`` is ``/spam`` the
         ``eggs/`` folder will be copied to ``dst_base_path``. By default only
         the filenames are kept, and none of the directories.
 
-    recursive : `bool` or `list` of `bool`, optional
+    recursive
        Controls if the path in ``file_list`` is added to the Globus task with
        the recursive flag or not.
        This should be `True` if the element of ``file_list`` is a directory.
        If you need to set this per-item in ``file_list`` it should be a `list`
        of `bool` of equal length as ``file_list``.
 
-    label : `str`
+    label
        Label for the Globus transfer. If None then a default will be used.
 
     Returns
@@ -87,17 +93,20 @@ def start_transfer_from_file_list(src_endpoint, dst_endpoint, dst_base_path, fil
                                                 sync_level="checksum",
                                                 verify_checksum=True)
 
-    dst_base_path = pathlib.Path(dst_base_path)
-    src_file_list = copy.copy(file_list)
-    dst_file_list = []
-    for src_file in src_file_list:
-        # If a common prefix is not specified just copy the filename
-        if not src_base_path:
-            src_filepath = src_file.name
-        else:
-            # Otherwise use the filepath relative to the base path
-            src_filepath = src_file.relative_to(src_base_path)
-        dst_file_list.append(dst_base_path / src_filepath)
+    src_file_list = file_list
+    if not isinstance(dst_base_path, (list, tuple)):
+        dst_base_path = pathlib.Path(dst_base_path)
+        dst_file_list = []
+        for src_file in src_file_list:
+            # If a common prefix is not specified just copy the filename or last directory
+            if not src_base_path:
+                src_filepath = src_file.name
+            else:
+                # Otherwise use the filepath relative to the base path
+                src_filepath = src_file.relative_to(src_base_path)
+            dst_file_list.append(dst_base_path / src_filepath)
+    else:
+        dst_file_list = dst_base_path
 
     for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
         transfer_manifest.add_item(str(src_file), str(dst_file), recursive=rec)
@@ -265,12 +274,12 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
 
 def _orchestrate_transfer_task(file_list: list[PathLike],
                                recursive: list[bool],
-                               destination_path: PathLike = "/~/",
+                               destination_path: PathLike | list[PathLike] = "/~/",
                                destination_endpoint: str = None,
                                *,
                                progress: bool | Literal["verbose"] = True,
                                wait: bool = True,
-                               label=None):
+                               label: str = None):
     """
     Transfer the files given in file_list to the path on ``destination_endpoint``.
 
