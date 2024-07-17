@@ -70,7 +70,7 @@ jobs:
           fingerprints: "SHA256:vf80el6ZY/FiLKo+eXblG/DQfCuJBwrQvH1S37vjG5I"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run: git config --global user.email "dkist@circleci" && git config --global user.name "DKIST Circle CI"
-      - run: git clone git@github.com:dkist/dkist-figure-tests.git --depth 1 -b dkist-${CIRCLE_BRANCH} ~/dkist-figure-tests/
+      - run: git clone git@github.com:DKISTDC/dkist-figure-tests.git --depth 1 -b dkist-${CIRCLE_BRANCH} ~/dkist-figure-tests/
       # Generate Reference images
       - run: pip install --user -U tox tox-pypi-filter
       - run: rm -rf /home/circleci/dkist-figure-tests/figures/$TOXENV/*
