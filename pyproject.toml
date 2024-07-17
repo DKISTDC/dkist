@@ -109,8 +109,6 @@ write_to = "dkist/_version.py"
   [ tool.gilesbot.circleci_artifacts.figure_report]
     url = ".tmp/py312-figure/figure_test_images/fig_comparison.html"
 
-  [tool.gilesbot.circleci_artifacts.figure_report_devdeps]
-
 [tool.towncrier]
     package = "dkist"
     filename = "CHANGELOG.rst"
