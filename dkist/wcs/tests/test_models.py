@@ -69,7 +69,7 @@ def test_update_celestial():
 
     # Copout and only test that one parameter is correct
     shift1 = trsfm.left.left.left.left.right
-    assert u.allclose(shift1.offset.quantity, 1 * u.pix)
+    assert u.allclose(shift1.offset.quantity, -1 * u.pix)
 
 def test_update_celestial_unitless():
     trsfm  = generate_celestial_transform(
