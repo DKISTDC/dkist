@@ -1,3 +1,4 @@
+import os
 import tarfile
 from pathlib import Path
 from urllib.parse import urljoin
@@ -88,6 +89,9 @@ def _get_sample_datasets(dataset_names, no_download=False, force_download=False)
         Raised if any of the files cannot be downloaded from any of the mirrors.
     """
     sampledata_dir = Path(conf.sample_data_directory)
+    if env_override := os.environ.get("DKIST_SAMPLE_DIR"):
+        sampledata_dir = Path(env_override)
+    sampledata_dir = sampledata_dir.expanduser()
 
     datasets = dict((k,v) for k, v in _SAMPLE_DATASETS.items() if k in dataset_names)  # noqa: C402
     download_paths = [sampledata_dir / fn for _, fn in datasets.values()]
