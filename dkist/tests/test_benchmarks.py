@@ -32,11 +32,11 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers):
 @pytest.mark.parametrize("axes", [
     ["y", None, None, "x"],
 ])
-def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
+def test_plot_dataset(benchmark, axes, visp_dataset_no_headers, tmp_path):
     @benchmark
     def plot_and_save_fig(ds=visp_dataset_no_headers, axes=axes):
         ds.plot(plot_axes=axes)
-        plt.savefig("tmpplot")
+        plt.savefig(tmp_path / "tmpplot.png")
         plt.close()
 
 
