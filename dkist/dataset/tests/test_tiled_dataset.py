@@ -30,7 +30,7 @@ def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
 
 @pytest.mark.parametrize("aslice", [np.s_[0, :100, 100:200]])
 def test_tiled_dataset_slice_tiles(large_tiled_dataset, aslice):
-    sliced = large_tiled_dataset.slice_tiles(aslice)
+    sliced = large_tiled_dataset.slice_tiles[aslice]
     for i, tile in enumerate(sliced.flat):
         # This will throw an AttributeError if you do tile.shape and I don't know why
         assert tile.data.shape == (100, 100)

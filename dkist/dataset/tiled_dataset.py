@@ -19,6 +19,21 @@ from .utils import dataset_info_str
 __all__ = ["TiledDataset"]
 
 
+class TiledDatasetSlicer:
+    """
+    Basic class to provide the slicing
+    """
+    def __init__(self, data, inventory):
+        self.data = data
+        self.inventory = inventory
+
+    def __getitem__(self, slice_):
+        new_data = []
+        for tile in self.data.flat:
+            new_data.append(tile[slice_])
+        return TiledDataset(np.array(new_data).reshape(self.data.shape), self.inventory)
+
+
 class TiledDataset(Collection):
     """
     Holds a grid of `.Dataset` objects.
@@ -67,6 +82,7 @@ class TiledDataset(Collection):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
         self._validate_component_datasets(self._data, inventory)
+        self._tile_slicer = TiledDatasetSlicer(self._data, self.inventory)
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -160,12 +176,9 @@ class TiledDataset(Collection):
         fig.suptitle(f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
 
-    def slice_tiles(self, slice_):
-        new_data = np.empty_like(self._data)
-        for i, row in enumerate(self._data):
-            for j, tile in enumerate(row):
-                new_data[i, j] = self[i, j][slice_]
-        return type(self)(new_data, self.inventory)
+    @property
+    def slice_tiles(self):
+        return self._tile_slicer
 
     # TODO: def regrid()
 
