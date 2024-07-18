@@ -147,7 +147,7 @@ class TiledDataset(Collection):
         if share_scale:
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
-        timestamp = self[0, 0].axis_world_coords(0)[-1].iso[slice_index]
+        timestamp = self[0, 0].axis_world_coords("time")[-1].iso[slice_index]
         fig.suptitle(f"TiledDataset {self.inventory['datasetId']} at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
 
