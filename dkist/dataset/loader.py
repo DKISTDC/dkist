@@ -1,4 +1,5 @@
 import importlib.resources as importlib_resources
+import importlib.metadata
 from pathlib import Path
 from functools import singledispatch
 
@@ -12,6 +13,13 @@ try:
 except ImportError:
     # fall back to top level asdf for older versions of asdf
     from asdf import ValidationError
+
+
+def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
+    if tuple(int(part) for part in importlib.metadata.version("asdf").split(".")) >= (3, 1, 0):
+        return {"memmap": memmap}
+    else:
+        return {"copy_arrays": not memmap}
 
 
 @singledispatch
@@ -156,7 +164,7 @@ def _load_from_asdf(filepath):
     try:
         with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, memmap=False) as ff:
+                           lazy_load=False, **asdf_open_memory_mapping_kwarg(memmap=False)) as ff:
                 ds = ff.tree["dataset"]
                 if isinstance(ds, TiledDataset):
                     for sub in ds.flat:
