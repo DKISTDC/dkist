@@ -36,6 +36,12 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers):
 
 @pytest.mark.benchmark
 def test_dataset_compute_data_full_files(benchmark, real_visp):
+    """
+    Note that although this will load all the files to compute the data, the
+    file IO overhead is *not* included in codspeed's timing of the benchmark,
+    because it doesn't support that. This test therefore only assesses the
+    performance of the compute step.
+    """
     ds = real_visp[0, :15]
     benchmark(ds.data.compute)
 
