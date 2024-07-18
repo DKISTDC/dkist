@@ -12,7 +12,7 @@ from astropy.modeling.models import Tabular1D
 
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
-                              generate_celestial_transform,
+                              generate_celestial_transform, update_celestial_transform_parameters,
                               varying_celestial_transform_from_tables)
 
 
@@ -50,6 +50,44 @@ def test_generate_celestial_unitless():
     )
     shift1 = tfrm.left.left.left.left.right
     assert u.allclose(shift1.offset, 0)
+
+
+def test_update_celestial():
+    trsfm  = generate_celestial_transform(
+              crpix=[0, 0] * u.pix,
+              crval=[0, 0] * u.arcsec,
+              cdelt=[1, 1] * u.arcsec/u.pix,
+              pc=np.identity(2) * u.pix)
+
+    update_celestial_transform_parameters(
+              trsfm,
+              [1, 1] * u.pix,
+              [0.5, 0.5] * u.arcsec/u.pix,
+              np.identity(2) * u.pix,
+              [1, 1] * u.arcsec,
+              180 * u.deg)
+
+    # Copout and only test that one parameter is correct
+    shift1 = trsfm.left.left.left.left.right
+    assert u.allclose(shift1.offset.quantity, -1 * u.pix)
+
+def test_update_celestial_unitless():
+    trsfm  = generate_celestial_transform(
+              crpix=[0, 0],
+              crval=[0, 0],
+              cdelt=[1, 1],
+              pc=np.identity(2))
+
+    update_celestial_transform_parameters(
+              trsfm,
+              [1, 1],
+              [0.5, 0.5],
+              np.identity(2),
+              [1, 1],
+              180)
+
+    shift1 = trsfm.left.left.left.left.right
+    assert u.allclose(shift1.offset.value, -1)
 
 
 def test_varying_transform_no_lon_pole_unit():
