@@ -82,7 +82,6 @@ class TiledDataset(Collection):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
         self._validate_component_datasets(self._data, inventory)
-        self._tile_slicer = TiledDatasetSlicer(self._data, self.inventory)
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -178,7 +177,7 @@ class TiledDataset(Collection):
 
     @property
     def slice_tiles(self):
-        return self._tile_slicer
+        return TiledDatasetSlicer(self._data, self.inventory)
 
     # TODO: def regrid()
 
