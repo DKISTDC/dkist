@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from dkist import Dataset, TiledDataset, load_dataset
-from dkist.data.sample import VBI_AJQWW, download_all_sample_data
+from dkist.data.sample import VBI_AJQWW
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -66,7 +66,6 @@ def test_tiled_dataset_from_components(dataset):
 @pytest.mark.mpl_image_compare
 @pytest.mark.parametrize("share_scale", [True, False])
 def test_plot(share_scale):
-    download_all_sample_data()
     ds = load_dataset(VBI_AJQWW)
     ds.plot(0, share_scale=share_scale)
     return plt.gcf()
