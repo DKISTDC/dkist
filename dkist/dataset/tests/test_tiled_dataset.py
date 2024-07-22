@@ -67,5 +67,6 @@ def test_tiled_dataset_from_components(dataset):
 def test_plot(share_scale):
     from dkist.data.sample import VBI_AJQWW
     ds = load_dataset(VBI_AJQWW)
+    fig = plt.figure(figsize=(600, 800))
     ds.plot(0, share_scale=share_scale)
     return plt.gcf()
