@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from dkist import Dataset, TiledDataset, load_dataset
+from dkist.tests.helpers import figure_test
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -62,7 +63,8 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.meta["headers"] is headers
 
 
-@pytest.mark.mpl_image_compare
+# @pytest.mark.mpl_image_compare
+@figure_test
 @pytest.mark.parametrize("share_scale", [True, False])
 def test_plot(share_scale):
     from dkist.data.sample import VBI_AJQWW
