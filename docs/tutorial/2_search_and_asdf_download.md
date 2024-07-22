@@ -107,7 +107,7 @@ Note that you can also pass more than one result to be downloaded.
 A simple example of both of these is:
 
 ```{code-cell} python
-Fido.fetch(visp[:3], path="~/dkist_data/{instrument}/{dataset_id}/")
+Fido.fetch(visp[:3], path="~/dkist_data/{instrument}_{dataset_id}/")
 ```
 
 This will put each of our ASDF files in a directory named with the corresponding Dataset ID and Instrument.

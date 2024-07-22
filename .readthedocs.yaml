@@ -10,7 +10,7 @@ build:
     pre_install:
       - git update-index --assume-unchanged .rtd-environment.yml docs/conf.py
     pre_build:
-      - export DKIST_SAMPLE_DIR="~/dkist_data/"
+      - export DKIST_SAMPLE_DIR="$HOME/dkist_data/"
       - python -c "from dkist.data.sample import download_all_sample_data; download_all_sample_data()"
 
 conda:
