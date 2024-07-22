@@ -3,6 +3,7 @@ from unittest.mock import call
 
 import pytest
 
+
 @pytest.fixture
 def tmp_sample_dir(tmp_path):
     old_path = os.environ.get("DKIST_SAMPLE_DIR", "")
