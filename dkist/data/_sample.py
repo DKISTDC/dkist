@@ -57,7 +57,7 @@ def _download_and_extract_sample_data(names, overwrite, path):
     for i, tarpath in enumerate(results):
         output_path = path / file_folder[Path(tarpath).name]
         with tarfile.open(tarpath, "r:*") as tar:
-            tar.extractall(path=output_path)
+            tar.extractall(path=output_path, filter="data")
         results[i] = output_path
 
     return results
@@ -102,6 +102,8 @@ def _get_sample_datasets(dataset_names, no_download=False, force_download=False)
     results = _download_and_extract_sample_data(datasets.keys(), overwrite=force_download, path=sampledata_dir)
 
     if results.errors:
-        raise RuntimeError
+        raise RuntimeError(
+            f"{len(results.errors)} sample data files failed "
+            "to download, the first error is above.") from results.errors[0].exception
 
     return list(results)
