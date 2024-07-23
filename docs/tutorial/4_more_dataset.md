@@ -23,7 +23,7 @@ import dkist
 import dkist.net
 
 res = Fido.search(a.dkist.Dataset('BKPLX'))
-files = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
+files = Fido.fetch(res, path="~/dkist_data/{instrument}_{dataset_id}")
 ds = dkist.load_dataset(files)
 ```
 
