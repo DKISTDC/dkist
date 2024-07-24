@@ -69,6 +69,10 @@ def test_tiled_dataset_from_components(dataset):
 def test_plot(share_scale):
     from dkist.data.sample import VBI_AJQWW
     ds = load_dataset(VBI_AJQWW)
+    newtiles = []
+    for tile in ds.flat:
+        newtiles.append(tile.rebin((1, 4, 4), operation=np.sum))
+    ds = TiledDataset(np.array(newtiles).reshape(ds.shape), inventory=ds.inventory)
     fig = plt.figure(figsize=(600, 800))
     ds.plot(0, share_scale=share_scale)
     return plt.gcf()
