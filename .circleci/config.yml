@@ -33,7 +33,6 @@ jobs:
         type: string
     docker:
       - image: cimg/python:3.12
-    resource_class: large
     environment:
       TOXENV=<< parameters.jobname >>
     steps:
@@ -56,7 +55,6 @@ jobs:
         type: string
     docker:
       - image: cimg/python:3.12
-    resource_class: large
     environment:
       TOXENV: << parameters.jobname >>
       GIT_SSH_COMMAND: ssh -i ~/.ssh/id_rsa_7b8fc81c13a3b446ec9aa50d3f626978
