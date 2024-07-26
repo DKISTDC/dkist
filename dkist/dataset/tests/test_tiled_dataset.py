@@ -73,5 +73,5 @@ def test_tileddataset_plot(share_zscale):
         newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
     ds = TiledDataset(np.array(newtiles).reshape(ds.shape), inventory=ds.inventory)
     fig = plt.figure(figsize=(600, 800))
-    ds.plot(0, share_scale=share_scale)
+    ds.plot(0, share_zscale=share_zscale)
     return plt.gcf()

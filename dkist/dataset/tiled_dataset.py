@@ -125,7 +125,7 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
-    def plot(self, slice_index: int, share_scale=False, **kwargs):
+    def plot(self, slice_index: int, share_zscale=False, **kwargs):
         vmin, vmax = np.inf, 0
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
@@ -144,7 +144,7 @@ class TiledDataset(Collection):
             vmax = axmax if axmax > vmax else vmax
             ax.set_ylabel(" ")
             ax.set_xlabel(" ")
-        if share_scale:
+        if share_zscale:
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
         timestamp = self[0, 0].axis_world_coords("time")[-1].iso[slice_index]
