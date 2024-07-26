@@ -63,7 +63,6 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.meta["headers"] is headers
 
 
-# @pytest.mark.mpl_image_compare
 @figure_test
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
 def test_tileddataset_plot(share_zscale):
