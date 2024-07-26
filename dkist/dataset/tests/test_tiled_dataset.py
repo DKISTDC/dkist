@@ -65,8 +65,8 @@ def test_tiled_dataset_from_components(dataset):
 
 # @pytest.mark.mpl_image_compare
 @figure_test
-@pytest.mark.parametrize("share_scale", [True, False])
-def test_plot(share_scale):
+@pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
+def test_tileddataset_plot(share_zscale):
     from dkist.data.sample import VBI_AJQWW
     ds = load_dataset(VBI_AJQWW)
     newtiles = []
