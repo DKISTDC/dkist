@@ -42,7 +42,7 @@ import dkist.net
 from sunpy.net import Fido, attrs as a
 
 res = Fido.search(a.dkist.Dataset('BKPLX'))
-files = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
+files = Fido.fetch(res, path="~/dkist_data/{instrument}_{dataset_id}")
 ds = dkist.load_dataset(files)
 ```
 
@@ -84,7 +84,7 @@ So for example:
 ```{code-cell} ipython3
 :tags: [skip-execution]
 
-ds[0, 0].files.download(path="~/dkist_data/{dataset_id}")
+ds[0, 0].files.download(path="~/dkist_data/{instrument}_{dataset_id}")
 ```
 
 would save the file to `~/dkist_data/BKPLX/VISP_2023_10_16T18_21_47_508_00630200_I_BKPLX_L1.fits`.
