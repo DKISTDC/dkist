@@ -21,7 +21,7 @@ def dataset_info_str(ds):
 
     # Pixel dimensions table
 
-    instr = ds.inventory.get("instrument_name", "")
+    instr = ds.inventory.get("instrument", "")
     if instr:
         instr += " "
 
