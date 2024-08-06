@@ -18,8 +18,7 @@ except ImportError:
 def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
     if tuple(int(part) for part in importlib.metadata.version("asdf").split(".")) >= (3, 1, 0):
         return {"memmap": memmap}
-    else:
-        return {"copy_arrays": not memmap}
+    return {"copy_arrays": not memmap}
 
 
 @singledispatch
