@@ -1,4 +1,3 @@
-import importlib.metadata
 import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import singledispatch
