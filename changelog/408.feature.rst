@@ -1,0 +1,1 @@
+Add `TiledDataset.plot()` quicklook method.

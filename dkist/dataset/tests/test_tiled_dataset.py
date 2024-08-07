@@ -1,9 +1,11 @@
 import copy
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from dkist import Dataset, TiledDataset
+from dkist import Dataset, TiledDataset, load_dataset
+from dkist.tests.helpers import figure_test
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -59,3 +61,17 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
         assert ds.meta["headers"] is headers
+
+
+@figure_test
+@pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
+def test_tileddataset_plot(share_zscale):
+    from dkist.data.sample import VBI_AJQWW
+    ds = load_dataset(VBI_AJQWW)
+    newtiles = []
+    for tile in ds.flat:
+        newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
+    ds = TiledDataset(np.array(newtiles).reshape(ds.shape), inventory=ds.inventory)
+    fig = plt.figure(figsize=(600, 800))
+    ds.plot(0, share_zscale=share_zscale)
+    return plt.gcf()
