@@ -57,7 +57,7 @@ def _download_and_extract_sample_data(names, overwrite, path):
     for i, tarpath in enumerate(results):
         output_path = path / file_folder[Path(tarpath).name]
         with tarfile.open(tarpath, "r:*") as tar:
-            tar.extractall(path=output_path, filter="data")
+            tar.extractall(path=output_path, filter=tarfile.fully_trusted_filter)
         results[i] = output_path
 
     return results
