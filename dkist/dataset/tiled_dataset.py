@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+from textwrap import dedent
 from collections.abc import Collection
 
 import matplotlib.pyplot as plt
@@ -13,8 +14,24 @@ import numpy as np
 from astropy.table import vstack
 
 from .dataset import Dataset
+from .utils import dataset_info_str
 
 __all__ = ["TiledDataset"]
+
+
+class TiledDatasetSlicer:
+    """
+    Basic class to provide the slicing
+    """
+    def __init__(self, data, inventory):
+        self.data = data
+        self.inventory = inventory
+
+    def __getitem__(self, slice_):
+        new_data = []
+        for tile in self.data.flat:
+            new_data.append(tile[slice_])
+        return TiledDataset(np.array(new_data).reshape(self.data.shape), self.inventory)
 
 
 class TiledDataset(Collection):
@@ -125,6 +142,13 @@ class TiledDataset(Collection):
         """
         return self._data.shape
 
+    @property
+    def tiles_shape(self):
+        """
+        The shape of each individual tile in the TiledDataset.
+        """
+        return [[tile.data.shape for tile in row] for row in self]
+
     def plot(self, slice_index: int, share_zscale=False, **kwargs):
         vmin, vmax = np.inf, 0
         fig = plt.figure()
@@ -151,4 +175,18 @@ class TiledDataset(Collection):
         fig.suptitle(f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at time {timestamp} (slice={slice_index})", y=0.95)
         return fig
 
+    @property
+    def slice_tiles(self):
+        return TiledDatasetSlicer(self._data, self.inventory)
+
     # TODO: def regrid()
+
+    def __repr__(self):
+        """
+        Overload the NDData repr because it does not play nice with the dask delayed io.
+        """
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
+
+    def __str__(self):
+        return dataset_info_str(self)
