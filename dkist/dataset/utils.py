@@ -19,7 +19,7 @@ def dataset_info_str(ds):
         ds = ds[0, 0]
     wcs = ds.wcs.low_level_wcs
 
-    # Pixel dimensions table
+    # Array dimensions table
 
     instr = ds.inventory.get("instrument", "")
     if instr:
@@ -47,7 +47,7 @@ def dataset_info_str(ds):
     pixel_nam_width = max(9, max(len(x) for x in pixel_axis_names))
     pixel_siz_width = max(9, len(str(max(array_shape))))
 
-    s += (("{0:" + str(pixel_dim_width) + "s}").format("Pixel Dim") + "  " +
+    s += (("{0:" + str(pixel_dim_width) + "s}").format("Array Dim") + "  " +
             ("{0:" + str(pixel_nam_width) + "s}").format("Axis Name") + "  " +
             ("{0:" + str(pixel_siz_width) + "s}").format("Data size") + "  " +
             "Bounds\n")
@@ -89,40 +89,15 @@ def dataset_info_str(ds):
 
     pixel_dim_width = max(3, len(str(wcs.world_n_dim)))
 
-    s += "Correlation between pixel and world axes:\n\n"
+    s += "Correlation between array and world axes:\n\n"
 
-    s += (" " * world_dim_width + "  " +
-            ("{0:^" + str(wcs.pixel_n_dim * 5 - 2) + "s}").format("Pixel Dim") +
-            "\n")
-
-    s += (("{0:" + str(world_dim_width) + "s}").format("World Dim") +
-            "".join(["  " + ("{0:" + str(pixel_dim_width) + "d}").format(ipix)
-                    for ipix in range(wcs.pixel_n_dim)]) +
-            "\n")
-
-    matrix = wcs.axis_correlation_matrix[::-1, ::-1]
-    matrix_str = np.empty(matrix.shape, dtype="U3")
-    matrix_str[matrix] = "yes"
-    matrix_str[~matrix] = "no"
-
-    for iwrl in range(wcs.world_n_dim):
-        s += (("{0:" + str(world_dim_width) + "d}").format(iwrl) +
-                "".join(["  " + ("{0:>" + str(pixel_dim_width) + "s}").format(matrix_str[iwrl, ipix])
-                        for ipix in range(wcs.pixel_n_dim)]) +
-                "\n")
+    s += _get_pp_matrix(ds.wcs)
 
     # Make sure we get rid of the extra whitespace at the end of some lines
     return "\n".join([line.rstrip() for line in s.splitlines()])
 
 
-def pp_matrix(wcs):
-    """
-    A small helper function to print a correlation matrix with labels
-
-    Parameters
-    ----------
-    wcs : `BaseHighLevelWCS` or `BaseLowLevelWCS`
-    """
+def _get_pp_matrix(wcs):
     slen = np.max([len(line) for line in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
     mstr = wcs.axis_correlation_matrix.astype(f"<U{slen}")
     mstr = np.insert(mstr, 0, wcs.pixel_axis_names, axis=0)
