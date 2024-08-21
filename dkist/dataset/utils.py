@@ -103,7 +103,18 @@ def _get_pp_matrix(wcs):
     for i, col in enumerate(mstr.T):
         wid = np.max([len(a) for a in col])
         mstr[:, i] = np.char.rjust(col, wid)
-    print(np.array_str(mstr, max_line_width=1000))
+    return np.array_str(mstr, max_line_width=1000)
+
+
+def pp_matrix(wcs):
+    """
+    A small helper function to print a correlation matrix with labels
+
+    Parameters
+    ----------
+    wcs : `BaseHighLevelWCS` or `BaseLowLevelWCS`
+    """
+    print(_get_pp_matrix(wcs))
 
 
 def extract_pc_matrix(headers, naxes=None):
