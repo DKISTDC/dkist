@@ -29,13 +29,13 @@ def dataset_info_str(ds):
     nframes = ds.inventory.get("frameCount", "")
 
     if is_tiled:
-        s = f"This {dstype} consists of an array of {tile_shape} Dataset objects\n\nEach "
+        s = f"This {dstype} {ds.inventory['datasetId']} consists of an array of {tile_shape} Dataset objects\n\nEach "
     else:
         s = "This "
 
-    s += f"{instr}Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions and consists of {nframes} frames\n"
+    s += f"{instr}Dataset {ds.inventory['datasetId']} has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions and consists of {nframes} frames\n"
     if ds.files:
-        s +="Files are stored in {ds.files.basepath}\n\n"
+        s += f"Files are stored in {ds.files.basepath}\n\n"
     s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
 
     array_shape = wcs.array_shape or (0,)
