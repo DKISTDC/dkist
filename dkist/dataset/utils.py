@@ -76,11 +76,11 @@ def dataset_info_str(ds):
             ("{0:" + str(world_typ_width) + "s}").format("Physical Type") + "  " +
             "Units\n")
 
-    for iwrl in range(wcs.world_n_dim):
+    for iwrl in range(wcs.world_n_dim)[::-1]:
 
-        name = wcs.world_axis_names[::-1][iwrl] or "None"
-        typ = wcs.world_axis_physical_types[::-1][iwrl] or "None"
-        unit = wcs.world_axis_units[::-1][iwrl] or "unknown"
+        name = wcs.world_axis_names[iwrl] or "None"
+        typ = wcs.world_axis_physical_types[iwrl] or "None"
+        unit = wcs.world_axis_units[iwrl] or "unknown"
 
         s += (("{0:" + str(world_dim_width) + "d}").format(iwrl) + "  " +
                 ("{0:" + str(world_nam_width) + "s}").format(name) + "  " +
