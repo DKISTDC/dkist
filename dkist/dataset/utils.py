@@ -26,8 +26,15 @@ def dataset_info_str(ds):
         instr += " "
     nframes = ds.inventory.get("frameCount", "")
 
-    s = f"This {instr}Dataset has {wcs.pixel_n_dim} array and {wcs.world_n_dim} world dimensions and consists of {nframes} frames stored in {ds.files.basepath}\n\n"
-    s += f"The data are represented by a Dask array: {ds.data}\n\n"
+    if is_tiled:
+        s = f"This {dstype} consists of an array of {tile_shape} Dataset objects\n\nEach "
+    else:
+        s = "This "
+
+    s += f"{instr}Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions and consists of {nframes} frames\n"
+    if ds.files:
+        s +="Files are stored in {ds.files.basepath}\n\n"
+    s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
 
     array_shape = wcs.array_shape or (0,)
     pixel_shape = wcs.pixel_shape or (None,) * wcs.pixel_n_dim
