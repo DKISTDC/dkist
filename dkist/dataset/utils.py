@@ -2,6 +2,8 @@
 Helper functions for the Dataset class.
 """
 
+import textwrap
+
 import numpy as np
 
 import gwcs
@@ -93,7 +95,7 @@ def dataset_info_str(ds):
 
     pixel_dim_width = max(3, len(str(wcs.world_n_dim)))
 
-    s += "Correlation between array and world axes:\n\n"
+    s += "Correlation between pixel and world axes:\n\n"
 
     s += _get_pp_matrix(ds.wcs)
 
@@ -103,14 +105,39 @@ def dataset_info_str(ds):
 
 def _get_pp_matrix(wcs):
     slen = np.max([len(line) for line in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
-    mstr = wcs.axis_correlation_matrix.astype(f"<U{slen}")
-    mstr = np.insert(mstr, 0, wcs.pixel_axis_names, axis=0)
-    world = ["", *list(wcs.world_axis_names)]
+    mstr = wcs.axis_correlation_matrix.astype("<U")
+    mstr[np.where(mstr == "True")] = "x"
+    mstr[np.where(mstr == "False")] = ""
+    mstr = mstr.astype(f"<U{slen}")
+
+    labels = wcs.pixel_axis_names
+    width = max(max([len(w) for w in label.split(" ")]) for label in labels)
+    wrapped = [textwrap.wrap(l, width=width, break_long_words=False) for l in labels]
+    maxlines = max([len(l) for l in wrapped])
+    for l in wrapped:
+        while len(l) < maxlines:
+            l.append("")
+    header = np.vstack([[s.center(width) for s in wrapped[l]] for l, _ in enumerate(labels)]).T
+
+    mstr = np.insert(mstr, 0, header, axis=0)
+    world = ["", "WORLD DIMENSIONS", *list(wcs.world_axis_names)]
     mstr = np.insert(mstr, 0, world, axis=1)
+    widths = [np.max([len(a) for a in col]) for col in mstr.T]
+    mstr = np.insert(mstr, 2, ["-"*wid for wid in widths], axis=0)
     for i, col in enumerate(mstr.T):
-        wid = np.max([len(a) for a in col])
-        mstr[:, i] = np.char.rjust(col, wid)
-    return np.array_str(mstr, max_line_width=1000)
+        if i == 0:
+            mstr[:, i] = np.char.rjust(col, widths[i])
+        else:
+            mstr[:, i] = np.char.center(col, widths[i])
+
+    mstr = np.array_str(mstr, max_line_width=1000)
+    # Make the matrix string prettier for this context by stripping out the array presentation
+    # Probably a nicer way to do this with regexes but this works fine
+    mstr = mstr.replace("[[", "").replace(" [", "").replace("]", "").replace("' '", " | ").replace("'", "")
+    wid = sum(widths[1:])
+    header = (" "*widths[0]) + " | " + "PIXEL DIMENSIONS".center(wid+(3*(len(wcs.pixel_axis_names)-1))) + "\n"
+
+    return header + mstr
 
 
 def pp_matrix(wcs):
