@@ -26,14 +26,15 @@ def dataset_info_str(ds):
     instr = ds.inventory.get("instrumentName", "")
     if instr:
         instr += " "
-    nframes = ds.inventory.get("frameCount", "")
+    nframes = ds.inventory.get("frameCount", "an unknown number")
+    dsID = ds.inventory.get("datasetId", "(no DatasetID)")
 
     if is_tiled:
-        s = f"This {dstype} {ds.inventory['datasetId']} consists of an array of {tile_shape} Dataset objects\n\nEach "
+        s = f"This {dstype} {dsID} consists of an array of {tile_shape} Dataset objects\n\nEach "
     else:
         s = "This "
 
-    s += f"{instr}Dataset {ds.inventory['datasetId']} has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions and consists of {nframes} frames\n"
+    s += f"{instr}Dataset {dsID} has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions and consists of {nframes} frames\n"
     if ds.files:
         s += f"Files are stored in {ds.files.basepath}\n\n"
     s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
@@ -120,7 +121,10 @@ def _get_pp_matrix(wcs):
     header = np.vstack([[s.center(width) for s in wrapped[l]] for l, _ in enumerate(labels)]).T
 
     mstr = np.insert(mstr, 0, header, axis=0)
-    world = ["", "WORLD DIMENSIONS", *list(wcs.world_axis_names)]
+    world = ["WORLD DIMENSIONS", *list(wcs.world_axis_names)]
+    nrows = maxlines + len(wcs.world_axis_names)
+    while len(world) < nrows:
+        world.insert(0, "")
     mstr = np.insert(mstr, 0, world, axis=1)
     widths = [np.max([len(a) for a in col]) for col in mstr.T]
     mstr = np.insert(mstr, 2, ["-"*wid for wid in widths], axis=0)
