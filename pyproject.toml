@@ -86,6 +86,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
+include = ["dkist*"]
 exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
