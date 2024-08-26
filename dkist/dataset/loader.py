@@ -14,6 +14,12 @@ except ImportError:
     from asdf import ValidationError
 
 
+def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
+    if asdf.__version__ > "3.1.0":
+        return {"memmap": memmap}
+    return {"copy_arrays": not memmap}
+
+
 @singledispatch
 def load_dataset(target):
     """
@@ -156,7 +162,7 @@ def _load_from_asdf(filepath):
     try:
         with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, copy_arrays=True) as ff:
+                           lazy_load=False, **asdf_open_memory_mapping_kwarg(memmap=False)) as ff:
                 ds = ff.tree["dataset"]
                 if isinstance(ds, TiledDataset):
                     for sub in ds.flat:
