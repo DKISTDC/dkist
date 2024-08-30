@@ -109,6 +109,7 @@ def dataset_info_str(ds_in):
 
 
 def _get_pp_matrix(wcs):
+    wcs = wcs.low_level_wcs # Just in case the dataset has been sliced and returned the wrong kind of wcs
     slen = np.max([len(line) for line in list(wcs.world_axis_names) + list(wcs.pixel_axis_names)])
     mstr = wcs.axis_correlation_matrix.astype("<U")
     mstr[np.where(mstr == "True")] = "x"
