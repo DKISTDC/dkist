@@ -53,7 +53,7 @@ def load_dataset(target):
 
     >>> dkist.load_dataset(Path("/path/to/ABCDE"))  # doctest: +SKIP
 
-    >>> from dkist.data.sample import VISP_BKPLX
+    >>> from dkist.data.sample import VISP_BKPLX  # doctest: +REMOTE_DATA
     >>> print(dkist.load_dataset(VISP_BKPLX))
     This VISP Dataset BKPLX has 4 pixel and 5 world dimensions and consists of 1700 frames
     Files are stored in /home/drew/.local/share/dkist/VISP_BKPLX
