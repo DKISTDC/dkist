@@ -11,14 +11,16 @@ import gwcs
 __all__ = ["dataset_info_str"]
 
 
-def dataset_info_str(ds):
+def dataset_info_str(ds_in):
     # Check for an attribute that only appears on TiledDataset
     # Not using isinstance to avoid circular import
-    is_tiled = hasattr(ds, "combined_headers")
-    dstype = type(ds).__name__
+    is_tiled = hasattr(ds_in, "combined_headers")
+    dstype = type(ds_in).__name__
     if is_tiled:
-        tile_shape = ds.shape
-        ds = ds[0, 0]
+        tile_shape = ds_in.shape
+        ds = ds_in[0, 0]
+    else:
+        ds = ds_in
     wcs = ds.wcs.low_level_wcs
 
     # Array dimensions table
@@ -36,7 +38,8 @@ def dataset_info_str(ds):
     s += f"has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions"
 
     if ds.files:
-        s += f" and consists of {len(ds.files)} frames\n"
+        nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in.flat])
+        s += f" and consists of {nframes} frames\n"
         s += f"Files are stored in {ds.files.basepath}\n\n"
     s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
 
