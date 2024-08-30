@@ -26,7 +26,6 @@ def dataset_info_str(ds):
     instr = ds.inventory.get("instrumentName", "")
     if instr:
         instr += " "
-    nframes = len(ds.files)
     dsID = ds.inventory.get("datasetId", "(no DatasetID)")
 
     if is_tiled:
@@ -37,7 +36,7 @@ def dataset_info_str(ds):
     s += f"has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions"
 
     if ds.files:
-        s += f" and consists of {nframes} frames\n"
+        s += f" and consists of {len(ds.files)} frames\n"
         s += f"Files are stored in {ds.files.basepath}\n\n"
     s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
 
