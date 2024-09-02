@@ -29,7 +29,7 @@ Here is a really quick demo of searching for all unembargoed VISP data and downl
     >>> from sunpy.net import Fido, attrs as a
     >>> import dkist.net
 
-    >>> res = Fido.search(a.Instrument.visp, a.dkist.Embargoed.false)  # doctest: +REMOTE_DATA
+    >>> res = Fido.search(a.Instrument.visp, a.dkist.Embargoed.false)  # doctest: +SKIP
     >>> res  # doctest: +SKIP
     <sunpy.net.fido_factory.UnifiedResponse object at ...>
     Results from 1 Provider:
@@ -44,8 +44,8 @@ Here is a really quick demo of searching for all unembargoed VISP data and downl
     <BLANKLINE>
     <BLANKLINE>
 
-    >>> asdf_files = Fido.fetch(res[:, 0])  # doctest: +REMOTE_DATA
-    >>> asdf_files  # doctest: +REMOTE_DATA
+    >>> asdf_files = Fido.fetch(res[:, 0])  # doctest: +SKIP
+    >>> asdf_files  # doctest: +SKIP
     <parfive.results.Results object at ...>
     ['...VISP_L1_20220602T175042_BDWQK.asdf']
 
@@ -133,8 +133,8 @@ This means you can first slice out a smaller dataset, and then only download the
 
 .. code-block:: python
 
-    >>> stokes_I_ds = ds[0]  # doctest: +REMOTE_DATA
-    >>> stokes_I_ds  # doctest: +REMOTE_DATA
+    >>> stokes_I_ds = ds[0]  # doctest: +SKIP
+    >>> stokes_I_ds  # doctest: +SKIP
     <dkist.dataset.dataset.Dataset object at ...>
     This Dataset has 3 pixel and 4 world dimensions
     <BLANKLINE>
