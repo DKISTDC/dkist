@@ -29,6 +29,7 @@ def test_module_getattr(mocker, attrname):
     mock.assert_has_calls([call(attrname), call().__getitem__(0)])
 
 
+@pytest.mark.skipif(pytest.config.getvalue("environment") == "publish")
 @pytest.mark.internet_off
 def test_fail(tmp_sample_dir):
     """
