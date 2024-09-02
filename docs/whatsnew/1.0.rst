@@ -60,8 +60,8 @@ Any DKIST level one ASDF file can be loaded with the `dkist.load_dataset` functi
 
     >>> import dkist
 
-    >>> ds = dkist.load_dataset(asdf_files)  # doctest: +REMOTE_DATA
-    >>> ds  # doctest: +REMOTE_DATA
+    >>> ds = dkist.load_dataset(asdf_files)  # doctest: +SKIP
+    >>> ds  # doctest: +SKIP
     <dkist.dataset.dataset.Dataset object at ...>
     This Dataset has 4 pixel and 5 world dimensions
     <BLANKLINE>
