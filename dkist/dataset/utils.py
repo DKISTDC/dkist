@@ -30,17 +30,23 @@ def dataset_info_str(ds_in):
         instr += " "
     dsID = ds.inventory.get("datasetId", "(no DatasetID)")
 
+    s = f"This {instr}Dataset {dsID} "
     if is_tiled:
-        s = f"This {instr}{dstype} {dsID} consists of an array of {tile_shape} Dataset objects\n\nEach Dataset "
-    else:
-        s = f"This {instr}Dataset {dsID} "
+        s += f"is an array of {tile_shape} Dataset objects "
+        if ds.files:
+            s += "and \n"
 
-    s += f"has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions"
 
     if ds.files:
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in.flat])
-        s += f" and consists of {nframes} frames\n"
-        s += f"Files are stored in {ds.files.basepath}\n\n"
+        s += f"consists of {nframes} frames stored in {ds.files.basepath}\n"
+
+    if is_tiled:
+        s += "\nEach "
+    else:
+        s += "\nThis "
+    s += f"Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions.\n\n"
+
     s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
 
     array_shape = wcs.array_shape or (0,)
