@@ -56,7 +56,7 @@ def load_dataset(target):
     >>> from dkist.data.sample import VISP_BKPLX  # doctest: +REMOTE_DATA
     >>> print(dkist.load_dataset(VISP_BKPLX))  # doctest: +REMOTE_DATA
     This VISP Dataset BKPLX has 4 pixel and 5 world dimensions and consists of 1700 frames
-    Files are stored in /.../VISP_BKPLX
+    Files are stored in ...VISP_BKPLX
     <BLANKLINE>
     The data are represented by a <class 'dask.array.core.Array'> object:
     dask.array<reshape, shape=(4, 425, 980, 2554), dtype=float64, chunksize=(1, 1, 980, 2554), chunktype=numpy.ndarray>
