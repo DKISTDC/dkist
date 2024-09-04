@@ -39,7 +39,8 @@ def dataset_info_str(ds_in):
 
     if ds.files:
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in.flat])
-        s += f"consists of {nframes} frames stored in {ds.files.basepath}\n"
+        s += f"consists of {nframes} frames.\n"
+        s += f"Files are stored in {ds.files.basepath}\n"
 
     if is_tiled:
         s += "\nEach "
