@@ -45,45 +45,48 @@ def load_dataset(target):
     Examples
     --------
 
+    >>> import dkist
+
     >>> dkist.load_dataset("/path/to/VISP_L1_ABCDE.asdf")  # doctest: +SKIP
 
     >>> dkist.load_dataset("/path/to/ABCDE/")  # doctest: +SKIP
 
     >>> dkist.load_dataset(Path("/path/to/ABCDE"))  # doctest: +SKIP
 
-    >>> from sunpy.net import Fido, attrs as a
-    >>> import dkist.net
-    >>> search_results = Fido.search(a.dkist.Dataset("AGLKO"))   # doctest: +REMOTE_DATA
-    >>> files = Fido.fetch(search_results)   # doctest: +REMOTE_DATA
-    >>> dkist.load_dataset(files)   # doctest: +REMOTE_DATA
-    <dkist.dataset.dataset.Dataset object at ...>
-    This Dataset has 4 pixel and 5 world dimensions
+    >>> from dkist.data.sample import VISP_BKPLX  # doctest: +REMOTE_DATA
+    >>> print(dkist.load_dataset(VISP_BKPLX))  # doctest: +REMOTE_DATA
+    This VISP Dataset BKPLX consists of 1700 frames.
+    Files are stored in ...VISP_BKPLX
     <BLANKLINE>
-    dask.array<reshape, shape=(4, 1000, 976, 2555), dtype=float64, chunksize=(1, 1, 976, 2555), chunktype=numpy.ndarray>
+    This Dataset has 4 pixel and 5 world dimensions.
     <BLANKLINE>
-    Pixel Dim  Axis Name                Data size  Bounds
+    The data are represented by a <class 'dask.array.core.Array'> object:
+    dask.array<reshape, shape=(4, 425, 980, 2554), dtype=float64, chunksize=(1, 1, 980, 2554), chunktype=numpy.ndarray>
+    <BLANKLINE>
+    Array Dim  Axis Name                Data size  Bounds
             0  polarization state               4  None
-            1  raster scan step number       1000  None
-            2  dispersion axis                976  None
-            3  spatial along slit            2555  None
+            1  raster scan step number        425  None
+            2  dispersion axis                980  None
+            3  spatial along slit            2554  None
     <BLANKLINE>
     World Dim  Axis Name                  Physical Type                   Units
-            0  stokes                     phys.polarization.stokes        unknown
-            1  time                       time                            s
+            4  stokes                     phys.polarization.stokes        unknown
+            3  time                       time                            s
             2  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
-            3  wavelength                 em.wl                           nm
-            4  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            1  wavelength                 em.wl                           nm
+            0  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
     <BLANKLINE>
     Correlation between pixel and world axes:
     <BLANKLINE>
-                   Pixel Dim
-    World Dim    0    1    2    3
-            0  yes   no   no   no
-            1   no  yes   no   no
-            2   no  yes   no  yes
-            3   no   no  yes   no
-            4   no  yes   no  yes
-
+                              |                      PIXEL DIMENSIONS
+                              |   spatial    |  dispersion  | raster scan  | polarization
+             WORLD DIMENSIONS |  along slit  |     axis     | step number  |    state
+    ------------------------- | ------------ | ------------ | ------------ | ------------
+    helioprojective longitude |      x       |              |      x       |
+                   wavelength |              |      x       |              |
+     helioprojective latitude |      x       |              |      x       |
+                         time |              |              |      x       |
+                       stokes |              |              |              |      x
     """
     known_types = _known_types_docs().keys()
     raise TypeError(f"Input type {type(target).__name__} not recognised. It must be one of {', '.join(known_types)}.")
