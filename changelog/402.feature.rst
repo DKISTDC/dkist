@@ -1,4 +1,0 @@
-Add various features for easier inspection of `TiledDataset`:
-- `__repr__` method to output basic dataset info;
-- `tiles_shape` property to access data array shape for each individual tile;
-- `slice_tiles()` method to apply the same slice to all datasets.

@@ -1,1 +1,0 @@
-Add CircleCI config to enable figure comparison testing with pytest_mpl.
