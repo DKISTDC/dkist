@@ -1,3 +1,43 @@
+1.8.0 (2024-09-04)
+==================
+
+Features
+--------
+
+- Add various features for easier inspection of `TiledDataset`:
+  - `__repr__` method to output basic dataset info;
+  - `tiles_shape` property to access data array shape for each individual tile;
+  - `slice_tiles()` method to apply the same slice to all datasets. (`#402 <https://github.com/DKISTDC/dkist/pull/402>`_)
+- Add `TiledDataset.plot()` quicklook method. (`#408 <https://github.com/DKISTDC/dkist/pull/408>`_)
+- Add CircleCI config to enable figure comparison testing with pytest_mpl. (`#415 <https://github.com/DKISTDC/dkist/pull/415>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Add some more benchmarks to track performance of more parts of the user tools. (`#387 <https://github.com/DKISTDC/dkist/pull/387>`_)
+- Add benchmarks for slicing and computing datasets. (`#394 <https://github.com/DKISTDC/dkist/pull/394>`_)
+- Added two partial datasets to `dkist.data.sample` for documentation and testing. (`#421 <https://github.com/DKISTDC/dkist/pull/421>`_)
+- replace usages of ``copy_arrays`` with ``memmap`` for ``asdf>=3.1.0`` (`#422 <https://github.com/DKISTDC/dkist/pull/422>`_)
+- Update Dataset representation for better readability. (`#431 <https://github.com/DKISTDC/dkist/pull/431>`_)
+- SKip a failing test in the release publish build. (`#434 <https://github.com/DKISTDC/dkist/pull/434>`_)
+
+
+1.7.0 (2024-07-11)
+==================
+
+Features
+--------
+
+- Add "status" to the list of know dataset inventory fields. (`#417 <https://github.com/DKISTDC/dkist/pull/417>`_)
+
+
+Bug Fixes
+---------
+
+- Catch URLError when trying to download attr values in tests so that the existing file isn't assumed to be corrupted and therefore deleted. (`#407 <https://github.com/DKISTDC/dkist/pull/407>`_)
+
+
 1.6.0 (2024-05-20)
 ==================
 

@@ -283,6 +283,15 @@ def simple_tiled_dataset(dataset):
 
 
 @pytest.fixture
+def large_tiled_dataset(tmp_path_factory):
+    vbidir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
+        with open(vbidir / "test_vbi.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(vbidir / "test_vbi.asdf")
+
+
+@pytest.fixture
 def small_visp_dataset():
     """
     This fixture is used to test when the array in the FITS file has a length

@@ -1,9 +1,11 @@
 import copy
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from dkist import Dataset, TiledDataset
+from dkist import Dataset, TiledDataset, load_dataset
+from dkist.tests.helpers import figure_test
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -24,6 +26,14 @@ def test_tiled_dataset(simple_tiled_dataset, dataset):
                                     np.s_[0:2, :]])
 def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
     assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
+
+
+@pytest.mark.parametrize("aslice", [np.s_[0, :100, 100:200]])
+def test_tiled_dataset_slice_tiles(large_tiled_dataset, aslice):
+    sliced = large_tiled_dataset.slice_tiles[aslice]
+    for i, tile in enumerate(sliced.flat):
+        # This will throw an AttributeError if you do tile.shape and I don't know why
+        assert tile.data.shape == (100, 100)
 
 
 def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
@@ -59,3 +69,25 @@ def test_tiled_dataset_from_components(dataset):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
         assert ds.meta["headers"] is headers
+
+
+@figure_test
+@pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
+def test_tileddataset_plot(share_zscale):
+    from dkist.data.sample import VBI_AJQWW
+    ds = load_dataset(VBI_AJQWW)
+    newtiles = []
+    for tile in ds.flat:
+        newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
+    ds = TiledDataset(np.array(newtiles).reshape(ds.shape), inventory=ds.inventory)
+    fig = plt.figure(figsize=(600, 800))
+    ds.plot(0, share_zscale=share_zscale)
+    return plt.gcf()
+
+def test_repr(simple_tiled_dataset):
+    r = repr(simple_tiled_dataset)
+    assert str(simple_tiled_dataset[0, 0].data) in r
+
+
+def test_tiles_shape(simple_tiled_dataset):
+    assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]

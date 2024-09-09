@@ -29,7 +29,7 @@ import dkist.net
 
 ```{code-cell} ipython3
 res = Fido.search(a.dkist.Dataset("BKPLX"))
-asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
+asdf_file = Fido.fetch(res, path="~/dkist_data/{instrument}_{dataset_id}")
 
 ds = dkist.load_dataset(asdf_file)
 ```
@@ -106,7 +106,7 @@ For the next few examples we'll go back to using some VBI data.
 
 ```{code-cell} ipython3
 res = Fido.search(a.dkist.Dataset("AJQWW"))
-asdf_file = Fido.fetch(res, path="~/dkist_data/{dataset_id}")
+asdf_file = Fido.fetch(res, path="~/dkist_data/{instrument}_{dataset_id}")
 
 # We extract the top left tile of the VBI mosaic
 ds = dkist.load_dataset(asdf_file)[0, 0]

@@ -1,19 +1,18 @@
 version: 2
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-lts-latest
   tools:
-    python: "mambaforge-4.10"
+    python: "mambaforge-latest"
   jobs:
     post_checkout:
       - git fetch --unshallow || true
     pre_install:
       - git update-index --assume-unchanged .rtd-environment.yml docs/conf.py
     pre_build:
-      - parfive https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/BKPLX_stokesI.tar https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/AJQWW_single_mosaic.tar
-      - mkdir -p $HOME/dkist_data/BKPLX $HOME/dkist_data/AJQWW
-      - tar -xv -f BKPLX_stokesI.tar --directory $HOME/dkist_data/BKPLX
-      - tar -xv -f AJQWW_single_mosaic.tar --directory $HOME/dkist_data/AJQWW
+      # Note $DKIST_SAMPLE_DIR is set by RTD to ~/dkist_data
+      - python -c "from dkist.data.sample import download_all_sample_data; download_all_sample_data()"
+      - python -c "from dkist.data.sample import VISP_BKPLX; print(VISP_BKPLX)"
 
 conda:
   environment: .rtd-environment.yml

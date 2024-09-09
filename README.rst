@@ -52,3 +52,12 @@ Code of Conduct
 ---------------
 
 When you are interacting with the `dkist` project you are asked to follow the SunPy `Code of Conduct <https://sunpy.org/coc>`__.
+
+Releasing The `dkist` package
+-----------------------------
+
+Doing a release of this package is automated using GitHub actions, the release can be done following these steps:
+
+1. Run the pre-release workflow on GitHub actions, this can be done by clicking "run workflow" `here <https://github.com/DKISTDC/dkist/actions/workflows/prepare-release.yml>`__.
+2. That workflow will have opened a PR, you should review it and merge it as normal.
+3. That workflow will also have drafted a GitHub release `here <https://github.com/DKISTDC/dkist/releases>`__, once the PR is merged you can publish that release, this will trigger the rest as long as the CI passes.
