@@ -119,6 +119,8 @@ jobs:
           branch: "prepare-v${{ inputs.version }}"
           title: 'Prepare for release of v${{ inputs.version }}'
           body: |
+            *This pull request will need to be closed and then re-opened to trigger the CI*
+            
             This PR renders the changelog and updates the JSON attrs before release of v${{ inputs.version }}.
 
             A draft release has been made with the changelog, release it after merge to trigger the release.
