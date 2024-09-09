@@ -277,3 +277,8 @@ def test_transfer_dataset_wrong_type(mocker, orchestrate_transfer_mock):
 
     with pytest.raises(TypeError, match="Input should be a single row of dataset inventory."):
         transfer_complete_datasets("AAAA")
+
+    # Also check that just giving a bad type to transfer_complete_datasets fails
+    # Again, shouldn't happen but we'll check anyway
+    with pytest.raises(TypeError, match="is of an unknown type, it should be search results or one or more dataset IDs."):
+        transfer_complete_datasets(42)
