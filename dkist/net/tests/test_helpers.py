@@ -126,6 +126,37 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
     get_inv_mock.assert_called_once_with(["AAAA", "BBBB"])
 
 
+def test_transfer_from_many_dataset_id(mocker, orchestrate_transfer_mock):
+    """Check that the short label is used when downloading many datasets"""
+
+    many_ds = [a*4 for a in "ABCDEFGHIJKLMNOPQ"]
+    get_inv_mock = mocker.patch(
+        "dkist.net.helpers._get_dataset_inventory",
+        autospec=True,
+        return_value=DKISTQueryResponseTable([
+            {
+                "Dataset ID": _id,
+                "Primary Proposal ID": "pm_1_10",
+                "Storage Bucket": "data",
+                "Wavelength Max": 856,
+                "Wavelength Min": 854,
+            } for _id in many_ds
+        ]),
+    )
+
+    transfer_complete_datasets(many_ds)
+
+    orchestrate_transfer_mock.assert_called_once_with(
+        mocker.ANY,
+        recursive=mocker.ANY,
+        destination_path=mocker.ANY,
+        destination_endpoint=mocker.ANY,
+        progress=mocker.ANY,
+        wait=mocker.ANY,
+        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - {len(many_ds)} datasets"
+    )
+
+
 def test_transfer_from_table(orchestrate_transfer_mock, mocker):
     res = DKISTQueryResponseTable(
         {
