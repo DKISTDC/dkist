@@ -263,3 +263,17 @@ def test_transfer_path_interpolation(orchestrate_transfer_mock, mocker):
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
+
+
+def test_transfer_dataset_wrong_type(mocker, orchestrate_transfer_mock):
+    """
+    Test that transfer fails if `_get_globus_path_for_dataset` is given bad input.
+    In practice this should never happen in the wild because of error catching elsewhere,
+    but worth checking in case that changes.
+    """
+    get_inv_mock = mocker.patch("dkist.net.helpers._get_dataset_inventory",
+                                autospec=True,
+                                return_value="This is not a QueryResponseRow")
+
+    with pytest.raises(TypeError, match="Input should be a single row of dataset inventory."):
+        transfer_complete_datasets("AAAA")
