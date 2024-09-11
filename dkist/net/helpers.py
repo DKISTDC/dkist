@@ -13,6 +13,7 @@ from sunpy.net.attr import or_
 from sunpy.net.base_client import QueryResponseRow
 from sunpy.net.fido_factory import UnifiedResponse
 
+from dkist.net import conf
 from dkist.net.attrs import Dataset
 from dkist.net.client import DKISTClient, DKISTQueryResponseTable
 from dkist.net.globus.transfer import _orchestrate_transfer_task
@@ -35,6 +36,25 @@ def _get_dataset_inventory(dataset_id: str | Iterable[str]) -> DKISTQueryRespons
     return results
 
 
+def _get_globus_path_for_dataset(dataset: QueryResponseRow):
+    """
+    Given a dataset ID get the directory on the source endpoint.
+    """
+    if not isinstance(dataset, QueryResponseRow):
+        raise TypeError("Input should be a single row of dataset inventory.")
+
+    # At this point we only have one dataset, and it should be a row not a table
+    dataset_id = dataset["Dataset ID"]
+    proposal_id = dataset["Primary Proposal ID"]
+    bucket = dataset["Storage Bucket"]
+
+    return Path(conf.dataset_path.format(
+        datasetId=dataset_id,
+        primaryProposalId=proposal_id,
+        bucket=bucket
+    ))
+
+
 def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow | DKISTQueryResponseTable | UnifiedResponse,
                                path: PathLike = "/~/",
                                destination_endpoint: str = None,
@@ -52,14 +72,13 @@ def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow 
         ``Fido.search``.
 
     path
-        The path to save the data in, must be accessible by the Globus
-        endpoint.
-        The default value is ``/~/``.
-        It is possible to put placeholder strings in the path with any key
-        from the dataset inventory dictionary which can be accessed as
-        ``ds.meta['inventory']``. An example of this would be
-        ``path="~/dkist/{datasetId}"`` to save the files in a folder named
-        with the dataset ID being downloaded.
+        The path to save the data in, must be accessible by the Globus endpoint.
+        The default value is ``/~/``.  It is possible to put placeholder strings
+        in the path with any key from inventory which can be shown with
+        :meth:`dkist.utils.inventory.path_format_keys`.  An example of this
+        would be ``path="~/dkist/{primary_proposal_id}"`` to save the files in a
+        folder named for the proposal id.  **Note** that ``{dataset_id}`` is
+        always added to the path if it is not already the last element.
 
     destination_endpoint
         A unique specifier for a Globus endpoint. If `None` a local
@@ -87,18 +106,22 @@ def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow 
     The path to the directories containing the dataset(s) on the destination endpoint.
 
     """
-    # Avoid circular import
-    from dkist.net import conf
+    path = Path(path)
+    if path.parts[-1] != "{dataset_id}":
+        path = path / "{dataset_id}"
 
-    if isinstance(datasets, (DKISTQueryResponseTable, QueryResponseRow)):
-        # These we don't have to pre-process
+    if isinstance(datasets, DKISTQueryResponseTable):
+        # This we don't have to pre-process
         pass
+
+    elif isinstance(datasets, QueryResponseRow):
+        datasets = DKISTQueryResponseTable(datasets)
 
     elif isinstance(datasets, UnifiedResponse):
         # If we have a UnifiedResponse object, it could contain one or more dkist tables.
         # Stack them and then treat them like we were passed a single table with many rows.
         datasets = datasets["dkist"]
-        if len(datasets) > 1:
+        if isinstance(datasets, UnifiedResponse) and len(datasets) > 1:
             datasets = table.vstack(datasets, metadata_conflicts="silent")
 
     elif isinstance(datasets, str) or all(isinstance(d, str) for d in datasets):
@@ -109,45 +132,38 @@ def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow 
         # Anything else, error
         raise TypeError(f"{type(datasets)} is of an unknown type, it should be search results or one or more dataset IDs.")
 
-    if not isinstance(datasets, QueryResponseRow) and len(datasets) > 1:
-        paths = []
-        for record in datasets:
-            paths.append(transfer_complete_datasets(record,
-                                                    path=path,
-                                                    destination_endpoint=destination_endpoint,
-                                                    progress=progress,
-                                                    wait=wait,
-                                                    label=label))
-        return paths
 
-    # ensure a length one table is a row
-    if len(datasets) == 1:
-        datasets = datasets[0]
+    source_paths = []
+    for record in datasets:
+        source_paths.append(_get_globus_path_for_dataset(record))
 
-    # At this point we only have one dataset, and it should be a row not a table
-    dataset = datasets
-    dataset_id = dataset["Dataset ID"]
-    proposal_id = dataset["Primary Proposal ID"]
-    bucket = dataset["Storage Bucket"]
+    destination_paths = []
+    for dataset in datasets:
+        dataset_id = dataset["Dataset ID"]
+        proposal_id = dataset["Primary Proposal ID"]
+        bucket = dataset["Storage Bucket"]
 
-    path_inv = path_format_inventory(dict(dataset))
-    destination_path = Path(path.format(**path_inv))
+        path_inv = path_format_inventory(dict(dataset))
+        destination_paths.append(Path(str(path).format(**path_inv)))
 
-    file_list = [Path(conf.dataset_path.format(
-        datasetId=dataset_id,
-        primaryProposalId=proposal_id,
-        bucket=bucket
-    ))]
+    if not label:
+        now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
+        datasetids = ",".join(datasets["Dataset ID"])
+        if len(datasetids) > 80:
+            datasetids = f"{len(datasets['Dataset ID'])} datasets"
+        label = f"DKIST Python Tools - {now} - {datasetids}"
 
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
-    label = f"DKIST Python Tools - {now} {dataset_id}" if label is None else label
+    # Globus limits labels to 128 characters, so truncate if needed
+    # In principle this can't happen because of the truncation above, but just in case
+    if len(label) > 128:
+        label = label[:125] + "..."  # pragma: no cover
 
-    _orchestrate_transfer_task(file_list,
+    _orchestrate_transfer_task(source_paths,
                                recursive=True,
-                               destination_path=destination_path,
+                               destination_path=destination_paths,
                                destination_endpoint=destination_endpoint,
                                progress=progress,
                                wait=wait,
                                label=label)
 
-    return destination_path / dataset_id
+    return destination_paths

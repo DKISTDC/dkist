@@ -107,6 +107,20 @@ def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):
         assert f"{os.path.sep}b{os.path.sep}" + filepath.name == tfr["destination_path"]
 
 
+def test_start_transfer_multiple_paths(mocker, transfer_client, mock_endpoints):
+    submit_mock = mocker.patch("globus_sdk.TransferClient.submit_transfer",
+                               return_value={"task_id": "task_id"})
+    mocker.patch("globus_sdk.TransferClient.get_submission_id",
+                 return_value={"value": "wibble"})
+    file_list = list(map(Path, ["/a/name.fits", "/a/name2.fits"]))
+    dst_list = list(map(Path, ["/aplace/newname.fits", "/anotherplace/newname2.fits"]))
+    start_transfer_from_file_list("a", "b", dst_list, file_list)
+    transfer_manifest = submit_mock.call_args_list[0][0][0]["DATA"]
+
+    for filepath, tfr in zip(dst_list, transfer_manifest):
+        assert str(filepath) == tfr["destination_path"]
+
+
 def test_process_event_list(transfer_client, mock_task_event_list):
     (events,
      json_events,
