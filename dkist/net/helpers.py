@@ -154,8 +154,9 @@ def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow 
         label = f"DKIST Python Tools - {now} - {datasetids}"
 
     # Globus limits labels to 128 characters, so truncate if needed
+    # In principle this can't happen because of the truncation above, but just in case
     if len(label) > 128:
-        label = label[:125] + "..."
+        label = label[:125] + "..."  # pragma: no cover
 
     _orchestrate_transfer_task(source_paths,
                                recursive=True,
