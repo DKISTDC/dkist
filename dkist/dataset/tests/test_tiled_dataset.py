@@ -98,10 +98,8 @@ def test_tiles_shape(simple_tiled_dataset):
     assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]
 
 
-def test_file_manager(dataset):
-    from dkist.data.sample import VBI_AJQWW
-    ds = load_dataset(VBI_AJQWW)
-
+def test_file_manager(large_tiled_dataset):
+    ds = large_tiled_dataset
     with pytest.raises(AttributeError):
         ds.files = 10
 
