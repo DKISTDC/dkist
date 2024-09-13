@@ -130,7 +130,6 @@ def test_file_manager():
         dataset.files = 10
 
     assert len(dataset.files.filenames) == 11
-    assert len(dataset.files.filenames) == 11
 
     assert isinstance(dataset[5]._file_manager, FileManager)
     assert len(dataset[..., 5].files.filenames) == 11
