@@ -1,0 +1,1 @@
+Add a FileManager property to TiledDataset for tracking files more easily.
