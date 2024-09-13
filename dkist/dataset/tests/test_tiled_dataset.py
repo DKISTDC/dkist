@@ -96,3 +96,19 @@ def test_repr(simple_tiled_dataset):
 @pytest.mark.accept_cli_tiled_dataset
 def test_tiles_shape(simple_tiled_dataset):
     assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]
+
+
+def test_file_manager(dataset):
+    from dkist.data.sample import VBI_AJQWW
+    ds = load_dataset(VBI_AJQWW)
+
+    with pytest.raises(AttributeError):
+        ds.files = 10
+
+    assert len(ds.files.filenames) == 27
+    assert ds.files.shape == (1, 4096, 4096)
+    assert ds.files.output_shape == (3, 3, 3, 4096, 4096)
+
+    # Have some slicing tests here
+    assert len(ds.slice_tiles[0].files.filenames) == 9
+    assert len(ds[:2, :2].files.filenames) == 12
