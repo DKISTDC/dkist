@@ -13,7 +13,8 @@ import numpy as np
 
 from astropy.table import vstack
 
-from dkist.io.file_manager import FileManager
+from dkist.io.file_manager import FileManager, StripedExternalArray
+from dkist.io.loaders import AstropyFITSLoader
 
 from .dataset import Dataset, FileManagerDescriptor
 from .utils import dataset_info_str
@@ -201,3 +202,17 @@ class TiledDataset(Collection):
         A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
         return self._file_manager
+
+    @property
+    def _file_manager(self):
+        return FileManager(
+            StripedExternalArray(
+                fileuris = [[tile.files.filenames for tile in row] for row in self],
+                target = 1,
+                dtype = self[0, 0].files.fileuri_array.dtype,
+                shape = self[0, 0]._data.chunksize,
+                loader = AstropyFITSLoader,
+                basepath = self[0, 0].files.basepath,
+                chunksize = self[0, 0]._data.chunksize
+            )
+        )

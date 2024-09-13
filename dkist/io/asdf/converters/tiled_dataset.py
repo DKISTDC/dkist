@@ -1,8 +1,5 @@
 from asdf.extension import Converter
 
-from dkist.io.file_manager import FileManager, StripedExternalArray
-from dkist.io.loaders import AstropyFITSLoader
-
 
 class TiledDatasetConverter(Converter):
     tags = [
@@ -14,19 +11,7 @@ class TiledDatasetConverter(Converter):
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
 
-        tiled_dataset = TiledDataset(node["datasets"], node["inventory"])
-        tiled_dataset._file_manager = FileManager(
-            StripedExternalArray(
-                fileuris = [[tile.files.filenames for tile in row] for row in tiled_dataset],
-                target = 1,
-                dtype = tiled_dataset[0, 0].files.fileuri_array.dtype,
-                shape = tiled_dataset[0, 0]._data.chunksize,
-                loader = AstropyFITSLoader,
-                basepath = tiled_dataset[0, 0].files.basepath,
-                chunksize = tiled_dataset[0, 0]._data.chunksize
-            )
-        )
-        return tiled_dataset
+        return TiledDataset(node["datasets"], node["inventory"])
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
         tree = {}
