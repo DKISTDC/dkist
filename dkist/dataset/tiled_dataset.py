@@ -13,7 +13,9 @@ import numpy as np
 
 from astropy.table import vstack
 
-from .dataset import Dataset
+from dkist.io.file_manager import FileManager
+
+from .dataset import Dataset, FileManagerDescriptor
 from .utils import dataset_info_str
 
 __all__ = ["TiledDataset"]
@@ -55,6 +57,8 @@ class TiledDataset(Collection):
         and montage packages for possible ways to achieve this.
 
     """
+
+    _file_manager = FileManagerDescriptor(default_type=FileManager)
 
     @classmethod
     def _from_components(cls, shape, file_managers, wcses, header_tables, inventory):
@@ -190,3 +194,10 @@ class TiledDataset(Collection):
 
     def __str__(self):
         return dataset_info_str(self)
+
+    @property
+    def files(self):
+        """
+        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
+        """
+        return self._file_manager
