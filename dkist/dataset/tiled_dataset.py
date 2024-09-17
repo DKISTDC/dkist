@@ -16,7 +16,7 @@ from astropy.table import vstack
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
 
-from .dataset import Dataset, FileManagerDescriptor
+from .dataset import Dataset
 from .utils import dataset_info_str
 
 __all__ = ["TiledDataset"]
@@ -58,8 +58,6 @@ class TiledDataset(Collection):
         and montage packages for possible ways to achieve this.
 
     """
-
-    _file_manager = FileManagerDescriptor(default_type=FileManager)
 
     @classmethod
     def _from_components(cls, shape, file_managers, wcses, header_tables, inventory):
