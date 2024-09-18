@@ -110,3 +110,9 @@ def test_file_manager(large_tiled_dataset):
     # Have some slicing tests here
     assert len(ds.slice_tiles[0].files.filenames) == 9
     assert len(ds[:2, :2].files.filenames) == 12
+
+    # TODO Also test that the other checks raise errors
+    # This at least demonstrates that the structure works
+    ds[1, 1].files.fileuri_array.dtype = np.dtype("<i")
+    with pytest.raises(AssertionError, match="must be the same across all tiles"):
+        ds.files

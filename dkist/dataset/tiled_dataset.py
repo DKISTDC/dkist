@@ -203,14 +203,29 @@ class TiledDataset(Collection):
 
     @property
     def _file_manager(self):
+        fileuris = [[tile.files.filenames for tile in row] for row in self]
+        dtype = self[0, 0].files.fileuri_array.dtype
+        shape = self[0, 0].files.shape
+        basepath = self[0, 0].files.basepath
+        chunksize = self[0, 0]._data.chunksize
+
+        for tile in self.flat:
+            try:
+                assert dtype == tile.files.fileuri_array.dtype
+                assert shape == tile.files.shape
+                assert basepath == tile.files.basepath
+                assert chunksize == tile._data.chunksize
+            except AssertionError as err:
+                raise AssertionError("Attributes of TiledDataset.FileManager must be the same across all tiles.") from err
+
         return FileManager(
             StripedExternalArray(
-                fileuris = [[tile.files.filenames for tile in row] for row in self],
-                target = 1,
-                dtype = self[0, 0].files.fileuri_array.dtype,
-                shape = self[0, 0]._data.chunksize,
-                loader = AstropyFITSLoader,
-                basepath = self[0, 0].files.basepath,
-                chunksize = self[0, 0]._data.chunksize
+                fileuris=fileuris,
+                target=1,
+                dtype=dtype,
+                shape=shape,
+                loader=AstropyFITSLoader,
+                basepath=basepath,
+                chunksize=chunksize
             )
         )
