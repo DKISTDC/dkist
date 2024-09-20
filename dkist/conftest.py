@@ -347,3 +347,9 @@ def visp_dataset_no_headers(tmp_path_factory):
         with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
+
+
+@pytest.fixture
+def ds(request):
+    dslist = [load_dataset(ds_) for ds_ in request.config.getoption("--ds").split(",")]
+    return dslist if len(dslist) > 1 else dslist[0]
