@@ -1,0 +1,1 @@
+Add `--ds` cli option and `accept_cli_datasets` marker for pytest to allow passing arbitrary datasets to the test suite.
