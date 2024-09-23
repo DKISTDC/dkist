@@ -351,7 +351,8 @@ def visp_dataset_no_headers(tmp_path_factory):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
-    dslist = item.config.getoption("--ds", "").split(",")
+    dslist = item.config.getoption("--ds")
+    dslist = dslist.split(",") if dslist else None
     if dslist and item.get_closest_marker("accept_cli_datasets"):
         dsargs = [load_dataset(ds) for ds in dslist]
         for ds, arg in zip(dsargs, item.fixturenames):
