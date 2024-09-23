@@ -43,6 +43,7 @@ def test_init_missing_meta_keys(identity_gwcs):
         Dataset(data, wcs=identity_gwcs, meta={"headers": {}})
 
 
+@pytest.mark.accept_cli_datasets
 def test_repr(dataset, dataset_3d):
     r = repr(dataset)
     assert str(dataset.data) in r
@@ -50,6 +51,7 @@ def test_repr(dataset, dataset_3d):
     assert str(dataset_3d.data) in r
 
 
+@pytest.mark.accept_cli_datasets
 def test_wcs_roundtrip(dataset):
     p = (10*u.pixel, 10*u.pixel)
     w = dataset.wcs.pixel_to_world(*p)
@@ -57,6 +59,7 @@ def test_wcs_roundtrip(dataset):
     assert_quantity_allclose(p, p2 * u.pix)
 
 
+@pytest.mark.accept_cli_datasets
 def test_wcs_roundtrip_3d(dataset_3d):
     p = (10*u.pixel, 10*u.pixel, 10*u.pixel)
     w = dataset_3d.wcs.pixel_to_world(*p)
@@ -115,6 +118,7 @@ def test_load_with_invalid_input():
         load_dataset(42)
 
 
+@pytest.mark.accept_cli_datasets
 def test_crop_few_slices(dataset_4d):
     sds = dataset_4d[0, 0]
     assert sds.wcs.world_n_dim == 2
@@ -158,6 +162,7 @@ def test_header_slicing_single_index():
     assert (sliced.headers["DINDEX3"] == sliced_headers["DINDEX3"]).all()
 
 
+@pytest.mark.accept_cli_datasets
 def test_header_slicing_3D_slice(large_visp_dataset):
     dataset = large_visp_dataset
     idx = np.s_[:2, 10:15, 0]
