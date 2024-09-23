@@ -349,7 +349,11 @@ def visp_dataset_no_headers(tmp_path_factory):
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
 
 
-@pytest.fixture
-def ds(request):
-    dslist = [load_dataset(ds_) for ds_ in request.config.getoption("--ds").split(",")]
-    return dslist if len(dslist) > 1 else dslist[0]
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    dslist = item.config.getoption("--ds", "").split(",")
+    if dslist and item.get_closest_marker("accept_cli_datasets"):
+        dsargs = [load_dataset(ds) for ds in dslist]
+        for ds, arg in zip(dsargs, item.fixturenames):
+            item.funcargs[arg] = ds
+    yield item
