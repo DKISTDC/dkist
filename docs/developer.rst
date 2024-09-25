@@ -107,10 +107,10 @@ By default the first fixture specified in the test definition is the one replace
 
 For example:
 
-```python
-@pytest.mark.accept_cli_dataset("another_dataset")
-def test_something(dataset, another_dataset):
-    ...
-```
+.. code-block:: python
+
+   @pytest.mark.accept_cli_dataset("another_dataset")
+   def test_something(dataset, another_dataset):
+       ...
 
 would usually run with the fixtures `dataset` and `another_dataset` as its inputs, but running `pytest --ds /path/to/dataset/ABCDE/` would run the test using the `dataset` fixture and the local dataset `ABCDE` instead.
