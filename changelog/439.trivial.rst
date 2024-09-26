@@ -1,0 +1,2 @@
+Add `--ds` and `--tiled-ds` CLI options to allow passing in datasets for use with the test suite.
+The dataset given with `--ds` is passed to tests marked with `accept_cli_dataset` and those given with `--tiled-ds` are passed to tests marked with `accept_cli_tiled_dataset`.

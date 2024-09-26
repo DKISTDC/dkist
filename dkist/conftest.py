@@ -347,3 +347,21 @@ def visp_dataset_no_headers(tmp_path_factory):
         with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    ds = item.config.getoption("--ds")
+    tds = item.config.getoption("--tiled-ds")
+
+    # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
+    mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")
+    if mark:
+        # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
+        replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
+        if ds:
+            item.funcargs[replace_arg] = load_dataset(ds)
+        if tds:
+            item.funcargs[tdsmark.args[0]] = load_dataset(tds)
+
+    yield item

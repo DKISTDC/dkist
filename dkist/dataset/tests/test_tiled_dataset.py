@@ -18,6 +18,7 @@ def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert simple_tiled_dataset.shape == (2, 2)
 
 
+@pytest.mark.accept_cli_tiled_dataset
 @pytest.mark.parametrize("aslice", [np.s_[0,0],
                                     np.s_[0],
                                     np.s_[...,0],
@@ -28,6 +29,7 @@ def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
     assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
 
 
+@pytest.mark.accept_cli_tiled_dataset
 @pytest.mark.parametrize("aslice", [np.s_[0, :100, 100:200]])
 def test_tiled_dataset_slice_tiles(large_tiled_dataset, aslice):
     sliced = large_tiled_dataset.slice_tiles[aslice]
@@ -84,10 +86,13 @@ def test_tileddataset_plot(share_zscale):
     ds.plot(0, share_zscale=share_zscale)
     return plt.gcf()
 
+
+@pytest.mark.accept_cli_tiled_dataset
 def test_repr(simple_tiled_dataset):
     r = repr(simple_tiled_dataset)
     assert str(simple_tiled_dataset[0, 0].data) in r
 
 
+@pytest.mark.accept_cli_tiled_dataset
 def test_tiles_shape(simple_tiled_dataset):
     assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]

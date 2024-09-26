@@ -92,3 +92,26 @@ Sphinx References
 When authoring documentation files each page (at minimum) should have a reference on its top title.
 This should take the form ``dkist:<section>:<page>``, so for the index page of the ``topic_guides/`` folder it is ``dkist:topic-guides:index``.
 All references should take this three element format, so a subheading in a page would be ``dkist:section:subheading``.
+
+Testing
+-------
+
+Testing with arbitrary datasets
+*******************************
+
+The DKIST Python tools allow the test suite to run on user-provided datasets.
+To enable this there are two pytest command line optionsa available, `--ds` and `--tiled-ds`.
+Each takes a string parseable by `load_dataset()`.
+Tests with the `accept_cli_dataset` or `accept_tiled_dataset` markers will take the value given for `--ds` or `--tiled-ds` respectively, load that dataset and pass it into the test in place of a fixture.
+To only run tests using the supplied datasets you can run pytest with `-m accept_cli_dataset` and/or `-m accept_cli_tiled_dataset`.
+By default the first fixture specified in the test definition is the one replaced, but if a fixture name is given to the marker that fixture will be replaced instead.
+
+For example:
+
+.. code-block:: python
+
+   @pytest.mark.accept_cli_dataset("another_dataset")
+   def test_something(dataset, another_dataset):
+       ...
+
+would usually run with the fixtures `dataset` and `another_dataset` as its inputs, but running `pytest --ds /path/to/dataset/ABCDE/` would run the test using the `dataset` fixture and the local dataset `ABCDE` instead.
