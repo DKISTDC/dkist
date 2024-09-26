@@ -362,6 +362,6 @@ def pytest_runtest_call(item):
         if ds:
             item.funcargs[replace_arg] = load_dataset(ds)
         if tds:
-            item.funcargs[tdsmark.args[0]] = load_dataset(tds)
+            item.funcargs[replace_arg] = load_dataset(tds)
 
     yield item
