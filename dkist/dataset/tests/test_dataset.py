@@ -55,7 +55,7 @@ def test_repr(dataset, dataset_3d):
 def test_wcs_roundtrip(dataset):
     p = [1*u.pixel] * dataset.wcs.pixel_n_dim
     w = dataset.wcs.pixel_to_world(*p)
-    p2 = dataset.wcs.world_to_pixel(*w)
+    p2 = dataset.wcs.world_to_pixel(w)
     assert_quantity_allclose(p, p2 * u.pix)
 
 
