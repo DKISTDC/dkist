@@ -59,7 +59,6 @@ def test_wcs_roundtrip(dataset):
 
 
 def test_wcs_roundtrip_3d(dataset_3d):
-    # TOO generalise this so mark.accept_cli_dataset will work, if possible
     p = (10*u.pixel, 10*u.pixel, 10*u.pixel)
     w = dataset_3d.wcs.pixel_to_world(*p)
     p2 = dataset_3d.wcs.world_to_pixel(*w) * u.pix
