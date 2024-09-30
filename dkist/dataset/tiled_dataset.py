@@ -153,10 +153,12 @@ class TiledDataset(Collection):
         return [[tile.data.shape for tile in row] for row in self]
 
     def plot(self, slice_index: int, share_zscale=False, **kwargs):
+        if isinstance(slice_index, int):
+            slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
         fig = plt.figure()
         for i, tile in enumerate(self.flat):
-            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
+            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[slice_index].wcs)
             tile[slice_index].plot(axes=ax, **kwargs)
             if i == 0:
                 xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
@@ -174,8 +176,12 @@ class TiledDataset(Collection):
         if share_zscale:
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
-        timestamp = self[0, 0].axis_world_coords("time")[-1].iso[slice_index]
-        fig.suptitle(f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at time {timestamp} (slice={slice_index})", y=0.95)
+        timestamp = tile[slice_index].global_coords["time"].iso
+        title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
+        for i, (coord, val) in enumerate(tile[slice_index].global_coords.items()):
+            title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
+        title += f"(slice={slice_index})"
+        fig.suptitle(title, y=0.95)
         return fig
 
     @property
