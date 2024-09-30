@@ -176,11 +176,12 @@ class TiledDataset(Collection):
         if share_zscale:
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
-        timestamp = tile[slice_index].global_coords["time"].iso
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(tile[slice_index].global_coords.items()):
+        for i, (coord, val) in enumerate(self[0,0][slice_index].global_coords.items()):
+            if coord == "time":
+                val = val.iso
             title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
-        title += f"(slice={slice_index})"
+        title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})"
         fig.suptitle(title, y=0.95)
         return fig
 
