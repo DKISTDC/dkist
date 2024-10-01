@@ -61,6 +61,8 @@ tests = [
 ]
 docs = [
   "sphinx",
+  "sphinx-automodapi",
+  "packaging",
   "sphinx-astropy",
   "sphinx-gallery",
   "sphinx-changelog",
