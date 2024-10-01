@@ -152,7 +152,19 @@ class TiledDataset(Collection):
         """
         return [[tile.data.shape for tile in row] for row in self]
 
-    def plot(self, slice_index: int, share_zscale=False, **kwargs):
+    def plot(self, slice_index, share_zscale=False, **kwargs):
+        """
+        Plot a slice of each tile in the TiledDataset
+
+        Parameters
+        ----------
+        slice_index : `int`, sequence of `int`s or `numpy.s_`
+            Object representing a slice which will reduce each component dataset of the TiledDataset to a 2D image.
+        share_zscale : `bool`
+            Determines whether the color scale of the plots should be calculated independently (``False``) or shared across all plots (``True``).
+            Defaults to False
+
+        """
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
@@ -181,7 +193,7 @@ class TiledDataset(Collection):
             if coord == "time":
                 val = val.iso
             title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
-        title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})"
+        title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace("slice(None, None, None)", ":")
         fig.suptitle(title, y=0.95)
         return fig
 
