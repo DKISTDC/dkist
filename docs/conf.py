@@ -2,15 +2,16 @@
 Configuration file for the Sphinx documentation builder.
 """
 # -- stdlib imports ------------------------------------------------------------
+
 import datetime
 import os
 import sys
-import warnings
 
 from packaging.version import Version
 from pkg_resources import get_distribution
 
 # -- Check for dependencies ----------------------------------------------------
+
 doc_requires = get_distribution("dkist").requires(extras=("docs",))
 missing_requirements = []
 for requirement in doc_requires:
@@ -26,7 +27,7 @@ if missing_requirements:
     sys.exit(1)
 
 # -- Read the Docs Specific Configuration --------------------------------------
-# This needs to be done before sunpy is imported
+
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 if on_rtd:
     os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
@@ -36,22 +37,30 @@ if on_rtd:
     os.environ["HIDE_PARFIVE_PROGESS"] = "True"
 
 # -- Non stdlib imports --------------------------------------------------------
+
 import dkist  # noqa
 from dkist import __version__
 
-# -- Project information -------------------------------------------------------
+# -- Project information -----------------------------------------------------
+
+# The full version, including alpha/beta/rc tags
+
+_version = Version(__version__)
+version = release = str(_version)
+# Avoid "post" appearing in version string in rendered docs
+if _version.is_postrelease:
+    version = release = _version.base_version
+# Avoid long githashes in rendered Sphinx docs
+elif _version.is_devrelease:
+    version = release = f"{_version.base_version}.dev{_version.dev}"
+is_development = _version.is_devrelease
+is_release = not(_version.is_prerelease or _version.is_devrelease)
+
 project = "DKIST"
 author = "NSO / AURA"
 copyright = f"{datetime.datetime.now().year}, {author}"
 
-# The full version, including alpha/beta/rc tags
-release = __version__
-dkist_version = Version(__version__)
-is_release = not(dkist_version.is_prerelease or dkist_version.is_devrelease)
-
-# We want to ignore all warnings in a release version.
-if is_release:
-    warnings.simplefilter("ignore")
+# -- General configuration ---------------------------------------------------
 
 # Suppress warnings about overriding directives as we overload some of the
 # doctest extensions.
@@ -87,10 +96,6 @@ extensions = [
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-
-# Add any extra paths that contain custom files (such as robots.txt or
-# .htaccess) here, relative to this directory. These files are copied
-
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "jupyter_execute", "**/*_NOTES.md"]
 
 # The suffix(es) of source filenames.
@@ -102,9 +107,8 @@ myst_enable_extensions = ["colon_fence", "dollarmath", "substitution"]
 # The master toctree document.
 master_doc = "index"
 
-# The reST default role (used for this markup: `text`) to use for all
-# documents. Set to the "smart" one.
-default_role = "obj"
+# Treat everything in single ` as a Python reference.
+default_role = "py:obj"
 
 napoleon_use_rtype = False
 
@@ -120,6 +124,7 @@ typehints_use_rtype = napoleon_use_rtype
 typehints_defaults = "comma"
 
 # -- Options for intersphinx extension -----------------------------------------
+
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
@@ -137,6 +142,7 @@ intersphinx_mapping = {
 }
 
 # -- Options for HTML output ---------------------------------------------------
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
@@ -163,6 +169,7 @@ graphviz_dot_args = [
 pygments_style = "github-light"
 
 # -- MyST_NB -------------------------------------------------------------------
+
 nb_execution_allow_errors = False
 nb_execution_in_temp = True
 nb_execution_mode = "auto"
