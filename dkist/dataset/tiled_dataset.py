@@ -159,11 +159,10 @@ class TiledDataset(Collection):
         Parameters
         ----------
         slice_index : `int`, sequence of `int`s or `numpy.s_`
-            Object representing a slice which will reduce each component dataset of the TiledDataset to a 2D image.
+            Object representing a slice which will reduce each component dataset of the TiledDataset to a 2D image. This is passed to ``TiledDataset.slice_tiles``
         share_zscale : `bool`
             Determines whether the color scale of the plots should be calculated independently (``False``) or shared across all plots (``True``).
             Defaults to False
-
         """
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
@@ -200,6 +199,9 @@ class TiledDataset(Collection):
 
     @property
     def slice_tiles(self):
+        """
+        Returns a new TiledDataset with the given slice applied to each of the tiles.
+        """
         return TiledDatasetSlicer(self._data, self.inventory)
 
     # TODO: def regrid()
