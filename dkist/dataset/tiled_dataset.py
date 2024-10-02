@@ -169,9 +169,10 @@ class TiledDataset(Collection):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
         fig = plt.figure()
-        for i, tile in enumerate(self.flat):
-            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[slice_index].wcs)
-            tile[slice_index].plot(axes=ax, **kwargs)
+        tiles = self.slice_tiles[slice_index].flat
+        for i, tile in enumerate(tiles):
+            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
+            tile.plot(axes=ax, **kwargs)
             if i == 0:
                 xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
                 ylabel = ax.coords[1].get_axislabel() or ax.coords[1]._get_default_axislabel()
@@ -189,7 +190,7 @@ class TiledDataset(Collection):
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(self[0,0][slice_index].global_coords.items()):
+        for i, (coord, val) in enumerate(tiles[0].global_coords.items()):
             if coord == "time":
                 val = val.iso
             title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
