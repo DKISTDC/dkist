@@ -221,10 +221,6 @@ class TiledDataset(Collection):
         """
         A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
-        return self._file_manager
-
-    @property
-    def _file_manager(self):
         fileuris = [[tile.files.filenames for tile in row] for row in self]
         dtype = self[0, 0].files.fileuri_array.dtype
         shape = self[0, 0].files.shape
