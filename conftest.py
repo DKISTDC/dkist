@@ -28,8 +28,8 @@ def pytest_report_header(config, start_path):
 def pytest_runtest_makereport(item, call):
     report = yield
     if report.when == "call":
-        ds = item.config.getoption("--ds")
-        tds = item.config.getoption("--tiled-ds")
+        ds = item.config.getoption("--ds") or None
+        tds = item.config.getoption("--tiled-ds") or None
         if ds and item.get_closest_marker("accept_cli_dataset"):
             report.nodeid += f"[{ds}]"
         if tds and item.get_closest_marker("accept_cli_tiled_dataset"):
