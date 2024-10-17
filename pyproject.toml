@@ -111,7 +111,10 @@ write_to = "dkist/_version.py"
     enabled = true
 
   [ tool.gilesbot.circleci_artifacts.figure_report]
-    url = ".tmp/py312-figure/figure_test_images/fig_comparison.html"
+    url = "py312-figure/figure_test_images/fig_comparison.html"
+
+  [ tool.gilesbot.circleci_artifacts.figure_devdeps_report]
+    url = "py312-figure-devdeps/figure_test_images/fig_comparison.html"
 
 [tool.towncrier]
     package = "dkist"
