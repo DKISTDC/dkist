@@ -351,8 +351,13 @@ def visp_dataset_no_headers(tmp_path_factory):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
-    ds = item.config.getoption("--ds")
-    tds = item.config.getoption("--tiled-ds")
+    try:
+        ds = item.config.getoption("--ds")
+        tds = item.config.getoption("--tiled-ds")
+    except ValueError:
+        # If CLI arguments can't be found, need to return gracefully
+        # TODO raise a warning here
+        yield item
 
     # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
     mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")

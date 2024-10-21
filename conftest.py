@@ -30,12 +30,11 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call":
         try:
             ds = item.config.getoption("--ds")
-        except ValueError:
-            ds = None
-        try:
             tds = item.config.getoption("--tiled-ds")
         except ValueError:
-            tds = None
+            # If CLI arguments can't be found, need to return gracefully
+            # TODO raise a warning here
+            return report
         if ds and item.get_closest_marker("accept_cli_dataset"):
             report.nodeid += f"[{ds}]"
         if tds and item.get_closest_marker("accept_cli_tiled_dataset"):
