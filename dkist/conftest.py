@@ -25,57 +25,6 @@ from dkist.io import FileManager
 from dkist.io.loaders import AstropyFITSLoader
 
 
-def pytest_addoption(parser):
-    parser.addoption("--ds", action="store", help="Dataset provided as a string which can be parsed by load_dataset. This will override fixtures used in tests decorated with @accept_ds_from_cli.")
-    parser.addoption("--tiled-ds", action="store", help="Tiled datasets provided as a string which can be parsed by load_dataset. These datasets will override fixtures used in tests decorated with @accept_tiled_ds_from_cli.")
-
-
-def pytest_report_header(config, start_path):
-    ds_str = config.getoption("--ds") or "None"
-    tds_str = config.getoption("--tiled-ds") or "None"
-
-    return [f"CLI dataset provided: {ds_str}",
-            f"CLI tiled dataset provided: {tds_str}"]
-
-
-@pytest.hookimpl(wrapper=True, tryfirst=True)
-def pytest_runtest_makereport(item, call):
-    report = yield
-    if report.when == "call":
-        try:
-            ds = item.config.getoption("--ds")
-        except ValueError:
-            ds = None
-        try:
-            tds = item.config.getoption("--tiled-ds")
-        except ValueError:
-            tds = None
-        if ds and item.get_closest_marker("accept_cli_dataset"):
-            report.nodeid += f"[{ds}]"
-        if tds and item.get_closest_marker("accept_cli_tiled_dataset"):
-            report.nodeid += f"[{tds}]"
-
-    return report
-
-
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_call(item):
-    ds = item.config.getoption("--ds")
-    tds = item.config.getoption("--tiled-ds")
-
-    # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
-    mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")
-    if mark:
-        # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
-        replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
-        if ds:
-            item.funcargs[replace_arg] = load_dataset(ds)
-        if tds:
-            item.funcargs[replace_arg] = load_dataset(tds)
-
-    yield item
-
-
 @pytest.fixture
 def caplog_dkist(caplog):
     """
@@ -398,3 +347,21 @@ def visp_dataset_no_headers(tmp_path_factory):
         with open(vispdir / "test_visp_no_headers.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    ds = item.config.getoption("--ds")
+    tds = item.config.getoption("--tiled-ds")
+
+    # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
+    mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")
+    if mark:
+        # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
+        replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
+        if ds:
+            item.funcargs[replace_arg] = load_dataset(ds)
+        if tds:
+            item.funcargs[replace_arg] = load_dataset(tds)
+
+    yield item
