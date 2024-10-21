@@ -1,5 +1,6 @@
 import copy
 import gzip
+import warnings
 from pathlib import Path
 
 import dask.array as da
@@ -351,17 +352,23 @@ def visp_dataset_no_headers(tmp_path_factory):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
-    ds = item.config.getoption("--ds")
-    tds = item.config.getoption("--tiled-ds")
+    try:
+        ds = item.config.getoption("--ds")
+        tds = item.config.getoption("--tiled-ds")
 
-    # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
-    mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")
-    if mark:
-        # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
-        replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
-        if ds:
-            item.funcargs[replace_arg] = load_dataset(ds)
-        if tds:
-            item.funcargs[replace_arg] = load_dataset(tds)
+        # Only one of accept_cli_dataset and accept_cli_tiled_dataset should be available
+        mark = item.get_closest_marker("accept_cli_dataset") or item.get_closest_marker("accept_cli_tiled_dataset")
+        if mark:
+            # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
+            replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
+            if ds:
+                item.funcargs[replace_arg] = load_dataset(ds)
+            if tds:
+                item.funcargs[replace_arg] = load_dataset(tds)
 
-    yield item
+        yield item
+    except ValueError:
+        # If CLI arguments can't be found, need to return gracefully
+        # TODO raise a warning here
+        warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets will not be used.")
+        yield item
