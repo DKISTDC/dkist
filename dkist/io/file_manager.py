@@ -242,7 +242,7 @@ class BaseFileManager:
         aslice = list(sanitize_slices(aslice, len(self.output_shape)))
         if fits_array_shape[0] == 1:
             # Insert a blank slice for the dummy dimension
-            aslice.insert(len(fits_array_shape) - 1, slice(None))
+            aslice.insert(len(fits_array_shape), slice(None))
         # Now only use the dimensions of the slice not covered by the array axes
         aslice = aslice[:-1*len(fits_array_shape)]
         return tuple(aslice)
