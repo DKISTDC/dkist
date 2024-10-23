@@ -79,7 +79,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
 
             **Join the chat**
 
-        .. button-link:: https://github.com/sunpy/sunpy/issues
+        .. button-link:: https://github.com/DKISTDC/dkist/issues
             :shadow:
             :expand:
             :color: primary
