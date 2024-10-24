@@ -159,13 +159,8 @@ class TiledDataset(Collection):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile[0].wcs)
             tile[slice_index].plot(axes=ax, **kwargs)
             if i == 0:
-                xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
-                ylabel = ax.coords[1].get_axislabel() or ax.coords[1]._get_default_axislabel()
-                for coord in ax.coords:
-                    if "b" in coord.axislabels.get_visible_axes():
-                        fig.supxlabel(xlabel, y=0.05)
-                    if "l" in coord.axislabels.get_visible_axes():
-                        fig.supylabel(ylabel, x=0.05)
+                fig.supxlabel(ax.get_xlabel(), y=0.05)
+                fig.supylabel(ax.get_ylabel(), x=0.05)
             axmin, axmax = ax.get_images()[0].get_clim()
             vmin = axmin if axmin < vmin else vmin
             vmax = axmax if axmax > vmax else vmax
