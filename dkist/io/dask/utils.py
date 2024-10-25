@@ -8,13 +8,20 @@ __all__ = ["stack_loader_array"]
 
 def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1):
     """
-    Stack a loader array along each of its dimensions.
+    Converts an array of loaders to a dask array that loads a chunk from each loader
 
     This results in a dask array with the correct chunks and dimensions.
 
     Parameters
     ----------
-    loader_array : `dkist.io.reference_collections.BaseFITSArrayContainer`
+    loader_array : `dkist.io.loaders.BaseFITSLoader`
+        An array of loader objects
+    output_shape : tuple[int]
+        The intended shape of the final array
+    chunksize : tuple[int]
+        Can be used to set a chunk size. If not provided, each batch is one chunk
+    batch_size : int
+        The number of files to load in each dask task
 
     Returns
     -------
