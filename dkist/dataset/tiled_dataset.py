@@ -190,9 +190,11 @@ class TiledDataset(Collection):
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(tiles[0].global_coords.items()):
+        for i, (coord, val) in enumerate(list(tiles[0].global_coords.items())[::-1]):
             if coord == "time":
                 val = val.iso
+            if coord == "stokes":
+                val = val.symbol
             title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
         title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace("slice(None, None, None)", ":")
         fig.suptitle(title, y=0.95)
