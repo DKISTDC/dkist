@@ -6,7 +6,7 @@ import numpy as np
 __all__ = ["stack_loader_array"]
 
 
-def stack_loader_array(loader_array, chunksize=None, batch_size=1):
+def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1):
     """
     Stack a loader array along each of its dimensions.
 
@@ -35,11 +35,11 @@ def stack_loader_array(loader_array, chunksize=None, batch_size=1):
                              name="load_files",
                              chunks=chunks,
                              dtype=loader_array.flat[0].dtype)
+    array = array.reshape(output_shape)
     if chunksize is not None:
         # If requested, re-chunk the array. Not sure this is optimal
         new_chunks = (1,) * (array.ndim - len(chunksize)) + chunksize
         array = array.rechunk(new_chunks)
-    # The calling function reshapes the array to the final, correct shape
     return array
 
 
