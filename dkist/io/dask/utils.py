@@ -1,12 +1,9 @@
-from itertools import batched
-
 import dask
-import numpy as np
 
 __all__ = ["stack_loader_array"]
 
 
-def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1):
+def stack_loader_array(loader_array, output_shape, chunksize=None):
     """
     Converts an array of loaders to a dask array that loads a chunk from each loader
 
@@ -20,8 +17,6 @@ def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1)
         The intended shape of the final array
     chunksize : tuple[int]
         Can be used to set a chunk size. If not provided, each batch is one chunk
-    batch_size : int
-        The number of files to load in each dask task
 
     Returns
     -------
@@ -30,18 +25,21 @@ def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1)
     file_shape = loader_array.flat[0].shape
 
     tasks = {}
-    batches = list(batched(loader_array.flat, batch_size))
-    for i, loaders in enumerate(batches):
+    for i, loader in enumerate(loader_array.flat):
+        # The key identifies this chunk's position in the (partially-flattened) final data cube
         key = ("load_files", i)
         key += (0,) * len(file_shape)
-        tasks[key] = (_load_batch, loaders)
+        # Each task will be to call the loader, with no arguments
+        tasks[key] = (loader,)
 
     dsk = dask.highlevelgraph.HighLevelGraph.from_collections("load_files", tasks, dependencies=())
-    chunks = (tuple(len(b) for b in batches),) + tuple((s,) for s in file_shape)
+    # Specifies that each chunk occupies a space of 1 pixel in the first dimension, and all the pixels in the others
+    chunks = ((1,) * loader_array.size,) + tuple((s,) for s in file_shape)
     array = dask.array.Array(dsk,
                              name="load_files",
                              chunks=chunks,
                              dtype=loader_array.flat[0].dtype)
+    # Now impose the higher dimensions on the data cube
     array = array.reshape(output_shape)
     if chunksize is not None:
         # If requested, re-chunk the array. Not sure this is optimal
@@ -49,9 +47,3 @@ def stack_loader_array(loader_array, output_shape, chunksize=None, batch_size=1)
         array = array.rechunk(new_chunks)
     return array
 
-
-def _load_batch(loaders):
-    arrays = [loader.data for loader in loaders]
-    if len(arrays) == 1:
-        return arrays[0]
-    return np.concatenate(arrays)
