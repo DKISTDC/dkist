@@ -93,7 +93,7 @@ class BaseStripedExternalArray(abc.ABC):
         still have a reference to this `~.FileManager` object, meaning changes
         to this object will be reflected in the data loaded by the array.
         """
-        return stack_loader_array(self.loader_array, self.chunksize).reshape(self.output_shape)
+        return stack_loader_array(self.loader_array, self.output_shape, self.chunksize)
 
 
 class StripedExternalArray(BaseStripedExternalArray):
