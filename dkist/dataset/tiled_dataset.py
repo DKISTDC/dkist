@@ -173,6 +173,7 @@ class TiledDataset(Collection):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
             tile.plot(axes=ax, **kwargs)
             if i == 0:
+                # TODO: When we can depend on astropy >=7.0 we can remove these or statements
                 xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
                 ylabel = ax.coords[1].get_axislabel() or ax.coords[1]._get_default_axislabel()
                 for coord in ax.coords:
