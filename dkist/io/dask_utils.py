@@ -1,4 +1,5 @@
 import dask
+import numpy as np
 
 __all__ = ["stack_loader_array"]
 
@@ -29,8 +30,8 @@ def stack_loader_array(loader_array, output_shape, chunksize=None):
         # The key identifies this chunk's position in the (partially-flattened) final data cube
         key = ("load_files", i)
         key += (0,) * len(file_shape)
-        # Each task will be to call the loader, with no arguments
-        tasks[key] = (loader,)
+        # Each task will be to call _call_loader, with the loader as an argument
+        tasks[key] = (_call_loader, loader)
 
     dsk = dask.highlevelgraph.HighLevelGraph.from_collections("load_files", tasks, dependencies=())
     # Specifies that each chunk occupies a space of 1 pixel in the first dimension, and all the pixels in the others
@@ -47,3 +48,10 @@ def stack_loader_array(loader_array, output_shape, chunksize=None):
         array = array.rechunk(new_chunks)
     return array
 
+
+def _call_loader(loader):
+    data = loader.data
+    # The data needs an extra dimension for the leading index of the intermediate data cube, which has a leading
+    # index for file number
+    data = np.expand_dims(data, 0)
+    return data

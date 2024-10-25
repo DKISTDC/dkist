@@ -64,10 +64,6 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     def data(self):
         return self[:]
 
-    def __call__(self):
-        # Support inserting loader directly into a Dask task
-        return self[:]
-
     @abc.abstractmethod
     def __getitem__(self, slc):
         pass
