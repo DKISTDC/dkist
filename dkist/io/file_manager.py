@@ -128,6 +128,10 @@ class StripedExternalArray(BaseStripedExternalArray):
     @basepath.setter
     def basepath(self, value: os.PathLike | str | None):
         self._basepath = Path(value).expanduser() if value is not None else None
+        if hasattr(self, '_loader_array'):
+            # We get called during __init__ before _loader_array is created
+            for loader in self._loader_array.flat:
+                loader.basepath = self._basepath
 
     @property
     def fileuri_array(self) -> NDArray[str]:
