@@ -20,8 +20,6 @@ def stack_loader_array(loader_array, chunksize=None, batch_size=1):
     -------
     array : `dask.array.Array`
     """
-    # If the chunksize isn't specified then use the whole array shape
-    chunksize = chunksize or loader_array.flat[0].shape
     file_shape = loader_array.flat[0].shape
 
     tasks = {}
@@ -37,6 +35,11 @@ def stack_loader_array(loader_array, chunksize=None, batch_size=1):
                              name="load_files",
                              chunks=chunks,
                              dtype=loader_array.flat[0].dtype)
+    if chunksize is not None:
+        # If requested, re-chunk the array. Not sure this is optimal
+        new_chunks = (1,) * (array.ndim - len(chunksize)) + chunksize
+        array = array.rechunk(new_chunks)
+    # The calling function reshapes the array to the final, correct shape
     return array
 
 
