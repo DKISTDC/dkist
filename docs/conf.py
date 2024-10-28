@@ -91,11 +91,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-<<<<<<<
-# templates_path = ['_templates']
-=======
 # templates_path = ["_templates"]  # NOQA: ERA001
->>>>>>>
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -150,13 +146,8 @@ intersphinx_mapping = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-<<<<<<<
 from dkist_sphinx_theme.conf.theme import *
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-=======
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"
 
@@ -176,18 +167,12 @@ graphviz_dot_args = [
 
 # By default, when rendering docstrings for classes, sphinx.ext.autodoc will
 # make docs with the class-level docstring and the class-method docstrings,
->>>>>>>
-# Render inheritance diagrams in SVG
-graphviz_output_format = "svg"
-
-graphviz_dot_args = [
-    "-Nfontsize=10",
-    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
-    "-Efontsize=10",
-    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
-    "-Gfontsize=10",
-    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif"
-]
+# but not the __init__ docstring, which often contains the parameters to
+# class constructors across the scientific Python ecosystem. The option below
+# will append the __init__ docstring to the class-level docstring when rendering
+# the docs. For more options, see:
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autoclass_content
+autoclass_content = "both"
 
 # Use a high-contrast code style from accessible-pygments
 # Our theme isn't using the correct background colours for code blocks, so this
