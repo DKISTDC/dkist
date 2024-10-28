@@ -1,0 +1,1 @@
+Improve performance of computing arrays when using non-thread or sync dask schedulers, by reducing the amount of data needed to be sent to each worker.
