@@ -45,12 +45,12 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     time.
     """
 
-    def __init__(self, fileuri, shape, dtype, target, array_container):
+    def __init__(self, fileuri, shape, dtype, target, basepath):
         self.fileuri = fileuri
         self.shape = shape
         self.dtype = dtype
         self.target = target
-        self.basepath = array_container.basepath
+        self.basepath = basepath
         self.ndim = len(self.shape)
         self.size = np.prod(self.shape)
 
