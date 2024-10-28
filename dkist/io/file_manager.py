@@ -97,14 +97,13 @@ class StripedExternalArray(BaseStripedExternalArray):
         self.dtype = dtype
         self.target = target
         self._loader = loader
-        self._basepath = None
-        self.basepath = basepath  # Use the setter to convert to a Path
+        self._basepath = self._sanitize_basepath(basepath)
         self.chunksize = chunksize
         self._fileuri_array = np.atleast_1d(np.array(fileuris))
 
         loader_array = np.empty_like(self._fileuri_array, dtype=object)
         for i, fileuri in enumerate(self._fileuri_array.flat):
-            loader_array.flat[i] = loader(fileuri, shape, dtype, target, self)
+            loader_array.flat[i] = loader(fileuri, shape, dtype, target, self.basepath)
 
         self._loader_array = loader_array
 
@@ -125,9 +124,15 @@ class StripedExternalArray(BaseStripedExternalArray):
         """
         return self._basepath
 
+    @staticmethod
+    def _sanitize_basepath(value):
+        return Path(value).expanduser() if value is not None else None
+
     @basepath.setter
     def basepath(self, value: os.PathLike | str | None):
-        self._basepath = Path(value).expanduser() if value is not None else None
+        self._basepath = self._sanitize_basepath(value)
+        for loader in self._loader_array.flat:
+            loader.basepath = self._basepath
 
     @property
     def fileuri_array(self) -> NDArray[str]:
