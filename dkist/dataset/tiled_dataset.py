@@ -204,7 +204,41 @@ class TiledDataset(Collection):
     def slice_tiles(self):
         """
         Returns a new TiledDataset with the given slice applied to each of the tiles.
+
+        Examples
+        --------
+        >>> from dkist import load_dataset
+        >>> from dkist.data.sample import VBI_AJQWW
+        >>> ds = load_dataset(VBI_AJQWW)
+        >>> ds.slice_tiles[0, 10:-10]
+        <dkist.dataset.tiled_dataset.TiledDataset object at 0x7024f7382cd0>
+        This VBI Dataset AJQWW is an array of (3, 3) Dataset objects and
+        consists of 9 frames.
+        Files are stored in /...
+
+        Each Dataset has 2 pixel and 2 world dimensions.
+
+        The data are represented by a <class 'dask.array.core.Array'> object:
+        dask.array<getitem, shape=(4076, 4096), dtype=float32, chunksize=(4076, 4096), chunktype=numpy.ndarray>
+
+        Array Dim  Axis Name                  Data size  Bounds
+                0  helioprojective latitude        4076  None
+                1  helioprojective longitude       4096  None
+
+        World Dim  Axis Name                  Physical Type                   Units
+                1  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+                0  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+
+        Correlation between pixel and world axes:
+
+                                  |          PIXEL DIMENSIONS
+                                  | helioprojective | helioprojective
+                 WORLD DIMENSIONS |    longitude    |     latitude
+        ------------------------- | --------------- | ---------------
+        helioprojective longitude |        x        |        x
+         helioprojective latitude |        x        |        x
         """
+
         return TiledDatasetSlicer(self._data, self.inventory)
 
     # TODO: def regrid()
