@@ -214,7 +214,7 @@ class TiledDataset(Collection):
         <dkist.dataset.tiled_dataset.TiledDataset object at 0x7024f7382cd0>
         This VBI Dataset AJQWW is an array of (3, 3) Dataset objects and
         consists of 9 frames.
-        Files are stored in /...
+        Files are stored in ...
 
         Each Dataset has 2 pixel and 2 world dimensions.
 
