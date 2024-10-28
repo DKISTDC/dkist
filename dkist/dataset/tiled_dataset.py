@@ -208,9 +208,9 @@ class TiledDataset(Collection):
         Examples
         --------
         >>> from dkist import load_dataset
-        >>> from dkist.data.sample import VBI_AJQWW
-        >>> ds = load_dataset(VBI_AJQWW)
-        >>> ds.slice_tiles[0, 10:-10]
+        >>> from dkist.data.sample import VBI_AJQWW  # doctest: +REMOTE_DATA
+        >>> ds = load_dataset(VBI_AJQWW)  # doctest: +REMOTE_DATA
+        >>> ds.slice_tiles[0, 10:-10]  # doctest: +REMOTE_DATA
         <dkist.dataset.tiled_dataset.TiledDataset object at 0x7024f7382cd0>
         This VBI Dataset AJQWW is an array of (3, 3) Dataset objects and
         consists of 9 frames.
