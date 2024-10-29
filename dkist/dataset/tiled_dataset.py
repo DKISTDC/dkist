@@ -159,9 +159,12 @@ class TiledDataset(Collection):
         Parameters
         ----------
         slice_index : `int`, sequence of `int`s or `numpy.s_`
-            Object representing a slice which will reduce each component dataset of the TiledDataset to a 2D image. This is passed to ``TiledDataset.slice_tiles``
+            Object representing a slice which will reduce each component dataset
+            of the TiledDataset to a 2D image. This is passed to
+            ``TiledDataset.slice_tiles``
         share_zscale : `bool`
-            Determines whether the color scale of the plots should be calculated independently (``False``) or shared across all plots (``True``).
+            Determines whether the color scale of the plots should be calculated
+            independently (``False``) or shared across all plots (``True``).
             Defaults to False
         """
         if isinstance(slice_index, int):
@@ -207,36 +210,38 @@ class TiledDataset(Collection):
 
         Examples
         --------
-        >>> from dkist import load_dataset
-        >>> from dkist.data.sample import VBI_AJQWW  # doctest: +REMOTE_DATA
-        >>> ds = load_dataset(VBI_AJQWW)  # doctest: +REMOTE_DATA
-        >>> ds.slice_tiles[0, 10:-10]  # doctest: +REMOTE_DATA
-        <dkist.dataset.tiled_dataset.TiledDataset object at ...>
-        This VBI Dataset AJQWW is an array of (3, 3) Dataset objects and
-        consists of 9 frames.
-        Files are stored in ...
+        .. code-block:: python
 
-        Each Dataset has 2 pixel and 2 world dimensions.
+            >>> from dkist import load_dataset
+            >>> from dkist.data.sample import VBI_AJQWW  # doctest: +REMOTE_DATA
+            >>> ds = load_dataset(VBI_AJQWW)  # doctest: +REMOTE_DATA
+            >>> ds.slice_tiles[0, 10:-10]  # doctest: +REMOTE_DATA
+            <dkist.dataset.tiled_dataset.TiledDataset object at ...>
+            This VBI Dataset AJQWW is an array of (3, 3) Dataset objects and
+            consists of 9 frames.
+            Files are stored in ...
 
-        The data are represented by a <class 'dask.array.core.Array'> object:
-        dask.array<getitem, shape=(4076, 4096), dtype=float32, chunksize=(4076, 4096), chunktype=numpy.ndarray>
+            Each Dataset has 2 pixel and 2 world dimensions.
 
-        Array Dim  Axis Name                  Data size  Bounds
-                0  helioprojective latitude        4076  None
-                1  helioprojective longitude       4096  None
+            The data are represented by a <class 'dask.array.core.Array'> object:
+            dask.array<getitem, shape=(4076, 4096), dtype=float32, chunksize=(4076, 4096), chunktype=numpy.ndarray>
 
-        World Dim  Axis Name                  Physical Type                   Units
-                1  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
-                0  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
+            Array Dim  Axis Name                  Data size  Bounds
+                    0  helioprojective latitude        4076  None
+                    1  helioprojective longitude       4096  None
 
-        Correlation between pixel and world axes:
+            World Dim  Axis Name                  Physical Type                   Units
+                    1  helioprojective latitude   custom:pos.helioprojective.lat  arcsec
+                    0  helioprojective longitude  custom:pos.helioprojective.lon  arcsec
 
-                                  |          PIXEL DIMENSIONS
-                                  | helioprojective | helioprojective
-                 WORLD DIMENSIONS |    longitude    |     latitude
-        ------------------------- | --------------- | ---------------
-        helioprojective longitude |        x        |        x
-         helioprojective latitude |        x        |        x
+            Correlation between pixel and world axes:
+
+                                      |          PIXEL DIMENSIONS
+                                      | helioprojective | helioprojective
+                     WORLD DIMENSIONS |    longitude    |     latitude
+            ------------------------- | --------------- | ---------------
+            helioprojective longitude |        x        |        x
+             helioprojective latitude |        x        |        x
         """
 
         return TiledDatasetSlicer(self._data, self.inventory)
