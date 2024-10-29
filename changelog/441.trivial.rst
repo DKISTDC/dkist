@@ -1,0 +1,1 @@
+Minor updates to `TiledDataset.plot()` for working with more complex arrangements of tiles.

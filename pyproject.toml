@@ -53,7 +53,7 @@ tests = [
   "pytest-mpl",
   "pytest-httpserver",
   "pytest-filter-subpackage",
-  "pytest-benchmark",
+  "pytest-benchmark<5",
   "pytest-xdist",
   "hypothesis",
   "tox",
