@@ -350,6 +350,18 @@ def visp_dataset_no_headers(tmp_path_factory):
     return load_dataset(vispdir / "test_visp_no_headers.asdf")
 
 
+@pytest.fixture
+def large_visp_no_dummy_axis(large_visp_dataset):
+    # Slightly tweaked dataset to remove the dummy axis in the file manager array shape.
+    large_visp_dataset._file_manager = FileManager.from_parts([f"dummyfile_{i}" for i in range(4*20)],
+                                                              0,
+                                                              float,
+                                                              (50, 128),
+                                                              loader=AstropyFITSLoader, basepath="./")
+
+    return large_visp_dataset
+
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
     try:
