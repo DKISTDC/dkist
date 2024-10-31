@@ -180,9 +180,11 @@ def test_header_slicing_3D_slice(large_visp_dataset):
 
 @pytest.mark.accept_cli_dataset
 def test_file_slicing_with_dummy_axis(large_visp_dataset):
+    assert len(large_visp_dataset[0].files) == 20
     assert len(large_visp_dataset[0, 0].files) == 1
 
 
 @pytest.mark.accept_cli_dataset
 def test_file_slicing_without_dummy_axis(large_visp_no_dummy_axis):
+    assert len(large_visp_no_dummy_axis[0].files) == 20
     assert len(large_visp_no_dummy_axis[0, 0].files) == 1
