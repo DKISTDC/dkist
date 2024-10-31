@@ -268,6 +268,31 @@ def dataset_4d(identity_gwcs_4d, empty_meta):
 
 
 @pytest.fixture
+def dataset_5d(identity_gwcs_5d_stokes, empty_meta):
+    shape = (4, 40, 30, 20, 10)
+    x = np.ones(shape)
+    array = da.from_array(x, tuple(shape))
+
+    identity_gwcs_4d.pixel_shape = array.shape[::-1]
+    identity_gwcs_4d.array_shape = array.shape
+
+    ds = Dataset(array, wcs=identity_gwcs_5d_stokes, meta={"inventory": {}, "headers": Table()}, unit=u.count)
+    fileuris = np.array([f"dummyfile_{i}" for i in range(np.prod(shape[:-2]))]).reshape(shape[:-2])
+    ds._file_manager = FileManager.from_parts(fileuris, 0, float, shape[-2:], loader=AstropyFITSLoader, basepath="./")
+
+    return ds
+
+
+@pytest.fixture
+def dataset_5d_dummy_filemanager_axis(dataset_5d):
+    shape = dataset_5d.data.shape
+    fileuris = np.array([f"dummyfile_{i}" for i in range(np.prod(shape[:-2]))]).reshape(shape[:-2])
+    dataset_5d._file_manager = FileManager.from_parts(fileuris, 0, float, (1, *shape[-2:]), loader=AstropyFITSLoader, basepath="./")
+
+    return dataset_5d
+
+
+@pytest.fixture
 def eit_dataset():
     eitdir = Path(rootdir) / "EIT"
     with asdf.open(eitdir / "eit_test_dataset.asdf") as f:
