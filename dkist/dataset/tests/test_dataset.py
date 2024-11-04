@@ -176,3 +176,25 @@ def test_header_slicing_3D_slice(large_visp_dataset):
 
     assert len(sliced.files.filenames) == len(sliced_headers["FILENAME"]) == len(sliced.headers)
     assert (sliced.headers["DINDEX3", "DINDEX4"] == sliced_headers["DINDEX3", "DINDEX4"]).all()
+
+
+@pytest.mark.accept_cli_dataset
+def test_file_slicing_with_dummy_axis(dataset_5d_dummy_filemanager_axis):
+    ds = dataset_5d_dummy_filemanager_axis
+    shape = ds.data.shape
+    assert len(ds.files) == np.prod(shape[:3])
+    assert len(ds[0].files) == np.prod(shape[1:3])
+    assert len(ds[0, 0].files) == np.prod(shape[2])
+    assert len(ds[0, 0, 0].files) == 1
+    assert len(ds[0, 0, 0, 0].files) == 1
+
+
+@pytest.mark.accept_cli_dataset
+def test_file_slicing_without_dummy_axis(dataset_5d):
+    ds = dataset_5d
+    shape = ds.data.shape
+    assert len(ds.files) == np.prod(shape[:3])
+    assert len(ds[0].files) == np.prod(shape[1:3])
+    assert len(ds[0, 0].files) == np.prod(shape[2])
+    assert len(ds[0, 0, 0].files) == 1
+    assert len(ds[0, 0, 0, 0].files) == 1
