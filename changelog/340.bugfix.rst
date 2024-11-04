@@ -1,1 +1,0 @@
-Fix a bug with `dkist.net.transfer_complete_datasets` where a length one ``UnifiedResponse`` would cause an error.
