@@ -11,6 +11,7 @@ from collections.abc import Collection
 import matplotlib.pyplot as plt
 import numpy as np
 
+import astropy
 from astropy.table import vstack
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
@@ -152,6 +153,20 @@ class TiledDataset(Collection):
         """
         return [[tile.data.shape for tile in row] for row in self]
 
+    @staticmethod
+    def _get_axislabels(ax):
+        if astropy.__version__ >= "6.1.5":
+            return (ax.get_xlabel(), ax.get_ylabel())
+
+        xlabel = ylabel = ""
+        for coord in ax.coords:
+            axislabel_position = coord.axislabels.get_visible_axes()
+            if "b" in axislabel_position:
+                xlabel = coord.get_axislabel() or coord._get_default_axislabel()
+            if "l" in axislabel_position:
+                ylabel = coord.get_axislabel() or coord._get_default_axislabel()
+        return (xlabel, ylabel)
+
     def plot(self, slice_index, share_zscale=False, **kwargs):
         """
         Plot a slice of each tile in the TiledDataset
@@ -176,14 +191,9 @@ class TiledDataset(Collection):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
             tile.plot(axes=ax, **kwargs)
             if i == 0:
-                # TODO: When we can depend on astropy >=7.0 we can remove these or statements
-                xlabel = ax.coords[0].get_axislabel() or ax.coords[0]._get_default_axislabel()
-                ylabel = ax.coords[1].get_axislabel() or ax.coords[1]._get_default_axislabel()
-                for coord in ax.coords:
-                    if "b" in coord.axislabels.get_visible_axes():
-                        fig.supxlabel(xlabel, y=0.05)
-                    if "l" in coord.axislabels.get_visible_axes():
-                        fig.supylabel(ylabel, x=0.05)
+                xlabel, ylabel = self._get_axislabels(ax)
+                fig.supxlabel(xlabel, y=0.05)
+                fig.supylabel(ylabel, x=0.05)
             axmin, axmax = ax.get_images()[0].get_clim()
             vmin = axmin if axmin < vmin else vmin
             vmax = axmax if axmax > vmax else vmax
