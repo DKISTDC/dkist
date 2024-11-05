@@ -1,3 +1,31 @@
+1.9.0 (2024-11-04)
+==================
+
+Features
+--------
+
+- `dkist.net.transfer_complete_datasets` will now only create one Globus task for all datasets it downloads. (`#340 <https://github.com/DKISTDC/dkist/pull/340>`_)
+- Add a FileManager property to TiledDataset for tracking files more easily. (`#437 <https://github.com/DKISTDC/dkist/pull/437>`_)
+- Improve performance of computing arrays when using non-thread or sync dask schedulers, by reducing the amount of data needed to be sent to each worker. (`#455 <https://github.com/DKISTDC/dkist/pull/455>`_)
+
+
+Bug Fixes
+---------
+
+- Fix a bug with `dkist.net.transfer_complete_datasets` where a length one ``UnifiedResponse`` would cause an error. (`#340 <https://github.com/DKISTDC/dkist/pull/340>`_)
+- Fix mark argument parsing in the new pytest hook. (`#440 <https://github.com/DKISTDC/dkist/pull/440>`_)
+- Minor tweak to correct indexing of >4D datasets. (`#453 <https://github.com/DKISTDC/dkist/pull/453>`_)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Add `--ds` and `--tiled-ds` CLI options to allow passing in datasets for use with the test suite.
+  The dataset given with `--ds` is passed to tests marked with `accept_cli_dataset` and those given with `--tiled-ds` are passed to tests marked with `accept_cli_tiled_dataset`. (`#439 <https://github.com/DKISTDC/dkist/pull/439>`_)
+- Minor updates to `TiledDataset.plot()` for working with more complex arrangements of tiles. (`#441 <https://github.com/DKISTDC/dkist/pull/441>`_)
+- Fix failure to fetch CLI options in publish build. (`#447 <https://github.com/DKISTDC/dkist/pull/447>`_)
+
+
 1.8.0 (2024-09-04)
 ==================
 
