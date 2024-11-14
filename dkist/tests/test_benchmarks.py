@@ -127,3 +127,13 @@ def test_slice_dataset(benchmark, large_visp_dataset):
     @benchmark
     def slice_dataset(dataset=large_visp_dataset, idx = np.s_[:2, 10:15, 0]):
         sliced = dataset[idx]
+
+
+@pytest.mark.benchmark
+def test_dataset_repr(benchmark, large_visp_dataset):
+    benchmark(repr, large_visp_dataset)
+
+
+@pytest.mark.benchmark
+def test_tileddataset_repr(benchmark, simple_tiled_dataset):
+    benchmark(repr, simple_tiled_dataset)
