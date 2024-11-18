@@ -12,9 +12,9 @@ __all__ = ["dataset_info_str"]
 
 
 def dataset_info_str(ds_in):
-    # Check for an attribute that only appears on TiledDataset
-    # Not using isinstance to avoid circular import
-    is_tiled = hasattr(ds_in, "combined_headers")
+    # Import here to remove circular import
+    from dkist.dataset import TiledDataset
+    is_tiled = isinstance(ds_in, TiledDataset)
     dstype = type(ds_in).__name__
     if is_tiled:
         tile_shape = ds_in.shape

@@ -153,6 +153,11 @@ write_to = "dkist/_version.py"
       showcontent = true
 
     [[tool.towncrier.type]]
+      directory = "performance"
+      name = "Performance Improvements"
+      showcontent = true
+
+    [[tool.towncrier.type]]
       directory = "doc"
       name = "Improved Documentation"
       showcontent = true
