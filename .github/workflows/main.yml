@@ -31,10 +31,10 @@ concurrency:
 
 jobs:
   tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    uses: zacharyburnett/github-actions-workflows/.github/workflows/tox.yml@tox/coverage_github_actions
     with:
       default_python: '3.10'
-      coverage: 'codecov'
+      coverage: 'github'
       posargs: '--color=yes'
       envs: |
         - linux: py312
