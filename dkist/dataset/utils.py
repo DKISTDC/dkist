@@ -164,7 +164,6 @@ def pp_matrix(wcs):
     ----------
     wcs : `BaseHighLevelWCS` or `BaseLowLevelWCS`
     """
-    print(_get_pp_matrix(wcs))
 
 
 def extract_pc_matrix(headers, naxes=None):

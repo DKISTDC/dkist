@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from astropy.table import Table
 
-__all__ = ["dehumanize_inventory", "humanize_inventory", "INVENTORY_KEY_MAP"]
+__all__ = ["INVENTORY_KEY_MAP", "dehumanize_inventory", "humanize_inventory"]
 
 
 class DefaultMap(defaultdict):

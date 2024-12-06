@@ -16,7 +16,7 @@ select = [
   "UP",
   "PT",
   "BLE",
-  "A",
+  # "A",
   "C4",
   "ICN",
   "G",
@@ -33,7 +33,7 @@ select = [
   "PLE",
   "FLY",
   "NPY",
-  "PERF",
+  # "PERF",
   "RUF",
 ]
 
@@ -74,7 +74,9 @@ extend-ignore = [
   "INP001", # File is part of an implicit namespace package.
 ]
 "docs/conf.py" = [
-  "E402" # Module imports not at top of file
+  "E402", # Module imports not at top of file
+  "A001",
+  "BLE001",
 ]
 "docs/*.py" = [
   "INP001", # File is part of an implicit namespace package.
@@ -99,6 +101,13 @@ extend-ignore = [
 ]
 "dkist/logger.py" = [
   "PTH",
+  "BLE001",
+]
+"dkist/tests/generate_*" = [
+  "T20",
+]
+"dkist/utils/sysinfo.py" = [
+  "T20",
 ]
 
 [lint.flake8-import-conventions.extend-aliases]

@@ -24,4 +24,3 @@ if __name__ == "__main__":
 
         asdf_filename = rootdir / "test_tiled_dataset.asdf"
         ds = dataset_from_fits(tempdir, asdf_filename)
-        print(ds)
