@@ -20,6 +20,10 @@ for requirement in doc_requires:
     except Exception:
         missing_requirements.append(requirement.name)
 if missing_requirements:
+    print(
+        f"The {' '.join(missing_requirements)} package(s) could not be found and "
+        "is needed to build the documentation, please install the 'docs' requirements."
+    )
     sys.exit(1)
 
 # -- Read the Docs Specific Configuration --------------------------------------
@@ -141,6 +145,7 @@ intersphinx_mapping = {
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
+
 from dkist_sphinx_theme.conf.theme import *
 
 # Render inheritance diagrams in SVG
