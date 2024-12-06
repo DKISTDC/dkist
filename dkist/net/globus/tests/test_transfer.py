@@ -130,7 +130,6 @@ def test_process_event_list(transfer_client, mock_task_event_list):
     assert all(isinstance(e, tuple) for e in events)
     assert all(all(isinstance(item, tuple) for item in e) for e in events)
 
-    print(events)
     assert len(json_events) == 1
     assert isinstance(json_events, tuple)
     assert isinstance(json_events[0], dict)
