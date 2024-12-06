@@ -27,22 +27,10 @@ select = [
   "NPY",
   "RUF",
 ]
-<<<<<<<
-=======
 
-[lint]
-select = [
-  "E",
-  "F",
-  "W",
-  "UP",
-  "PT",
-]
->>>>>>>
 extend-ignore = [
   # pycodestyle (E, W)
-<<<<<<<
-  "E501", # LineTooLong                             # TODO! fix
+  "E501", # ignore line length will use a formatter instead
   "E702",
   "E711",
   "E741",
@@ -50,27 +38,14 @@ extend-ignore = [
   "F403",
   "F821",
   "F841",
-=======
-  "E501", # ignore line length will use a formatter instead
   # pyupgrade (UP)
   "UP038", # Use | in isinstance - not compatible with models and is slower
->>>>>>>
   # pytest (PT)
   "PT001", # Always use pytest.fixture()
   "PT023", # Always use () on pytest decorators
-<<<<<<<
-  # pyupgrade
-  "UP038", # Use | in isinstance - not compatible with models and is slower
   # Returns (RET)
   "RET502",  # Do not implicitly return None in function able to return non-None value
   "RET503",  # Missing explicit return at the end of function able to return non-None value
-  # Pathlib (PTH)
-  "PTH123",  # open() should be replaced by Path.open()
-  # Ruff
-  "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-  "RUF013",  # PEP 484 prohibits implicit `Optional`
-  "RUF015",  # Prefer `next(iter(...))` over single element slice
-=======
   # flake8-pie (PIE)
   "PIE808", # Disallow passing 0 as the first argument to range
   # flake8-use-pathlib (PTH)
@@ -80,7 +55,6 @@ extend-ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "RUF013", # PEP 484 prohibits implicit `Optional`
   "RUF015", # Prefer `next(iter(...))` over single element slice
->>>>>>>
 ]
 
 [lint.per-file-ignores]
@@ -108,13 +82,15 @@ extend-ignore = [
 ]
 "test_*.py" = [
   "E402", # Module level import not at top of cell
+  "B011",
+  "D",
+  "E402",
+  "PGH001",
+  "S101",
 ]
-<<<<<<<
-"__init__.py" = ["E402", "F401", "F403"]
-"test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
-"dkist/logger.py" = ["PTH"]
-=======
->>>>>>>
+"dkist/logger.py" = [
+  "PTH",
+]
 
 [lint.flake8-import-conventions.extend-aliases]
 "astropy.units" = "u"
