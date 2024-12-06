@@ -142,6 +142,8 @@ def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: n
     url = client.oauth2_get_authorize_url()
 
     webbrowser.open(url, new=1)
+    print("Waiting for completion of Globus Authentication in your webbrowser...")
+    print(f"If your webbrowser has not opened, please go to {url} to authenticate with globus.")
 
     try:
         auth_code = server.wait_for_code()
@@ -209,6 +211,7 @@ def ensure_globus_authorized(func):
             # older versions of the globus_sdk use raw_text, which is now deprecated
             response_text = getattr(e, "text", "") or getattr(e, "raw_text", "")
             if e.http_status == 400 and "invalid_grant" in response_text:
+                print("Globus login has expired.")
                 get_refresh_token_authorizer(force_reauth=True)
                 return func(*args, **kwargs)
 
