@@ -79,9 +79,11 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/DKISTDC/dkist"
+"Source Code" = "https://github.com/DKISTDC/dkist"
 Download = "https://pypi.org/project/dkist"
 Documentation = "https://docs.dkist.nso.edu/projects/python-tools/en/stable/"
 Changelog = "https://docs.dkist.nso.edu/projects/python-tools/en/stable/whatsnew/changelog.html"
+"Issue Tracker" = "https://github.com/DKISTDC/dkist/issues"
 
 [project.entry-points]
 'asdf.extensions' = {dkist = 'dkist.io.asdf.entry_points:get_extensions'}
