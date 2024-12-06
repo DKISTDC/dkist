@@ -113,7 +113,6 @@ def main():
                 a.jsoc.Series("aia.lev1_euv_12s"), a.jsoc.Segment("image"),
                 a.jsoc.Notify("stuart@cadair.com"))
 
-            print(results)
 
             files = Fido.fetch(results, path=str(path))
 
@@ -186,9 +185,7 @@ def main():
     wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, input_frame=detector_frame,
                        output_frame=sky_frame)
 
-    print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, with_units=True))
 
     ea = references_from_filenames(cube, relative_to=str(path))
 
@@ -201,14 +198,10 @@ def main():
         # ff.write_to("test.asdf")
         filename = str(path / f"aia_{time_coords[0]}.asdf")
         ff.write_to(filename)
-        print(f"Saved to : {filename}")
 
     # import sys; sys.exit(0)
 
     ds = load_dataset(str(path))
-    print(repr(ds))
-    print(repr(ds.wcs))
-    print(ds.wcs(*[1*u.pix]*4, with_units=True))
 
 
 if __name__ == "__main__":

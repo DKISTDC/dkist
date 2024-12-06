@@ -120,9 +120,7 @@ def main():
     wcs = gwcs.wcs.WCS(forward_transform=hcubemodel, input_frame=detector_frame,
                        output_frame=sky_frame)
 
-    print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*3, with_units=True))
 
     hp = HeaderParser.from_headers(headers, filenames=files, validate=False)
     ac = references_from_filenames(hp, hdu_index=0, relative_to=str(rootdir / "EIT"))
@@ -141,7 +139,6 @@ def main():
     with asdf.AsdfFile(tree) as ff:
         filename = rootdir / "EIT" / "eit_test_dataset.asdf"
         ff.write_to(filename)
-        print(f"Saved to : {filename}")
 
 
     ds.plot()
