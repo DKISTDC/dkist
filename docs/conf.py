@@ -85,9 +85,16 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",  # must be loaded after napoleon
     "sunpy.util.sphinx.doctest",
+<<<<<<<
     "sunpy.util.sphinx.generate",
     "myst_nb",
     "sphinx_design",
+=======
+    "sphinx.ext.mathjax",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
+    "sphinx_changelog",
+>>>>>>>
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -145,8 +152,12 @@ intersphinx_mapping = {
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
+<<<<<<<
 
 from dkist_sphinx_theme.conf.theme import *
+=======
+html_theme = "sunpy"
+>>>>>>>
 
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"
