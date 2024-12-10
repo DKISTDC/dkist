@@ -52,6 +52,12 @@ def test_repr(dataset, dataset_3d):
 
 
 @pytest.mark.accept_cli_dataset
+def test_flat_repr(large_tiled_dataset):
+    r = repr(large_tiled_dataset.flat)
+    assert f"is an array of ({np.prod(large_tiled_dataset.shape)},) Dataset objects" in r
+
+
+@pytest.mark.accept_cli_dataset
 def test_wcs_roundtrip(dataset):
     p = [1*u.pixel] * dataset.wcs.pixel_n_dim
     w = dataset.wcs.pixel_to_world(*p)

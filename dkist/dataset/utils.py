@@ -18,7 +18,7 @@ def dataset_info_str(ds_in):
     dstype = type(ds_in).__name__
     if is_tiled:
         tile_shape = ds_in.shape
-        ds = ds_in[0, 0]
+        ds = ds_in.flat[0]
     else:
         ds = ds_in
     wcs = ds.wcs.low_level_wcs
