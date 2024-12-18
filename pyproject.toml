@@ -136,7 +136,11 @@ write_to = "dkist/_version.py"
   package = "dkist"
   filename = "CHANGELOG.rst"
   directory = "changelog/"
+<<<<<<<
   issue_format = "`#{issue} https:github.com/DKISTDC/dkist/pull/{issue}>`__"
+=======
+  issue_format = "`#{issue} <https://github.com/DKISTDC/dkist/pull/{issue}>`__"
+>>>>>>>
   title_format = "{version} ({project_date})"
 
   [[tool.towncrier.type]]
