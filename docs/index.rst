@@ -19,7 +19,6 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
   whatsnew/index
   developer
 
-
 .. grid:: 2
     :gutter: 2
 

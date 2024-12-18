@@ -15,7 +15,7 @@ from tqdm.notebook import tqdm as tqdm_notebook
 from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
                         get_endpoint_id, get_local_endpoint_id, get_transfer_client)
 
-__all__ = ["watch_transfer_progress", "start_transfer_from_file_list"]
+__all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 
 
 def start_transfer_from_file_list(
