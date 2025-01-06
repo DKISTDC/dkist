@@ -8,18 +8,18 @@ def test_crop_visp_by_only_stokes(croppable_visp_dataset):
         None,
         None,
         None,
-        StokesCoord('I'),
+        StokesCoord("I"),
     ],
     [
         None,
         None,
         None,
-        StokesCoord('I'),
+        StokesCoord("I"),
     ])
 
     assert cropped.wcs.pixel_n_dim == croppable_visp_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_visp_dataset.data.shape[1:]
-    assert (cropped.headers['DINDEX4'] == 1).all()
+    assert (cropped.headers["DINDEX4"] == 1).all()
 
 
 def test_crop_visp_by_time(croppable_visp_dataset):
@@ -96,17 +96,17 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
     cropped = croppable_cryo_dataset.crop([
         None,
         None,
-        StokesCoord('I'),
+        StokesCoord("I"),
     ],
     [
         None,
         None,
-        StokesCoord('I'),
+        StokesCoord("I"),
     ])
 
     assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_cryo_dataset.data.shape[1:]
-    assert (cropped.headers['DINDEX4'] == 1).all()
+    assert (cropped.headers["DINDEX4"] == 1).all()
 
 
 def test_crop_cryo_by_time(croppable_cryo_dataset):
@@ -119,7 +119,7 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
 
     cropped = croppable_cryo_dataset.crop([
         coord0,
-        # Time has to be later than the start time becuase the crop is the smallest range that includes specified values
+        # Time has to be later than the start time because the crop is the smallest range that includes specified values
         Time("2023-01-01T13:00:04"),
         None,
     ],
@@ -138,7 +138,7 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     orig_coords = croppable_cryo_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
 
-    # Whole coordinte array is too large to compare, so check just the edges
+    # Whole coordinate array is too large to compare, so check just the edges
     assert (cropped_coords[0][0, 0, 0, :] == orig_coords[0][0, 0, 0, :]).all()
     assert (cropped_coords[0][0, 0, -1, :] == orig_coords[0][0, 0, -1, :]).all()
     assert (cropped_coords[0][0, 0, :, 0] == orig_coords[0][0, 0, :, 0]).all()
