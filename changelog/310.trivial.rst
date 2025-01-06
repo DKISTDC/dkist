@@ -1,0 +1,1 @@
+Add tests for cropping datasets by world coords
