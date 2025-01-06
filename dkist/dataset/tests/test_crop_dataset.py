@@ -106,7 +106,7 @@ def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
 
     assert cropped.wcs.pixel_n_dim == croppable_cryo_dataset.wcs.pixel_n_dim - 1
     assert cropped.data.shape == croppable_cryo_dataset.data.shape[1:]
-    assert (cropped.headers["DINDEX4"] == 1).all()
+    assert (cropped.headers["DINDEX5"] == 1).all()
 
 
 def test_crop_cryo_by_time(croppable_cryo_dataset):
