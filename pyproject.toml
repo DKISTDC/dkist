@@ -173,3 +173,8 @@ write_to = "dkist/_version.py"
     directory = "trivial"
     name = "Trivial/Internal Changes"
     showcontent = true
+
+  [[tool.towncrier.type]]
+    directory = "performance"
+    name = "Performance Improvements"
+    showcontent = true

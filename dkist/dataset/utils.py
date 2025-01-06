@@ -11,14 +11,25 @@ import gwcs
 __all__ = ["dataset_info_str"]
 
 
+def get_array_repr(array):
+    """
+    Return a "repr-like" string for an array, without any values.
+
+    The objective of this function is primarily to provide a dask array like repr for numpy arrays.
+    """
+    if isinstance(array, np.ndarray):
+        return f"numpy.ndarray<shape={array.shape}, dtype={array.dtype}>"
+    return repr(array)
+
+
 def dataset_info_str(ds_in):
-    # Check for an attribute that only appears on TiledDataset
-    # Not using isinstance to avoid circular import
-    is_tiled = hasattr(ds_in, "combined_headers")
+    # Import here to remove circular import
+    from dkist.dataset import TiledDataset
+    is_tiled = isinstance(ds_in, TiledDataset)
     dstype = type(ds_in).__name__
     if is_tiled:
         tile_shape = ds_in.shape
-        ds = ds_in[0, 0]
+        ds = ds_in.flat[0]
     else:
         ds = ds_in
     wcs = ds.wcs.low_level_wcs
@@ -48,7 +59,7 @@ def dataset_info_str(ds_in):
         s += "\nThis "
     s += f"Dataset has {wcs.pixel_n_dim} pixel and {wcs.world_n_dim} world dimensions.\n\n"
 
-    s += f"The data are represented by a {type(ds.data)} object:\n{ds.data}\n\n"
+    s += f"The data are represented by a {type(ds.data)} object:\n{get_array_repr(ds.data)}\n\n"
 
     array_shape = wcs.array_shape or (0,)
     pixel_shape = wcs.pixel_shape or (None,) * wcs.pixel_n_dim
@@ -139,7 +150,7 @@ def _get_pp_matrix(wcs):
         world.insert(0, "")
     mstr = np.insert(mstr, 0, world, axis=1)
     widths = [np.max([len(a) for a in col]) for col in mstr.T]
-    mstr = np.insert(mstr, 2, ["-"*wid for wid in widths], axis=0)
+    mstr = np.insert(mstr, header.shape[0], ["-"*wid for wid in widths], axis=0)
     for i, col in enumerate(mstr.T):
         if i == 0:
             mstr[:, i] = np.char.rjust(col, widths[i])
