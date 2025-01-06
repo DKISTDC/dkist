@@ -53,7 +53,7 @@ tests = [
   "pytest-mpl",
   "pytest-httpserver",
   "pytest-filter-subpackage",
-  "pytest-benchmark<5",
+  "pytest-benchmark",
   "pytest-xdist",
   "hypothesis",
   "tox",
@@ -62,10 +62,11 @@ tests = [
 docs = [
   "sphinx",
   "sphinx-automodapi",
+  "sphinx-changelog",
+  "sunpy-sphinx-theme",
   "packaging",
   "sphinx-astropy",
   "sphinx-gallery",
-  "sphinx-changelog",
   "pytest",
   "sphinx_autodoc_typehints",
   "dkist-sphinx-theme>=1.1.2",
@@ -77,7 +78,12 @@ docs = [
 ]
 
 [project.urls]
-repository = "https://github.com/DKISTDC/dkist"
+Homepage = "https://github.com/DKISTDC/dkist"
+"Source Code" = "https://github.com/DKISTDC/dkist"
+Download = "https://pypi.org/project/dkist"
+Documentation = "https://docs.dkist.nso.edu/projects/python-tools/en/stable/"
+Changelog = "https://docs.dkist.nso.edu/projects/python-tools/en/stable/whatsnew/changelog.html"
+"Issue Tracker" = "https://github.com/DKISTDC/dkist/issues"
 
 [project.entry-points]
 'asdf.extensions' = {dkist = 'dkist.io.asdf.entry_points:get_extensions'}
@@ -101,8 +107,14 @@ write_to = "dkist/_version.py"
   [ tool.gilesbot.towncrier_changelog ]
     enabled = true
     verify_pr_number = true
-    changelog_skip_label = "no changelog"
-    help_url = "https://github.com/DKISTDC/dkist/changelog/README.rst"
+    changelog_skip_label = "No Changelog Entry Needed"
+    help_url = "https://github.com/DKISTDC/dkist/blob/main/changelog/README.rst"
+
+    changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/DKISTDC/dkist/blob/main/changelog/README.rst)."
+
+    type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/DKISTDC/dkist/blob/main/changelog/README.rst)"
+
+    number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
 
   [ tool.gilesbot.milestones ]
     enabled = false
@@ -121,48 +133,48 @@ write_to = "dkist/_version.py"
     report_on_fail = true
 
 [tool.towncrier]
-    package = "dkist"
-    filename = "CHANGELOG.rst"
-    directory = "changelog/"
-    issue_format = "`#{issue} <https://github.com/DKISTDC/dkist/pull/{issue}>`_"
-    title_format = "{version} ({project_date})"
+  package = "dkist"
+  filename = "CHANGELOG.rst"
+  directory = "changelog/"
+  issue_format = "`#{issue} <https://github.com/DKISTDC/dkist/pull/{issue}>`__"
+  title_format = "{version} ({project_date})"
 
-    [[tool.towncrier.type]]
-        directory = "breaking"
-        name = "Backwards Incompatible Changes"
-        showcontent = true
-
-    [[tool.towncrier.type]]
-        directory = "api"
-        name = "API Changes"
-        showcontent = true
-
-    [[tool.towncrier.type]]
-      directory = "removal"
-      name = "Deprecations and Removals"
+  [[tool.towncrier.type]]
+      directory = "breaking"
+      name = "Backwards Incompatible Changes"
       showcontent = true
 
-    [[tool.towncrier.type]]
-      directory = "feature"
-      name = "Features"
+  [[tool.towncrier.type]]
+      directory = "api"
+      name = "API Changes"
       showcontent = true
 
-    [[tool.towncrier.type]]
-      directory = "bugfix"
-      name = "Bug Fixes"
-      showcontent = true
+  [[tool.towncrier.type]]
+    directory = "removal"
+    name = "Deprecations and Removals"
+    showcontent = true
 
-    [[tool.towncrier.type]]
-      directory = "performance"
-      name = "Performance Improvements"
-      showcontent = true
+  [[tool.towncrier.type]]
+    directory = "feature"
+    name = "Features"
+    showcontent = true
 
-    [[tool.towncrier.type]]
-      directory = "doc"
-      name = "Improved Documentation"
-      showcontent = true
+  [[tool.towncrier.type]]
+    directory = "bugfix"
+    name = "Bug Fixes"
+    showcontent = true
 
-    [[tool.towncrier.type]]
-      directory = "trivial"
-      name = "Trivial/Internal Changes"
-      showcontent = true
+  [[tool.towncrier.type]]
+    directory = "doc"
+    name = "Improved Documentation"
+    showcontent = true
+
+  [[tool.towncrier.type]]
+    directory = "trivial"
+    name = "Trivial/Internal Changes"
+    showcontent = true
+
+  [[tool.towncrier.type]]
+    directory = "performance"
+    name = "Performance Improvements"
+    showcontent = true

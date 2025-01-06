@@ -4,7 +4,7 @@ This module provides some (partial) sample datasets.
 
 from ._sample import _SAMPLE_DATASETS, VISP_HEADER, _get_sample_datasets
 
-__all__ = ["download_all_sample_data", *sorted(_SAMPLE_DATASETS.keys()), "VISP_HEADER"]
+__all__ = ["download_all_sample_data", *sorted(_SAMPLE_DATASETS.keys()), "VISP_HEADER"]  # noqa: PLE0604
 
 
 # See PEP 562 (https://peps.python.org/pep-0562/) for module-level __dir__()
