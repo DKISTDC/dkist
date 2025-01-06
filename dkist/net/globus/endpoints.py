@@ -11,7 +11,7 @@ import globus_sdk
 
 from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
-__all__ = ["get_data_center_endpoint_id", "get_endpoint_id", "get_directory_listing"]
+__all__ = ["get_data_center_endpoint_id", "get_directory_listing", "get_endpoint_id"]
 
 
 def get_transfer_client(force_reauth=False):

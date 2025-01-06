@@ -28,7 +28,7 @@ from dkist.utils.inventory import INVENTORY_KEY_MAP
 from . import attrs as dattrs
 from .attr_walker import walker
 
-__all__ = ["DKISTQueryResponseTable", "DKISTClient"]
+__all__ = ["DKISTClient", "DKISTQueryResponseTable"]
 
 
 class DKISTQueryResponseTable(QueryResponseTable):
