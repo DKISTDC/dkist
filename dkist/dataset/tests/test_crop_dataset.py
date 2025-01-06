@@ -1,9 +1,14 @@
+import pytest
+
 import astropy.units as u
 from astropy.coordinates import SkyCoord, SpectralCoord, StokesCoord
 from astropy.time import Time
 
+gwcs = pytest.importorskip("gwcs", "0.22.2")
+
 
 def test_crop_visp_by_only_stokes(croppable_visp_dataset):
+
     cropped = croppable_visp_dataset.crop([
         None,
         None,
