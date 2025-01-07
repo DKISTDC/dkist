@@ -407,3 +407,21 @@ def pytest_runtest_call(item):
         # TODO raise a warning here
         warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets will not be used.")
         yield item
+
+
+@pytest.fixture(scope="session")
+def croppable_visp_dataset(tmp_path_factory):
+    vispdir = tmp_path_factory.mktemp("data")
+    # This asdf file is for dataset ID BKEWK
+    with gzip.open(Path(rootdir) / "croppable_visp.asdf.gz", mode="rb") as gfo:
+        with open(vispdir / "croppable_visp.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(vispdir / "croppable_visp.asdf")
+
+
+@pytest.fixture(scope="session")
+def croppable_cryo_dataset():
+    with gzip.open(Path(rootdir) / "croppable_cryo.asdf.gz", mode="rb") as gfo:
+        with open(rootdir / "croppable_cryo.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(Path(rootdir) / "croppable_cryo.asdf")
