@@ -1,6 +1,5 @@
 (dkist:tutorial:index)=
-Python Tools Tutorial
-=====================
+# Python Tools Tutorial
 
 Welcome to the DKIST tutorial.
 In this tutorial we shall guide you through getting started with DKIST data.
