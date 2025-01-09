@@ -1,3 +1,13 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "nbformat",
+#   "markdown-it-py",
+#   "myst_parser",
+#   "sphinx",
+#   "jupytext",
+# ]
+# ///
 """
 This script converts the tutorial from the documentation into workshop.
 
@@ -105,7 +115,7 @@ if __name__ == "__main__":
                                instructor_file.relative_to(output_dir),
                                learner_file.relative_to(output_dir))
 
-        subprocess.run(["jupytext", "--to", "ipynb", input_file, "-o", instructor_file])
+        subprocess.run([sys.executable, "-m", "jupytext", "--to", "ipynb", input_file, "-o", instructor_file])
         # Replace the sphinx toctree with a simple list of links
         if input_file.name == "index.md":
             add_toctree_to_index(toc_files, instructor_file, instructor_file)
