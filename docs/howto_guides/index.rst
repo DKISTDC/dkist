@@ -9,3 +9,4 @@ These How-To Guides will guide you through a specific task.
   :maxdepth: 1
 
   reproject_vbi_mosaic
+  bounding_boxes_from_dataset
