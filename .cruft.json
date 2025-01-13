@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/sunpy/package-template",
-  "commit": "5f101bf6b5be7d6f6aca05245f754684383d9fff",
+  "commit": "d6b86e07efa31959f43e99ba32d323cf76736a05",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -23,7 +23,7 @@
       "include_example_code": "n",
       "include_cruft_update_github_workflow": "y",
       "use_extended_ruff_linting": "y",
-      "_sphinx_theme": "dkist",
+      "_sphinx_theme": "sunpy",
       "_parent_project": "",
       "_install_requires": "",
       "_copy_without_render": [
@@ -32,7 +32,7 @@
         ".github/workflows/sub_package_update.yml"
       ],
       "_template": "https://github.com/sunpy/package-template",
-      "_commit": "5f101bf6b5be7d6f6aca05245f754684383d9fff"
+      "_commit": "d6b86e07efa31959f43e99ba32d323cf76736a05"
     }
   },
   "directory": null
