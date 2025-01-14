@@ -87,13 +87,13 @@ class TiledDataset(Collection):
 
         return cls(datasets, meta={"inventory": inventory})
 
-    def __init__(self, dataset_array, inventory=None, *, meta=None):
+    def __init__(self, dataset_array, inventory=None, mask=False, *, meta=None):
         if inventory is not None:
             warnings.warn(
                 "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
                 DKISTDeprecationWarning,
             )
-        self._data = np.array(dataset_array, dtype=object)
+        self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
         self._validate_component_datasets(self._data, inventory)
@@ -118,7 +118,7 @@ class TiledDataset(Collection):
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
-        datasets = datasets.flat
+        datasets = datasets.compressed()
         inv_1 = datasets[0].meta["inventory"]
         if inv_1 and inv_1 is not inventory:
             raise ValueError("The inventory record of the first dataset does not match the one passed to TiledDataset")
@@ -135,7 +135,7 @@ class TiledDataset(Collection):
         """
         Represent this `.TiledDataset` as a 1D array.
         """
-        return type(self)(self._data.flat, meta=self.meta)
+        return type(self)(self._data.compressed(), meta=self.meta)
 
     @property
     def meta(self):
@@ -157,7 +157,7 @@ class TiledDataset(Collection):
         A single `astropy.table.Table` containing all the FITS headers for all
         files in this dataset.
         """
-        return vstack([ds.meta["headers"] for ds in self._data.flat])
+        return vstack([ds.meta["headers"] for ds in self._data.compressed()])
 
     @property
     def shape(self):
