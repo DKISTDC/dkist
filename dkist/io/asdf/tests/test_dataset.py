@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from pytest_lazy_fixtures import lf
 
 import asdf
 import astropy.table
@@ -68,7 +69,7 @@ def test_roundtrip_tiled_dataset(simple_tiled_dataset):
 @pytest.mark.parametrize("tagobj",
                          [
                              "dataset",
-                             "simple_tiled_dataset",
+                             lf("simple_tiled_dataset"),
                          ],
                          indirect=True)
 def test_save_dataset_without_file_schema(tagobj, tmp_path):
