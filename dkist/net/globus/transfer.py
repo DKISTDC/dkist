@@ -109,7 +109,7 @@ def start_transfer_from_file_list(
         dst_file_list = dst_base_path
 
     for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
-        transfer_manifest.add_item(str(src_file), str(dst_file), recursive=rec)
+        transfer_manifest.add_item(src_file.as_posix(), dst_file.as_posix(), recursive=rec)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 
