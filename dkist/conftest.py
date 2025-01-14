@@ -299,17 +299,24 @@ def eit_dataset():
         return f.tree["dataset"]
 
 
-@pytest.fixture
-def simple_tiled_dataset(dataset):
+@pytest.fixture(params=[False,
+                        [[False, False],
+                         [True, False]]],
+                ids=["simple-nomask", "simple-masked"])
+def simple_tiled_dataset(dataset, request):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
     dataset_array = np.array(datasets).reshape((2,2))
     meta = {"inventory": dataset.meta["inventory"]}
-    return TiledDataset(dataset_array, meta=meta)
+    return TiledDataset(dataset_array, meta=meta, mask=request.param)
 
 
-@pytest.fixture
+@pytest.fixture(params=[False,
+                        [[False, True, False],
+                         [True, False, True],
+                         [False, True, False]]],
+                ids=["large-nomask", "large-masked"])
 def large_tiled_dataset(tmp_path_factory):
     vbidir = tmp_path_factory.mktemp("data")
     with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
