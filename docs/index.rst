@@ -13,6 +13,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
   self
   installation
   tutorial/index
+  examples/index
   howto_guides/index
   topic_guides/index
   reference
@@ -31,14 +32,14 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
 
         This tutorial walks you through how to search for, download and load DKIST Level one data.
 
-    .. grid-item-card:: How To Guides
-        :link: dkist:howto-guides:index
+    .. grid-item-card:: Examples
+        :link: dkist:examples:index
         :link-type: ref
         :text-align: center
 
         :octicon:`question;8em;sd-text-secondary`
 
-        Walkthroughs on how to achieve a specific task.
+        Tutorials on how to achieve a specific task.
 
     .. grid-item-card:: Topic Guides
         :link: dkist:topic-guides:index
@@ -49,6 +50,15 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
 
         In-depth explanations of concepts and key topics.
         Most useful for answering "why" questions.
+
+    .. grid-item-card:: How-to Guides
+        :link: dkist:howto-guides:index
+        :link-type: ref
+        :text-align: center
+
+        :material-outlined:`school;8em;sd-text-secondary`
+
+        Snippets of code for accomplishing specific tasks.
 
     .. grid-item-card:: Reference
         :link: dkist:api
