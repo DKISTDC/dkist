@@ -1,6 +1,5 @@
 (dkist:tutorial:index)=
-Python Tools Tutorial
-=====================
+# Python Tools Tutorial
 
 Welcome to the DKIST tutorial.
 In this tutorial we shall guide you through getting started with DKIST data.
@@ -13,6 +12,7 @@ By the end of this tutorial you should be familiar with how to:
 * How to do some basic plotting of the DKIST data.
 
 Before you get started with this tutorial follow {ref}`dkist:installation` to get Python and the ``dkist`` package installed.
+
 
 **Contents**
 

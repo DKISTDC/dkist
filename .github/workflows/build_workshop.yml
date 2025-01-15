@@ -1,0 +1,50 @@
+name: Build Workshop Repo
+
+on:
+  # Allow manual runs through the web UI
+  workflow_dispatch:
+  # Push to the main branch of the workshop repo on release
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_workshop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Install pipx
+        run: pip install -U pipx
+
+      - name: Clone workshop repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'DKISTDC/DKIST-Workshop'
+          fetch-depth: 0
+          path: 'workshop'
+
+      - name: Run pipx
+        run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
+
+      - name: Commit and Push
+        run: |
+          cd workshop
+          git add .
+          git commit -m "Update notebooks from user tools repo"
+          git push
