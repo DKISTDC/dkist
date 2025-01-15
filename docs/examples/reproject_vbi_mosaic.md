@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:examples:vbi-reproject)=
 # Stitching a VBI Mosaic with `reproject`
 
 ```{note}

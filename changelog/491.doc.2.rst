@@ -1,0 +1,1 @@
+Add a how-to guide on redownloading the sample data with Fido / Globus.
