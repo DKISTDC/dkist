@@ -20,7 +20,7 @@ Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from 
     import dkist.net
 
     results = Fido.search(a.dkist.Dataset("BKPLX"))
-    asdf_file = Fido.fetch(results, ")
+    asdf_file = Fido.fetch(results)
 
     ds = dkist.load_dataset(asdf_file)
 
@@ -28,13 +28,13 @@ Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from 
 Downloading the FITS files with Globus
 --------------------------------------
 
-Having loaded the ASDF file into a `dkist.Dataset` as this is a VISP dataset with polarimetry, we can download the Stokes I profile as so:
+Having loaded the ASDF file into a `dkist.Dataset` as this is a VISP dataset with polarimetry, we can download the Stokes I profile by indexing the first element of the first dimension:
 
 .. code-block:: python
 
     ds[0].files.download()  # doctest: +SKIP
 
-This will download all the FITS files into the same directory as the ASDF file.
+This will download the Stokes I FITS files into the same directory as the ASDF file.
 
 To download the whole dataset do:
 
