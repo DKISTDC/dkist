@@ -4,7 +4,7 @@ Downloading the Sample Data with Globus
 =======================================
 
 The Python tools provide a few different partial datasets as sample data, these are used in documentation and examples.
-This how to guide will show you how to download the complete data for these datasets.
+This how to guide will show you how to download the complete data for these datasets, or let you change the dataset for a different one.
 
 
 Searching for and downloading the ASDF file
@@ -28,7 +28,7 @@ Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from 
 Downloading the FITS files with Globus
 --------------------------------------
 
-Having loaded the ASDF file into a `dkist.Dataset` we can download the Stokes I profile as so:
+Having loaded the ASDF file into a `dkist.Dataset` as this is a VISP dataset with polarimetry, we can download the Stokes I profile as so:
 
 .. code-block:: python
 
