@@ -52,7 +52,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
         Most useful for answering "why" questions.
 
     .. grid-item-card:: How-to Guides
-        :link: dkist:howto-guides:index
+        :link: dkist:howto-guide:index
         :link-type: ref
         :text-align: center
 

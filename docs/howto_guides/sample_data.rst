@@ -1,4 +1,4 @@
-.. dkist:howto-guide:sample-data
+.. dkist:howto-guide:sample-data:
 
 Downloading the Sample Data with Globus
 =======================================
@@ -10,7 +10,7 @@ This how to guide will show you how to download the complete data for these data
 Searching for and downloading the ASDF file
 -------------------------------------------
 
-Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from the VISP we download the ASDF file and create a `.Dataset` object.
+Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from the VISP we download the ASDF file and create a `dkist.Dataset` object.
 
 .. code-block:: python
 
@@ -28,7 +28,7 @@ Using the `BKPLX <https://dkist.data.nso.edu/datasetview/BKPLX>`__ dataset from 
 Downloading the FITS files with Globus
 --------------------------------------
 
-Having loaded the ASDF file into a `.Dataset` we can download the Stokes I profile as so:
+Having loaded the ASDF file into a `dkist.Dataset` we can download the Stokes I profile as so:
 
 .. code-block:: python
 

@@ -1,4 +1,4 @@
-.. _dkist:howto-guides:index:
+.. _dkist:howto-guide:index:
 
 How To Guides
 =============
