@@ -40,7 +40,7 @@ jobs:
           path: 'workshop'
 
       - name: Run pipx
-        run: pipx run ./docs/build_workshop_materials.py docs/tutorial workshop
+        run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
 
       - name: Commit and Push
         run: |

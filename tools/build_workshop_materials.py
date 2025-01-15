@@ -14,11 +14,6 @@ This script converts the tutorial from the documentation into workshop.
 The learner notebooks will have all the code stripped from the code cells unless
 they have "keep-inputs" in their tags.
 """
-try:
-    import pytest
-    pytest.mark.skip()
-except ImportError:
-    pass
 import sys
 import argparse
 import subprocess
