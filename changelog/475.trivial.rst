@@ -1,1 +1,0 @@
-Fix small bug which caused `ds.flat` to break if not indexed.
