@@ -75,6 +75,7 @@ docs = [
   "ipywidgets",
   "accessible-pygments",
   "reproject[all]",
+  "sunpy[net,asdf]>=6.1.0rc1",  # Needed for the VBI extent example
 ]
 
 [project.urls]
