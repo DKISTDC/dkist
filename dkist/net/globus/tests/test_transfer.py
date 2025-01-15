@@ -86,7 +86,7 @@ def test_start_transfer(mocker, transfer_client, mock_endpoints):
     transfer_manifest = submit_mock.call_args_list[0][0][0]["DATA"]
 
     for filepath, tfr in zip(file_list, transfer_manifest):
-        assert str(filepath) == tfr["source_path"]
+        assert filepath.as_posix() == tfr["source_path"]
         assert os.path.sep + filepath.name == tfr["destination_path"]
 
 
@@ -103,7 +103,7 @@ def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):
     transfer_manifest = submit_mock.call_args_list[0][0][0]["DATA"]
 
     for filepath, tfr in zip(file_list, transfer_manifest):
-        assert str(filepath) == tfr["source_path"]
+        assert filepath.as_posix() == tfr["source_path"]
         assert f"{os.path.sep}b{os.path.sep}" + filepath.name == tfr["destination_path"]
 
 
@@ -118,7 +118,7 @@ def test_start_transfer_multiple_paths(mocker, transfer_client, mock_endpoints):
     transfer_manifest = submit_mock.call_args_list[0][0][0]["DATA"]
 
     for filepath, tfr in zip(dst_list, transfer_manifest):
-        assert str(filepath) == tfr["destination_path"]
+        assert filepath.as_posix() == tfr["destination_path"]
 
 
 def test_process_event_list(transfer_client, mock_task_event_list):
