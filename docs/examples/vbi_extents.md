@@ -59,7 +59,8 @@ first_tiles = ds.slice_tiles[0]
 ```
 
 ```{code-cell} ipython3
-fig = ds.plot(0, share_zscale=True)
+fig = plt.figure(figsize=(12, 12))
+fig = ds.plot(0, share_zscale=True, fig=fig)
 ```
 
 Now let's extract the timestamps of each of these tiles
