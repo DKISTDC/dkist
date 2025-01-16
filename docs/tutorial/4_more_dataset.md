@@ -18,13 +18,13 @@ kernelspec:
 Firstly we need to re-create our dataset object from the last tutorial.
 
 ```{code-cell} ipython
-from sunpy.net import Fido, attrs as a
+---
+tags: [keep-inputs]
+---
 import dkist
-import dkist.net
 
-res = Fido.search(a.dkist.Dataset('BKPLX'))
-files = Fido.fetch(res, path="~/dkist_data/{instrument}_{dataset_id}")
-ds = dkist.load_dataset(files)
+ds = dkist.load_dataset("~/sunpy/data/VISP/BKPLX/")
+ds
 ```
 
 The `Dataset` object allows us to do some basic inspection of the dataset as a whole without having to download the entire thing, using the metadata in the FITS headers.
@@ -56,10 +56,17 @@ tags: [output_scroll]
 ds.headers['DATE-AVG']
 ```
 
-Or we can look at one or more rows (i.e.: files) by slicing the table.
+Alternatively if we want to look at all the columns but fewer files, we can either slice the table directly:
 
 ```{code-cell} ipython
 ds.headers[:5]
+```
+
+or we can slice the dataset to give us the files we want to inspect:
+
+
+```python
+ds[:, 0].headers
 ```
 
 The table is an instance of {obj}`astropy.table.Table`, and can therefore be inspected and manipulated in any of the usual ways for Table objects.
@@ -82,8 +89,21 @@ Then it's trivial to plot this information:
 ```{code-cell} ipython
 import matplotlib.pyplot as plt
 
-plt.plot(ds.headers['ATMOS_R0'])
+plt.plot(ds[0].headers['ATMOS_R0'])
 plt.show()
+```
+
+Or we can use multiple columns from the headers to compare information or look at related values.
+
+```{code-cell} python
+ds.headers.keys()
+```
+
+```{code-cell} ipython
+import astropy.units as u
+
+# Pick a better example here?
+plt.scatter(ds[0].headers["CRVAL1"], ds[0].headers["CRVAL3"])
 ```
 
 ## Tracking files
@@ -94,7 +114,7 @@ plt.show()
 ds.files
 ```
 
-This tells us that our (20, 4096, 4096) data array is stored as 20 files, each containing an array of (4096, 4096).
+This tells us that our (4, 425, 980, 2554) data array is stored as 1700 files, each containing an array of (1, 980, 2554).
 Since the filenames are automatically generated from observation metadata, the `files` attribute can also track those before we even download the data.
 
 ```{code-cell} ipython
@@ -108,37 +128,10 @@ ds.files.basepath
 ```
 
 When we download the data for this dataset later on, this is where it will be saved.
-So in general you may want to use the path interpolation feature of the various download functions to keep your data files arranged sensibly, as we have for this example.
+This defaults to the location of the ASDF file.
+Remember that there may be thousands of FITS files in a dataset, so in general you may want to use the path interpolation feature of the various download functions to keep your them arranged sensibly.
+This is why for this example, we have downloaded the ASDF file to its own folder.
 
-### Reducing file downloads
-We have mentioned a few times already that we can reduce the size of a data download by finding just the data that interests us and slicing the dataset down to just that portion.
-However, there is an important point to note about this, which is that you need to keep in mind how the data are stored across the dataset's files.
-
-As we saw before, each FITS file contains effectively a 2D image - a single raster scan at one polarisation state - and we have many of these files to make a full 4D dataset.
-What this means is that if we look at a subset of the scan steps or polarisation states, we will reduce the number of files across which the array is stored.
-
-```{code-cell} ipython
-ds[0]
-```
-
-First, notice that when we slice a `Dataset` like this, the output we get here shows us not just the updated array shape but also the updated dimensions.
-Because we're looking at a single polarisation state, that axis and the corresponding physical axis have been removed.
-
-Going back to the `files` attribute, we can see that we do indeed have fewer files for this subset of the data.
-
-```{code-cell} ipython
-ds[0].files
-```
-
-However, if we decide we want to look at a single wavelength, we are taking a row of pixels from every single file.
-So although we reduce the dimensions of the array, we are not reducing the number of files we need to reference - and therefore download.
-
-```{code-cell} ipython
-ds[:, :, 500, :].data.shape
-```
-```{code-cell} ipython
-ds[:, :, 500, :].files
-```
 ## Downloading the quality report and preview movie
 
 For each dataset a quality report is produced during calibration which gives useful information about the quality of the data.
