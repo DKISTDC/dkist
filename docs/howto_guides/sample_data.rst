@@ -1,4 +1,4 @@
-.. dkist:howto-guide:sample-data:
+.. _dkist:howto-guide:sample-data:
 
 Downloading the Sample Data with Globus
 =======================================
