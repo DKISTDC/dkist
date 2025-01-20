@@ -125,7 +125,7 @@ jobs:
 
             A draft release has been made with the changelog, release it after merge to trigger the release.
           labels: |
-            no changelog
+            No Changelog Entry Needed
 
       - name: Create draft GitHub Release
         uses: actions/github-script@v7

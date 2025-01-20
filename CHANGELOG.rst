@@ -1,3 +1,26 @@
+1.9.1 (2025-01-15)
+==================
+
+Bug Fixes
+---------
+
+- Fix some small issues with `Dataset.__repr__`. (`#479 <https://github.com/DKISTDC/dkist/pull/479>`__)
+- Fix path errors with Globus transfers on windows. (`#489 <https://github.com/DKISTDC/dkist/pull/489>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Add tests for cropping datasets by world coords (`#310 <https://github.com/DKISTDC/dkist/pull/310>`__)
+- Fix small bug which caused `ds.flat` to break if not indexed. (`#475 <https://github.com/DKISTDC/dkist/pull/475>`__)
+
+
+Performance Improvements
+------------------------
+
+- Improve the performance of the ``TiledDataset`` ``repr`` and ``str``. (`#467 <https://github.com/DKISTDC/dkist/pull/467>`__)
+
+
 1.9.0 (2024-11-04)
 ==================
 
