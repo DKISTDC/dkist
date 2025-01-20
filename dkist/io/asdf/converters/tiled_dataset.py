@@ -19,7 +19,12 @@ class TiledDatasetConverter(Converter):
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
 
-        return TiledDataset(node["datasets"], meta=meta)
+        try:
+            mask = node["mask"]
+        except KeyError:
+            mask = None
+
+        return TiledDataset(node["datasets"], mask=mask, meta=meta)
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
         tree = {}
@@ -29,4 +34,5 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         tree["datasets"] = tiled_dataset._data.tolist()
+        tree["mask"] = tiled_dataset._data.mask.tolist()
         return tree
