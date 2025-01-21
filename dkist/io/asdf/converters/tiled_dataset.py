@@ -12,10 +12,7 @@ class TiledDatasetConverter(Converter):
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
 
-        try:
-            mask = node["mask"]
-        except KeyError:
-            mask = None
+        mask = node.get("mask", None)
 
         return TiledDataset(node["datasets"], node["inventory"], mask)
 
