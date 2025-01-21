@@ -693,3 +693,21 @@ def test_asymmetric_mapping_n_inputs():
     assert am.inverse(1, 2, 3, 4) == (1, 2)
 
     assert "TestModel" in repr(am)
+
+
+def test_varying_transform_crval_crpix():
+    crval_table=np.array([[2,2], [3,3]])
+    crpix_table=np.array([[5,5], [4,4]])
+
+    vct = VaryingCelestialTransform(
+        crpix=crpix_table * u.pix,
+        cdelt=(1, 1) * u.arcsec/u.pix,
+        crval_table=crval_table * u.arcsec,
+        pc_table=np.identity(2),
+    )
+    trans0 = vct.transform_at_index(0)
+    world_0 = trans0(0,0)
+    trans1 = vct.transform_at_index(1)
+    world_1 = trans1(0,0)
+
+    assert world_0 == world_1
