@@ -167,7 +167,7 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    def plot(self, slice_index, share_zscale=False, **kwargs):
+    def plot(self, slice_index, share_zscale=False, fig=None, **kwargs):
         """
         Plot a slice of each tile in the TiledDataset
 
@@ -181,11 +181,17 @@ class TiledDataset(Collection):
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
             Defaults to False
+        fig : `matplotlib.figure.Figure`
+            A figure to use for the plot. If not specified the current pyplot
+            figure will be used, or a new one created.
         """
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
-        fig = plt.figure()
+
+        if fig is None:
+            fig = plt.gcf()
+
         tiles = self.slice_tiles[slice_index].flat
         for i, tile in enumerate(tiles):
             ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
