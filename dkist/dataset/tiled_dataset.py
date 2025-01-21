@@ -10,6 +10,7 @@ from collections.abc import Collection
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.gridspec import GridSpec
 
 import astropy
 from astropy.table import vstack
@@ -192,24 +193,31 @@ class TiledDataset(Collection):
         if fig is None:
             fig = plt.gcf()
 
-        tiles = self.slice_tiles[slice_index].flat
-        for i, tile in enumerate(tiles):
-            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
-            tile.plot(axes=ax, **kwargs)
-            if i == 0:
-                xlabel, ylabel = self._get_axislabels(ax)
-                fig.supxlabel(xlabel, y=0.05)
-                fig.supylabel(ylabel, x=0.05)
-            axmin, axmax = ax.get_images()[0].get_clim()
-            vmin = axmin if axmin < vmin else vmin
-            vmax = axmax if axmax > vmax else vmax
-            ax.set_ylabel(" ")
-            ax.set_xlabel(" ")
+        sliced_dataset = self.slice_tiles[slice_index]
+        dataset_ncols, dataset_nrows = sliced_dataset.shape
+        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=fig)
+        for col in range(dataset_ncols):
+            for row in range(dataset_nrows):
+                tile = sliced_dataset[col, row]
+                ax_gridspec = gridspec[dataset_nrows - row - 1, col]
+                ax = fig.add_subplot(ax_gridspec, projection=tile.wcs)
+                tile.plot(axes=ax, **kwargs)
+                if col == row == 0:
+                    xlabel, ylabel = self._get_axislabels(ax)
+                    fig.supxlabel(xlabel, y=0.05)
+                    fig.supylabel(ylabel, x=0.05)
+                axmin, axmax = ax.get_images()[0].get_clim()
+                vmin = axmin if axmin < vmin else vmin
+                vmax = axmax if axmax > vmax else vmax
+                ax.set_ylabel(" ")
+                ax.set_xlabel(" ")
+
         if share_zscale:
             for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
+
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(list(tiles[0].global_coords.items())[::-1]):
+        for i, (coord, val) in enumerate(list(sliced_dataset.flat[0].global_coords.items())[::-1]):
             if coord == "time":
                 val = val.iso
             if coord == "stokes":
