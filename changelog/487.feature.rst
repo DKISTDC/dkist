@@ -1,0 +1,1 @@
+Add support to TiledDataset for mosaic datasets with missing tiles or where tiles are irregularly arranged.
