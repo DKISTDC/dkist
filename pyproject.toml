@@ -55,6 +55,7 @@ tests = [
   "pytest-filter-subpackage",
   "pytest-benchmark",
   "pytest-xdist",
+  "pytest-lazy-fixtures",
   "hypothesis",
   "tox",
   "pydot",
