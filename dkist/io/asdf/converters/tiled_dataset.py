@@ -19,10 +19,7 @@ class TiledDatasetConverter(Converter):
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
 
-        try:
-            mask = node["mask"]
-        except KeyError:
-            mask = None
+        mask = node.get("mask", None)
 
         return TiledDataset(node["datasets"], mask=mask, meta=meta)
 
