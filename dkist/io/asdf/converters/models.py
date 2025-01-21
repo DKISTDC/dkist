@@ -49,7 +49,7 @@ class VaryingCelestialConverter(TransformConverterBase):
                 node["pc_table"] = u.Quantity(node["pc_table"].value, unit=u.pix)
 
         return varying_celestial_transform_from_tables(
-            crpix=node["crpix"],
+            crpix_table=node["crpix"],
             cdelt=node["cdelt"],
             lon_pole=node["lon_pole"],
             crval_table=node["crval_table"],
@@ -61,7 +61,7 @@ class VaryingCelestialConverter(TransformConverterBase):
 
     def to_yaml_tree_transform(self, model, tag, ctx):
         return {
-            "crpix": parameter_to_value(model.crpix),
+            "crpix": parameter_to_value(model.crpix_table),
             "cdelt": parameter_to_value(model.cdelt),
             "lon_pole": parameter_to_value(model.lon_pole),
             "crval_table": parameter_to_value(model.crval_table),
