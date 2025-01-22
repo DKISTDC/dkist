@@ -138,8 +138,30 @@ def _load_from_path(path: Path):
 
 def _load_from_directory(directory):
     """
-    Construct a `~dkist.dataset.Dataset` from a directory containing one
-    asdf file and a collection of FITS files.
+    Construct a `~dkist.dataset.Dataset` from a directory containing one (or
+    more) ASDF files and a collection of FITS files.
+
+    ASDF files have the generic pattern:
+
+    ``{instrument}_L1_{start_time:%Y%m%dT%H%M%S}_{dataset_id}[_{suffix}].asdf``
+
+    where the ``_{suffix}`` on the end may be absent or one of a few different
+    suffixes which have been used at different times.  When searching a
+    directory for one or more ASDF file to load we should attempt to only load
+    one per dataset ID by selecting files in suffix order.
+
+    The order of suffixes are (from newest used to oldest):
+
+    - ``_metadata``
+    - ``_user_tools``
+    - None
+
+    The algorithm used to find ASDF files to load in a directory is therefore:
+
+    - Glob the directory for all ASDF files
+    - Group all results by the filename up to and including the dataset id in the filename
+    - Ignore any ASDF files with an old suffix if a new suffix is present
+    - Throw a warning to the user if any ASDF files with older suffixes are found
     """
     base_path = Path(directory).expanduser()
     asdf_files = tuple(base_path.glob("*.asdf"))
@@ -147,12 +169,11 @@ def _load_from_directory(directory):
     if not asdf_files:
         raise ValueError(f"No asdf file found in directory {base_path}.")
 
-    if len(asdf_files) > 1:
-        return _load_from_iterable(asdf_files)
+    if len(asdf_files) == 1:
+        return _load_from_asdf(asdf_files[0])
 
-    asdf_file = asdf_files[0]
+    return _load_from_iterable(asdf_files)
 
-    return _load_from_asdf(asdf_file)
 
 
 def _load_from_asdf(filepath):

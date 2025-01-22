@@ -1,4 +1,5 @@
 import shutil
+import numbers
 
 import pytest
 from parfive import Results
@@ -114,3 +115,54 @@ def test_not_dkist_asdf(tmp_path):
 
     with pytest.raises(TypeError, match="not a valid DKIST"):
         load_dataset(tmp_path / "test.asdf")
+
+
+def generate_asdf_folder(tmp_path, asdf_path, filenames):
+    for fname in filenames:
+        shutil.copy(asdf_path, tmp_path / fname)
+
+    return tmp_path
+
+
+@pytest.mark.parametrize(("filenames", "indices"), [
+    # param[0] is list of filenames
+    # parram[1] is the indices in that list that should be used
+    (("VBI_L1_20231016T184519_AJQWW.asdf",), 0),
+    (("VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 0),
+    (("VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 0),
+    (("VBI_L1_20231016T184519_AJQWW_unknown.asdf",), 0),
+    (("VBI_L1_20231016T184519_AJQWW.asdf",
+      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 1),
+    (("VBI_L1_20231016T184519_AJQWW.asdf",
+      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
+      "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 2),
+    (("VBI_L1_20231016T184519_AJQWW.asdf",
+      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
+      "VBI_L1_20231016T184519_AJQWW_metadata.asdf",
+      "VBI_L1_20231016T184519_AJQWW_unknown.asdf"), (2, 3)),
+])
+def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
+    asdf_folder = generate_asdf_folder(tmp_path, asdf_path, filenames)
+
+    asdf_file_paths = tuple(asdf_folder / fname for fname in filenames)
+
+    # First we check that we load the correct amount of datasets and that the
+    # loading completes correctly
+
+    datasets = load_dataset(asdf_folder)
+
+    if isinstance(indices, numbers.Integral):
+        assert isinstance(datasets, Dataset)
+    else:
+        assert len(datasets) == len(indices)
+
+    # Now we check that the correct files are chosen
+
+    load_from_asdf = mocker.patch("dkist.dataset.loader._load_from_asdf")
+    load_from_iterable = mocker.patch("dkist.dataset.loader._load_from_iterable")
+
+    datasets = load_dataset(asdf_folder)
+    if isinstance(indices, numbers.Integral):
+        load_from_asdf.assert_called_once_with(asdf_file_paths[indices])
+    else:
+        load_from_iterable.assert_called_once_with(tuple(asdf_file_paths[i] for i in indices))
