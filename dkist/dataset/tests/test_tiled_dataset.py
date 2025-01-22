@@ -82,8 +82,8 @@ def test_tileddataset_plot(share_zscale):
     for tile in ds.flat:
         newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
     ds = TiledDataset(np.array(newtiles).reshape(ds.shape), inventory=newtiles[0].inventory)
-    fig = plt.figure(figsize=(600, 800))
-    ds.plot(0, share_zscale=share_zscale)
+    fig = plt.figure(figsize=(12, 15))
+    ds.plot(0, share_zscale=share_zscale, fig=fig)
     return plt.gcf()
 
 
