@@ -1,0 +1,2 @@
+Add `limits_from_wcs` kwarg to `TiledDataset.plot`.
+This option (default ``True``) flips each tile to ensure that the WCS coordinate values increase from lower-left to upper-right.
