@@ -86,8 +86,11 @@ def test_tileddataset_plot(share_zscale):
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
     ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+    non_square_ds = ds[:2, :]
+    assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
     fig = plt.figure(figsize=(12, 15))
-    ds.plot(0, share_zscale=share_zscale, fig=fig)
+    non_square_ds.plot(0, share_zscale=share_zscale, fig=fig)
+    assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
     return plt.gcf()
 
 
