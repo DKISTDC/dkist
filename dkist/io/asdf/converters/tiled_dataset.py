@@ -20,5 +20,5 @@ class TiledDatasetConverter(Converter):
         tree = {}
         tree["inventory"] = tiled_dataset._inventory
         tree["datasets"] = tiled_dataset._data.tolist()
-        tree["mask"] = tiled_dataset._data.mask.tolist()
+        tree["mask"] = tiled_dataset._data.mask
         return tree
