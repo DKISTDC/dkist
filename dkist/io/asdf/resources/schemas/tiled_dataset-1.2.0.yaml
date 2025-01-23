@@ -38,11 +38,7 @@ properties:
 
   mask:
     description: A mask to indicate if invalid or missing Datasets should be ignored.
-    type: array
-    items:
-      type: array
-      items:
-        - type: boolean
+    datatype: bool8
 
 required: [datasets, meta, mask]
 additionalProperties: false

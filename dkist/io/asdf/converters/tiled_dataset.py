@@ -31,5 +31,5 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         tree["datasets"] = tiled_dataset._data.tolist()
-        tree["mask"] = tiled_dataset._data.mask.tolist()
+        tree["mask"] = tiled_dataset._data.mask
         return tree
