@@ -6,6 +6,8 @@
   "dkist.dataset.tests.test_plotting.test_2d_plot[aslice1]": "cbb84fbae51d8238803f8f0d6820c575f024fe54b1656f1b181dc4ec645e9ff9",
   "dkist.dataset.tests.test_plotting.test_2d_plot[aslice2]": "4b5be9cf1883d0ebd15ff091f52cea2822068e8238a8df7b0f594d69fba27597",
   "dkist.dataset.tests.test_plotting.test_2d_plot2": "1c10e9db44b0b694a6bb1b493c4c2193278541df7c1302bb11fe3f6372682e35",
-  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[share_zscale]": "3ff43a5f92e253c9033dbfd7b101c09739d941fb604220ce88dfe2278261df06",
-  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[indpendent_zscale]": "c0a1e248e133c6ea86f80ec5cc30d2ded9e740efec02a4f09847310b72ff9b18"
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[wcs_lims-share_zscale]": "a7af28683a85e55b76f132abcd5fb99e85b400e3d6641724dbb3414dff25df03",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[wcs_lims-indpendent_zscale]": "f18bef9708a69e61e2c6ed4e6781432188c61eb4e583aae2876164c86794cb59",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[raw_lims-share_zscale]": "540329173485ec175b4ef4a689a125004d8e988075407bd2cfc0bafd8edaa5c8",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[raw_lims-indpendent_zscale]": "05bfe3fb2c3c7b02c52b6b75944e88c19bf351b52d5f638b1d29526cc3bf8198"
 }

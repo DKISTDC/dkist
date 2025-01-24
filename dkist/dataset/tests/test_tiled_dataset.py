@@ -75,9 +75,15 @@ def test_tiled_dataset_from_components(dataset):
 
 @figure_test
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
-def test_tileddataset_plot(share_zscale):
+@pytest.mark.parametrize("limits_from_wcs", [True, False], ids=["wcs_lims", "raw_lims"])
+def test_tileddataset_plot(share_zscale, limits_from_wcs):
     from dkist.data.sample import VBI_AJQWW
     ori_ds = load_dataset(VBI_AJQWW)
+
+    # Swap WCS to make the `limits_from_wcs` option meaningful
+    for tile in ori_ds.flat:
+        tile.wcs.forward_transform[0].cdelt *= -1
+
     newtiles = []
     for tile in ori_ds.flat:
         newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
@@ -86,11 +92,26 @@ def test_tileddataset_plot(share_zscale):
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
     ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+
     non_square_ds = ds[:2, :]
     assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
+
     fig = plt.figure(figsize=(12, 15))
-    non_square_ds.plot(0, share_zscale=share_zscale, fig=fig)
+    non_square_ds.plot(0, share_zscale=share_zscale, limits_from_wcs=limits_from_wcs, fig=fig)
+
     assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
+    for ax in fig.axes:
+        xlims = ax.get_xlim()
+        ylims = ax.get_ylim()
+
+        if limits_from_wcs:
+            # Because we know the WCS are flipped, so a correctly ordered WCS will be a "backwards" absolute pixel order
+            assert xlims[0] > xlims[1]
+            assert ylims[0] > ylims[1]
+        else:
+            assert xlims[0] < xlims[1]
+            assert ylims[0] < ylims[1]
+
     return plt.gcf()
 
 
