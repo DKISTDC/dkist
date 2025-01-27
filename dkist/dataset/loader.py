@@ -1,6 +1,8 @@
+import re
 import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import singledispatch
+from collections import defaultdict
 
 from parfive import Results
 
@@ -12,6 +14,9 @@ try:
 except ImportError:
     # fall back to top level asdf for older versions of asdf
     from asdf import ValidationError
+
+
+ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]+)(?P<suffix>_user_tools|_metadata)?.asdf$"
 
 
 def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
@@ -172,7 +177,47 @@ def _load_from_directory(directory):
     if len(asdf_files) == 1:
         return _load_from_asdf(asdf_files[0])
 
-    return _load_from_iterable(asdf_files)
+    pattern = re.compile(ASDF_FILENAME_PATTERN)
+    candidates = []
+    asdfs_to_load = []
+    for filepath in asdf_files:
+        filename = filepath.name
+
+        # If the asdf file doesn't match the data center pattern then we load it
+        # as it's probably a custom user file
+        if pattern.match(filename) is None:
+            asdfs_to_load.append(filepath)
+            continue
+
+        # All the matches have to be checked
+        candidates.append(filepath)
+
+    # If we only have one match load it
+    if len(candidates) == 1:
+        asdfs_to_load += candidates
+    else:
+        # Now we group by prefix
+        matches = [pattern.match(fp.name) for fp in candidates]
+        grouped = defaultdict(list)
+        for m in matches:
+            prefix = m.string.removesuffix(".asdf").removesuffix(m.group("suffix") or "")
+            grouped[prefix].append(m.group("suffix"))
+
+        for prefix, suffixes in grouped.items():
+            if "_metadata" in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}_metadata.asdf")
+            elif "_user_tools" in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}_user_tools.asdf")
+            elif None in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}.asdf")
+            else:
+                raise ValueError("How did you end up here?")
+
+    if len(asdfs_to_load) == 1:
+        return _load_from_asdf(asdfs_to_load[0])
+
+    # Ensure we load in the same order we were passed the files
+    return _load_from_iterable([pth for pth in asdf_files if pth in asdfs_to_load])
 
 
 

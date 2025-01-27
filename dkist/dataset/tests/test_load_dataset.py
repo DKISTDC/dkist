@@ -1,3 +1,4 @@
+import re
 import shutil
 import numbers
 
@@ -8,6 +9,7 @@ import asdf
 
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.data.test import rootdir
+from dkist.dataset.loader import ASDF_FILENAME_PATTERN
 
 
 @pytest.fixture
@@ -124,39 +126,51 @@ def generate_asdf_folder(tmp_path, asdf_path, filenames):
     return tmp_path
 
 
+@pytest.mark.parametrize(("filename", "match"), [
+    ("VBI_L1_20231016T184519_AJQWW.asdf", True),
+    ("VBI_L1_20231016T184519_AJQWW_user_tools.asdf", True),
+    ("VBI_L1_20231016T184519_AJQWW_metadata.asdf", True),
+    ("DL-NIRSP_L1_20231016T184519_AJQWW.asdf", True),
+    ("DL-NIRSP_L1_20231016T184519_AJQWW_user_tools.asdf", True),
+    ("DL-NIRSP_L1_20231016T184519_AJQWW_metadata.asdf", True),
+    ("VISP_L1_99999999T184519_AAAAAAA.asdf", True),
+    ("VISP_L1_20231016T888888_AAAAAAA_user_tools.asdf", True),
+    ("VISP_L1_20231016T184519_AAAAAAA_metadata.asdf", True),
+    ("VISP_L1_20231016T184519_AAAAAAA_unknown.asdf", False),
+    ("wibble.asdf", False),
+    ])
+def test_asdf_regex(filename, match):
+
+    m = re.match(ASDF_FILENAME_PATTERN, filename)
+    assert bool(m) is match
+
+
 @pytest.mark.parametrize(("filenames", "indices"), [
     # param[0] is list of filenames
     # parram[1] is the indices in that list that should be used
-    (("VBI_L1_20231016T184519_AJQWW.asdf",), 0),
-    (("VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 0),
-    (("VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 0),
-    (("VBI_L1_20231016T184519_AJQWW_unknown.asdf",), 0),
-    (("VBI_L1_20231016T184519_AJQWW.asdf",
-      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 1),
-    (("VBI_L1_20231016T184519_AJQWW.asdf",
-      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
-      "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 2),
-    (("VBI_L1_20231016T184519_AJQWW.asdf",
-      "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
-      "VBI_L1_20231016T184519_AJQWW_metadata.asdf",
-      "VBI_L1_20231016T184519_AJQWW_unknown.asdf"), (2, 3)),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",), 0, id="Single no suffix"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 0, id="single _user_tools"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 0, id="single _metadata"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW_unknown.asdf",), 0, id="single _unknown"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 1, id="none & _user_tools"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 2, id="_user_tools & _metadata"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_metadata.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_unknown.asdf"), (2, 3), id="_user_tools & _metadata & _unknown"),
+    pytest.param(("random.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), (0, 1), id="other pattern & _user_tools"),
+    pytest.param(("random.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
+                  "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), (0, 2), id="other pattern & _user_tools & _metadata"),
 ])
 def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     asdf_folder = generate_asdf_folder(tmp_path, asdf_path, filenames)
 
     asdf_file_paths = tuple(asdf_folder / fname for fname in filenames)
-
-    # First we check that we load the correct amount of datasets and that the
-    # loading completes correctly
-
-    datasets = load_dataset(asdf_folder)
-
-    if isinstance(indices, numbers.Integral):
-        assert isinstance(datasets, Dataset)
-    else:
-        assert len(datasets) == len(indices)
-
-    # Now we check that the correct files are chosen
 
     load_from_asdf = mocker.patch("dkist.dataset.loader._load_from_asdf")
     load_from_iterable = mocker.patch("dkist.dataset.loader._load_from_iterable")
@@ -165,4 +179,4 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     if isinstance(indices, numbers.Integral):
         load_from_asdf.assert_called_once_with(asdf_file_paths[indices])
     else:
-        load_from_iterable.assert_called_once_with(tuple(asdf_file_paths[i] for i in indices))
+        load_from_iterable.assert_called_once_with([asdf_file_paths[i] for i in indices])
