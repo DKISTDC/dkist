@@ -19,7 +19,7 @@ except ImportError:
     from asdf import ValidationError
 
 
-ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]+)(?P<suffix>_user_tools|_metadata)?.asdf$"
+ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
 
 
 def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
