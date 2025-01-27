@@ -10,6 +10,7 @@ import asdf
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.data.test import rootdir
 from dkist.dataset.loader import ASDF_FILENAME_PATTERN
+from dkist.utils.exceptions import DKISTUserWarning
 
 
 @pytest.fixture
@@ -176,7 +177,16 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     load_from_asdf = mocker.patch("dkist.dataset.loader._load_from_asdf")
     load_from_iterable = mocker.patch("dkist.dataset.loader._load_from_iterable")
 
-    datasets = load_dataset(asdf_folder)
+    # The load_dataset call should throw a warning if any files are skipped, but
+    # not otherwise, the warning should have the filenames of any skipped files in
+    tuple_of_indices = indices if isinstance(indices, tuple) else (indices,)
+    if len(tuple_of_indices) == len(filenames):
+        datasets = load_dataset(asdf_folder)
+    else:
+        files_to_be_skipped = set(filenames).difference([filenames[i] for i in tuple_of_indices])
+        with pytest.warns(DKISTUserWarning, match=f".*[{'|'.join([re.escape(f) for f in files_to_be_skipped])}].*"):
+            datasets = load_dataset(asdf_folder)
+
     if isinstance(indices, numbers.Integral):
         load_from_asdf.assert_called_once_with(asdf_file_paths[indices])
     else:

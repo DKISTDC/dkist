@@ -1,4 +1,5 @@
 import re
+import warnings
 import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import singledispatch
@@ -7,6 +8,8 @@ from collections import defaultdict
 from parfive import Results
 
 import asdf
+
+from dkist.utils.exceptions import DKISTUserWarning
 
 try:
     # first try to import from asdf.exceptions for asdf 2.15+
@@ -203,6 +206,7 @@ def _load_from_directory(directory):
             prefix = m.string.removesuffix(".asdf").removesuffix(m.group("suffix") or "")
             grouped[prefix].append(m.group("suffix"))
 
+        # Now we select the best suffix for each prefix
         for prefix, suffixes in grouped.items():
             if "_metadata" in suffixes:
                 asdfs_to_load.append(base_path / f"{prefix}_metadata.asdf")
@@ -212,6 +216,14 @@ def _load_from_directory(directory):
                 asdfs_to_load.append(base_path / f"{prefix}.asdf")
             else:
                 raise ValueError("How did you end up here?")
+
+    # Throw a warning if we have skipped any files
+    if ignored_files := set(asdf_files).difference(asdfs_to_load):
+        warnings.warn(
+            f"ASDF files with old names ({', '.join([a.name for a in ignored_files])}) "
+            "were found in this directory and ignored.",
+            DKISTUserWarning
+        )
 
     if len(asdfs_to_load) == 1:
         return _load_from_asdf(asdfs_to_load[0])
