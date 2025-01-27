@@ -215,7 +215,8 @@ def _load_from_directory(directory):
             elif None in suffixes:
                 asdfs_to_load.append(base_path / f"{prefix}.asdf")
             else:
-                raise ValueError("How did you end up here?")
+                # This branch should never be hit because the regex enumerates the suffixes
+                raise ValueError("Unknown suffix encountered.")  # pragma: no cover
 
     # Throw a warning if we have skipped any files
     if ignored_files := set(asdf_files).difference(asdfs_to_load):
