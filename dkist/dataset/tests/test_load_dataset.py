@@ -168,6 +168,13 @@ def test_asdf_regex(filename, match):
                   "VBI_L1_not_a_proper_name.asdf",
                   "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
                   "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), (0, 1, 3), id="2 other patterns & _user_tools & _metadata"),
+    pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",
+                  "VISP_L1_20231016T184519_AJQWW.asdf",), (0, 1), id="Two patterns, no suffix"),
+    pytest.param(("VBI_L1_20231016T184519_AAA.asdf",
+                  "VBI_L1_20231016T184519_AAA_metadata.asdf",
+                  "VBI_L1_20231116T184519_BBBBBBB.asdf",
+                  "VBI_L1_20231216T184519_CCCCCCC.asdf",
+                  "VBI_L1_20231216T184519_CCCCCCC_user_tools.asdf"), (1, 2, 4), id="Three patterns, mixed suffixes"),
 ])
 def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     asdf_folder = generate_asdf_folder(tmp_path, asdf_path, filenames)
