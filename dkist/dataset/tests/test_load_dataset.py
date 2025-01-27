@@ -137,10 +137,10 @@ def generate_asdf_folder(tmp_path, asdf_path, filenames):
     ("VISP_L1_20231016T888888_AAAAAAA_user_tools.asdf", True),
     ("VISP_L1_20231016T184519_AAAAAAA_metadata.asdf", True),
     ("VISP_L1_20231016T184519_AAAAAAA_unknown.asdf", False),
+    ("VISP_L1_20231016T184519.asdf", False),
     ("wibble.asdf", False),
     ])
 def test_asdf_regex(filename, match):
-
     m = re.match(ASDF_FILENAME_PATTERN, filename)
     assert bool(m) is match
 
@@ -164,8 +164,9 @@ def test_asdf_regex(filename, match):
     pytest.param(("random.asdf",
                   "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), (0, 1), id="other pattern & _user_tools"),
     pytest.param(("random.asdf",
+                  "VBI_L1_not_a_proper_name.asdf",
                   "VBI_L1_20231016T184519_AJQWW_user_tools.asdf",
-                  "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), (0, 2), id="other pattern & _user_tools & _metadata"),
+                  "VBI_L1_20231016T184519_AJQWW_metadata.asdf",), (0, 1, 3), id="2 other patterns & _user_tools & _metadata"),
 ])
 def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     asdf_folder = generate_asdf_folder(tmp_path, asdf_path, filenames)
