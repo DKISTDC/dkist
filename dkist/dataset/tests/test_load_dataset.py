@@ -179,4 +179,8 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
     if isinstance(indices, numbers.Integral):
         load_from_asdf.assert_called_once_with(asdf_file_paths[indices])
     else:
-        load_from_iterable.assert_called_once_with([asdf_file_paths[i] for i in indices])
+        calls = load_from_iterable.mock_calls
+        # We need to assert that _load_from_iterable is called with the right
+        # paths but in a order-invariant way.
+        assert len(calls) == 1
+        assert set(calls[0].args[0]) == {asdf_file_paths[i] for i in indices}

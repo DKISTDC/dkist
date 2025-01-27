@@ -216,8 +216,7 @@ def _load_from_directory(directory):
     if len(asdfs_to_load) == 1:
         return _load_from_asdf(asdfs_to_load[0])
 
-    # Ensure we load in the same order we were passed the files
-    return _load_from_iterable([pth for pth in asdf_files if pth in asdfs_to_load])
+    return _load_from_iterable(asdfs_to_load)
 
 
 
