@@ -223,22 +223,26 @@ class TiledDataset(Collection):
         for col in range(dataset_ncols):
             for row in range(dataset_nrows):
                 tile = sliced_dataset[col, row]
+
+                # Fill up grid from the bottom row
                 ax_gridspec = gridspec[dataset_nrows - row - 1, col]
                 ax = fig.add_subplot(ax_gridspec, projection=tile.wcs)
+
                 tile.plot(axes=ax, **kwargs)
 
                 if limits_from_wcs:
                     self._ensure_wcs_ordered_axis_lims(tile.wcs, ax)
 
+                ax.set_ylabel(" ")
+                ax.set_xlabel(" ")
                 if col == row == 0:
                     xlabel, ylabel = self._get_axislabels(ax)
                     fig.supxlabel(xlabel, y=0.05)
                     fig.supylabel(ylabel, x=0.05)
+
                 axmin, axmax = ax.get_images()[0].get_clim()
                 vmin = axmin if axmin < vmin else vmin
                 vmax = axmax if axmax > vmax else vmax
-                ax.set_ylabel(" ")
-                ax.set_xlabel(" ")
 
         if share_zscale:
             for ax in fig.get_axes():
