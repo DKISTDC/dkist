@@ -87,7 +87,7 @@ class TiledDataset(Collection):
     def __init__(self, dataset_array, inventory=None, headers=None):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
-        self.combined_headers = headers
+        self.combined_headers = vstack(headers) if headers else None
         self._validate_component_datasets(self._data, inventory)
 
     def __contains__(self, x):
