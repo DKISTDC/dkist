@@ -11,6 +11,11 @@ class TiledDatasetConverter(Converter):
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
 
+        for row in node["datasets"]:
+            for ds in row:
+                if ds:
+                    ds._is_mosaic_tile = True
+
         return TiledDataset(node["datasets"], node["inventory"])
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
