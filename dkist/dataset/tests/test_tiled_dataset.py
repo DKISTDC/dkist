@@ -75,8 +75,29 @@ def test_tiled_dataset_from_components(dataset):
 
 @figure_test
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
+def test_tileddataset_plot(share_zscale):
+    from dkist.data.sample import VBI_AJQWW
+    ori_ds = load_dataset(VBI_AJQWW)
+
+    newtiles = []
+    for tile in ori_ds.flat:
+        newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
+    # ndcube 2.3.0 introduced a deepcopy for rebin, this broke our dataset validation
+    # https://github.com/sunpy/ndcube/issues/815
+    for tile in newtiles:
+        tile.meta["inventory"] = ori_ds.inventory
+    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+
+    fig = plt.figure(figsize=(12, 15))
+    ds.plot(0, share_zscale=share_zscale, fig=fig)
+
+    return plt.gcf()
+
+@figure_test
 @pytest.mark.parametrize("limits_from_wcs", [True, False], ids=["wcs_lims", "raw_lims"])
-def test_tileddataset_plot(share_zscale, limits_from_wcs):
+def test_tileddataset_plot_limit_swapping(limits_from_wcs):
+    # Also test that row/column sizes are correct
+
     from dkist.data.sample import VBI_AJQWW
     ori_ds = load_dataset(VBI_AJQWW)
 
@@ -97,7 +118,7 @@ def test_tileddataset_plot(share_zscale, limits_from_wcs):
     assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
 
     fig = plt.figure(figsize=(12, 15))
-    non_square_ds.plot(0, share_zscale=share_zscale, limits_from_wcs=limits_from_wcs, fig=fig)
+    non_square_ds.plot(0, share_zscale=False, limits_from_wcs=limits_from_wcs, fig=fig)
 
     assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
     for ax in fig.axes:
