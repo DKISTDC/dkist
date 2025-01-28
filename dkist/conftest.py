@@ -302,10 +302,12 @@ def eit_dataset():
 @pytest.fixture
 def simple_tiled_dataset(dataset):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
+    headers = []
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
+        headers.append(ds.headers)
     dataset_array = np.array(datasets).reshape((2,2))
-    return TiledDataset(dataset_array, dataset.meta["inventory"])
+    return TiledDataset(dataset_array, dataset.meta["inventory"], headers=headers)
 
 
 @pytest.fixture
