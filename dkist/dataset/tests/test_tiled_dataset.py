@@ -70,7 +70,7 @@ def test_tiled_dataset_from_components(dataset):
     for ds, fm, headers in zip(tiled_ds.flat, file_managers, header_tables):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
-        assert ds.meta["headers"] is headers
+        assert (ds.meta["headers"] == headers).all()
 
 
 @figure_test

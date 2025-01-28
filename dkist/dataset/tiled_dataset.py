@@ -74,17 +74,20 @@ class TiledDataset(Collection):
         assert len(file_managers) == len(wcses) == len(header_tables)
 
         datasets = np.empty(len(file_managers), dtype=object)
-        for i, (fm, wcs, headers) in enumerate(zip(file_managers, wcses, header_tables)):
+        all_headers = vstack(header_tables)
+        for i, (fm, wcs) in enumerate(zip(file_managers, wcses)):
+            headers = all_headers[i*len(fm):(i+1)*len(fm)]
             meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm._generate_array(), wcs=wcs, meta=meta)
+            datasets[i] = Dataset(fm._generate_array(), wcs=wcs, meta=meta, is_tile=True)
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
-        return cls(datasets, inventory)
+        return cls(datasets, inventory, all_headers)
 
-    def __init__(self, dataset_array, inventory=None):
+    def __init__(self, dataset_array, inventory=None, headers=None):
         self._data = np.array(dataset_array, dtype=object)
         self._inventory = inventory or {}
+        self.combined_headers = headers
         self._validate_component_datasets(self._data, inventory)
 
     def __contains__(self, x):
@@ -130,14 +133,6 @@ class TiledDataset(Collection):
         The inventory record as kept by the data center for this dataset.
         """
         return self._inventory
-
-    @property
-    def combined_headers(self):
-        """
-        A single `astropy.table.Table` containing all the FITS headers for all
-        files in this dataset.
-        """
-        return vstack([ds.meta["headers"] for ds in self._data.flat])
 
     @property
     def shape(self):
