@@ -56,6 +56,7 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
         TiledDataset(np.array((dataset, ds2)), dataset.meta["inventory"])
 
 
+@pytest.mark.accept_cli_dataset
 def test_tiled_dataset_from_components(dataset):
     shape = (2, 2)
     file_managers = [dataset._file_manager] * 4
