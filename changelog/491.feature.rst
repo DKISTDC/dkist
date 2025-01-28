@@ -1,1 +1,0 @@
-Add a ``fig=`` keyword argument to `TiledDataset.plot` and make it default to the current figure.

@@ -1,9 +1,0 @@
-The minimum supported versions of dependencies and Python have been updated, this release requires:
-* Python 3.11
-* asdf 2.15 (and plugin version bumps)
-* dask 2023.2
-* matplotlib 3.7
-* ndcube 2.1
-* numpy 1.25
-* parfive 2.1
-* sunpy 5.0
