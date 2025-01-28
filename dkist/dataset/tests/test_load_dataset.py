@@ -129,6 +129,7 @@ def generate_asdf_folder(tmp_path, asdf_path, filenames):
 
 @pytest.mark.parametrize(("filename", "match"), [
     ("VBI_L1_20231016T184519_AJQWW.asdf", True),
+    ("VBI_L1_20231016T184519_AAAA.asdf", False),
     ("VBI_L1_20231016T184519_AJQWW_user_tools.asdf", True),
     ("VBI_L1_20231016T184519_AJQWW_metadata.asdf", True),
     ("DL-NIRSP_L1_20231016T184519_AJQWW.asdf", True),
