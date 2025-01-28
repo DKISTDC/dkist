@@ -222,7 +222,7 @@ def _load_from_directory(directory):
     if ignored_files := set(asdf_files).difference(asdfs_to_load):
         warnings.warn(
             f"ASDF files with old names ({', '.join([a.name for a in ignored_files])}) "
-            "were found in this directory and ignored.",
+            "were found in this directory and ignored. You may want to delete these files.",
             DKISTUserWarning
         )
 

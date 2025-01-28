@@ -148,8 +148,6 @@ def test_asdf_regex(filename, match):
 
 
 @pytest.mark.parametrize(("filenames", "indices"), [
-    # param[0] is list of filenames
-    # parram[1] is the indices in that list that should be used
     pytest.param(("VBI_L1_20231016T184519_AJQWW.asdf",), 0, id="Single no suffix"),
     pytest.param(("VBI_L1_20231016T184519_AJQWW_user_tools.asdf",), 0, id="single _user_tools"),
     pytest.param(("VBI_L1_20231016T184519_AJQWW_metadata.asdf",), 0, id="single _metadata"),
