@@ -48,7 +48,7 @@ jobs:
   docs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: '3.13'
+      default_python: '3.12'
       coverage: 'codecov'
       envs: |
         - linux: build_docs-notebooks
