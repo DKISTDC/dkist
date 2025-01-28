@@ -33,22 +33,22 @@ jobs:
   tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: '3.10'
+      default_python: '3.13'
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
+        - linux: py313
         - linux: py312
-        - linux: py311
-        - windows: py311-online
-        - macos: py310
-        - linux: py310-oldestdeps
+        - windows: py312-online
+        - macos: py311
+        - linux: py311-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: '3.10'
+      default_python: '3.13'
       coverage: 'codecov'
       envs: |
         - linux: build_docs-notebooks
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.13'
       - run: python -m pip install -U --user build
       - run: python -m build . --sdist
       - run: python -m pip install -U --user twine
@@ -77,7 +77,7 @@ jobs:
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
-        - linux: py311-devdeps
+        - linux: py313-devdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -90,7 +90,7 @@ jobs:
       )
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
-      python-version: '3.10'
+      python-version: '3.13'
       test_extras: tests
       test_command: pytest --pyargs dkist -k "not test_fail"
       # We have to work around a github runner bug here: https://github.com/actions/runner/issues/2788#issuecomment-2145922705
