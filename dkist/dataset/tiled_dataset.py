@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+from typing import Literal
 from textwrap import dedent
 from collections.abc import Collection
 
@@ -14,7 +15,6 @@ from matplotlib.gridspec import GridSpec
 
 import astropy
 from astropy.table import vstack
-from astropy.visualization.wcsaxes import WCSAxes
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
@@ -169,26 +169,8 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    @staticmethod
-    def _ensure_wcs_ordered_axis_lims(ax: WCSAxes) -> None:
-        """
-        Adjust axis limits so the WCS values go from smaller numbers in the bottom left to higher numbers in the upper right.
-        """
-        xmin, xmax = ax.get_xlim()
-        ymin, ymax = ax.get_ylim()
 
-        world_xmin, world_ymin = ax.wcs.pixel_to_world_values(xmin, ymin)
-        world_xmax, world_ymax = ax.wcs.pixel_to_world_values(xmax, ymax)
-
-        new_xmin, new_ymin = ax.wcs.world_to_pixel_values(min(world_xmin, world_xmax), min(world_ymin, world_ymax))
-        new_xmax, new_ymax = ax.wcs.world_to_pixel_values(max(world_xmin, world_xmax), max(world_ymin, world_ymax))
-
-        ax.set_xlim(new_xmin, new_xmax)
-        ax.set_ylim(new_ymin, new_ymax)
-
-        return
-
-    def plot(self, slice_index, share_zscale=False, fig=None, limits_from_wcs=True, **kwargs):
+    def plot(self, slice_index, share_zscale=False, fig=None, swap_tile_limits: Literal["x", "y", "xy"] | None = None, **kwargs):
         """
         Plot a slice of each tile in the TiledDataset
 
@@ -205,10 +187,15 @@ class TiledDataset(Collection):
         fig : `matplotlib.figure.Figure`
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
-        limits_from_wcs : `bool`
-           If ``True`` the plots will be adjusted so smaller WCS values in the lower left, increasing to the upper
-           right. If ``False`` then the raw orientation of the data is used.
+        swap_tile_limits : `"x", "y", "xy"` or `None` (default)
+            Invert the axis limits of each tile. Either the "x" or "y" axis limits can be inverted separately, or they
+            can both be inverted with "xy". This option is useful if the orientation of the tile data arrays is flipped
+            w.r.t. the WCS orientation implied by the mosaic keys. For example, most DL-NIRSP data should be plotted with
+            `swap_tile_limits="xy"`.
         """
+        if swap_tile_limits not in ["x", "y", "xy", None]:
+            raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
+
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
@@ -229,8 +216,11 @@ class TiledDataset(Collection):
 
                 tile.plot(axes=ax, **kwargs)
 
-                if limits_from_wcs:
-                    self._ensure_wcs_ordered_axis_lims(ax)
+                if swap_tile_limits in ["x", "xy"]:
+                    ax.invert_xaxis()
+
+                if swap_tile_limits in ["y", "xy"]:
+                    ax.invert_yaxis()
 
                 ax.set_ylabel(" ")
                 ax.set_xlabel(" ")

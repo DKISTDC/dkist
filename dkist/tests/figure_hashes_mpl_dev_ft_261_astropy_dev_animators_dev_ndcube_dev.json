@@ -8,6 +8,8 @@
   "dkist.dataset.tests.test_plotting.test_2d_plot2": "1c10e9db44b0b694a6bb1b493c4c2193278541df7c1302bb11fe3f6372682e35",
   "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[share_zscale]": "bd0cfadd99f9d3d416f011184f2e9a7971df226879c8786e8ab2349e13909b5c",
   "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[indpendent_zscale]": "2d6afac3f582846f4be95b23b524bb670895b0885519d8c13623307d07a3b39e",
-  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[wcs_lims]": "05219c0c450825fa7bd555ff27a9a111066082b15e2dde83ac2f3ac43dba5102",
-  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[raw_lims]": "64a247b0b54b7de8a8a7c636d60bdceb7d7581a5429c9e8d813b8d81912a2c10"
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[x]": "b35593deb273b02ff1f2384810c4cf825ef5017ecad4d020543c53ad6361cd9e",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[y]": "78de0395df62edd8626014d7b8924b5f3d1d66b27be9c1a328fac7b7639e702b",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[xy]": "05219c0c450825fa7bd555ff27a9a111066082b15e2dde83ac2f3ac43dba5102",
+  "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot_limit_swapping[None]": "64a247b0b54b7de8a8a7c636d60bdceb7d7581a5429c9e8d813b8d81912a2c10"
 }
