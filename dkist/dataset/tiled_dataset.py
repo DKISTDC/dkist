@@ -82,10 +82,12 @@ class TiledDataset(Collection):
 
         return cls(datasets, inventory)
 
-    def __init__(self, dataset_array, inventory=None):
+    def __init__(self, dataset_array, inventory=None, meta=None):
         self._data = np.array(dataset_array, dtype=object)
-        self._inventory = inventory or {}
         self._validate_component_datasets(self._data, inventory)
+        inventory = inventory or {}
+        self._meta = meta or {}
+        self._meta["inventory"] = inventory
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -125,11 +127,18 @@ class TiledDataset(Collection):
         return type(self)(self._data.flat, self.inventory)
 
     @property
+    def meta(self):
+        """
+        A dictionary of extra metadata about the dataset.
+        """
+        return self._meta
+
+    @property
     def inventory(self):
         """
         The inventory record as kept by the data center for this dataset.
         """
-        return self._inventory
+        return self._meta["inventory"]
 
     @property
     def combined_headers(self):
