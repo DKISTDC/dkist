@@ -18,6 +18,7 @@ class TiledDatasetConverter(Converter):
         tree = {}
         meta = copy.deepcopy(tiled_dataset.meta)
         inventory = meta.pop("inventory")
+        # If the history key has been injected into the meta, do not save it
         meta.pop("history")
         tree["inventory"] = inventory
         tree["meta"] = meta

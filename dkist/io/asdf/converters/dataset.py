@@ -63,6 +63,8 @@ class DatasetConverter(Converter):
                              "it was not constructed from a set of FITS files.")
         node = {}
         node["meta"] = dataset.meta or {}
+        # If the history key has been injected into the meta, do not save it
+        node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs
         node["data"] = dataset.files
         if dataset.unit:
