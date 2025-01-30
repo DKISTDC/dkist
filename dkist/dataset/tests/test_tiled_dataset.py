@@ -89,7 +89,7 @@ def test_tileddataset_plot(share_zscale):
     ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
 
     fig = plt.figure(figsize=(12, 15))
-    ds.plot(0, share_zscale=share_zscale, fig=fig)
+    ds.plot(0, share_zscale=share_zscale, figure=fig)
 
     return plt.gcf()
 
@@ -118,7 +118,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
     assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
 
     fig = plt.figure(figsize=(12, 15))
-    non_square_ds.plot(0, share_zscale=False, swap_tile_limits=swap_tile_limits, fig=fig)
+    non_square_ds.plot(0, share_zscale=False, swap_tile_limits=swap_tile_limits, figure=fig)
 
     assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
     for ax in fig.axes:
