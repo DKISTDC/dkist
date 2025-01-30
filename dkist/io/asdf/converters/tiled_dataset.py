@@ -1,4 +1,5 @@
 from asdf.extension import Converter
+from astropy.table import vstack
 
 
 class TiledDatasetConverter(Converter):
@@ -16,10 +17,16 @@ class TiledDatasetConverter(Converter):
                 if ds:
                     ds._is_mosaic_tile = True
 
-        return TiledDataset(node["datasets"], node["inventory"])
+        if node.get("headers"):
+            headers = node["headers"]
+        else:
+            headers = vstack([ds.headers for ds in row for row in node["datasets"]])
+
+        return TiledDataset(node["datasets"], node["inventory"], headers)
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
         tree = {}
         tree["inventory"] = tiled_dataset._inventory
         tree["datasets"] = tiled_dataset._data.tolist()
+        tree["headers"] = tiled_dataset.combined_headers
         return tree
