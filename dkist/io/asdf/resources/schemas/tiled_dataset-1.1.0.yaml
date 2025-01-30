@@ -1,0 +1,29 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.1.0"
+
+title: |
+  A DKIST Tiled Dataset object.
+description:
+  The container for a set of Dataset objects.
+
+type: object
+properties:
+  datasets:
+    description: A nested structure of Dataset objects
+    type: array
+    items:
+      type: array
+      items:
+        - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
+  inventory:
+    description: A copy of the inventory record for this dataset.
+    type: object
+  headers:
+    description: A table of all the headers for the constituent files.
+    tag: "tag:astropy.org:astropy/table/table-1.*"
+
+required: [datasets, inventory, headers]
+additionalProperties: false
+...
