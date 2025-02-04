@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import warnings
 from textwrap import dedent
 from collections.abc import Collection
 
@@ -16,6 +17,7 @@ from astropy.table import vstack
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 from .dataset import Dataset
 from .utils import dataset_info_str
@@ -27,15 +29,15 @@ class TiledDatasetSlicer:
     """
     Basic class to provide the slicing
     """
-    def __init__(self, data, inventory):
+    def __init__(self, data, meta):
         self.data = data
-        self.inventory = inventory
+        self.meta = meta
 
     def __getitem__(self, slice_):
         new_data = []
         for tile in self.data.flat:
             new_data.append(tile[slice_])
-        return TiledDataset(np.array(new_data).reshape(self.data.shape), self.inventory)
+        return TiledDataset(np.array(new_data).reshape(self.data.shape), meta=self.meta)
 
 
 class TiledDataset(Collection):
@@ -80,12 +82,20 @@ class TiledDataset(Collection):
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
-        return cls(datasets, inventory)
+        return cls(datasets, meta={"inventory": inventory})
 
-    def __init__(self, dataset_array, inventory=None):
+    def __init__(self, dataset_array, inventory=None, *, meta=None):
+        if inventory is not None:
+            warnings.warn(
+                "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
+                DKISTDeprecationWarning,
+            )
         self._data = np.array(dataset_array, dtype=object)
-        self._inventory = inventory or {}
+        meta = meta or {}
+        inventory = meta.get("inventory", inventory or {})
         self._validate_component_datasets(self._data, inventory)
+        self._meta = meta
+        self._meta["inventory"] = inventory
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -101,7 +111,7 @@ class TiledDataset(Collection):
         if isinstance(new_data, Dataset):
             return new_data
 
-        return type(self)(new_data, inventory=self.inventory)
+        return type(self)(new_data, meta=self.meta)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
@@ -122,14 +132,21 @@ class TiledDataset(Collection):
         """
         Represent this `.TiledDataset` as a 1D array.
         """
-        return type(self)(self._data.flat, self.inventory)
+        return type(self)(self._data.flat, meta=self.meta)
+
+    @property
+    def meta(self):
+        """
+        A dictionary of extra metadata about the dataset.
+        """
+        return self._meta
 
     @property
     def inventory(self):
         """
         The inventory record as kept by the data center for this dataset.
         """
-        return self._inventory
+        return self._meta["inventory"]
 
     @property
     def combined_headers(self):
@@ -260,7 +277,7 @@ class TiledDataset(Collection):
              helioprojective latitude |        x        |        x
         """
 
-        return TiledDatasetSlicer(self._data, self.inventory)
+        return TiledDatasetSlicer(self._data, self.meta)
 
     # TODO: def regrid()
 

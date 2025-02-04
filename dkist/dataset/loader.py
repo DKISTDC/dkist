@@ -108,9 +108,7 @@ def _load_from_results(results):
     return _load_from_iterable(results)
 
 
-# In Python 3.11 we can use the Union type here
-@load_dataset.register(list)
-@load_dataset.register(tuple)
+@load_dataset.register(tuple | list)
 def _load_from_iterable(iterable):
     """
     A list or tuple of valid inputs to ``load_dataset``.
@@ -245,6 +243,7 @@ def _load_from_asdf(filepath):
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
                            lazy_load=False, **asdf_open_memory_mapping_kwarg(memmap=False)) as ff:
                 ds = ff.tree["dataset"]
+                ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
                     for sub in ds.flat:
                         sub.files.basepath = base_path
