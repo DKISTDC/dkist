@@ -44,16 +44,17 @@ def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
 
 
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
+    meta = {"inventory": dataset.meta["inventory"]}
     with pytest.raises(ValueError, match="inventory record of the first dataset"):
         TiledDataset(np.array((dataset, dataset_4d)))
 
     with pytest.raises(ValueError, match="physical types do not match"):
-        TiledDataset(np.array((dataset, dataset_4d)), inventory=dataset.meta["inventory"])
+        TiledDataset(np.array((dataset, dataset_4d)), meta=meta)
 
     ds2 = copy.deepcopy(dataset)
     ds2.meta["inventory"] = {"hello": "world"}
     with pytest.raises(ValueError, match="inventory records of all the datasets"):
-        TiledDataset(np.array((dataset, ds2)), dataset.meta["inventory"])
+        TiledDataset(np.array((dataset, ds2)), meta=meta)
 
 
 def test_tiled_dataset_from_components(dataset):

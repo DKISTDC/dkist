@@ -1,3 +1,5 @@
+import copy
+
 from asdf.extension import Converter
 
 
@@ -62,7 +64,8 @@ class DatasetConverter(Converter):
             raise ValueError("This Dataset object can not be saved to asdf as "
                              "it was not constructed from a set of FITS files.")
         node = {}
-        node["meta"] = dataset.meta or {}
+        # Copy the meta so we don't pop from the one in memory
+        node["meta"] = copy.copy(dataset.meta) or {}
         # If the history key has been injected into the meta, do not save it
         node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs
