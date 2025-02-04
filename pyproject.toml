@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=62.1",
-  "setuptools_scm[toml]>=6.2",
+  "setuptools_scm[toml]>=8.0.0",
   "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -98,7 +98,7 @@ include = ["dkist*"]
 exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
-write_to = "dkist/_version.py"
+version_file = "dkist/_version.py"
 
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]
