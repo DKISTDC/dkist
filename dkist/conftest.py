@@ -305,7 +305,8 @@ def simple_tiled_dataset(dataset):
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
     dataset_array = np.array(datasets).reshape((2,2))
-    return TiledDataset(dataset_array, dataset.meta["inventory"])
+    meta = {"inventory": dataset.meta["inventory"]}
+    return TiledDataset(dataset_array, meta=meta)
 
 
 @pytest.fixture

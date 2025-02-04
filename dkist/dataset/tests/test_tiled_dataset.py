@@ -44,16 +44,17 @@ def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
 
 
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
+    meta = {"inventory": dataset.meta["inventory"]}
     with pytest.raises(ValueError, match="inventory record of the first dataset"):
         TiledDataset(np.array((dataset, dataset_4d)))
 
     with pytest.raises(ValueError, match="physical types do not match"):
-        TiledDataset(np.array((dataset, dataset_4d)), inventory=dataset.meta["inventory"])
+        TiledDataset(np.array((dataset, dataset_4d)), meta=meta)
 
     ds2 = copy.deepcopy(dataset)
     ds2.meta["inventory"] = {"hello": "world"}
     with pytest.raises(ValueError, match="inventory records of all the datasets"):
-        TiledDataset(np.array((dataset, ds2)), dataset.meta["inventory"])
+        TiledDataset(np.array((dataset, ds2)), meta=meta)
 
 
 def test_tiled_dataset_from_components(dataset):
@@ -86,7 +87,7 @@ def test_tileddataset_plot(share_zscale):
     # https://github.com/sunpy/ndcube/issues/815
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
-    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), meta={"inventory": newtiles[0].inventory})
 
     fig = plt.figure(figsize=(12, 15))
     ds.plot(0, share_zscale=share_zscale, figure=fig)
@@ -112,7 +113,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
     # https://github.com/sunpy/ndcube/issues/815
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
-    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), meta={"inventory": newtiles[0].inventory})
 
     non_square_ds = ds[:2, :]
     assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
