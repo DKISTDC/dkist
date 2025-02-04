@@ -1,5 +1,5 @@
 from asdf.extension import Converter
-from astropy.table import vstack
+from astropy.table import Table, vstack
 
 
 class TiledDatasetConverter(Converter):
@@ -21,7 +21,7 @@ class TiledDatasetConverter(Converter):
         if node.get("headers"):
             headers = node["headers"]
         else:
-            headers = vstack([ds.headers for ds in row for row in node["datasets"]])
+            headers = vstack([Table(ds.headers) for ds in row for row in node["datasets"]])
 
         return TiledDataset(node["datasets"], node["inventory"], headers)
 
@@ -29,5 +29,5 @@ class TiledDatasetConverter(Converter):
         tree = {}
         tree["inventory"] = tiled_dataset._inventory
         tree["datasets"] = tiled_dataset._data.tolist()
-        tree["headers"] = tiled_dataset.combined_headers
+        tree["headers"] = tiled_dataset.combined_headers.as_array()
         return tree
