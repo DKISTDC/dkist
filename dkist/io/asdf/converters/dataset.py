@@ -63,6 +63,8 @@ class DatasetConverter(Converter):
                              "it was not constructed from a set of FITS files.")
         node = {}
         node["meta"] = dataset.meta or {}
+        if dataset._is_mosaic_tile and node.get("meta"):
+            node["meta"]["headers"] = None
         node["wcs"] = dataset.wcs
         node["data"] = dataset.files
         if dataset.unit:

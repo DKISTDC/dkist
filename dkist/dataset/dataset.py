@@ -100,7 +100,7 @@ class Dataset(NDCube):
     _file_manager = FileManagerDescriptor(default_type=FileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
-                 unit=None, copy=False):
+                 unit=None, copy=False, is_tile=False):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
@@ -122,6 +122,8 @@ class Dataset(NDCube):
             raise ValueError("The meta dict must contain the headers table.")
         if "inventory" not in meta:
             raise ValueError("The meta dict must contain the inventory record.")
+
+        self._is_mosaic_tile = is_tile
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
                          unit=unit, copy=copy)

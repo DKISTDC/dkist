@@ -56,6 +56,7 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
         TiledDataset(np.array((dataset, ds2)), dataset.meta["inventory"])
 
 
+@pytest.mark.accept_cli_dataset
 def test_tiled_dataset_from_components(dataset):
     shape = (2, 2)
     file_managers = [dataset._file_manager] * 4
@@ -70,7 +71,7 @@ def test_tiled_dataset_from_components(dataset):
     for ds, fm, headers in zip(tiled_ds.flat, file_managers, header_tables):
         assert ds.files == fm
         assert ds.meta["inventory"] is inventory
-        assert ds.meta["headers"] is headers
+        assert (ds.meta["headers"] == headers).all()
 
 
 @figure_test
