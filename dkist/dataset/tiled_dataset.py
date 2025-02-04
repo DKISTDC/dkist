@@ -19,7 +19,7 @@ from astropy.table import vstack
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
-from dkist.utils.exceptions import DKISTDeprecationWarning
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset
 from .utils import dataset_info_str
@@ -211,6 +211,11 @@ class TiledDataset(Collection):
         """
         if swap_tile_limits not in ["x", "y", "xy", None]:
             raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
+
+        if len(self.meta.get("history", {}).get("entries", [])) == 0:
+            warnings.warn("The metadata ASDF file that produced this dataset is out of date and "
+                          "will result in incorrect plots. Please re-download the metadata ASDF file.",
+                          DKISTUserWarning)
 
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
