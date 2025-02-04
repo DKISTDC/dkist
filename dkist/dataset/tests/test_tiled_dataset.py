@@ -86,7 +86,7 @@ def test_tileddataset_plot(share_zscale):
     # https://github.com/sunpy/ndcube/issues/815
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
-    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), inventory=newtiles[0].inventory)
+    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), meta={"inventory": newtiles[0].inventory})
     fig = plt.figure(figsize=(12, 15))
     ds.plot(0, share_zscale=share_zscale, figure=fig)
     return plt.gcf()
