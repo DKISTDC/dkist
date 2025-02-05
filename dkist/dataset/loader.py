@@ -22,12 +22,6 @@ except ImportError:
 ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
 
 
-def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
-    if asdf.__version__ > "3.1.0":
-        return {"memmap": memmap}
-    return {"copy_arrays": not memmap}
-
-
 @singledispatch
 def load_dataset(target):
     """
@@ -241,7 +235,7 @@ def _load_from_asdf(filepath):
     try:
         with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, **asdf_open_memory_mapping_kwarg(memmap=False)) as ff:
+                           lazy_load=False, memmap=False) as ff:
                 ds = ff.tree["dataset"]
                 ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
