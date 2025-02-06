@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import types
 import warnings
 from textwrap import dedent
 from collections.abc import Collection
@@ -193,7 +194,7 @@ class TiledDataset(Collection):
         slice_index : `int`, sequence of `int`s or `numpy.s_`
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
-            ``TiledDataset.slice_tiles``
+            ``TiledDataset.slice_tiles``, if each tile is already 2D pass ``slice_index=...`.
         share_zscale : `bool`
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
@@ -202,7 +203,7 @@ class TiledDataset(Collection):
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
         """
-        if isinstance(slice_index, int):
+        if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
 
