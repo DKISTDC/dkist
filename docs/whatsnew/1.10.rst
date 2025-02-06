@@ -11,9 +11,9 @@ This release of ``dkist`` includes compatibility with new metadata ASDF files ge
 
 .. warning::
 
-   You should re-download ASDF files when upgrading to this version of ``dkist``, particularly for VBI data.
+   You should re-download all ASDF files when upgrading to this version of ``dkist``, particularly for VBI data.
 
-These ASDF files change the ordering of the tiles inside a `.TiledDataset` object to correctly account for the differences between column-major (in FITS files) and row-major ordering (in numpy), this release of ``dkist`` updates the `.TiledDataset.plot` method to correctly plot these tiles in the expected order.
+These ASDF files change the ordering of the tiles inside a `.TiledDataset` object to correctly account for the differences between column-major (in FITS files) and row-major ordering (in numpy); this release of ``dkist`` updates the `.TiledDataset.plot` method to correctly plot these tiles in the expected order.
 It should be noted that with new metadata ASDF files the indexing of specific tiles will have changed.
 
 
