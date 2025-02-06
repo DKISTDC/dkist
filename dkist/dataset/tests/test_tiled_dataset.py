@@ -6,6 +6,7 @@ import pytest
 
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.tests.helpers import figure_test
+from dkist.utils.exceptions import DKISTUserWarning
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -79,6 +80,7 @@ def test_tiled_dataset_from_components(dataset):
 def test_tileddataset_plot(share_zscale):
     from dkist.data.sample import VBI_AJQWW
     ori_ds = load_dataset(VBI_AJQWW)
+
     newtiles = []
     for tile in ori_ds.flat:
         newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
@@ -87,8 +89,60 @@ def test_tileddataset_plot(share_zscale):
     for tile in newtiles:
         tile.meta["inventory"] = ori_ds.inventory
     ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), meta={"inventory": newtiles[0].inventory})
+
     fig = plt.figure(figsize=(12, 15))
-    ds.plot(0, share_zscale=share_zscale, figure=fig)
+    with pytest.warns(DKISTUserWarning,
+                      match="The metadata ASDF file that produced this dataset is out of date and will result in "
+                            "incorrect plots. Please re-download the metadata ASDF file."):
+        #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
+        ds.plot(0, share_zscale=share_zscale, figure=fig)
+
+    return plt.gcf()
+
+@figure_test
+@pytest.mark.parametrize("swap_tile_limits", ["x", "y", "xy", None])
+def test_tileddataset_plot_limit_swapping(swap_tile_limits):
+    # Also test that row/column sizes are correct
+
+    from dkist.data.sample import VBI_AJQWW
+    ori_ds = load_dataset(VBI_AJQWW)
+
+    # Swap WCS to make the `swap_tile_limits` option more natural
+    for tile in ori_ds.flat:
+        tile.wcs.forward_transform[0].cdelt *= -1
+
+    newtiles = []
+    for tile in ori_ds.flat:
+        newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
+    # ndcube 2.3.0 introduced a deepcopy for rebin, this broke our dataset validation
+    # https://github.com/sunpy/ndcube/issues/815
+    for tile in newtiles:
+        tile.meta["inventory"] = ori_ds.inventory
+    ds = TiledDataset(np.array(newtiles).reshape(ori_ds.shape), meta={"inventory": newtiles[0].inventory})
+
+    non_square_ds = ds[:2, :]
+    assert non_square_ds.shape[0] != non_square_ds.shape[1]  # Just in case the underlying data change for some reason
+
+    fig = plt.figure(figsize=(12, 15))
+    with pytest.warns(DKISTUserWarning,
+                      match="The metadata ASDF file that produced this dataset is out of date and will result in "
+                            "incorrect plots. Please re-download the metadata ASDF file."):
+        #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
+        non_square_ds.plot(0, share_zscale=False, swap_tile_limits=swap_tile_limits, figure=fig)
+
+    assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
+    for ax in fig.axes:
+        xlims = ax.get_xlim()
+        ylims = ax.get_ylim()
+
+        if swap_tile_limits in ["x", "xy"]:
+            assert xlims[0] > xlims[1]
+        if swap_tile_limits in ["y", "xy"]:
+            assert ylims[0] > ylims[1]
+        if swap_tile_limits is None:
+            assert xlims[0] < xlims[1]
+            assert ylims[0] < ylims[1]
+
     return plt.gcf()
 
 
