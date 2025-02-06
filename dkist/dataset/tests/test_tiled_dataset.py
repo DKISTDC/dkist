@@ -146,6 +146,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
 
     return plt.gcf()
 
+@pytest.mark.remote_data
 def test_tileddataset_plot_non2d_sliceindex():
     from dkist.data.sample import VBI_AJQWW
     ds = load_dataset(VBI_AJQWW)
