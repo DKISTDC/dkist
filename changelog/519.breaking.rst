@@ -1,7 +1,0 @@
-The minimum supported gwcs version is now 0.24 which is the first version with support for VISP inverse transforms (world to pixel). This required the following additional dependency bumps:
-
-* asdf >= 3.3
-* asdf-astropy >= 0.5
-* asdf-coordinate-schemas >= 0.3
-* asdf-transform-schemas >= 0.5
-* asdf-wcs-schemas >= 0.4

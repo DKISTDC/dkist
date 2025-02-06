@@ -1,10 +1,16 @@
-The minimum supported versions of dependencies and Python have been updated, this release requires:
+This release of ``dkist`` includes both scheduled bumps to our dependencies as well as a special bump of gwcs to version 0.24, and associated dependencies.
+The version upgrade to gwcs 0.24 fixes the inverse transform (world to pixel) for VISP WCSs.
 
-* Python 3.11
-* asdf 2.15 (and plugin version bumps)
-* dask 2023.2
-* matplotlib 3.7
-* ndcube 2.1
-* numpy 1.25
-* parfive 2.1
-* sunpy 5.0
+* Python >= 3.11
+* dask >= 2023.2
+* gwcs >= 0.24
+* matplotlib >= 3.7
+* ndcube >= 2.1
+* numpy >= 1.25
+* parfive >= 2.1
+* sunpy >= 5.0.7
+* asdf >= 3.3
+* asdf-astropy >= 0.5
+* asdf-coordinate-schemas >= 0.3
+* asdf-transform-schemas >= 0.5
+* asdf-wcs-schemas >= 0.4
