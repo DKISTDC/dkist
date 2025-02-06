@@ -6,18 +6,20 @@ but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
 import warnings
+from typing import Literal
 from textwrap import dedent
 from collections.abc import Collection
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.gridspec import GridSpec
 
 import astropy
 from astropy.table import vstack
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
-from dkist.utils.exceptions import DKISTDeprecationWarning
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset
 from .utils import dataset_info_str
@@ -184,7 +186,7 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    def plot(self, slice_index, share_zscale=False, figure=None, **kwargs):
+    def plot(self, slice_index, share_zscale=False, figure=None, swap_tile_limits: Literal["x", "y", "xy"] | None = None, **kwargs):
         """
         Plot a slice of each tile in the TiledDataset
 
@@ -201,7 +203,20 @@ class TiledDataset(Collection):
         figure : `matplotlib.figure.Figure`
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
+        swap_tile_limits : `"x", "y", "xy"` or `None` (default)
+            Invert the axis limits of each tile. Either the "x" or "y" axis limits can be inverted separately, or they
+            can both be inverted with "xy". This option is useful if the orientation of the tile data arrays is flipped
+            w.r.t. the WCS orientation implied by the mosaic keys. For example, most DL-NIRSP data should be plotted with
+            `swap_tile_limits="xy"`.
         """
+        if swap_tile_limits not in ["x", "y", "xy", None]:
+            raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
+
+        if len(self.meta.get("history", {}).get("entries", [])) == 0:
+            warnings.warn("The metadata ASDF file that produced this dataset is out of date and "
+                          "will result in incorrect plots. Please re-download the metadata ASDF file.",
+                          DKISTUserWarning)
+
         if isinstance(slice_index, int):
             slice_index = (slice_index,)
         vmin, vmax = np.inf, 0
@@ -209,24 +224,42 @@ class TiledDataset(Collection):
         if figure is None:
             figure = plt.gcf()
 
-        tiles = self.slice_tiles[slice_index].flat
-        for i, tile in enumerate(tiles):
-            ax = figure.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
-            tile.plot(axes=ax, **kwargs)
-            if i == 0:
-                xlabel, ylabel = self._get_axislabels(ax)
-                figure.supxlabel(xlabel, y=0.05)
-                figure.supylabel(ylabel, x=0.05)
-            axmin, axmax = ax.get_images()[0].get_clim()
-            vmin = axmin if axmin < vmin else vmin
-            vmax = axmax if axmax > vmax else vmax
-            ax.set_ylabel(" ")
-            ax.set_xlabel(" ")
+        sliced_dataset = self.slice_tiles[slice_index]
+        dataset_ncols, dataset_nrows = sliced_dataset.shape
+        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=figure)
+        for col in range(dataset_ncols):
+            for row in range(dataset_nrows):
+                tile = sliced_dataset[col, row]
+
+                # Fill up grid from the bottom row
+                ax_gridspec = gridspec[dataset_nrows - row - 1, col]
+                ax = figure.add_subplot(ax_gridspec, projection=tile.wcs)
+
+                tile.plot(axes=ax, **kwargs)
+
+                if swap_tile_limits in ["x", "xy"]:
+                    ax.invert_xaxis()
+
+                if swap_tile_limits in ["y", "xy"]:
+                    ax.invert_yaxis()
+
+                ax.set_ylabel(" ")
+                ax.set_xlabel(" ")
+                if col == row == 0:
+                    xlabel, ylabel = self._get_axislabels(ax)
+                    figure.supxlabel(xlabel, y=0.05)
+                    figure.supylabel(ylabel, x=0.05)
+
+                axmin, axmax = ax.get_images()[0].get_clim()
+                vmin = axmin if axmin < vmin else vmin
+                vmax = axmax if axmax > vmax else vmax
+
         if share_zscale:
             for ax in figure.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
+
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(list(tiles[0].global_coords.items())[::-1]):
+        for i, (coord, val) in enumerate(list(sliced_dataset.flat[0].global_coords.items())[::-1]):
             if coord == "time":
                 val = val.iso
             if coord == "stokes":
