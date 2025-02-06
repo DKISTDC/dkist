@@ -102,7 +102,7 @@ def test_asdf_tags(dataset, tmp_path):
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
     tree = {"dataset": tagobj}
     with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
-        with asdf.AsdfFile(tree, custom_schema=schema_path.as_posix()) as afile:
+        with asdf.AsdfFile(tree, custom_schema=schema_path) as afile:
             afile.validate()  # it seems that asdf 4.0 does not validate the custom schema on write?
             afile.write_to(Path(tmpdir / "test.asdf"))
 
