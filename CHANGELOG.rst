@@ -5,7 +5,7 @@ Backwards Incompatible Changes
 ------------------------------
 
 - This release of ``dkist`` includes both scheduled bumps to our dependencies as well as a special bump of gwcs to version 0.24, and associated dependencies.
-  The version upgrade to gwcs 0.24 fixes the inverse transform (world to pixel) for VISP WCSs.
+  The version upgrade to gwcs 0.24 fixes the inverse transform (world to pixel) for VISP WCSs. (`#507 <https://github.com/DKISTDC/dkist/pull/507>`__)
 
   * Python >= 3.11
   * dask >= 2023.2
@@ -19,7 +19,7 @@ Backwards Incompatible Changes
   * asdf-astropy >= 0.5
   * asdf-coordinate-schemas >= 0.3
   * asdf-transform-schemas >= 0.5
-  * asdf-wcs-schemas >= 0.4 (`#507 <https://github.com/DKISTDC/dkist/pull/507>`__)
+  * asdf-wcs-schemas >= 0.4 
 
 
 Features
