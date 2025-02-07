@@ -38,8 +38,7 @@ jobs:
       posargs: '--color=yes'
       envs: |
         - linux: py313
-        - linux: py312
-        - windows: py312-online
+        - windows: py312
         - macos: py311
         - linux: py311-oldestdeps
     secrets:
@@ -77,6 +76,7 @@ jobs:
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
+        - linux: py312-online
         - linux: py313-devdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
