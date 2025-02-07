@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import types
 import warnings
 from typing import Literal
 from textwrap import dedent
@@ -195,7 +196,7 @@ class TiledDataset(Collection):
         slice_index : `int`, sequence of `int`s or `numpy.s_`
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
-            ``TiledDataset.slice_tiles``
+            `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
         share_zscale : `bool`
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
@@ -217,14 +218,21 @@ class TiledDataset(Collection):
                           "will result in incorrect plots. Please re-download the metadata ASDF file.",
                           DKISTUserWarning)
 
-        if isinstance(slice_index, int):
+        if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
+
         vmin, vmax = np.inf, 0
 
         if figure is None:
             figure = plt.gcf()
 
         sliced_dataset = self.slice_tiles[slice_index]
+        # This can change to just .shape once we support ndcube >= 2.3
+        if (nd_sliced := len(sliced_dataset.flat[0].data.shape)) != 2:
+            raise ValueError(
+                f"Applying slice '{slice_index}' to this dataset resulted in a {nd_sliced} "
+                "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile."
+            )
         dataset_ncols, dataset_nrows = sliced_dataset.shape
         gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=figure)
         for col in range(dataset_ncols):

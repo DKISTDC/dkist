@@ -1,3 +1,4 @@
+import re
 import copy
 
 import matplotlib.pyplot as plt
@@ -145,6 +146,29 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
 
     return plt.gcf()
 
+@pytest.mark.remote_data
+def test_tileddataset_plot_non2d_sliceindex():
+    from dkist.data.sample import VBI_AJQWW
+    ds = load_dataset(VBI_AJQWW)
+
+    newtiles = []
+    for tile in ds.flat:
+        newtiles.append(tile.rebin((1, 8, 8), operation=np.sum))
+    # ndcube 2.3.0 introduced a deepcopy for rebin, this broke our dataset validation
+    # https://github.com/sunpy/ndcube/issues/815
+    for tile in newtiles:
+        tile.meta["inventory"] = ds.inventory
+    ds = TiledDataset(np.array(newtiles).reshape(ds.shape), meta={"inventory": newtiles[0].inventory})
+
+    already_sliced_ds = ds.slice_tiles[0]
+
+    fig = plt.figure(figsize=(12, 15))
+    with pytest.warns(DKISTUserWarning,
+                      match="The metadata ASDF file that produced this dataset is out of date and will result in "
+                            "incorrect plots. Please re-download the metadata ASDF file."):
+        with pytest.raises(ValueError, match=re.escape("Applying slice '(0,)' to this dataset resulted in a 1 "
+                "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile.")):
+            already_sliced_ds.plot(0, figure=fig)
 
 @pytest.mark.accept_cli_tiled_dataset
 def test_repr(simple_tiled_dataset):
