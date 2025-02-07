@@ -1,3 +1,0 @@
-Update grid orientation of `TiledDataset.plot`.
-The grid now has MAXIS1 columns and MAXIS2 rows where MINDEX1 corresponds to column and MINDEX2 corresponds to row.
-Additionally, the origin for the grid is now in the lower-left as opposed to the upper-left.

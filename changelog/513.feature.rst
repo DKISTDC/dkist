@@ -1,1 +1,0 @@
-``TiledDataset`` now has a ``.meta`` dictionary like that of ``Dataset``.

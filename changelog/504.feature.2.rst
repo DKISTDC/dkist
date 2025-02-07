@@ -1,2 +1,0 @@
-Add `swap_tile_limits` kwarg to `TiledDataset.plot`.
-This option allows the user to invert plot limits on either axes to account for WCS values that decrease compared to the pixel axes.
