@@ -227,7 +227,8 @@ class TiledDataset(Collection):
             figure = plt.gcf()
 
         sliced_dataset = self.slice_tiles[slice_index]
-        if (nd_sliced := len(sliced_dataset.flat[0].shape)) != 2:
+        # This can change to just .shape once we support ndcube >= 2.3
+        if (nd_sliced := len(sliced_dataset.flat[0].data.shape)) != 2:
             raise ValueError(
                 f"Applying slice '{slice_index}' to this dataset resulted in a {nd_sliced} "
                 "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile."
