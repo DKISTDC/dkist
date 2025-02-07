@@ -1,1 +1,0 @@
-History of the ADSF file, such as versions of packages and extensions used when writing it are now exposed ``TiledDataset.meta["history"]`` and ``Dataset.meta["history"]``.
