@@ -11,8 +11,8 @@ from dkist import conf
 
 VISP_HEADER = fits.Header.fromtextfile(Path(__file__).parent / "VISP_HEADER.hdr")
 _SAMPLE_DATASETS = {
-    "VISP_BKPLX": ("https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "BKPLX_stokesI.tar"),
-    "VBI_AJQWW": ("https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "AJQWW_single_mosaic.tar"),
+    "VISP_BKPLX": ("http://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "BKPLX_stokesI.tar"),
+    "VBI_AJQWW": ("http://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "AJQWW_single_mosaic.tar"),
 }
 
 
