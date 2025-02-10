@@ -44,7 +44,7 @@ If you want to replace this dataset with your own dataset, see {ref}`dkist:howto
 Let's load the data with {obj}`dkist.load_dataset`:
 
 ```{code-cell} ipython3
-ds = dkist.load_dataset(VBI_AJQWW / "VBI_L1_20231016T184519_AJQWW.asdf")
+ds = dkist.load_dataset(VBI_AJQWW)
 ds
 ```
 

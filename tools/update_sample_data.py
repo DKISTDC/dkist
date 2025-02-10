@@ -45,7 +45,7 @@ def main(datasets, working_directory, destination_path="/user_tools_tutorial_dat
 
     for did, props in datasets.items():
         res = Fido.search(a.dkist.Dataset(did))
-        asdf_file = Fido.fetch(res, path=working_directory / "{dataset_id}", progress=False, overwrite=False)
+        asdf_file = Fido.fetch(res, path=working_directory / "{dataset_id}", progress=False, overwrite=True)
 
         ds = dkist.load_dataset(asdf_file)
         if "slice" in props:
@@ -64,10 +64,12 @@ def main(datasets, working_directory, destination_path="/user_tools_tutorial_dat
         [f.unlink() for f in dataset_path.glob("*.mp4")]
         [f.unlink() for f in dataset_path.glob("*.pdf")]
         assert len(list(dataset_path.glob("*.asdf"))) == 1
+        dataset_files = tuple(dataset_path.glob("*"))
 
         sample_filename = working_directory / props["filename"]
         with tarfile.open(sample_filename, mode="w") as tfile:
-            tfile.add(dataset_path, recursive=True)
+            for dfile in dataset_files:
+                tfile.add(dfile, arcname=dfile.name, recursive=False)
 
         sample_files_for_upload.append(sample_filename)
 

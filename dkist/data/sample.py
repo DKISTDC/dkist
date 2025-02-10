@@ -20,8 +20,13 @@ def __getattr__(name):
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
 
-def download_all_sample_data():
+def download_all_sample_data(overwrite=False):
     """
     Download all sample data at once that has not already been downloaded.
+
+    Parameters
+    ----------
+    overwrite : `bool`
+        Re-download and overwrite any existing files.
     """
-    return _get_sample_datasets(_SAMPLE_DATASETS.keys())
+    return _get_sample_datasets(_SAMPLE_DATASETS.keys(), force_download=not overwrite)
