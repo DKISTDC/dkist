@@ -24,7 +24,7 @@ dependencies = [
   # files with them unpinned so they are now required to read generated asdf
   # files.
   "asdf>=3.3.0",  # Required by gwcs 0.24
-  "asdf-astropy>=0.5.0,!=0.7.0",  # Required by gwcs 0.24
+  "asdf-astropy>=0.5.0",  # Required by gwcs 0.24
   "asdf-coordinates-schemas>=0.3.0",  # required by wcs-schemas 0.4
   "asdf-standard>=1.1.0",
   "asdf-transform-schemas>=0.5.0",  # required by wcs-schemas 0.4
