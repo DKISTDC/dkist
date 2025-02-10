@@ -77,6 +77,7 @@ def test_tiled_dataset_from_components(dataset):
 
 
 @figure_test
+@pytest.mark.remote_data
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
 def test_tileddataset_plot(share_zscale):
     from dkist.data.sample import VBI_AJQWW
@@ -101,6 +102,7 @@ def test_tileddataset_plot(share_zscale):
     return plt.gcf()
 
 @figure_test
+@pytest.mark.remote_data
 @pytest.mark.parametrize("swap_tile_limits", ["x", "y", "xy", None])
 def test_tileddataset_plot_limit_swapping(swap_tile_limits):
     # Also test that row/column sizes are correct
