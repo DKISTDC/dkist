@@ -20,4 +20,4 @@ jobs:
         uses: CodspeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: "pytest -vvv -r fEs --pyargs dkist --codspeed"
+          run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any"
