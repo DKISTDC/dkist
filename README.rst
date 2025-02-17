@@ -28,7 +28,12 @@ data.
 Documentation
 -------------
 
+<<<<<<<
 See the documentation at `https://docs.dkist.nso.edu/projects/python-tools <https://docs.dkist.nso.edu/projects/python-tools>`__.
+=======
+Usage of Generative AI
+----------------------
+>>>>>>>
 
 Installation
 ------------
