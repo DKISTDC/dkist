@@ -10,9 +10,9 @@ When you load a recently-downloaded ASDF file you may see a warning something li
     AsdfPackageVersionWarning: File '<file you tried to load>' was created with extension URI 'asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.2.0' (from package gwcs==0.24.0), but older package (gwcs==0.22.0) is installed.
 
 
-Of course the extension and package it complains about will vary.
-This warning means that an extension needed to properly parse the ASDF file is missing or outdated.
-To correct this, you should update your Python tools installation with
+The extension and package it references will vary.
+This warning means that the `dkist` package or one of its dependencies is out of date.
+To correct this, you should update your Python tools installation (and its dependencies) with
 
 .. code-block:: bash
 
