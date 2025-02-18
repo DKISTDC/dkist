@@ -28,7 +28,7 @@ Again, we can use the `overwrite` keyword for this.
 
     from dkist.data.sample import download_all_sample_data
 
-    download_all_sample_data(overwrite=True) # doctest: +REMOTE_DATA
+    download_all_sample_data(overwrite=True)  # doctest: +REMOTE_DATA
 
 
 Occasionally, the naming convention for the ASDF files has also changed, meaning that the usual checks to stop you downloading a dataset you already have locally may fail and you will end up with two (likely identical) metadata files.
