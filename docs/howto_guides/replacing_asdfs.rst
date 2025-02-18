@@ -18,7 +18,7 @@ When this happens you may see the following warning (or something similar) when 
 
     >>> from dkist.data.sample import VBI_AJQWW # doctest: +REMOTE_DATA
     >>> from dkist import load_dataset
-    >>> ds = load_dataset(VBI_AJQWW)
+    >>> ds = load_dataset(VBI_AJQWW) # doctest: +REMOTE_DATA
 
     asdf.exceptions.AsdfPackageVersionWarning: File 'file:///home/runner/.local/share/dkist/VBI_AJQWW/VBI_L1_20231016T184519_AJQWW_metadata.asdf' was created with extension URI 'asdf://astropy.org/core/extensions/core-1.5.0' (from package asdf-astropy==0.5.0), which is not currently installed
 
