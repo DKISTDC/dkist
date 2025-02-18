@@ -4,10 +4,7 @@ Update Previously Downloaded ASDF Files
 =======================================
 
 The DKIST Data Center will occasionally update the ASDF files for all the datasets it stores, due to changes or corrections to the metadata.
-This can lead to two possible problems.
-First, when you download ASDF metadata files from the Data Center those files might be expecting a newer version of the Python tools.
-Second, ASDF files you have downloaded previously might become outdated and need to be re-downloaded.
-
+This means that ASDF files you have downloaded previously might become outdated and need to be re-downloaded.
 
 You should periodically re-download your local ASDF files to keep up to date with changes to the dataset metadata.
 To do so, you can use the `overwrite` keyword argument when downloading an ASDF file.
