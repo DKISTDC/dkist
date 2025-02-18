@@ -55,7 +55,7 @@ When you load a recently-downloaded ASDF file you may see a warning something li
 
 The extension name and package it references will vary.
 This warning means that the `dkist` package or one of it's dependencies is out of date.
-To correct this, you should update your Python tools installation with
+To correct this, you should update your Python tools installation (and it's dependencies) with
 
 .. code-block:: bash
 
