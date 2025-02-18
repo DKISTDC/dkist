@@ -31,7 +31,7 @@ Again, we can use the ``overwrite`` keyword for this.
     download_all_sample_data(overwrite=True)  # doctest: +REMOTE_DATA
 
 
-Occasionally, the naming convention for the ASDF files has also changed, meaning that the usual checks to stop you downloading a dataset you already have locally may fail and you will end up with two (likely identical) metadata files.
+In the past, the naming convention for the metadata ASDF files has also changed, meaning that the usual checks to stop you downloading a dataset you already have locally may fail and you will end up with two separate metadata files.
 If you try and load a dataset where a file with an old name is present you will see a warning similar to this:
 
 .. code-block:: python
