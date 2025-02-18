@@ -19,7 +19,7 @@ Backwards Incompatible Changes
   * asdf-astropy >= 0.5
   * asdf-coordinate-schemas >= 0.3
   * asdf-transform-schemas >= 0.5
-  * asdf-wcs-schemas >= 0.4 
+  * asdf-wcs-schemas >= 0.4
 
 
 Features
