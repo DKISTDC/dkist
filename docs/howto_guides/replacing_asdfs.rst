@@ -16,7 +16,7 @@ For example:
 
 .. code-block:: python
 
-    Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}", overwrite=True) # doctest: +SKIP
+    Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}", overwrite=True)  # doctest: +SKIP
 
 
 where `res` is the result of a `Fido` search for some dataset you already have saved locally.
