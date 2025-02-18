@@ -68,7 +68,7 @@ In the second case, if the metadata file has been renamed then you may see a war
 .. code-block:: python
 
     >>> from dkist import load_dataset
-    >>> ds = load_dataset('~/sunpy/data/VISP/AGLKO/')
+    >>> ds = load_dataset('~/sunpy/data/VISP/AGLKO/') # doctest: +REMOTE_DATA
 
     WARNING: DKISTUserWarning: ASDF files with old names (VISP_L1_20221024T212807_AGLKO_user_tools.asdf) were found in this directory and ignored. You may want to delete these files. [dkist.dataset.loader]
 
