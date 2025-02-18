@@ -45,6 +45,6 @@ If you try and load a dataset where a file with an old name is present you will 
 When this happens the newer ASDF file is loaded so the old one can safely be ignored.
 However, to remove the warning the old file can simply be deleted or moved elsewhere.
 
-Note that this behaviour is new in dkist v1.10.0.
+Note that this warning was added in dkist version 1.10.0.
 In older versions the loader will return a list containing the corresponding dataset for each ASDF file present, which is likely to cause problems.
 Deleting the old file will still solve the issue, although you should also update your Python tools installation to v1.10.1 or later if possible.
