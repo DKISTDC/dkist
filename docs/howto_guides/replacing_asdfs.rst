@@ -16,7 +16,7 @@ When this happens you may see the following warning (or something similar) when 
 
 .. code-block:: python
 
-    >>> from dkist.data.sample import VBI_AJQWW
+    >>> from dkist.data.sample import VBI_AJQWW # doctest: +REMOTE_DATA
     >>> from dkist import load_dataset
     >>> ds = load_dataset(VBI_AJQWW)
 
