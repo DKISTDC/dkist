@@ -1,3 +1,24 @@
+1.10.1 (2025-02-18)
+===================
+
+Features
+--------
+
+- Adds an `overwrite` keyword to `download_all_sample_data()` to force downloading new data. (`#523 <https://github.com/DKISTDC/dkist/pull/523>`__)
+
+
+Improved Documentation
+----------------------
+
+- Add a how-to guide explaining how to replace outdated dataset metadata files. (`#531 <https://github.com/DKISTDC/dkist/pull/531>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Update hashes for `TiledDataset.plot()` figure tests. (`#523 <https://github.com/DKISTDC/dkist/pull/523>`__)
+
+
 1.10.0 (2025-02-07)
 ===================
 
