@@ -1,6 +1,6 @@
 .. _dkist:howto-guide:replacing-asdfs:
 
-Replacing Previously Downloaded ASDF Files
+Update Previously Downloaded ASDF Files
 ==========================================
 
 The DKIST Data Center will occasionally update the ASDF files for all the datasets it stores, due to changes or corrections to the metadata.
