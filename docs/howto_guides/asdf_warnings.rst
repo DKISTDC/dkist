@@ -1,4 +1,4 @@
-.. _dkist:howto-guide:asdf-warnings
+.. _dkist:howto-guide:asdf-warnings:
 
 Understand version warnings when loading ASDFs
 ==============================================
