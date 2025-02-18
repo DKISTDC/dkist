@@ -13,7 +13,7 @@ For example:
 
 .. code-block:: python
 
-    Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}", overwrite=True)  # doctest: +SKIP
+    Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}", overwrite=True) # doctest: +SKIP
 
 
 where ``res`` is the result of a ``Fido`` search for some dataset you already have saved locally.
@@ -25,7 +25,7 @@ Again, we can use the ``overwrite`` keyword for this.
 
     from dkist.data.sample import download_all_sample_data
 
-    download_all_sample_data(overwrite=True)  # doctest: +REMOTE_DATA
+    download_all_sample_data(overwrite=True) # doctest: +REMOTE_DATA
 
 
 In the past, the naming convention for the metadata ASDF files has also changed, meaning that the usual checks to stop you downloading a dataset you already have locally may fail and you will end up with two separate metadata files.
