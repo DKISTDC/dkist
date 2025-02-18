@@ -32,7 +32,7 @@ Again, we can use the ``overwrite`` keyword for this.
 
 
 Occasionally, the naming convention for the ASDF files has also changed, meaning that the usual checks to stop you downloading a dataset you already have locally may fail and you will end up with two (likely identical) metadata files.
-If you re-download a dataset that you already had locally before the rename, you may see a warning like this when you load the dataset:
+If you try and load a dataset where a file with an old name is present you will see a warning similar to this:
 
 .. code-block:: python
 
