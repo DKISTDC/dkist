@@ -47,4 +47,4 @@ However, to remove the warning the old file can simply be deleted or moved elsew
 
 Note that this warning was added in dkist version 1.10.0.
 In older versions the loader will return a list containing the corresponding dataset for each ASDF file present, which is likely to cause problems.
-Deleting the old file will still solve the issue, although you should also update your Python tools installation to v1.10.1 or later if possible.
+Deleting the old file will still solve the issue, although you should also update your Python tools installation to v1.10.0 or later.
