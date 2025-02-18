@@ -19,7 +19,7 @@ For example:
     Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}", overwrite=True)  # doctest: +SKIP
 
 
-where `res` is the result of a `Fido` search for some dataset you already have saved locally.
+where ``res`` is the result of a ``Fido`` search for some dataset you already have saved locally.
 
 You might also need to force a refresh of the sample data which is included with the Python tools.
 Again, we can use the `overwrite` keyword for this.
