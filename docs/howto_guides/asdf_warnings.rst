@@ -1,7 +1,7 @@
 .. _dkist:howto-guide:asdf-warnings
 
 Understand version warnings when loading ASDFs
-=================================================
+==============================================
 
 When you load a recently-downloaded ASDF file you may see a warning something like this:
 
