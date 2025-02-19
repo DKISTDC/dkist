@@ -38,6 +38,7 @@ jobs:
           repository: 'DKISTDC/DKIST-Workshop'
           fetch-depth: 0
           path: 'workshop'
+          token: '${{ secrets.WORKSHOP_DEPLOY_TOKEN }}'
 
       - name: Run pipx
         run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
