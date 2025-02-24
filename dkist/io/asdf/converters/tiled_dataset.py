@@ -8,6 +8,7 @@ class TiledDatasetConverter(Converter):
         "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.0.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.1.0",
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.2.0",
     ]
     types = ["dkist.dataset.tiled_dataset.TiledDataset"]
 
