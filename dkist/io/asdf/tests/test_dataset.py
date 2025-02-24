@@ -96,7 +96,7 @@ def test_asdf_tags(dataset, tmp_path):
 
 @pytest.mark.parametrize("tagobj",
                          [
-                             "dataset",
+                             lf("dataset"),
                              lf("simple_tiled_dataset"),
                          ],
                          indirect=False)
