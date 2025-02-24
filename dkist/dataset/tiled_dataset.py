@@ -87,7 +87,7 @@ class TiledDataset(Collection):
 
         return cls(datasets, meta={"inventory": inventory})
 
-    def __init__(self, dataset_array, inventory=None, mask=False, *, meta=None):
+    def __init__(self, dataset_array, inventory=None, mask=None, *, meta=None):
         if inventory is not None:
             warnings.warn(
                 "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
