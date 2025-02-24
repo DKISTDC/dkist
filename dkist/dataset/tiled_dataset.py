@@ -118,7 +118,7 @@ class TiledDataset(Collection):
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
-        datasets = datasets.compressed()
+        datasets = [ds for ds in datasets.compressed() if ds is not None]
         inv_1 = datasets[0].meta["inventory"]
         if inv_1 and inv_1 is not inventory:
             raise ValueError("The inventory record of the first dataset does not match the one passed to TiledDataset")
