@@ -112,14 +112,18 @@ def test_ensure_auth_decorator(mocker):
     mock_response.headers = {"Content-Type": "application/json"}
     error = globus_sdk.AuthAPIError(mock_response)
     reauth = mocker.patch("dkist.net.globus.auth.get_refresh_token_authorizer")
+    reauth.return_value = {"transfer.api.globus.org": "some new token"}
 
     called = [False]
     @ensure_globus_authorized
-    def test_func():
+    def test_func(tfr_client):
         if not called[0]:
             called[0] = True
             raise error
         return True
 
-    assert test_func()
+    mock_client = mocker.MagicMock()
+    mock_client.authorizer = "some old token"
+    assert test_func(tfr_client=mock_client)
+    assert mock_client.authorizer == "some new token"
     reauth.assert_called_once_with(force_reauth=True)
