@@ -211,10 +211,9 @@ def ensure_globus_authorized(func):
             response_text = getattr(e, "text", "") or getattr(e, "raw_text", "")
             if e.http_status == 400 and "invalid_grant" in response_text:
                 print("Globus login has expired.")
+                auths = get_refresh_token_authorizer(force_reauth=True)
                 if "tfr_client" in kwargs:
-                    kwargs["tfr_client"] = get_transfer_client(force_reauth=True)
-                else:
-                    get_refresh_token_authorizer(force_reauth=True)
+                    kwargs["tfr_client"].authorizer = auths["transfer.api.globus.org"]
                 return func(*args, **kwargs)
 
     return do_reauth
