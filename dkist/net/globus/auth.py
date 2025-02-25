@@ -127,7 +127,7 @@ def save_auth_cache(auth_cache):
     cache_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
 
 
-def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: no cover
+def do_native_app_authentication(client, requested_scopes=None):  # pragma: no cover
     """
     Does a Native App authentication flow and returns a
     dict of tokens keyed by service name.
@@ -135,7 +135,6 @@ def do_native_app_authentication(client_id, requested_scopes=None):  # pragma: n
     server = start_local_server()
     redirect_uri = f"http://{server.server_address[0]}:{server.server_address[1]}"
 
-    client = globus_sdk.NativeAppAuthClient(client_id=client_id)
     client.oauth2_start_flow(requested_scopes=SCOPES,
                              redirect_uri=redirect_uri,
                              refresh_tokens=True)
@@ -176,11 +175,11 @@ def get_refresh_token_authorizer(force_reauth=False):
     tokens = None
     if not force_reauth:
         tokens = get_cache_contents()
-    if not tokens:
-        tokens = do_native_app_authentication(CLIENT_ID, SCOPES)
-        save_auth_cache(tokens)
 
     auth_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
+    if not tokens:
+        tokens = do_native_app_authentication(auth_client, SCOPES)
+        save_auth_cache(tokens)
 
     transfer_tokens = tokens["transfer.api.globus.org"]
 
