@@ -37,10 +37,12 @@ class TiledDatasetSlicer:
         self.meta = meta
 
     def __getitem__(self, slice_):
-        new_data = []
-        for tile in self.data.flat:
-            new_data.append(tile[slice_])
-        return TiledDataset(np.array(new_data).reshape(self.data.shape), meta=self.meta)
+        new_data = np.empty(self.data.shape, dtype=object, order="F")
+        for ds in self.data.flat:
+            if ds:
+                mindex1, mindex2 = ds.headers[0]["MINDEX1", "MINDEX2"]
+                new_data[mindex1 - 1, mindex2 - 1] = ds[slice_]
+        return TiledDataset(new_data, meta=self.meta)
 
 
 class TiledDataset(Collection):
