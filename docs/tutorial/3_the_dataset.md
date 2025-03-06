@@ -17,7 +17,7 @@ kernelspec:
 
 In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
-As previously discussed we know that a "DKIST dataset" is comprised of many files, including an ASDF and many FITS files.
+As previously discussed we know that a "DKIST dataset" is comprised of multiple files, including an ASDF and many FITS files.
 The user tools represent all these files with the {obj}`dkist.Dataset` class.
 
 A `Dataset` object is constructed from the ASDF file for that dataset.
@@ -35,7 +35,7 @@ This will mean we won't have access to the data arrays in the FITS files, but ev
 The Python tools provide a utility function {obj}`dkist.load_dataset` which loads an ASDF file and creates one or more {obj}`dkist.Dataset` or {obj}`dkist.TiledDataset` objects.
 This function takes one of several different kinds of input:
 
-- a string representation of either a valid ASDF file or a directory containing one;
+- a string representation of either; a valid ASDF file or a directory containing one;
 - a `pathlib.Path` object representing a valid ASDF or directory containing one;
 - a `parfive.results.Results` object as returned by `sunpy.Fido.fetch` (this will only work if _all_ results in the table are valid DKIST ASDF files); or
 - a list or tuple of any combination of the above.
@@ -170,7 +170,7 @@ ds.axis_world_coords('time')
 
 ### Slicing Datasets
 
-Another useful feature of the `Dataset` class, which it inherits from `NDCube` is the ability to "slice" the dataset and get a smaller dataset, with the array and coordinate information in tact.
+Another useful feature of the `Dataset` class, which it inherits from `NDCube`, is the ability to "slice" the dataset and return a smaller dataset, with the array and coordinate information in tact.
 The syntax for this is exactly as you would expect for a NumPy array, but it is worth taking quick look at how the coordinates are handled.
 
 For example, to extract the Stokes I component of the dataset we would access the first item of the first axis:

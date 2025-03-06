@@ -14,7 +14,7 @@ kernelspec:
 (dkist:tutorial:search-and-download)=
 # Searching for DKIST Datasets
 
-In this session we will cover how to search for DKIST datasets available at the DKIST Data Center.
+In this chapter we will cover how to search for DKIST datasets available at the DKIST Data Center.
 In DKIST data parlance, a "dataset" is the smallest unit of data that is searchable from the data centre, and represents a single observation from a single instrument at a single pass band.
 
 Each dataset comprises a number of different files:
@@ -23,10 +23,10 @@ Each dataset comprises a number of different files:
   * An mp4 preview movie.
   * A (large) number of FITS files, each containing a "calibrated exposure".
 
-All of these files apart from the FITS files containing the data can be downloaded irrespective of embargo status.
+All of these files, apart from the FITS files containing the data, can be downloaded irrespective of embargo status.
 
 For each of these "datasets" the DKIST Data Center keeps a "dataset inventory record" which is a limited set of metadata about the dataset on which you can search, either through the web portal or the `dkist` Python package.
-The ASDF, quality report and preview movie can all be downloaded without authenticating, the FITS files require the use of Globus.
+The ASDF, quality report and preview movie can all be downloaded without authentication, the FITS files require the use of Globus.
 
 
 ## Using `Fido.search`
@@ -42,7 +42,7 @@ from sunpy.net import Fido, attrs as a
 import dkist.net
 ```
 
-`Fido` searches are built up from "attrs", which we imported above as `a`.
+`Fido` searches are built up from attributes, referred to in python as `attrs`, which we have imported above as `a`.
 These attrs are combined together with either logical AND or logical OR operations to make complex queries.
 Let's start simple and search for all the DKIST datasets which are not embargoed:
 
@@ -75,7 +75,7 @@ Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False))
 
 As you can see this has returned two separate tables, one for VBI and one for VISP.
 
-Because `Fido` can search other clients as well as the DKIST you can make a more complex query which will search for VISP data and context images from AIA at the same time:
+Because `Fido` can search other clients in addition to the DKIST specific client. You can create more complex queries, for example a search for VISP data and context images from AIA at the same time:
 
 ```{code-cell} python
 time = a.Time("2022-06-02 17:00:00", "2022-06-02 18:00:00")
@@ -147,7 +147,7 @@ To download the FITS files containing the data, see the [downloading data tutori
 
 To download files with `Fido` we pass the search results to `Fido.fetch`.
 
-If we want to download the first VBI dataset we searched for earlier we can do so like this:
+If we want to download the first VBI dataset we searched for earlier, we can do so like this:
 ```{code-cell} python
 Fido.fetch(vbi[0])
 ```
