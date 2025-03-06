@@ -178,4 +178,4 @@ So if we want to put each of our ASDF files in a directory named with the Datase
 Fido.fetch(vbi[:5], path="~/sunpy/data/{instrument}/{dataset_id}/")
 ```
 
-Storing each dataset in its own folder may seem unneccessary right now, since we are only downloading a single ASDF file for each one. However, this extra level of sorting will become useful later on when we start to download the FITS files.
+Storing each dataset in its own folder may seem unnecessary right now, since we are only downloading a single ASDF file for each one. However, this extra level of sorting will become useful later on when we start to download the FITS files.

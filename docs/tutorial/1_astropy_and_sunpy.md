@@ -231,4 +231,4 @@ wcs.axis_correlation_matrix
 
 This correlation matrix has the world dimensions as rows, and the pixel dimensions as columns.
 Here we have a 2D image, with two pixel and two world axes where both are coupled together.
-This means that to calculate either latitude or longitude you need both pixel coordinates. 
+This means that to calculate either latitude or longitude you need both pixel coordinates.
