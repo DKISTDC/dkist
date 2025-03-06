@@ -5,17 +5,22 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import types
+import warnings
+from typing import Literal
 from textwrap import dedent
 from collections.abc import Collection
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.gridspec import GridSpec
 
 import astropy
 from astropy.table import vstack
 
 from dkist.io.file_manager import FileManager, StripedExternalArray
 from dkist.io.loaders import AstropyFITSLoader
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset
 from .utils import dataset_info_str
@@ -27,15 +32,15 @@ class TiledDatasetSlicer:
     """
     Basic class to provide the slicing
     """
-    def __init__(self, data, inventory):
+    def __init__(self, data, meta):
         self.data = data
-        self.inventory = inventory
+        self.meta = meta
 
     def __getitem__(self, slice_):
         new_data = []
         for tile in self.data.flat:
             new_data.append(tile[slice_])
-        return TiledDataset(np.array(new_data).reshape(self.data.shape), self.inventory)
+        return TiledDataset(np.array(new_data).reshape(self.data.shape), meta=self.meta)
 
 
 class TiledDataset(Collection):
@@ -80,12 +85,20 @@ class TiledDataset(Collection):
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
-        return cls(datasets, inventory)
+        return cls(datasets, meta={"inventory": inventory})
 
-    def __init__(self, dataset_array, inventory=None):
+    def __init__(self, dataset_array, inventory=None, *, meta=None):
+        if inventory is not None:
+            warnings.warn(
+                "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
+                DKISTDeprecationWarning,
+            )
         self._data = np.array(dataset_array, dtype=object)
-        self._inventory = inventory or {}
+        meta = meta or {}
+        inventory = meta.get("inventory", inventory or {})
         self._validate_component_datasets(self._data, inventory)
+        self._meta = meta
+        self._meta["inventory"] = inventory
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -101,7 +114,7 @@ class TiledDataset(Collection):
         if isinstance(new_data, Dataset):
             return new_data
 
-        return type(self)(new_data, inventory=self.inventory)
+        return type(self)(new_data, meta=self.meta)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
@@ -122,14 +135,21 @@ class TiledDataset(Collection):
         """
         Represent this `.TiledDataset` as a 1D array.
         """
-        return type(self)(self._data.flat, self.inventory)
+        return type(self)(self._data.flat, meta=self.meta)
+
+    @property
+    def meta(self):
+        """
+        A dictionary of extra metadata about the dataset.
+        """
+        return self._meta
 
     @property
     def inventory(self):
         """
         The inventory record as kept by the data center for this dataset.
         """
-        return self._inventory
+        return self._meta["inventory"]
 
     @property
     def combined_headers(self):
@@ -167,7 +187,7 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    def plot(self, slice_index, share_zscale=False, **kwargs):
+    def plot(self, slice_index, share_zscale=False, figure=None, swap_tile_limits: Literal["x", "y", "xy"] | None = None, **kwargs):
         """
         Plot a slice of each tile in the TiledDataset
 
@@ -176,42 +196,86 @@ class TiledDataset(Collection):
         slice_index : `int`, sequence of `int`s or `numpy.s_`
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
-            ``TiledDataset.slice_tiles``
+            `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
         share_zscale : `bool`
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
             Defaults to False
+        figure : `matplotlib.figure.Figure`
+            A figure to use for the plot. If not specified the current pyplot
+            figure will be used, or a new one created.
+        swap_tile_limits : `"x", "y", "xy"` or `None` (default)
+            Invert the axis limits of each tile. Either the "x" or "y" axis limits can be inverted separately, or they
+            can both be inverted with "xy". This option is useful if the orientation of the tile data arrays is flipped
+            w.r.t. the WCS orientation implied by the mosaic keys. For example, most DL-NIRSP data should be plotted with
+            `swap_tile_limits="xy"`.
         """
-        if isinstance(slice_index, int):
+        if swap_tile_limits not in ["x", "y", "xy", None]:
+            raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
+
+        if len(self.meta.get("history", {}).get("entries", [])) == 0:
+            warnings.warn("The metadata ASDF file that produced this dataset is out of date and "
+                          "will result in incorrect plots. Please re-download the metadata ASDF file.",
+                          DKISTUserWarning)
+
+        if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
+
         vmin, vmax = np.inf, 0
-        fig = plt.figure()
-        tiles = self.slice_tiles[slice_index].flat
-        for i, tile in enumerate(tiles):
-            ax = fig.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
-            tile.plot(axes=ax, **kwargs)
-            if i == 0:
-                xlabel, ylabel = self._get_axislabels(ax)
-                fig.supxlabel(xlabel, y=0.05)
-                fig.supylabel(ylabel, x=0.05)
-            axmin, axmax = ax.get_images()[0].get_clim()
-            vmin = axmin if axmin < vmin else vmin
-            vmax = axmax if axmax > vmax else vmax
-            ax.set_ylabel(" ")
-            ax.set_xlabel(" ")
+
+        if figure is None:
+            figure = plt.gcf()
+
+        sliced_dataset = self.slice_tiles[slice_index]
+        # This can change to just .shape once we support ndcube >= 2.3
+        if (nd_sliced := len(sliced_dataset.flat[0].data.shape)) != 2:
+            raise ValueError(
+                f"Applying slice '{slice_index}' to this dataset resulted in a {nd_sliced} "
+                "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile."
+            )
+        dataset_ncols, dataset_nrows = sliced_dataset.shape
+        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=figure)
+        for col in range(dataset_ncols):
+            for row in range(dataset_nrows):
+                tile = sliced_dataset[col, row]
+
+                # Fill up grid from the bottom row
+                ax_gridspec = gridspec[dataset_nrows - row - 1, col]
+                ax = figure.add_subplot(ax_gridspec, projection=tile.wcs)
+
+                tile.plot(axes=ax, **kwargs)
+
+                if swap_tile_limits in ["x", "xy"]:
+                    ax.invert_xaxis()
+
+                if swap_tile_limits in ["y", "xy"]:
+                    ax.invert_yaxis()
+
+                ax.set_ylabel(" ")
+                ax.set_xlabel(" ")
+                if col == row == 0:
+                    xlabel, ylabel = self._get_axislabels(ax)
+                    figure.supxlabel(xlabel, y=0.05)
+                    figure.supylabel(ylabel, x=0.05)
+
+                axmin, axmax = ax.get_images()[0].get_clim()
+                vmin = axmin if axmin < vmin else vmin
+                vmax = axmax if axmax > vmax else vmax
+
         if share_zscale:
-            for ax in fig.get_axes():
+            for ax in figure.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
+
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(list(tiles[0].global_coords.items())[::-1]):
+        for i, (coord, val) in enumerate(list(sliced_dataset.flat[0].global_coords.items())[::-1]):
             if coord == "time":
                 val = val.iso
             if coord == "stokes":
                 val = val.symbol
             title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
         title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace("slice(None, None, None)", ":")
-        fig.suptitle(title, y=0.95)
-        return fig
+        figure.suptitle(title, y=0.95)
+        return figure
 
     @property
     def slice_tiles(self):
@@ -254,7 +318,7 @@ class TiledDataset(Collection):
              helioprojective latitude |        x        |        x
         """
 
-        return TiledDatasetSlicer(self._data, self.inventory)
+        return TiledDatasetSlicer(self._data, self.meta)
 
     # TODO: def regrid()
 

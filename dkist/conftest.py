@@ -305,7 +305,8 @@ def simple_tiled_dataset(dataset):
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
     dataset_array = np.array(datasets).reshape((2,2))
-    return TiledDataset(dataset_array, dataset.meta["inventory"])
+    meta = {"inventory": dataset.meta["inventory"]}
+    return TiledDataset(dataset_array, meta=meta)
 
 
 @pytest.fixture
@@ -420,8 +421,9 @@ def croppable_visp_dataset(tmp_path_factory):
 
 
 @pytest.fixture(scope="session")
-def croppable_cryo_dataset():
+def croppable_cryo_dataset(tmp_path_factory):
+    cryodir = tmp_path_factory.mktemp("data")
     with gzip.open(Path(rootdir) / "croppable_cryo.asdf.gz", mode="rb") as gfo:
-        with open(rootdir / "croppable_cryo.asdf", mode="wb") as afo:
+        with open(cryodir / "croppable_cryo.asdf", mode="wb") as afo:
             afo.write(gfo.read())
-    return load_dataset(Path(rootdir) / "croppable_cryo.asdf")
+    return load_dataset(cryodir / "croppable_cryo.asdf")

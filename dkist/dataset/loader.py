@@ -1,10 +1,15 @@
+import re
+import warnings
 import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import singledispatch
+from collections import defaultdict
 
 from parfive import Results
 
 import asdf
+
+from dkist.utils.exceptions import DKISTUserWarning
 
 try:
     # first try to import from asdf.exceptions for asdf 2.15+
@@ -14,10 +19,7 @@ except ImportError:
     from asdf import ValidationError
 
 
-def asdf_open_memory_mapping_kwarg(memmap: bool) -> dict:
-    if asdf.__version__ > "3.1.0":
-        return {"memmap": memmap}
-    return {"copy_arrays": not memmap}
+ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
 
 
 @singledispatch
@@ -100,9 +102,7 @@ def _load_from_results(results):
     return _load_from_iterable(results)
 
 
-# In Python 3.11 we can use the Union type here
-@load_dataset.register(list)
-@load_dataset.register(tuple)
+@load_dataset.register(tuple | list)
 def _load_from_iterable(iterable):
     """
     A list or tuple of valid inputs to ``load_dataset``.
@@ -138,8 +138,30 @@ def _load_from_path(path: Path):
 
 def _load_from_directory(directory):
     """
-    Construct a `~dkist.dataset.Dataset` from a directory containing one
-    asdf file and a collection of FITS files.
+    Construct a `~dkist.dataset.Dataset` from a directory containing one (or
+    more) ASDF files and a collection of FITS files.
+
+    ASDF files have the generic pattern:
+
+    ``{instrument}_L1_{start_time:%Y%m%dT%H%M%S}_{dataset_id}[_{suffix}].asdf``
+
+    where the ``_{suffix}`` on the end may be absent or one of a few different
+    suffixes which have been used at different times.  When searching a
+    directory for one or more ASDF file to load we should attempt to only load
+    one per dataset ID by selecting files in suffix order.
+
+    The order of suffixes are (from newest used to oldest):
+
+    - ``_metadata``
+    - ``_user_tools``
+    - None
+
+    The algorithm used to find ASDF files to load in a directory is therefore:
+
+    - Glob the directory for all ASDF files
+    - Group all results by the filename up to and including the dataset id in the filename
+    - Ignore any ASDF files with an old suffix if a new suffix is present
+    - Throw a warning to the user if any ASDF files with older suffixes are found
     """
     base_path = Path(directory).expanduser()
     asdf_files = tuple(base_path.glob("*.asdf"))
@@ -147,12 +169,60 @@ def _load_from_directory(directory):
     if not asdf_files:
         raise ValueError(f"No asdf file found in directory {base_path}.")
 
-    if len(asdf_files) > 1:
-        return _load_from_iterable(asdf_files)
+    if len(asdf_files) == 1:
+        return _load_from_asdf(asdf_files[0])
 
-    asdf_file = asdf_files[0]
+    pattern = re.compile(ASDF_FILENAME_PATTERN)
+    candidates = []
+    asdfs_to_load = []
+    for filepath in asdf_files:
+        filename = filepath.name
 
-    return _load_from_asdf(asdf_file)
+        # If the asdf file doesn't match the data center pattern then we load it
+        # as it's probably a custom user file
+        if pattern.match(filename) is None:
+            asdfs_to_load.append(filepath)
+            continue
+
+        # All the matches have to be checked
+        candidates.append(filepath)
+
+    # If we only have one match load it
+    if len(candidates) == 1:
+        asdfs_to_load += candidates
+    else:
+        # Now we group by prefix
+        matches = [pattern.match(fp.name) for fp in candidates]
+        grouped = defaultdict(list)
+        for m in matches:
+            prefix = m.string.removesuffix(".asdf").removesuffix(m.group("suffix") or "")
+            grouped[prefix].append(m.group("suffix"))
+
+        # Now we select the best suffix for each prefix
+        for prefix, suffixes in grouped.items():
+            if "_metadata" in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}_metadata.asdf")
+            elif "_user_tools" in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}_user_tools.asdf")
+            elif None in suffixes:
+                asdfs_to_load.append(base_path / f"{prefix}.asdf")
+            else:
+                # This branch should never be hit because the regex enumerates the suffixes
+                raise ValueError("Unknown suffix encountered.")  # pragma: no cover
+
+    # Throw a warning if we have skipped any files
+    if ignored_files := set(asdf_files).difference(asdfs_to_load):
+        warnings.warn(
+            f"ASDF files with old names ({', '.join([a.name for a in ignored_files])}) "
+            "were found in this directory and ignored. You may want to delete these files.",
+            DKISTUserWarning
+        )
+
+    if len(asdfs_to_load) == 1:
+        return _load_from_asdf(asdfs_to_load[0])
+
+    return _load_from_iterable(asdfs_to_load)
+
 
 
 def _load_from_asdf(filepath):
@@ -165,8 +235,9 @@ def _load_from_asdf(filepath):
     try:
         with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, **asdf_open_memory_mapping_kwarg(memmap=False)) as ff:
+                           lazy_load=False, memmap=False) as ff:
                 ds = ff.tree["dataset"]
+                ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
                     for sub in ds.flat:
                         sub.files.basepath = base_path
