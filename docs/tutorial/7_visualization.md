@@ -134,7 +134,7 @@ fig = tds.plot(0, figure=fig)
 
 As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
 
-You may notice in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
+You may notice that in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
 
 
 ```{code-cell} ipython3
