@@ -5,9 +5,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.5
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -18,14 +18,13 @@ In this session we will look at how to take a better look at the actual data onc
 As usual, first we'll need a dataset.
 We'll use the VISP data we downloaded at the end of the last notebook.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 %matplotlib tk
 ```
 
-```{code-cell} python
+```{code-cell} ipython3
 import dkist
 import matplotlib.pyplot as plt
 
@@ -38,7 +37,7 @@ ds
 Getting started with plotting a dataset is straightforward.
 `Dataset` provides a `plot()` method which makes a decent default plot of the data.
 
-```{code-cell} python
+```{code-cell} ipython3
 ds.plot()
 plt.show()
 ```
@@ -58,7 +57,7 @@ This takes a list which defines which axes to plot as the slice and which to use
 The list should contain `"x"` and `"y"` in the locations corresponding to the axes we want to plot, and `None` elsewhere.
 The ordering for this is the same as for the pixel dimensions as shown in the `Dataset` summary.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds
 ```
 
@@ -66,13 +65,13 @@ So the list needed to specify the default ordering would be `[None, None, 'y', '
 If instead we want to plot the image formed by the raster scan at a particular wavelength and Stokes value, we can change which axes we specify as the x and y axes of the plot.
 For this example we will slice the data down to a particular region of interest.
 
-```{code-cell} python
+```{code-cell} ipython3
 small_ds = ds[0, 150:300, :, 1010:-1010]
 ```
 
 Note that since this removes the first axis, the `plot_axes` argument is now only three items long.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 # Plot 'raster scan step number' on the y axis and 'spatial along slit' on the x axis
 small_ds.plot(plot_axes=['y', None, 'x'])
 plt.show()
@@ -92,7 +91,7 @@ See issue [#256](https://github.com/DKISTDC/dkist/issues/256) for more details.
 You can also use `plot_axes` to create a line plot, by specifying only one axis of the data.
 So to plot a spectrum at a fixed Stokes, time and raster location we can tell `plot` to use the dispersion axis as the x axis.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds.plot(plot_axes=[None, None, 'x', None])
 plt.show()
 ```
@@ -100,7 +99,7 @@ plt.show()
 It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 # Plot the same data as above
 ds[0, 0, :, 0].plot()
 plt.show()
@@ -112,7 +111,7 @@ plt.show()
 Next we are going to use the coordinate information in the VISP dataset to plot VISP's field of view over an AIA image.
 To do this we are going to use {obj}`sunpy.map`.
 
-```{code-cell} python
+```{code-cell} ipython3
 import sunpy.map
 from sunpy.net import Fido, attrs as a
 import astropy.units as u
@@ -120,28 +119,28 @@ import astropy.units as u
 
 First we shall search for an AIA image closest to the start time of the VISP dataset.
 
-```{code-cell} python
+```{code-cell} ipython3
 start_time = ds.inventory["startTime"]
 end_time = ds.inventory["endTime"]
 ```
 
-```{code-cell} python
+```{code-cell} ipython3
 res = Fido.search(a.Time(start_time, end_time, start_time), a.Instrument.aia, a.Wavelength(19.3 * u.nm)) # change this to 160?
 res
 ```
 
-```{code-cell} python
+```{code-cell} ipython3
 aia_files = Fido.fetch(res)
 aia_files
 ```
 
 Now we have an AIA image file, let's read it with `sunpy`.
 
-```{code-cell} python
+```{code-cell} ipython3
 import sunpy.map
 ```
 
-```{code-cell} python
+```{code-cell} ipython3
 aia = sunpy.map.Map(aia_files)
 aia
 ```
@@ -149,7 +148,7 @@ aia
 Now let's make a simple plot of the AIA map.
 The sunpy map object has a `.plot()` method which sets up a lot of stuff for us, but we will manually make the figure and axes.
 
-```{code-cell} python
+```{code-cell} ipython3
 fig = plt.figure()
 ax = plt.subplot(projection=aia)
 aia.plot(axes=ax)
@@ -169,13 +168,11 @@ coords
 This gives us the full coordinates at one corner of the dataset.
 Of course, the spectral, time and Stokes coordinates are of no use to us here so we can access the longitude and latitude by indexing to get just the `SkyCoord`:
 
-
-```{code-cell} python
+```{code-cell} ipython3
 coords[1]
 ```
 
-
-```python
+```{code-cell} ipython3
 ds
 ```
 
@@ -184,8 +181,7 @@ At this point we _can_ simply call `array_index_to_world()` again for the other 
 As we briefly saw previously, a `SkyCoord` object can be an array.
 Therefore if we pass `array_index_to_world` an array-like input it will give us an array-like output:
 
-
-```python
+```{code-cell} ipython3
 corners = ds.wcs.array_index_to_world([0, 0],
                                       [0, ds.data.shape[1]-1],
                                       [0, 0],
@@ -193,8 +189,7 @@ corners = ds.wcs.array_index_to_world([0, 0],
 corners
 ```
 
-
-```python
+```{code-cell} ipython3
 # Text below is wrong but hopefully this whole example will change anyway.
 ```
 
@@ -202,8 +197,7 @@ So here for the first array index dimension we are giving it the bottom left row
 
 This gives us back a `SkyCoord` with two elements in both `Tx` and `Ty`:
 
-
-```python
+```{code-cell} ipython3
 corners[1].Tx
 ```
 
@@ -211,8 +205,7 @@ corners[1].Tx
 
 Now we can use this to overplot the field of view of the VISP image:
 
-
-```{code-cell} python
+```{code-cell} ipython3
 fig = plt.figure()
 ax = plt.subplot(projection=aia)
 aia.plot(axes=ax)
@@ -222,7 +215,7 @@ aia.draw_quadrangle(corners[1])
 Finally, we can zoom in a little.
 If you are doing this interactively you can zoom in with the UI, here I shall do it by specifying pixel coordinates:
 
-```{code-cell} python
+```{code-cell} ipython3
 _ = ax.axis((1200, 2400, 1600, 2800))
 fig
 ```

@@ -202,34 +202,3 @@ Again following usual NumPy slicing syntax, we can also slice out a section of a
 feature = ds[0, 100:200, :, 638:-638]
 feature
 ```
-
-### Slicing and files
-
-We have mentioned already that slicing a dataset down to only the portion of it that interests us can be a way of reducing the size of the download once we want to actually get the data. We'll come back to both file tracking and downloads, but for now let us look at how our slicing operations impact the number of files.
-
-```{code-cell} ipython3
-ds.data.shape, ds.files
-```
-
-Here we can see that our initial starting point with the full dataset was an array of (4, 425, 980, 2554) datapoints stored in 1700 FITS files. Notice that the array in each file is of size (1, 980, 2554) - the dimensions match the spatial and dispersion axes of the data (with a dummy axis). Each file therefore effectively contains a single 2D image taken at a single raster location and polarization state, and many of these files put together make the full 4D dataset.
-
-Next let us look at our sliced datasets.
-
-```{code-cell} ipython3
-stokes_i.data.shape, stokes_i.files
-```
-
-Now since the dataset only contains Stokes I, we only need the files containing the corresponding data and those measured at the other polarization states have been dropped, leaving 425.
-
-```{code-cell} ipython3
-scan.data.shape, scan.files
-```
-
-In this case, however, although the dataset is obviously smaller it still spans the same 425 files. This is because we haven't sliced by raster location and are therefore taking one row of pixels from every file. To reduce the number of files any further we must look at fewer wavelengths:
-
-```{code-cell} ipython3
-feature.data.shape, feature.files
-```
-
-Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.
-It is therefore important to pay attention to how your data are stored across files. As noted before, slicing sensibly can significantly reduce how many files you need to download, but it can also be a relevant concern when doing some computational tasks and when plotting, as every file touched by the data will need to be opened and stored in memory.

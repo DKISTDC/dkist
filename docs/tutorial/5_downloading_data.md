@@ -7,7 +7,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -66,10 +66,10 @@ Various useful information is displayed here but for now the most important is w
 ![](./globus2.png)
 
 In either case Globus will also send an email to your registered email address when the task finishes.
-Of course in this trivial example this is unneccessary, but if you're transfering a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
+Of course in this trivial example this is unnecessary, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
 You do not need to leave the web app open for the transfer to continue, but remember that you do need to have GCP running - so if you stop it then your data download will stop as well.
 
-If you try transfering the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
+If you try transferring the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
 This is to save download time and avoid duplication.
 
 ## Dataset and downloading
@@ -78,10 +78,9 @@ Now that we've been over the basic concepts of how data downloads work in Globus
 For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
 First let's reload the VISP dataset we were using before.
 
-```{code-cell} ipython
----
-tags: [keep-inputs]
----
+```{code-cell} ipython3
+:tags: [keep-inputs]
+
 import dkist
 import dkist.net
 from sunpy.net import Fido, attrs as a
@@ -91,7 +90,7 @@ ds = dkist.load_dataset("~/sunpy/data/VISP/BKPLX")
 
 As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the dataset even before downloading any.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 print(ds.files)
 print(ds.files.filenames)
 ```
@@ -100,46 +99,43 @@ The `files` attribute has a `download()` method that we will use for downloading
 In order to speed up this demonstration a bit, we will just download the first file.
 To do this we can slice the dataset so that we're only accessing the portion of the data saved in the first file, paying attention to the chunking information in the `Dataset`:
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds
 ```
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds[0, 0].files
 ```
 
-```{code-cell} ipython
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 ds[0, 0].files.download()
 ```
 
-```{code-cell} ipython
+```{code-cell} ipython3
 ds[0, 0].plot()
 ```
 
-The default download directory used by `donwload()` is in the same folder as the ASDF file we loaded, so in this case `~/sunpy/data/VISP/BKPLX`.
+The default download directory used by `download()` is in the same folder as the ASDF file we loaded, so in this case `~/sunpy/data/VISP/BKPLX`.
 Since the `download()` method set up the transfer through globus, you can check on the status of your download in the activity tab of the web app as we saw earlier.
 
 We can change the download location of the files using the `path` argument.
 But remember that whatever path you specify must be accessible by Globus Connect Personal.
 
-```{code-cell} ipython
----
-tags: [skip-execution]
----
-ds[0].files.download(path="~/somewhere/globus/cant/reach/")  # will hang for a while and then fail
+```{code-cell} ipython3
+:tags: [skip-execution]
+
+ds[0].files.download(path="~/somewhere/globus/can't/reach/")  # will hang for a while and then fail
 ```
 
 The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`.
 Any key in the dataset inventory (`ds.meta['inventory']`) can be used for this.
 So for example:
 
-```{code-cell} ipython
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 ds[0, 0].files.download(path="~/sunpy/data/{dataset_id}")
 ```
 
@@ -147,24 +143,22 @@ would save the file to `~/sunpy/data/BKPLX/VISP_2023_10_16T18_21_47_508_00630200
 
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
-```{code-cell} python
+```{code-cell} ipython3
 ds[0].files.basepath
 ```
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 ds.files.download()
 ```
 
 Alternatively, the user tools offer another function which can also be used to download a full dataset.
 The `transfer_complete_datasets()` function can take a Fido search results object and download an entire dataset:
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 results = Fido.search(a.Instrument("VISP"), a.Time("2023-10-16 18:00", "2023-10-16 19:00"))
 dkist.net.transfer_complete_datasets(results["dkist"][0])
 ```
@@ -174,10 +168,9 @@ Notice that we have to specify `results["dkist"]` here, because `transfer_comple
 We can also download many datasets at once.
 For example if we have a proposal ID that we want to download all the data for we could run:
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 results = Fido.search(a.dkist.Proposal("pid_1_123"))
 dkist.net.transfer_complete_datasets(results)
 ```
@@ -187,10 +180,9 @@ This will iterate over the results and download each dataset in turn, with a pro
 Of course, if this is a dataset you already know you will want to download all of - for example if it's your own observation - then you may not need to find it through Fido first.
 Fortunately, `transfer_complete_datasets()`, also lets you specify a dataset or datasets for which to download all files, by passing the dataset IDs.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 dkist.net.transfer_complete_datasets('BKPLX')
 ```
 
@@ -204,10 +196,9 @@ Setting `wait=False` will also skip the wait at the end of each dataset if downl
 
 To demonstrate this, let's grab some data for the next session, which will be on visualisation.
 
-```{code-cell} python
----
-tags: [skip-execution]
----
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 ds = dkist.Dataset.from_directory("~/sunpy/data/VISP/AGLKO")
 ds.files.download(wait=False, progress=False)
 ```
