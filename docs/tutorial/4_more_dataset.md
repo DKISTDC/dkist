@@ -21,9 +21,9 @@ Firstly we need to re-create our dataset object from the last tutorial.
 ---
 tags: [keep-inputs]
 ---
-import dkist
+from dkist.data.sample import VISP_BKPLX
 
-ds = dkist.load_dataset("~/sunpy/data/VISP/BKPLX/")
+ds = dkist.load_dataset(VISP_BKPLX)
 ds
 ```
 

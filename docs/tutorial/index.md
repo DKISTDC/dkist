@@ -24,4 +24,5 @@ Before you get started with this tutorial follow {ref}`dkist:installation` to ge
 4_more_dataset
 5_downloading_data
 6_visualization
+7_tiled-dataset
 ```
