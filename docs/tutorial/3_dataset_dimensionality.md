@@ -12,8 +12,8 @@ kernelspec:
   name: python3
 ---
 
-(dkist:tutorial:dataset-dimensionality)=
-# Dimensionality of a `Dataset`
+(dkist:tutorial:dataset)=
+# Introduction to `Dataset`
 
 In this chapter you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
@@ -63,7 +63,12 @@ This function takes one of several different kinds of input:
 - a `parfive.results.Results` object as returned by `sunpy.Fido.fetch` (this will only work if _all_ results in the table are valid DKIST ASDF files); or
 - a list or tuple of any combination of the above.
 
-Since we have a `Path` to our sample data as defined above, we can pass this straight to `load_dataset()`
+## Loading a VISP Dataset
+
+For the rest of this tutorial we are going to be using sample data provided with the `dkist` package.
+These sample datasets provide convenient examples to work with and contain some FITS files which do not require Globus to access.
+
+The sample datasets can be imported from `dkist.data.sample`, here we use a VISP one:
 
 ```{code-cell} ipython3
 import dkist
@@ -71,7 +76,7 @@ import dkist
 ds = dkist.load_dataset(VISP_L1_KMUPT)
 ```
 
-Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't assume the presence of any of the actual data.
+Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
 This may sound unhelpful but we'll see how it can be very powerful.
 
 First let's have a look at the basic representation of the `Dataset`.
@@ -121,7 +126,7 @@ ds.wcs.pixel_axis_names
 note how these are reversed from one another, we can print them together with:
 
 ```{code-cell} ipython3
-for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.shape):
+for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.dimensions):
     print(f"{name}: {length}")
 ```
 
