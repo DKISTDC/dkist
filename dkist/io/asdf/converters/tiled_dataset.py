@@ -21,7 +21,6 @@ class TiledDatasetConverter(Converter):
             meta["inventory"] = inventory
 
         mask = node.get("mask", None)
-
         return TiledDataset(node["datasets"], mask=mask, meta=meta)
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
