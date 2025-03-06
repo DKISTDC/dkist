@@ -12,8 +12,8 @@ kernelspec:
   name: python3
 ---
 
-(dkist:tutorial:more-dataset)=
-# More `Dataset`
+(dkist:tutorial:dataset-exploring-files)=
+# Exploring Files in a `Dataset`
 
 Firstly we need to re-create our dataset object from the last tutorial.
 
