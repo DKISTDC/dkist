@@ -110,24 +110,3 @@ Similarly if we want to crop the edges of each tile we can index just as easily 
 ```{code-cell} ipython3
 tds.slice_tiles[:, 1024:-1024, 1024:-1024]
 ```
-
-## Plotting with `TiledDataset`
-
-Again like `Dataset`, `TiledDataset` provides a plotting helper method. This works slightly differently to `Dataset.plot()` though, in that it is not straightforward to animate a collection of tiles, which leaves the problem of how to display 3D data as a static image. `TiledDataset.plot()` therefore takes an argument which specifies a slice to be taken through each tile, which must reduce it to a plottable two dimensions.
-
-In the case of VBI, this argument will be a single number which specifies the index on the time axis to plot.
-
-
-```{code-cell} ipython3
-import matplotlib.pyplot as plt
-tds.plot(0)
-```
-
-As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
-
-You may notice that in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
-
-
-```{code-cell} ipython3
-tds.plot(0, share_zscale=True)
-```

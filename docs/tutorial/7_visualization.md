@@ -105,117 +105,23 @@ ds[0, 0, :, 0].plot()
 plt.show()
 ```
 
-### Using AIA as a Context Image
-
-#### Fetching an AIA Image
-Next we are going to use the coordinate information in the VISP dataset to plot VISP's field of view over an AIA image.
-To do this we are going to use {obj}`sunpy.map`.
-
+## Plotting with `TiledDataset`
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+Again like `Dataset`, `TiledDataset` provides a plotting helper method. This works slightly differently to `Dataset.plot()` though, in that it is not straightforward to animate a collection of tiles, which leaves the problem of how to display 3D data as a static image. `TiledDataset.plot()` therefore takes an argument which specifies a slice to be taken through each tile, which must reduce it to a plottable two dimensions.
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+In the case of VBI, this argument will be a single number which specifies the index on the time axis to plot.
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
 ```{code-cell} ipython3
-import sunpy.map
-from sunpy.net import Fido, attrs as a
-import astropy.units as u
+import matplotlib.pyplot as plt
+tds.plot(0)
 ```
-
-First we shall search for an AIA image closest to the start time of the VISP dataset.
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+You may notice that in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
 ```{code-cell} ipython3
-start_time = ds.inventory["startTime"]
-end_time = ds.inventory["endTime"]
-```
-
-```{code-cell} ipython3
-res = Fido.search(a.Time(start_time, end_time, start_time), a.Instrument.aia, a.Wavelength(19.3 * u.nm)) # change this to 160?
-res
-```
-
-```{code-cell} ipython3
-aia_files = Fido.fetch(res)
-aia_files
-```
-
-Now we have an AIA image file, let's read it with `sunpy`.
-
-```{code-cell} ipython3
-import sunpy.map
-```
-
-```{code-cell} ipython3
-aia = sunpy.map.Map(aia_files)
-aia
-```
-
-Now let's make a simple plot of the AIA map.
-The sunpy map object has a `.plot()` method which sets up a lot of stuff for us, but we will manually make the figure and axes.
-
-```{code-cell} ipython3
-fig = plt.figure()
-ax = plt.subplot(projection=aia)
-aia.plot(axes=ax)
-```
-
-#### Computing the VISP field of View
-
-As we can see from the docstring of `aia.draw_quadrangle` we can specify a bottom left and a top right coordinate.
-Remember we can calculate the world coordinates of a dataset like this:
-
-
-```python
-coords = ds.wcs.array_index_to_world(0, 0, 0, 0)
-coords
-```
-
-This gives us the full coordinates at one corner of the dataset.
-Of course, the spectral, time and Stokes coordinates are of no use to us here so we can access the longitude and latitude by indexing to get just the `SkyCoord`:
-
-```{code-cell} ipython3
-coords[1]
-```
-
-```{code-cell} ipython3
-ds
-```
-
-At this point we _can_ simply call `array_index_to_world()` again for the other side of the array to get the opposite corner and pass both in to `draw_quadrangle()`. However, instead we'll demonstrate a useful feature of `SkyCoord`
-
-As we briefly saw previously, a `SkyCoord` object can be an array.
-Therefore if we pass `array_index_to_world` an array-like input it will give us an array-like output:
-
-```{code-cell} ipython3
-corners = ds.wcs.array_index_to_world([0, 0],
-                                      [0, ds.data.shape[1]-1],
-                                      [0, 0],
-                                      [0, ds.data.shape[3]-1])
-corners
-```
-
-```{code-cell} ipython3
-# Text below is wrong but hopefully this whole example will change anyway.
-```
-
-So here for the first array index dimension we are giving it the bottom left row index and the top right row index and for the second array index dimension we are giving it the bottom left column index and the top right column index.
-
-This gives us back a `SkyCoord` with two elements in both `Tx` and `Ty`:
-
-```{code-cell} ipython3
-corners[1].Tx
-```
-
-#### Plotting VISP Field of View on AIA Images
-
-Now we can use this to overplot the field of view of the VISP image:
-
-```{code-cell} ipython3
-fig = plt.figure()
-ax = plt.subplot(projection=aia)
-aia.plot(axes=ax)
-aia.draw_quadrangle(corners[1])
-```
-
-Finally, we can zoom in a little.
-If you are doing this interactively you can zoom in with the UI, here I shall do it by specifying pixel coordinates:
-
-```{code-cell} ipython3
-_ = ax.axis((1200, 2400, 1600, 2800))
-fig
+tds.plot(0, share_zscale=True)
 ```
