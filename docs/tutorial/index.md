@@ -20,9 +20,9 @@ Before you get started with this tutorial follow {ref}`dkist:installation` to ge
 :maxdepth: 1
 1_astropy_and_sunpy
 2_search_and_asdf_download
-3_the_dataset
-4_more_dataset
-5_downloading_data
-6_visualization
-7_tiled-dataset
+3_dataset_dimensionality
+4_dataset_files
+5_tileddataset
+6_downloading_data
+7_visualization
 ```
