@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, TiledDataset, load_dataset
-from dkist.io import FileManager
+from dkist.io import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
@@ -145,7 +145,7 @@ def test_file_manager():
 
     assert len(dataset.files.filenames) == 11
 
-    assert isinstance(dataset[5]._file_manager, FileManager)
+    assert isinstance(dataset[5]._file_manager, DKISTFileManager)
     assert len(dataset[..., 5].files.filenames) == 11
     assert len(dataset[5].files.filenames) == 1
 

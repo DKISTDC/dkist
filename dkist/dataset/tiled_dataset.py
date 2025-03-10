@@ -18,8 +18,8 @@ from matplotlib.gridspec import GridSpec
 import astropy
 from astropy.table import vstack
 
-from dkist.io.file_manager import FileManager, StripedExternalArray
-from dkist.io.loaders import AstropyFITSLoader
+# from dkist.io.file_manager import FileManager, StripedExternalArray
+# from dkist.io.loaders import AstropyFITSLoader
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset

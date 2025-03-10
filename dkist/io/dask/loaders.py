@@ -14,9 +14,6 @@ from sunpy.util.decorators import add_common_docstring
 
 from dkist import log
 
-__all__ = ["AstropyFITSLoader", "BaseFITSLoader"]
-
-
 common_parameters = """
 
 Parameters

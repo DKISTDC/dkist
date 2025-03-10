@@ -3,9 +3,9 @@ Functionality for loading many DKIST FITS files into a single Dask array.
 """
 import dkist.config as _config
 
-from .file_manager import FileManager
+from .file_manager import DKISTFileManager
 
-__all__ = ["FileManager", "conf"]
+__all__ = ["DKISTFileManager", "conf"]
 
 
 class Conf(_config.ConfigNamespace):

@@ -7,7 +7,7 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
-from dkist.io.file_manager import FileManager
+from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
 
 from .utils import dataset_info_str
@@ -97,7 +97,7 @@ class Dataset(NDCube):
     slicing creates a new object in this case.
     """
 
-    _file_manager = FileManagerDescriptor(default_type=FileManager)
+    _file_manager = FileManagerDescriptor(default_type=DKISTFileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
                  unit=None, copy=False):
@@ -184,7 +184,7 @@ class Dataset(NDCube):
     @property
     def files(self):
         """
-        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
+        A `~.DKISTFileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
         return self._file_manager
 

@@ -22,8 +22,8 @@ from dkist import load_dataset, log
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
 from dkist.dataset.tiled_dataset import TiledDataset
-from dkist.io import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io import DKISTFileManager
+from dkist.io.dask.loaders import AstropyFITSLoader
 
 
 @pytest.fixture
@@ -232,8 +232,8 @@ def dataset(array, identity_gwcs):
 
     # Construct the filename here as a scalar array to make sure that works as
     # it's what dkist-inventory does
-    ds._file_manager = FileManager.from_parts(np.array("test1.fits"), 0, "float", array.shape,
-                                              loader=AstropyFITSLoader)
+    ds._file_manager = DKISTFileManager.from_parts(np.array("test1.fits"), 0, "float", array.shape,
+                                                   loader=AstropyFITSLoader)
 
     return ds
 
@@ -278,7 +278,7 @@ def dataset_5d(identity_gwcs_5d_stokes, empty_meta):
 
     ds = Dataset(array, wcs=identity_gwcs_5d_stokes, meta={"inventory": {}, "headers": Table()}, unit=u.count)
     fileuris = np.array([f"dummyfile_{i}" for i in range(np.prod(shape[:-2]))]).reshape(shape[:-2])
-    ds._file_manager = FileManager.from_parts(fileuris, 0, float, shape[-2:], loader=AstropyFITSLoader, basepath="./")
+    ds._file_manager = DKISTFileManager.from_parts(fileuris, 0, float, shape[-2:], loader=AstropyFITSLoader, basepath="./")
 
     return ds
 
@@ -287,7 +287,7 @@ def dataset_5d(identity_gwcs_5d_stokes, empty_meta):
 def dataset_5d_dummy_filemanager_axis(dataset_5d):
     shape = dataset_5d.data.shape
     fileuris = np.array([f"dummyfile_{i}" for i in range(np.prod(shape[:-2]))]).reshape(shape[:-2])
-    dataset_5d._file_manager = FileManager.from_parts(fileuris, 0, float, (1, *shape[-2:]), loader=AstropyFITSLoader, basepath="./")
+    dataset_5d._file_manager = DKISTFileManager.from_parts(fileuris, 0, float, (1, *shape[-2:]), loader=AstropyFITSLoader, basepath="./")
 
     return dataset_5d
 
@@ -388,7 +388,7 @@ def large_visp_no_dummy_axis(large_visp_dataset):
     # Slightly tweaked dataset to remove the dummy axis in the file manager array shape.
     shape = large_visp_dataset.data.shape[:2]
     fileuris = np.array([f"dummyfile_{i}" for i in range(np.prod(shape))]).reshape(shape)
-    large_visp_dataset._file_manager = FileManager.from_parts(fileuris, 0, float, (50, 128), loader=AstropyFITSLoader, basepath="./")
+    large_visp_dataset._file_manager = DKISTFileManager.from_parts(fileuris, 0, float, (50, 128), loader=AstropyFITSLoader, basepath="./")
 
     return large_visp_dataset
 
