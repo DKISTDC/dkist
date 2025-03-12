@@ -16,7 +16,7 @@ def file_manager(eit_dataset):
     """
     A file manager
     """
-    return eit_dataset.files
+    return eit_dataset.files._fm
 
 
 @pytest.fixture

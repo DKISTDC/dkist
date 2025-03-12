@@ -1,5 +1,4 @@
 """
-
 This module contains two key classes:
 
 * ``StripedExternalArray``: The object which tracks the ``BaseFITSLoader``
@@ -16,7 +15,6 @@ view into the original ``StripedExternalArray`` object through the
 import os
 from typing import Any
 from pathlib import Path
-from functools import cached_property
 from collections.abc import Iterable
 
 import dask.array
@@ -265,7 +263,8 @@ class FileManager:
     def _generate_array(self):
         return self._striped_external_array._generate_array()
 
-    @cached_property
+    # @cached_property
+    @property
     def dask_array(self):
         """
         The Dask array managed by this FileManager.

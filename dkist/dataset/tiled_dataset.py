@@ -18,8 +18,9 @@ from matplotlib.gridspec import GridSpec
 import astropy
 from astropy.table import vstack
 
-# from dkist.io.file_manager import FileManager, StripedExternalArray
-# from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.dask.loaders import AstropyFITSLoader
+from dkist.io.dask.striped_array import FileManager, StripedExternalArray
+from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset
@@ -37,13 +38,14 @@ class TiledDatasetSlicer:
         self.meta = meta
 
     def __getitem__(self, slice_):
-        new_data = np.ma.zeros_like(data)
+        new_data = np.zeros_like(self.data.data)
 
-        for i, ds in enumerate(data.flat):
-            if ds is np.ma.masked:
+        for i, ds in enumerate(self.data.flat):
+            if self.data.mask.flat[i]:
                 continue
-            new.flat[i] = ds[slice_]
-        return TiledDataset(new_data, meta=self.meta)
+            new_data.flat[i] = ds[slice_]
+
+        return TiledDataset(new_data, meta=self.meta, mask=self.data.mask)
 
 
 class TiledDataset(Collection):
@@ -84,7 +86,7 @@ class TiledDataset(Collection):
         datasets = np.empty(len(file_managers), dtype=object)
         for i, (fm, wcs, headers) in enumerate(zip(file_managers, wcses, header_tables)):
             meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm._generate_array(), wcs=wcs, meta=meta)
+            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta)
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
@@ -355,14 +357,16 @@ class TiledDataset(Collection):
             except AssertionError as err:
                 raise AssertionError("Attributes of TiledDataset.FileManager must be the same across all tiles.") from err
 
-        return FileManager(
-            StripedExternalArray(
-                fileuris=fileuris,
-                target=1,
-                dtype=dtype,
-                shape=shape,
-                loader=AstropyFITSLoader,
-                basepath=basepath,
-                chunksize=chunksize
+        return DKISTFileManager(
+            FileManager(
+                StripedExternalArray(
+                    fileuris=fileuris,
+                    target=1,
+                    dtype=dtype,
+                    shape=shape,
+                    loader=AstropyFITSLoader,
+                    basepath=basepath,
+                    chunksize=chunksize
+                )
             )
         )

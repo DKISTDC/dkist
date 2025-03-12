@@ -180,7 +180,7 @@ def test_header_slicing_3D_slice(large_visp_dataset):
     idx = np.s_[:2, 10:15, 0]
     sliced = dataset[idx]
 
-    file_idx = dataset.files._array_slice_to_loader_slice(idx)
+    file_idx = dataset.files._fm._array_slice_to_loader_slice(idx)
     grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
     file_idx = tuple(grid[i].ravel() for i in range(np.prod(grid.shape[:-2])))
 

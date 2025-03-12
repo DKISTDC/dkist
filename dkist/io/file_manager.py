@@ -6,7 +6,7 @@ import os
 from typing import Any, Protocol
 from pathlib import Path
 
-import parfive
+from parfive import Downloader, Results
 
 from dkist.io.dask.striped_array import FileManager
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
@@ -56,6 +56,29 @@ class DKISTFileManager:
         # The name `_ndcube` comes from using NDCubeLinkedDescriptor in Dataset
         self._ndcube = parent_ndcube
 
+    # def __eq__(self, other):
+    #     return self._fm.__eq__(other)
+
+    def __len__(self):
+        return self._fm.__len__()
+
+    # def __str__(self) -> str:
+    #     return self._fm.__str__()
+
+    # def __repr__(self) -> str:
+    #     return self._fm.__repr__()
+
+    def __getitem__(self, item):
+        return self._fm.__getitem__(item)
+
+    # @property
+    # def fileuri_array(self):
+    #     return self._fm.fileuri_array
+
+    # @property
+    # def shape(self):
+    #     return self._fm.shape
+
     @property
     def basepath(self) -> os.PathLike:
         """
@@ -68,8 +91,23 @@ class DKISTFileManager:
         self._fm.basepath = basepath
 
     def __getattr__(self, attr):
-        # We want to proxy most API through to the FileManager object
-        return getattr(self._fm, attr)
+        # We want to proxy a fixed list of public API:
+        proxy_api = [
+            "__eq__",
+            "__len__",
+            "__str__",
+            "__repr__",
+            "fileuri_array",
+            "shape",
+            "output_shape",
+            "filenames",
+            "dask_array",
+        ]
+
+        if attr in proxy_api:
+            return getattr(self._fm, attr)
+
+        raise AttributeError(f"type '{type(self).__name__}' has no attribute '{attr}'")
 
     @property
     def _metadata_streamer_url(self) -> str:
@@ -78,7 +116,7 @@ class DKISTFileManager:
 
         return conf.download_endpoint
 
-    def quality_report(self, path: str | os.PathLike = None, overwrite: bool = None) -> parfive.Results:
+    def quality_report(self, path: str | os.PathLike = None, overwrite: bool = None) -> Results:
         """
         Download the quality report PDF.
 
@@ -104,9 +142,9 @@ class DKISTFileManager:
         url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
-        return parfive.Downloader.simple_download([url], path=path, overwrite=overwrite)
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
-    def preview_movie(self, path: str | os.PathLike = None, overwrite: bool = None) -> parfive.Results:
+    def preview_movie(self, path: str | os.PathLike = None, overwrite: bool = None) -> Results:
         """
         Download the preview movie.
 
@@ -132,7 +170,7 @@ class DKISTFileManager:
         url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
-        return parfive.Downloader.simple_download([url], path=path, overwrite=overwrite)
+        return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
     def download(
         self,

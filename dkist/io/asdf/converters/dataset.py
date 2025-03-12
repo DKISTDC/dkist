@@ -69,7 +69,7 @@ class DatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs
-        node["data"] = dataset.files
+        node["data"] = dataset.files._fm
         if dataset.unit:
             node["unit"] = dataset.unit
         if dataset.mask:
