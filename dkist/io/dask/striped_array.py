@@ -86,7 +86,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         dtype: DTypeLike,
         shape: Iterable[int],
         *,
-        loader: BaseFITSLoader,
+        loader: type[BaseFITSLoader],
         basepath: os.PathLike = None,
         chunksize: Iterable[int] = None,
     ):
@@ -159,7 +159,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
 
     def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
         self.parent = parent
-        self.parent_slice = tuple(aslice)
+        self.parent_slice = aslice if isinstance(aslice, tuple) else (aslice,)
 
     def __getattr__(self, attr):
         return getattr(self.parent, attr)

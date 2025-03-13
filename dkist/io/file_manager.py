@@ -116,7 +116,7 @@ class DKISTFileManager:
 
         return conf.download_endpoint
 
-    def quality_report(self, path: str | os.PathLike = None, overwrite: bool = None) -> Results:
+    def quality_report(self, path: str | os.PathLike | None = None, overwrite: bool = None) -> Results:
         """
         Download the quality report PDF.
 
@@ -144,7 +144,7 @@ class DKISTFileManager:
             path = self.basepath
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
-    def preview_movie(self, path: str | os.PathLike = None, overwrite: bool = None) -> Results:
+    def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool = None) -> Results:
         """
         Download the preview movie.
 
@@ -174,7 +174,7 @@ class DKISTFileManager:
 
     def download(
         self,
-        path: str | os.PathLike = None,
+        path: str | os.PathLike | None = None,
         destination_endpoint: str = None,
         progress: bool = True,
         wait: bool = True,
