@@ -168,7 +168,7 @@ class DKISTClient(BaseClient):
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
-        Search for datasets provided by the DKIST data centre.
+        Search for datasets provided by the DKIST data center.
         """
         from dkist.net import conf
 
@@ -180,8 +180,9 @@ class DKISTClient(BaseClient):
             if "pageSize" not in url_parameters:
                 url_parameters.update({"pageSize": conf.default_page_size})
             # TODO make this accept and concatenate multiple wavebands in a search
-            query_string = urllib.parse.urlencode(url_parameters, doseq=True)
-            full_url = f"{self._dataset_search_url}?{query_string}"
+            parsed = list(urllib.parse.urlparse(self._dataset_search_url))
+            parsed[4] = urllib.parse.urlencode(url_parameters, doseq=True)
+            full_url = urllib.parse.urlunparse(parsed)
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results.append(data)

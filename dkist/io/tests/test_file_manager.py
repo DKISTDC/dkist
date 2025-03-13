@@ -162,6 +162,8 @@ def test_reprs(file_manager):
 
 @pytest.fixture
 def orchestrate_transfer_mock(mocker):
+    mocker.patch("dkist.io.file_manager.FileManager._get_inventory",
+                 return_value=None)
     return mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
                        autospec=True)
 
