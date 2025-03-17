@@ -192,35 +192,49 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inve
     )
 
 
-def test_inventory_refresh(httpserver, dataset, orchestrate_transfer_mock):
+@pytest.fixture
+def httpserver_dataset_endpoint(httpserver):
     from dkist.net import conf
+    old = conf.dataset_endpoint
+    conf.dataset_endpoint = httpserver.url_for("/datasets/")
 
+    yield
+
+    conf.dataset_endpoint = old
+
+
+def test_inventory_refresh(httpserver, dataset, orchestrate_transfer_mock, httpserver_dataset_endpoint):
     dataset_id = dataset.meta["inventory"]["datasetId"]
 
     # Setup a happy path response
     exp = httpserver.expect_request("/datasets/v1", query_string={"datasetIds": dataset_id})
     exp.respond_with_json({"searchResults": [{"bucket": "notdata"}]})
 
-    # Tell the client to use the httpserver URL
-    conf.dataset_endpoint = httpserver.url_for("/datasets/")
-
-    new_inv = dataset.files._get_inventory(dataset_id)
+    new_inv = dataset.files._inventory
 
     assert new_inv == {"bucket": "notdata"}
 
+    assert dataset.files._inventory_cache is new_inv
+
+    cached_inv = dataset.files._inventory
+
+    assert cached_inv is new_inv
+
 
 @pytest.mark.parametrize("error_code", [404, 202])
-def test_inventory_refresh_fails(httpserver, caplog_dkist, dataset, orchestrate_transfer_mock, error_code):
-    from dkist.net import conf
-
+def test_inventory_refresh_fails(
+        httpserver,
+        caplog_dkist,
+        dataset,
+        orchestrate_transfer_mock,
+        error_code,
+        httpserver_dataset_endpoint
+):
     dataset_id = dataset.meta["inventory"]["datasetId"]
 
     # Setup a happy path response
     exp = httpserver.expect_request("/datasets/v1", query_string={"datasetIds": dataset_id})
     exp.respond_with_data("Not Found", status=error_code)
-
-    # Tell the client to use the httpserver URL
-    conf.dataset_endpoint = httpserver.url_for("/datasets/")
 
     new_inv = dataset.files._get_inventory(dataset_id)
     assert ("dkist", logging.INFO, "Refreshing dataset inventory for dataset test_dataset") in caplog_dkist.record_tuples
