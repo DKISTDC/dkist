@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import dask.array as da
@@ -161,14 +162,18 @@ def test_reprs(file_manager):
 
 
 @pytest.fixture
+def mock_inventory_refresh(mocker):
+    return mocker.patch("dkist.io.file_manager.FileManager._get_inventory",
+                        return_value=None)
+
+
+@pytest.fixture
 def orchestrate_transfer_mock(mocker):
-    mocker.patch("dkist.io.file_manager.FileManager._get_inventory",
-                 return_value=None)
     return mocker.patch("dkist.net.helpers._orchestrate_transfer_task",
                        autospec=True)
 
 
-def test_download_default_keywords(dataset, orchestrate_transfer_mock):
+def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
     file_list = [*dataset.files.filenames, folder / "test_dataset.asdf", folder / "test_dataset.mp4", folder / "test_dataset.pdf"]
@@ -187,6 +192,51 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     )
 
 
+def test_inventory_refresh(httpserver, dataset, orchestrate_transfer_mock):
+    from dkist.net import conf
+
+    dataset_id = dataset.meta["inventory"]["datasetId"]
+
+    # Setup a happy path response
+    exp = httpserver.expect_request("/datasets/v1", query_string={"datasetIds": dataset_id})
+    exp.respond_with_json({"searchResults": [{"bucket": "notdata"}]})
+
+    # Tell the client to use the httpserver URL
+    conf.dataset_endpoint = httpserver.url_for("/datasets/")
+
+    new_inv = dataset.files._get_inventory(dataset_id)
+
+    assert new_inv == {"bucket": "notdata"}
+
+
+@pytest.mark.parametrize("error_code", [404, 202])
+def test_inventory_refresh_fails(httpserver, caplog_dkist, dataset, orchestrate_transfer_mock, error_code):
+    from dkist.net import conf
+
+    dataset_id = dataset.meta["inventory"]["datasetId"]
+
+    # Setup a happy path response
+    exp = httpserver.expect_request("/datasets/v1", query_string={"datasetIds": dataset_id})
+    exp.respond_with_data("Not Found", status=error_code)
+
+    # Tell the client to use the httpserver URL
+    conf.dataset_endpoint = httpserver.url_for("/datasets/")
+
+    new_inv = dataset.files._get_inventory(dataset_id)
+    assert ("dkist", logging.INFO, "Refreshing dataset inventory for dataset test_dataset") in caplog_dkist.record_tuples
+    if error_code == 404:
+        assert ("dkist",
+                logging.ERROR,
+                f"Inventory refresh failed with HTTP Error {error_code}: NOT FOUND") in caplog_dkist.record_tuples
+
+    if error_code == 202:
+        assert ("dkist",
+                logging.ERROR,
+                f"Inventory refresh failed with error code {error_code}") in caplog_dkist.record_tuples
+
+    assert new_inv is None
+
+
 @pytest.mark.parametrize("keywords", [
     {"progress": True, "wait": True, "destination_endpoint": None, "label": None},
     {"progress": True, "wait": False, "destination_endpoint": None, "label": None},
@@ -194,7 +244,7 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock):
     {"progress": False, "wait": True, "destination_endpoint": "wibble", "label": None},
     {"progress": False, "wait": True, "destination_endpoint": None, "label": "fibble"},
 ])
-def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
+def test_download_keywords(dataset, orchestrate_transfer_mock, mock_inventory_refresh, keywords):
     """
     Assert that keywords are passed through as expected
     """
@@ -217,7 +267,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, keywords):
         assert dataset.files.basepath == Path("/test/")
 
 
-def test_download_path_interpolation(dataset, orchestrate_transfer_mock):
+def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
     file_list = [*dataset.files.filenames, folder / "test_dataset.asdf", folder / "test_dataset.mp4", folder / "test_dataset.pdf"]

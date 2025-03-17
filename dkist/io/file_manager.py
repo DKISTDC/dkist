@@ -15,6 +15,7 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
+import json
 import urllib
 from typing import Any
 from pathlib import Path
@@ -332,7 +333,7 @@ class FileManager(BaseFileManager):
         from dkist.net import conf
 
         parsed = list(urllib.parse.urlparse(conf.dataset_endpoint))
-        parsed[2] = conf.dataset_search_path
+        parsed[2] = parsed[2] + conf.dataset_search_path
         parsed[4] = urllib.parse.urlencode({"datasetIds": datasetID})
         full_url = urllib.parse.urlunparse(parsed)
 
@@ -357,7 +358,7 @@ class FileManager(BaseFileManager):
             raise ValueError(
                 "This file manager has no associated Dataset object, "
                 "so the data can not be downloaded."
-            )
+            )  # pragma: no cover
         return self._ndcube.meta["inventory"]["datasetId"]
 
     @property
