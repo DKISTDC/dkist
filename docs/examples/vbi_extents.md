@@ -72,7 +72,7 @@ times = Time([d.global_coords["time"] for d in first_tiles.flat]).sort()
 And then download the AIA image closest to the time of the first tile within the range of all 9 tiles.
 
 ```{code-cell} ipython3
-results = Fido.search(a.Instrument.aia, a.Wavelength(171*u.AA), a.Time(times[0], times[1], times[0]))
+results = Fido.search(a.Instrument.aia, a.Wavelength(171*u.AA), a.Time(times[0], times[-1], times[0]))
 results
 ```
 
