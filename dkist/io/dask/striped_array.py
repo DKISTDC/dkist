@@ -13,6 +13,7 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
+import abc
 from typing import Any
 from pathlib import Path
 from collections.abc import Iterable
@@ -23,7 +24,7 @@ import numpy as np
 try:
     from numpy.typing import DTypeLike, NDArray
 except ImportError:
-    NDArray = DTypeLike = Iterable
+    NDArray = DTypeLike = Iterable  # type: ignore
 
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
@@ -33,10 +34,31 @@ from dkist.io.dask.utils import stack_loader_array
 __all__ = ["FileManager", "StripedExternalArray"]
 
 
-class BaseStripedExternalArray:
+class BaseStripedExternalArray(abc.ABC):
     """
     Implements shared functionality between FITSLoader and FITSLoaderView.
     """
+    target: Any
+    dtype: DTypeLike
+    shape: Iterable[int]
+    chunksize: Iterable[int] | None
+
+    @abc.abstractproperty
+    def fileuri_array(self) -> NDArray[np.str_]:
+        """
+        An array of relative (to ``basepath``) file uris.
+        """
+
+    # np.object_ isn't a generic so we can't type hint the actual type
+    # https://github.com/numpy/numpy/issues/25351
+    @abc.abstractproperty
+    def loader_array(self) -> NDArray[np.object_]:
+        """
+        An array of `.BaseFITSLoader` objects.
+
+        These loader objects implement the minimal array-like interface for
+        conversion to a dask array.
+        """
 
     def __len__(self) -> int:
         return self.loader_array.size
@@ -115,16 +137,16 @@ class StripedExternalArray(BaseStripedExternalArray):
     def ndim(self):
         return len(self.loader_array.shape)
 
+    @staticmethod
+    def _sanitize_basepath(value):
+        return Path(value).expanduser() if value is not None else None
+
     @property
     def basepath(self) -> os.PathLike:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
         return self._basepath
-
-    @staticmethod
-    def _sanitize_basepath(value):
-        return Path(value).expanduser() if value is not None else None
 
     @basepath.setter
     def basepath(self, value: os.PathLike | str | None):
@@ -133,14 +155,14 @@ class StripedExternalArray(BaseStripedExternalArray):
             loader.basepath = self._basepath
 
     @property
-    def fileuri_array(self) -> NDArray[str]:
+    def fileuri_array(self) -> NDArray[np.str_]:
         """
         An array of relative (to ``basepath``) file uris.
         """
         return self._fileuri_array
 
     @property
-    def loader_array(self) -> NDArray[BaseFITSLoader]:
+    def loader_array(self) -> NDArray[np.object_]:
         """
         An array of `.BaseFITSLoader` objects.
 
@@ -182,7 +204,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         self.parent.basepath = value
 
     @property
-    def fileuri_array(self) -> NDArray[str]:
+    def fileuri_array(self) -> NDArray[np.str_]:
         """
         An array of relative (to ``basepath``) file uris.
         """
@@ -191,7 +213,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         return np.array(self._fileuri_array[self.parent_slice])
 
     @property
-    def loader_array(self) -> NDArray[BaseFITSLoader]:
+    def loader_array(self) -> NDArray[np.object_]:
         """
         An array of `.BaseParent` objects.
 
