@@ -8,7 +8,7 @@ from dkist import net
 
 @pytest.fixture
 def mock_inventory_refresh(mocker):
-    return mocker.patch("dkist.io.file_manager.FileManager._get_inventory",
+    return mocker.patch("dkist.io.file_manager.DKISTFileManager._get_inventory",
                         return_value=None)
 
 
