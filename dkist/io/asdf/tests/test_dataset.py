@@ -70,8 +70,7 @@ def test_roundtrip_tiled_dataset(simple_tiled_dataset):
                          [
                              "dataset",
                              lf("simple_tiled_dataset"),
-                         ],
-                         indirect=False)
+                         ])
 def test_save_dataset_without_file_schema(tagobj, tmp_path):
     tree = {"dataset": tagobj}
     with asdf.AsdfFile(tree) as afile:
@@ -98,8 +97,7 @@ def test_asdf_tags(dataset, tmp_path):
                          [
                              lf("dataset"),
                              lf("simple_tiled_dataset"),
-                         ],
-                         indirect=False)
+                         ])
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
     tree = {"dataset": tagobj}
     with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
