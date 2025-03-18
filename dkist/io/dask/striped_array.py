@@ -181,7 +181,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
 
     def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
         self.parent = parent
-        self.parent_slice = aslice if isinstance(aslice, tuple) else (aslice,)
+        self.parent_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
 
     def __getattr__(self, attr):
         return getattr(self.parent, attr)

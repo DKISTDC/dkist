@@ -9,3 +9,4 @@ Each example is a self-contained tutorial working through one task.
   :maxdepth: 1
 
   reproject_vbi_mosaic
+  vbi_extents
