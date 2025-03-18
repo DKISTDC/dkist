@@ -329,15 +329,15 @@ class FileManager(BaseFileManager):
         return conf.download_endpoint
 
     @staticmethod
-    def _get_inventory(datasetID):
+    def _get_inventory(dataset_id):
         from dkist.net import conf
 
         parsed = list(urllib.parse.urlparse(conf.dataset_endpoint))
         parsed[2] = parsed[2] + conf.dataset_search_path
-        parsed[4] = urllib.parse.urlencode({"datasetIds": datasetID})
+        parsed[4] = urllib.parse.urlencode({"datasetIds": dataset_id})
         full_url = urllib.parse.urlunparse(parsed)
 
-        log.info("Refreshing dataset inventory for dataset %s", datasetID)
+        log.info("Refreshing dataset inventory for dataset %s", dataset_id)
         try:
             resp = urllib.request.urlopen(full_url, timeout=1)
         except urllib.error.HTTPError as e:
