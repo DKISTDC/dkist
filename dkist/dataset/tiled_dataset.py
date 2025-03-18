@@ -371,5 +371,4 @@ class TiledDataset(Collection):
         """
         A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
-
         return self._files
