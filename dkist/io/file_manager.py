@@ -9,7 +9,6 @@ from pathlib import Path
 from parfive import Downloader, Results
 
 from dkist.io.dask.striped_array import FileManager
-from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
 
@@ -38,8 +37,7 @@ class DKISTFileManager:
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
-
-    __slots__ = ["_fm", "_ndcube"]
+    __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
@@ -55,29 +53,13 @@ class DKISTFileManager:
         # be populated with a reference to that Dataset instance.
         # The name `_ndcube` comes from using NDCubeLinkedDescriptor in Dataset
         self._ndcube = parent_ndcube
-
-    # def __eq__(self, other):
-    #     return self._fm.__eq__(other)
+        self._inventory_cache = None
 
     def __len__(self):
         return self._fm.__len__()
 
-    # def __str__(self) -> str:
-    #     return self._fm.__str__()
-
-    # def __repr__(self) -> str:
-    #     return self._fm.__repr__()
-
     def __getitem__(self, item):
         return self._fm.__getitem__(item)
-
-    # @property
-    # def fileuri_array(self):
-    #     return self._fm.fileuri_array
-
-    # @property
-    # def shape(self):
-    #     return self._fm.shape
 
     @property
     def basepath(self) -> os.PathLike:
@@ -116,6 +98,51 @@ class DKISTFileManager:
 
         return conf.download_endpoint
 
+    @staticmethod
+    def _get_inventory(dataset_id):
+        from dkist.net import conf
+
+        parsed = list(urllib.parse.urlparse(conf.dataset_endpoint))
+        parsed[2] = parsed[2] + conf.dataset_search_path
+        parsed[4] = urllib.parse.urlencode({"datasetIds": dataset_id})
+        full_url = urllib.parse.urlunparse(parsed)
+
+        log.info("Refreshing dataset inventory for dataset %s", dataset_id)
+        try:
+            resp = urllib.request.urlopen(full_url, timeout=1)
+        except urllib.error.HTTPError as e:
+            log.error("Inventory refresh failed with %s", e)
+            return
+        if resp.code != 200:
+            log.error("Inventory refresh failed with error code %s", resp.code)
+            return
+
+        jresp = json.loads(resp.read())
+        results = jresp["searchResults"]
+        if len(results) == 1:
+            return results[0]
+
+    @property
+    def _dataset_id(self):
+        if self._ndcube is None:
+            raise ValueError(
+                "This file manager has no associated Dataset object, "
+                "so the data can not be downloaded."
+            )  # pragma: no cover
+        return self._ndcube.meta["inventory"]["datasetId"]
+
+    @property
+    def _inventory(self):
+        if self._inventory_cache is not None:
+            return self._inventory_cache
+
+        new_inv = self._get_inventory(self._dataset_id)
+        if new_inv is not None:
+            self._inventory_cache = new_inv
+            return new_inv
+
+        return self._ndcube.meta["inventory"]
+
     def quality_report(self, path: str | os.PathLike | None = None, overwrite: bool = None) -> Results:
         """
         Download the quality report PDF.
@@ -138,13 +165,12 @@ class DKISTFileManager:
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
-        url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
+        url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
-    def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool = None) -> Results:
+    def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool | None = None) -> Results:
         """
         Download the preview movie.
 
@@ -166,8 +192,7 @@ class DKISTFileManager:
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
-        url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
+        url = f"{self._metadata_streamer_url}/movie?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
@@ -225,10 +250,7 @@ class DKISTFileManager:
         from dkist.net import conf as net_conf
         from dkist.net.helpers import _orchestrate_transfer_task
 
-        if self._ndcube is None:
-            raise ValueError("This file manager has no associated Dataset object, so the data can not be downloaded.")
-
-        inv = self._ndcube.meta["inventory"]
+        inv = self._inventory
         path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
