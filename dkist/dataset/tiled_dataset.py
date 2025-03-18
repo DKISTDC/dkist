@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import os
 import types
 import warnings
 from typing import Literal
@@ -18,8 +19,6 @@ from matplotlib.gridspec import GridSpec
 import astropy
 from astropy.table import vstack
 
-from dkist.io.dask.loaders import AstropyFITSLoader
-from dkist.io.dask.striped_array import FileManager, StripedExternalArray
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
@@ -27,6 +26,35 @@ from .dataset import Dataset
 from .utils import dataset_info_str
 
 __all__ = ["TiledDataset"]
+
+
+class TiledDatasetFileManager:
+    """
+    Manage the collection of FITS files backing a `~dkist.TiledDataset`.
+    """
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    @property
+    def basepath(self) -> os.PathLike:
+        """
+        The path all arrays read data from.
+        """
+        basepath = self._parent.flat[0].files.basepath
+        for tile in self._parent.flat:
+            if basepath != tile.files.basepath:
+                raise ValueError("Not all tiles share the same basepath. Use 'TiledDataset.files.basepath = <new_path>' to set basepath on all tiles.")
+        return basepath
+
+    @basepath.setter
+    def basepath(self, basepath: str | os.PathLike):
+        for tile in self._parent.flat:
+            tile.files.basepath = basepath
+
+    @property
+    def filenames(self):
+        return np.array([tile.files.filenames for tile in self._parent.flat]).flatten().tolist()
 
 
 class TiledDatasetSlicer:
@@ -104,6 +132,7 @@ class TiledDataset(Collection):
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
+        self._files = DKISTFileManager(TiledDatasetFileManager(parent=self))
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -342,31 +371,5 @@ class TiledDataset(Collection):
         """
         A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
-        fileuris = [[tile.files.filenames for tile in row] for row in self]
-        dtype = self[0, 0].files.fileuri_array.dtype
-        shape = self[0, 0].files.shape
-        basepath = self[0, 0].files.basepath
-        chunksize = self[0, 0]._data.chunksize
 
-        for tile in self.flat:
-            try:
-                assert dtype == tile.files.fileuri_array.dtype
-                assert shape == tile.files.shape
-                assert basepath == tile.files.basepath
-                assert chunksize == tile._data.chunksize
-            except AssertionError as err:
-                raise AssertionError("Attributes of TiledDataset.FileManager must be the same across all tiles.") from err
-
-        return DKISTFileManager(
-            FileManager(
-                StripedExternalArray(
-                    fileuris=fileuris,
-                    target=1,
-                    dtype=dtype,
-                    shape=shape,
-                    loader=AstropyFITSLoader,
-                    basepath=basepath,
-                    chunksize=chunksize
-                )
-            )
-        )
+        return self._files

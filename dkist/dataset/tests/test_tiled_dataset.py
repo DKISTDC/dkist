@@ -189,15 +189,11 @@ def test_file_manager(large_tiled_dataset):
         ds.files = 10
 
     assert len(ds.files.filenames) == 27
-    assert ds.files.shape == (1, 4096, 4096)
-    assert ds.files.output_shape == (3, 3, 3, 4096, 4096)
 
     # Have some slicing tests here
     assert len(ds.slice_tiles[0].files.filenames) == 9
     assert len(ds[:2, :2].files.filenames) == 12
 
-    # TODO Also test that the other checks raise errors
-    # This at least demonstrates that the structure works
-    ds[1, 1].files.fileuri_array.dtype = np.dtype("<i")
-    with pytest.raises(AssertionError, match="must be the same across all tiles"):
-        ds.files
+    ds[1, 1].files.basepath = "/not/a/dir/"
+    with pytest.raises(ValueError, match="Not all tiles share the same basepath"):
+        ds.files.basepath
