@@ -1,0 +1,1 @@
+Dataset inventory is now refreshed before downloading FITS files with globus to ensure that any data which has been moved at the data center is still downloaded correctly.

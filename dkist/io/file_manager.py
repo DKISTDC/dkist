@@ -15,6 +15,8 @@ view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
 import os
+import json
+import urllib
 from typing import Any
 from pathlib import Path
 from collections.abc import Iterable
@@ -30,6 +32,7 @@ except ImportError:
 
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
+from dkist import log
 from dkist.io.dask_utils import stack_loader_array
 from dkist.io.loaders import BaseFITSLoader
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
@@ -309,13 +312,14 @@ class FileManager(BaseFileManager):
     retrieving these FITS files, as well as specifying where to load these
     files from.
     """
-    __slots__ = ["_ndcube"]
+    __slots__ = ["_inventory_cache", "_ndcube"]
 
     def __init__(self, fits_loader: StripedExternalArray):
         super().__init__(fits_loader)
         # When this object is attached to a Dataset object this attribute will
         # be populated with a reference to that Dataset instance.
         self._ndcube = None
+        self._inventory_cache = None
 
     @property
     def _metadata_streamer_url(self):
@@ -324,7 +328,52 @@ class FileManager(BaseFileManager):
 
         return conf.download_endpoint
 
-    def quality_report(self, path=None, overwrite=None):
+    @staticmethod
+    def _get_inventory(dataset_id):
+        from dkist.net import conf
+
+        parsed = list(urllib.parse.urlparse(conf.dataset_endpoint))
+        parsed[2] = parsed[2] + conf.dataset_search_path
+        parsed[4] = urllib.parse.urlencode({"datasetIds": dataset_id})
+        full_url = urllib.parse.urlunparse(parsed)
+
+        log.info("Refreshing dataset inventory for dataset %s", dataset_id)
+        try:
+            resp = urllib.request.urlopen(full_url, timeout=1)
+        except urllib.error.HTTPError as e:
+            log.error("Inventory refresh failed with %s", e)
+            return
+        if resp.code != 200:
+            log.error("Inventory refresh failed with error code %s", resp.code)
+            return
+
+        jresp = json.loads(resp.read())
+        results = jresp["searchResults"]
+        if len(results) == 1:
+            return results[0]
+
+    @property
+    def _dataset_id(self):
+        if self._ndcube is None:
+            raise ValueError(
+                "This file manager has no associated Dataset object, "
+                "so the data can not be downloaded."
+            )  # pragma: no cover
+        return self._ndcube.meta["inventory"]["datasetId"]
+
+    @property
+    def _inventory(self):
+        if self._inventory_cache is not None:
+            return self._inventory_cache
+
+        new_inv = self._get_inventory(self._dataset_id)
+        if new_inv is not None:
+            self._inventory_cache = new_inv
+            return new_inv
+
+        return self._ndcube.meta["inventory"]
+
+    def quality_report(self, path: str | os.PathLike | None = None, overwrite: bool | None = None):
         """
         Download the quality report PDF.
 
@@ -346,24 +395,23 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
-        url = f"{self._metadata_streamer_url}/quality?datasetId={dataset_id}"
+        url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
-    def preview_movie(self, path=None, overwrite=None):
+    def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool | None = None):
         """
         Download the preview movie.
 
         Parameters
         ----------
-        path: `str` or `pathlib.Path`
+        path
             The destination path to save the file to. See
             `parfive.Downloader.simple_download` for details.
             The default path is ``.basepath``, if ``.basepath`` is None it will
             default to `~/`.
-        overwrite: `bool`
+        overwrite
             Set to `True` to overwrite file if it already exists. See
             `parfive.Downloader.simple_download` for details.
 
@@ -374,19 +422,25 @@ class FileManager(BaseFileManager):
             downloaded file if the download was successful, and any errors if it
             was not.
         """
-        dataset_id = self._ndcube.meta["inventory"]["datasetId"]
-        url = f"{self._metadata_streamer_url}/movie?datasetId={dataset_id}"
+        url = f"{self._metadata_streamer_url}/movie?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
-    def download(self, path=None, destination_endpoint=None, progress=True, wait=True, label=None):
+    def download(
+        self,
+        path: str | os.PathLike | None = None,
+        destination_endpoint: str = None,
+        progress: bool = True,
+        wait: bool = True,
+        label: str = None,
+    ):
         """
         Start a Globus file transfer for all files in this Dataset.
 
         Parameters
         ----------
-        path : `pathlib.Path` or `str`, optional
+        path
             The path to save the data in, must be accessible by the Globus
             endpoint.
             The default value is ``.basepath``, if ``.basepath`` is None it will
@@ -402,36 +456,31 @@ class FileManager(BaseFileManager):
             argument, so that the array can be read from your transferred
             files.
 
-        destination_endpoint : `str`, optional
+        destination_endpoint
             A unique specifier for a Globus endpoint. If `None` a local
             endpoint will be used if it can be found, otherwise an error will
             be raised. See `~dkist.net.globus.get_endpoint_id` for valid
             endpoint specifiers.
 
-        progress : `bool` or `str`, optional
+        progress
            If `True` status information and a progress bar will be displayed
            while waiting for the transfer to complete.
            If ``progress="verbose"`` then all globus events generated during
            the transfer will be shown (by default only error messages are
            shown.)
 
-        wait : `bool`, optional
+        wait
             If `False` then the function will return while the Globus transfer task
             is still running. Setting ``wait=False`` implies ``progress=False``.
 
-        label : `str`
+        label
             Label for the Globus transfer. If `None` then a default will be used.
         """
         # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
         from dkist.net import conf as net_conf
         from dkist.net.helpers import _orchestrate_transfer_task
 
-        if self._ndcube is None:
-            raise ValueError(
-                "This file manager has no associated Dataset object, so the data can not be downloaded."
-            )
-
-        inv = self._ndcube.meta["inventory"]
+        inv = self._inventory
         path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
