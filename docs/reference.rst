@@ -22,7 +22,7 @@ Reference / API
    :headings: ^#
    :no-inheritance-diagram:
 
-.. automodapi:: dkist.io.dask.loaders
+.. automodapi:: dkist.io.dask
    :headings: #~
 
 .. automodapi:: dkist.wcs
