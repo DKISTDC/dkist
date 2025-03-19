@@ -1,6 +1,5 @@
 import re
 import copy
-from pathlib import PosixPath
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -198,12 +197,3 @@ def test_file_manager(large_tiled_dataset):
     ds[1, 1].files.basepath = "/not/a/dir/"
     with pytest.raises(ValueError, match="Not all tiles share the same basepath"):
         ds.files.basepath
-
-
-def test_file_manager_basepath_setter(simple_tiled_dataset):
-    ds = simple_tiled_dataset
-    old_basepaths = np.array([tile.files.basepath for tile in ds.flat])
-    ds.files.basepath = "/some_new_path/"
-    new_basepaths = np.array([tile.files.basepath for tile in ds.flat])
-    assert (old_basepaths != new_basepaths).all()
-    assert (new_basepaths == PosixPath("/some_new_path/")).all()

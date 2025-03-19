@@ -201,3 +201,35 @@ def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
         [f"{conf.download_endpoint}/movie?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
         **kwargs
     )
+
+
+def test_tiled_file_manager_basepath_setter(simple_tiled_dataset):
+    ds = simple_tiled_dataset
+    old_basepaths = np.array([tile.files.basepath for tile in ds.flat])
+    ds.files.basepath = "/some_new_path/"
+    new_basepaths = np.array([tile.files.basepath for tile in ds.flat])
+    assert (old_basepaths != new_basepaths).all()
+    assert (new_basepaths == PosixPath("/some_new_path/")).all()
+
+
+def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_mock, mock_inventory_refresh):
+    ds = large_tiled_dataset
+    base_path = Path(net.conf.dataset_path.format(**ds.meta["inventory"]))
+    folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**ds.meta["inventory"]))
+    file_list = [*ds.files.filenames,
+                 folder / "VBI_L1_20231016T184519_AJQWW.asdf",
+                 folder / "{datasetId}.mp4".format(**ds.meta["inventory"]),
+                 folder / "{datasetId}.pdf".format(**ds.meta["inventory"])]
+    file_list = [base_path / fn for fn in file_list]
+
+    ds.files.download()
+
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=False,
+        destination_path=ds.files.basepath,
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+        label=None,
+    )
