@@ -132,7 +132,7 @@ class TiledDataset(Collection):
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
-        self._files = DKISTFileManager(TiledDatasetFileManager(parent=self))
+        self._files = DKISTFileManager(TiledDatasetFileManager(parent=self), parent_ndcube=self)
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
