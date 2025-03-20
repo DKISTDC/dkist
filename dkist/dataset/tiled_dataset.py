@@ -272,7 +272,7 @@ class TiledDataset(Collection):
         for col in range(dataset_ncols):
             for row in range(dataset_nrows):
                 tile = sliced_dataset[col, row]
-                if not isinstance(tile, Dataset):
+                if isinstance(tile, np.ma.core.MaskedConstant):
                     continue
 
                 # Fill up grid from the bottom row
