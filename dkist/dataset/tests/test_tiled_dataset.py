@@ -122,6 +122,20 @@ def test_tileddataset_plot(share_zscale):
 
     return plt.gcf()
 
+
+@figure_test
+@pytest.mark.remote_data
+def test_masked_tileddataset_plot():
+    from dkist.data.sample import VBI_AJQWW
+    ds = load_dataset(VBI_AJQWW)
+    ds._data.mask[:2, 0] = True
+    ds._data.mask[0, 1] = True
+
+    fig = plt.figure(figsize=(12, 15))
+    ds.plot(0, figure=fig)
+    return plt.gcf()
+
+
 @figure_test
 @pytest.mark.remote_data
 @pytest.mark.parametrize("swap_tile_limits", ["x", "y", "xy", None])

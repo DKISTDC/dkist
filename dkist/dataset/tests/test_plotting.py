@@ -31,10 +31,3 @@ def test_2d_plot2(dataset_3d):
     fig = plt.figure()
     dataset_3d[:, :, 0].plot(axes_units=["Angstrom", "deg", "deg"])
     return fig
-
-
-@figure_test
-def test_tiled_dataset(large_tiled_dataset):
-    fig = plt.figure()
-    large_tiled_dataset.plot(1)
-    return
