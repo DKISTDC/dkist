@@ -323,7 +323,7 @@ def large_tiled_dataset(tmp_path_factory, request):
         with open(vbidir / "test_vbi.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     ds = load_dataset(vbidir / "test_vbi.asdf")
-    ds._data.mask = request.param
+    ds.mask = request.param
     return ds
 
 
