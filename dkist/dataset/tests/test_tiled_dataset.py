@@ -14,21 +14,42 @@ def test_tiled_dataset(simple_tiled_dataset, dataset):
     assert isinstance(simple_tiled_dataset, TiledDataset)
     assert simple_tiled_dataset._data[0, 0] in simple_tiled_dataset
     assert 5 not in simple_tiled_dataset
-    assert all(isinstance(t, Dataset) for t in simple_tiled_dataset.flat)
     assert all(t.shape == (2,) for t in simple_tiled_dataset)
     assert simple_tiled_dataset.inventory is dataset.meta["inventory"]
     assert simple_tiled_dataset.shape == (2, 2)
 
 
+def test_tileddataset_flat(simple_tiled_dataset):
+    assert isinstance(simple_tiled_dataset.flat, TiledDataset)
+    assert all(isinstance(t, Dataset) for t in simple_tiled_dataset.flat)
+    assert not simple_tiled_dataset.flat.mask.all()
+
+
 @pytest.mark.accept_cli_tiled_dataset
-@pytest.mark.parametrize("aslice", [np.s_[0,0],
+@pytest.mark.parametrize("aslice", [np.s_[0, 0],
                                     np.s_[0],
-                                    np.s_[...,0],
-                                    np.s_[:,1],
-                                    np.s_[1,1],
+                                    np.s_[..., 0],
+                                    np.s_[:, 1],
+                                    np.s_[0, 1],
+                                    np.s_[1, 0],
                                     np.s_[0:2, :]])
 def test_tiled_dataset_slice(simple_tiled_dataset, aslice):
-    assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
+    if simple_tiled_dataset.mask[aslice].all():
+        # If a test case is added where more than one tile is returned
+        # here and they are all masked this will probably fail.
+        assert simple_tiled_dataset[aslice] is np.ma.masked
+    else:
+        assert np.all(simple_tiled_dataset[aslice] == simple_tiled_dataset._data[aslice])
+
+
+def test_tiled_dataset_mask(simple_tiled_dataset):
+    assert isinstance(simple_tiled_dataset.mask, np.ndarray)
+    new_mask = np.zeros_like(simple_tiled_dataset.mask, dtype=np.bool_)
+    simple_tiled_dataset.mask[0, 0] = False
+    assert not simple_tiled_dataset.mask[0, 0]
+
+    simple_tiled_dataset.mask = new_mask
+    assert not simple_tiled_dataset.mask.any()
 
 
 @pytest.mark.accept_cli_tiled_dataset

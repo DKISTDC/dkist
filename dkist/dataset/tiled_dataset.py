@@ -8,13 +8,14 @@ not contiguous in the spatial dimensions (due to overlaps and offsets).
 import os
 import types
 import warnings
-from typing import Literal
+from typing import Any, Literal
 from textwrap import dedent
 from collections.abc import Collection
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
+from numpy.typing import NDArray
 
 import astropy
 from astropy.table import vstack
@@ -96,6 +97,18 @@ class TiledDataset(Collection):
         data. This functionality will be added in the future, see the reproject
         and montage packages for possible ways to achieve this.
 
+    Parameters
+    ----------
+    dataset_array
+        A numpy object array of Dataset objects. If ``mask=`` is
+        provided elements where the mask is `True` will be ignored so
+        can be other types, such as `None`.
+    mask
+        A numpy boolean array, `True` is masked.
+    meta
+        Associated metadata, the ``"inventory"`` key is used for
+        dataset inventory, and is required for download of FITS files
+        etc to work.
     """
 
     @classmethod
@@ -120,7 +133,14 @@ class TiledDataset(Collection):
 
         return cls(datasets, meta={"inventory": inventory})
 
-    def __init__(self, dataset_array, inventory=None, mask=None, *, meta=None):
+    def __init__(
+        self,
+        dataset_array: NDArray[np.object_],
+        inventory: dict[Any, Any] | None = None,
+        mask: NDArray[np.bool_] | None = None,
+        *,
+        meta: dict[Any, Any] | None = None
+    ):
         if inventory is not None:
             warnings.warn(
                 "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
@@ -148,7 +168,7 @@ class TiledDataset(Collection):
         if isinstance(new_data, (Dataset, np.ma.core.MaskedConstant)):
             return new_data
 
-        return type(self)(new_data.data, meta=self.meta, mask=new_data.mask)
+        return type(self)(new_data.data, mask=new_data.mask, meta=self.meta)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
@@ -163,6 +183,19 @@ class TiledDataset(Collection):
             if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
                 raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
         return True
+
+    @property
+    def mask(self):
+        """
+        The mask for tiles in this dataset.
+
+        An element where the mask is `True` will ignore any dataset in that tile position.
+        """
+        return self._data.mask
+
+    @mask.setter
+    def mask(self, value):
+        self._data.mask = value
 
     @property
     def flat(self):
