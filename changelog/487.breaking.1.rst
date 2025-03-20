@@ -1,0 +1,2 @@
+``dkist.io.file_manager.BaseFileManager`` has been renamed ``dkist.io.dask.striped_array.FileManager``.
+In addition the DKIST specific functionality that was implemented in ``dkist.io.file_manager.FileManager`` is now in the ``dkist.io.file_manager.DKISTFileManager``, which now instead of being a subclass of ``BaseFileManager`` now encapsulates a ``dkist.io.dask.striped_array.FileManager`` object (or similar object).
