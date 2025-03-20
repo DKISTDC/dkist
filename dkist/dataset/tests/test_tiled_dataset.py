@@ -188,11 +188,13 @@ def test_file_manager(large_tiled_dataset):
     with pytest.raises(AttributeError):
         ds.files = 10
 
-    assert len(ds.files.filenames) == 27
+    assert len(ds.files.filenames) == np.array([len(tile.files.filenames) for tile in ds.flat]).sum()
 
-    # Have some slicing tests here
-    assert len(ds.slice_tiles[0].files.filenames) == 9
-    assert len(ds[:2, :2].files.filenames) == 12
+    # Test slices in various directions
+    first_frames = ds.slice_tiles[0]
+    assert len(first_frames.files.filenames) == len(first_frames.flat)
+    small_mosaic = ds[:2, :2]
+    assert len(small_mosaic.files.filenames) == np.array([len(tile.files.filenames) for tile in small_mosaic.flat]).sum()
 
     ds[1, 1].files.basepath = "/not/a/dir/"
     with pytest.raises(ValueError, match="Not all tiles share the same basepath"):

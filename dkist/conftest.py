@@ -317,12 +317,14 @@ def simple_tiled_dataset(dataset, request):
                          [True, False, True],
                          [False, True, False]]],
                 ids=["large-nomask", "large-masked"])
-def large_tiled_dataset(tmp_path_factory):
+def large_tiled_dataset(tmp_path_factory, request):
     vbidir = tmp_path_factory.mktemp("data")
     with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
         with open(vbidir / "test_vbi.asdf", mode="wb") as afo:
             afo.write(gfo.read())
-    return load_dataset(vbidir / "test_vbi.asdf")
+    ds = load_dataset(vbidir / "test_vbi.asdf")
+    ds._data.mask = request.param
+    return ds
 
 
 @pytest.fixture
