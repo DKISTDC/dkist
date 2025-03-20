@@ -1,5 +1,0 @@
-A major refactor of the ``FileManager`` code has taken place, the following subpackages have been renamed:
-
-* ``dkist.io.loaders`` is now ``dkist.io.dask.loaders``.
-* ``dkist.io.dask_utils`` is now ``dkist.io.dask.utils``.
-* ``dkist.io.file_manager`` is now ``dkist.io.striped_array`` (apart from DKIST specific functionality, which is still in ``dkist.io.file_manager``).

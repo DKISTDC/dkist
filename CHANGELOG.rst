@@ -1,3 +1,44 @@
+1.11 (2025-03-20)
+=================
+
+Backwards Incompatible Changes
+------------------------------
+
+- A major refactor of the ``FileManager`` code has taken place, the following subpackages have been renamed:
+
+  * ``dkist.io.loaders`` is now ``dkist.io.dask.loaders``.
+  * ``dkist.io.dask_utils`` is now ``dkist.io.dask.utils``.
+  * ``dkist.io.file_manager`` is now ``dkist.io.striped_array`` (apart from DKIST specific functionality, which is still in ``dkist.io.file_manager``). (`#487 <https://github.com/DKISTDC/dkist/pull/487>`__)
+- ``dkist.io.file_manager.BaseFileManager`` has been renamed ``dkist.io.dask.striped_array.FileManager``.
+  In addition the DKIST specific functionality that was implemented in ``dkist.io.file_manager.FileManager`` is now in the ``dkist.io.file_manager.DKISTFileManager``, which now instead of being a subclass of ``BaseFileManager`` now encapsulates a ``dkist.io.dask.striped_array.FileManager`` object (or similar object). (`#487 <https://github.com/DKISTDC/dkist/pull/487>`__)
+
+
+Features
+--------
+
+- Add support to `dkist.TiledDataset` for mosaic datasets with missing tiles or where tiles are irregularly arranged.
+  This includes adding a new `dkist.TiledDataset.mask` which is a numpy array, where `True` values are masked. (`#487 <https://github.com/DKISTDC/dkist/pull/487>`__)
+
+
+Bug Fixes
+---------
+
+- Fix issue issue causing Globus to intermittently fail after auth. (`#533 <https://github.com/DKISTDC/dkist/pull/533>`__)
+- Dataset inventory is now refreshed before downloading FITS files with globus to ensure that any data which has been moved at the data center is still downloaded correctly. (`#539 <https://github.com/DKISTDC/dkist/pull/539>`__)
+
+
+Improved Documentation
+----------------------
+
+- Added an example of plotting the bounding boxes of VBI datasets on AIA data. (`#492 <https://github.com/DKISTDC/dkist/pull/492>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- A new version of the ASDF schema and tag for `dkist.TiledDataset`, v1.2.0 is added, along with a new dkist manifest v1.4.0. (`#487 <https://github.com/DKISTDC/dkist/pull/487>`__)
+
+
 1.10.1 (2025-02-18)
 ===================
 
