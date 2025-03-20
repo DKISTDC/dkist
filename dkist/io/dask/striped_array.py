@@ -20,11 +20,7 @@ from collections.abc import Iterable
 
 import dask.array
 import numpy as np
-
-try:
-    from numpy.typing import DTypeLike, NDArray
-except ImportError:
-    NDArray = DTypeLike = Iterable  # type: ignore
+from numpy.typing import DTypeLike, NDArray
 
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
