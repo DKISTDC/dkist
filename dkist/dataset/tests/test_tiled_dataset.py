@@ -201,7 +201,7 @@ def test_repr(simple_tiled_dataset):
 
 @pytest.mark.accept_cli_tiled_dataset
 def test_tiles_shape(simple_tiled_dataset):
-    assert simple_tiled_dataset.tiles_shape == [[tile.data.shape for tile in row] for row in simple_tiled_dataset]
+    assert simple_tiled_dataset.tiles_shape == [tuple(tile.data.shape for tile in row) for row in simple_tiled_dataset]
 
 
 def test_file_manager(large_tiled_dataset):
