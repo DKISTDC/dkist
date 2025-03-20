@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from dkist import net
@@ -209,7 +210,7 @@ def test_tiled_file_manager_basepath_setter(simple_tiled_dataset):
     ds.files.basepath = "/some_new_path/"
     new_basepaths = np.array([tile.files.basepath for tile in ds.flat])
     assert (old_basepaths != new_basepaths).all()
-    assert (new_basepaths == PosixPath("/some_new_path/")).all()
+    assert (new_basepaths == Path("/some_new_path/")).all()
 
 
 def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_mock, mock_inventory_refresh):
