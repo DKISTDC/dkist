@@ -145,10 +145,10 @@ class TiledDataset(Collection):
 
     def __getitem__(self, aslice):
         new_data = self._data[aslice]
-        if isinstance(new_data, Dataset):
+        if isinstance(new_data, (Dataset, np.ma.core.MaskedConstant)):
             return new_data
 
-        return type(self)(new_data, meta=self.meta)
+        return type(self)(new_data.data, meta=self.meta, mask=new_data.mask)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
@@ -272,6 +272,8 @@ class TiledDataset(Collection):
         for col in range(dataset_ncols):
             for row in range(dataset_nrows):
                 tile = sliced_dataset[col, row]
+                if not isinstance(tile, Dataset):
+                    continue
 
                 # Fill up grid from the bottom row
                 ax_gridspec = gridspec[dataset_nrows - row - 1, col]
