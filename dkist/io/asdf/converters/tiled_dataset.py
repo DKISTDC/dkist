@@ -8,6 +8,7 @@ class TiledDatasetConverter(Converter):
         "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.0.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.1.0",
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.2.0",
     ]
     types = ["dkist.dataset.tiled_dataset.TiledDataset"]
 
@@ -19,7 +20,8 @@ class TiledDatasetConverter(Converter):
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
 
-        return TiledDataset(node["datasets"], meta=meta)
+        mask = node.get("mask", None)
+        return TiledDataset(node["datasets"], mask=mask, meta=meta)
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
         tree = {}
@@ -29,4 +31,5 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         tree["datasets"] = tiled_dataset._data.tolist()
+        tree["mask"] = tiled_dataset.mask
         return tree
