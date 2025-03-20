@@ -1,0 +1,1 @@
+A new version of the ASDF schema and tag for `dkist.TiledDataset`, v1.2.0 is added, along with a new dkist manifest v1.4.0.
