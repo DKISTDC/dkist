@@ -313,9 +313,9 @@ def simple_tiled_dataset(dataset, request):
 
 
 @pytest.fixture(params=[False,
-                        [[False, True, False],
-                         [True, False, True],
-                         [False, True, False]]],
+                        [[True, True, False],
+                         [True, False, False],
+                         [False, False, False]]],
                 ids=["large-nomask", "large-masked"])
 def large_tiled_dataset(tmp_path_factory, request):
     vbidir = tmp_path_factory.mktemp("data")
