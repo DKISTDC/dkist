@@ -133,7 +133,7 @@ def test_masked_tileddataset_plot():
 
     fig = plt.figure(figsize=(12, 15))
     ds.plot(0, figure=fig)
-    return plt.gcf()
+    return fig
 
 
 @figure_test
