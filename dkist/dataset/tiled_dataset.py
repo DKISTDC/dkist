@@ -8,17 +8,18 @@ not contiguous in the spatial dimensions (due to overlaps and offsets).
 import os
 import types
 import warnings
-from typing import Any, Literal
+from typing import Any, Self, Literal
 from textwrap import dedent
-from collections.abc import Collection
+from collections.abc import Iterable, Collection
 
+import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 from numpy.typing import NDArray
 
 import astropy
-from astropy.table import vstack
+from astropy.table import Table, vstack
 
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
@@ -54,7 +55,7 @@ class TiledDatasetFileManager:
             tile.files.basepath = basepath
 
     @property
-    def filenames(self):
+    def filenames(self) -> list[str]:
         return np.array([tile.files.filenames for tile in self._parent.flat]).flatten().tolist()
 
 
@@ -185,7 +186,7 @@ class TiledDataset(Collection):
         return True
 
     @property
-    def mask(self):
+    def mask(self) -> NDArray[np.bool_]:
         """
         The mask for tiles in this dataset.
 
@@ -194,32 +195,32 @@ class TiledDataset(Collection):
         return self._data.mask
 
     @mask.setter
-    def mask(self, value):
+    def mask(self, value: NDArray[np.bool_]):
         self._data.mask = value
 
     @property
-    def flat(self):
+    def flat(self) -> Self:
         """
         Represent this `.TiledDataset` as a 1D array.
         """
         return type(self)(self._data.compressed(), meta=self.meta)
 
     @property
-    def meta(self):
+    def meta(self) -> dict[Any, Any]:
         """
         A dictionary of extra metadata about the dataset.
         """
         return self._meta
 
     @property
-    def inventory(self):
+    def inventory(self) -> dict[str, Any]:
         """
         The inventory record as kept by the data center for this dataset.
         """
         return self._meta["inventory"]
 
     @property
-    def combined_headers(self):
+    def combined_headers(self) -> Table:
         """
         A single `astropy.table.Table` containing all the FITS headers for all
         files in this dataset.
@@ -227,18 +228,18 @@ class TiledDataset(Collection):
         return vstack([ds.meta["headers"] for ds in self._data.compressed()])
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, int]:
         """
         The shape of the tiled grid.
         """
         return self._data.shape
 
     @property
-    def tiles_shape(self):
+    def tiles_shape(self) -> list[tuple[int, ...]]:
         """
         The shape of each individual tile in the TiledDataset.
         """
-        return [[tile.data.shape for tile in row] for row in self]
+        return [tuple(tile.data.shape for tile in row) for row in self]
 
     @staticmethod
     def _get_axislabels(ax):
@@ -254,24 +255,31 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    def plot(self, slice_index, share_zscale=False, figure=None, swap_tile_limits: Literal["x", "y", "xy"] | None = None, **kwargs):
+    def plot(
+        self,
+        slice_index: int | slice | Iterable[int | slice],
+        share_zscale: bool = False,
+        figure: matplotlib.figure.Figure | None = None,
+        swap_tile_limits: Literal["x", "y", "xy"] | None = None,
+        **kwargs
+    ):
         """
         Plot a slice of each tile in the TiledDataset
 
         Parameters
         ----------
-        slice_index : `int`, sequence of `int`s or `numpy.s_`
+        slice_index
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
             `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
-        share_zscale : `bool`
+        share_zscale
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
             Defaults to False
-        figure : `matplotlib.figure.Figure`
+        figure
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
-        swap_tile_limits : `"x", "y", "xy"` or `None` (default)
+        swap_tile_limits
             Invert the axis limits of each tile. Either the "x" or "y" axis limits can be inverted separately, or they
             can both be inverted with "xy". This option is useful if the orientation of the tile data arrays is flipped
             w.r.t. the WCS orientation implied by the mosaic keys. For example, most DL-NIRSP data should be plotted with
@@ -402,8 +410,8 @@ class TiledDataset(Collection):
         return dataset_info_str(self)
 
     @property
-    def files(self):
+    def files(self) -> DKISTFileManager:
         """
-        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
+        A `~.DKISTFileManager` helper for interacting with the files backing the data in this `.TiledDataset`.
         """
         return self._files
