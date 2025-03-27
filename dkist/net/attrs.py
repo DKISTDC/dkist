@@ -28,6 +28,7 @@ __all__ = [
     "Page",
     "PageSize",
     "PolarimetricAccuracy",
+    "ProductID",
     "Proposal",
     "Recipe",
     "SpatialSampling",
@@ -469,3 +470,17 @@ class HeaderVersion(_SimpleAttr):
     """
     def __init__(self, version: str):
         super().__init__(version)
+
+
+#productID
+class ProductID(_SimpleAttr):
+    """
+    Unique identifier for a dataset's set of uncalibrated science frames.
+
+    Parameters
+    ----------
+    product_id : `str`
+        A random unique identifier for a dataset.
+    """
+    def __init__(self, product_id: str):
+        super().__init__(product_id)
