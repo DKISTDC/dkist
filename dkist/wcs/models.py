@@ -360,14 +360,14 @@ class BaseVaryingCelestialTransform(Model, ABC):
         # NB: x and y are normally on the detector and z is typically the number of raster steps
         if self._is_inverse:
             dims = ["z", "q", "m"]
-            {d: u.pix for d in dims[:self.n_inputs]}
+            dict.fromkeys(dims[:self.n_inputs], u.pix)
             units = {"lon": u.deg, "lat": u.deg}
             for d in dims[:self.n_inputs-2]:
                 units[d] = u.pix
             return units
 
         dims = ["x", "y", "z", "q", "m"]
-        return {d: u.pix for d in dims[:self.n_inputs]}
+        return dict.fromkeys(dims[:self.n_inputs], u.pix)
 
 
 class VaryingCelestialTransform(BaseVaryingCelestialTransform):
