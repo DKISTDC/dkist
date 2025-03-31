@@ -240,3 +240,8 @@ def _(wlk, attr, params):
 @walker.add_applier(ProductID)
 def _(wlk, attr, params):
     return params.update({"productIds": attr.value})
+
+
+@walker.add_applier(ProductID)
+def _(wlk, attr, params):
+    return params.update({"productIds": attr.value})
