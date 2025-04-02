@@ -60,6 +60,8 @@ def load_dataset(target):
     This VISP Dataset BKPLX consists of 1700 frames.
     Files are stored in ...VISP_BKPLX
     <BLANKLINE>
+    This calibration has Dataset ID BKPLX and the original frames have Product ID (L1-KMUPT).
+    <BLANKLINE>
     This Dataset has 4 pixel and 5 world dimensions.
     <BLANKLINE>
     The data are represented by a <class 'dask.array.core.Array'> object:
