@@ -372,7 +372,7 @@ class TiledDataset(Collection):
             consists of 9 frames.
             Files are stored in ...
 
-            This calibration has Dataset ID AJQWW and the original frames have Product ID L1-NZJTB.
+            This calibration has Dataset ID AJQWW and the original frames have Product ID ...
 
             Each Dataset has 2 pixel and 2 world dimensions.
 
