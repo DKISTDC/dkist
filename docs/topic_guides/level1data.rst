@@ -27,4 +27,4 @@ The ASDF file provides the following information about the dataset:
 * Information about the dtype, shape and HDU number of the arrays in the FITS file.
 * A `gWCS <https://gwcs.readthedocs.io/>`__ object providing the coordinate information for the reconstructed dataset array.
 
-These components are used by the `dkist` package to construct the `dkist.Dataset` class and it's associated `dkist.io.FileManager` class which manages the references to all the FITS files.
+These components are used by the `dkist` package to construct the `dkist.Dataset` class and its associated `dkist.io.DKISTFileManager` class which manages the references to all the FITS files.

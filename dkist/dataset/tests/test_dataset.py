@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, TiledDataset, load_dataset
-from dkist.io import FileManager
+from dkist.io import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
@@ -62,7 +62,7 @@ def test_repr_numpy(dataset):
 @pytest.mark.accept_cli_dataset
 def test_flat_repr(large_tiled_dataset):
     r = repr(large_tiled_dataset.flat)
-    assert f"is an array of ({np.prod(large_tiled_dataset.shape)},) Dataset objects" in r
+    assert f"is an array of ({len(large_tiled_dataset.flat)},) Dataset objects" in r
 
 
 @pytest.mark.accept_cli_dataset
@@ -145,7 +145,7 @@ def test_file_manager():
 
     assert len(dataset.files.filenames) == 11
 
-    assert isinstance(dataset[5]._file_manager, FileManager)
+    assert isinstance(dataset[5]._file_manager, DKISTFileManager)
     assert len(dataset[..., 5].files.filenames) == 11
     assert len(dataset[5].files.filenames) == 1
 
@@ -180,7 +180,7 @@ def test_header_slicing_3D_slice(large_visp_dataset):
     idx = np.s_[:2, 10:15, 0]
     sliced = dataset[idx]
 
-    file_idx = dataset.files._array_slice_to_loader_slice(idx)
+    file_idx = dataset.files._fm._array_slice_to_loader_slice(idx)
     grid = np.mgrid[{tuple: file_idx, slice: (file_idx,)}[type(file_idx)]]
     file_idx = tuple(grid[i].ravel() for i in range(np.prod(grid.shape[:-2])))
 

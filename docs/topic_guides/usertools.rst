@@ -17,9 +17,9 @@ Technical Details
 
 What the `dkist` package provides is the following:
 
-* A subclass of `ndcube.NDCube` which hooks into our ASDF schemas and provides access to the table of FITS headers and the `dkist.io.FileManager` object.
+* A subclass of `ndcube.NDCube` which hooks into our ASDF schemas and provides access to the table of FITS headers and the `dkist.io.DKISTFileManager` object.
 * A client class for `sunpy.net.Fido` which transparently loads on import of `dkist.net` and allows Fido to search the DKIST data center.
-* A set of helper functions to transfer files from the data center via `Globus <https://globus.org/>`__, the way to call this is the `~dkist.io.FileManager.download` of the `dkist.Dataset.files` property.
+* A set of helper functions to transfer files from the data center via `Globus <https://globus.org/>`__, the way to call this is the `~dkist.io.DKISTFileManager.download` of the `dkist.Dataset.files` property.
 
 This facilitates search, retrieval and loading of level 1 data using the functionality provided by `sunpy` and `ndcube`.
 It is expected that any community developed analysis software that is explicitly DKIST specific will also be included in the `dkist` package in the future.

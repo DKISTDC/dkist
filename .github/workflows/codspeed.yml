@@ -16,9 +16,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install .[tests] pytest-codspeed 'numpy<2'
-      - run: python -c "from dkist.data.sample import download_all_sample_data; download_all_sample_data()"
       - name: Run benchmarks
         uses: CodspeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: "pytest -vvv -r fEs --pyargs dkist --codspeed"
+          run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any"

@@ -68,22 +68,22 @@ def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_c
     transfer_client = get_transfer_client()
 
     # Test exact display name match
-    endpoint_id = get_endpoint_id("NCAR Data Sharing Service", transfer_client)
+    endpoint_id = get_endpoint_id("NCAR Data Sharing Service", tfr_client=transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
     # Test multiple match fail
     with pytest.raises(ValueError, match="Multiple"):
-        get_endpoint_id(" ", transfer_client)
+        get_endpoint_id(" ", tfr_client=transfer_client)
 
     # Test just one result
     mock_search.return_value = {"DATA": endpoint_search["DATA"][1:2]}
-    endpoint_id = get_endpoint_id(" ", transfer_client)
+    endpoint_id = get_endpoint_id(" ", tfr_client=transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
     # Test no results
     mock_search.return_value = {"DATA": []}
     with pytest.raises(ValueError, match="No matches"):
-        get_endpoint_id(" ", transfer_client)
+        get_endpoint_id(" ", tfr_client=transfer_client)
 
 
 def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
@@ -93,7 +93,7 @@ def test_get_endpoint_id_uuid(mocker, transfer_client, endpoint_search):
                                new_callable=mocker.PropertyMock)
     get_ep_mock.return_value = {"DATA": endpoint_search["DATA"][1:2]}
 
-    endpoint_id = get_endpoint_id("dd1ee92a-6d04-11e5-ba46-22000b92c6ec", transfer_client)
+    endpoint_id = get_endpoint_id("dd1ee92a-6d04-11e5-ba46-22000b92c6ec", tfr_client=transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
 
@@ -105,11 +105,11 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
 
     # Test Other transfer error
     with pytest.raises(globus_sdk.TransferAPIError):
-        get_endpoint_id("wibble", transfer_client)
+        get_endpoint_id("wibble", tfr_client=transfer_client)
 
     # Test EndpointNotFound error
     mocker.patch.object(err, "code", "EndpointNotFound")
-    endpoint_id = get_endpoint_id("wibble", transfer_client)
+    endpoint_id = get_endpoint_id("wibble", tfr_client=transfer_client)
     assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
 
 

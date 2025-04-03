@@ -1,4 +1,5 @@
 import os
+import platform
 from unittest.mock import call
 
 import pytest
@@ -29,6 +30,7 @@ def test_module_getattr(mocker, attrname):
     mock.assert_has_calls([call(attrname), call().__getitem__(0)])
 
 
+@pytest.mark.skipif(platform.system() == "Windows", reason="Internet not properly disabled on Windows")
 @pytest.mark.internet_off
 def test_fail(tmp_sample_dir):
     """

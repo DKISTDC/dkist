@@ -19,19 +19,19 @@ __all__ = ["AstropyFITSLoader", "BaseFITSLoader"]
 
 common_parameters = """
 
-    Parameters
-    ----------
-    fileuri: `str`
-        The filename, either absolute, or if `basepath` is specified, relative to `basepath`.
-    shape: `tuple`
-        The shape of the array to be proxied.
-    dtype: `numpy.dtype`
-        The dtype of the resulting array
-    target: `int`
-        The HDU number to load the array from.
-    array_container: `BaseStripedExternalArray`
-        The parent object of this class, which builds the array from a sequence
-        of these loaders.
+Parameters
+----------
+fileuri: `str`
+    The filename, either absolute, or if `basepath` is specified, relative to `basepath`.
+shape: `tuple`
+    The shape of the array to be proxied.
+dtype: `numpy.dtype`
+    The dtype of the resulting array
+target: `int`
+    The HDU number to load the array from.
+array_container: `BaseStripedExternalArray`
+    The parent object of this class, which builds the array from a sequence
+    of these loaders.
 """
 
 

@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=62.1",
-  "setuptools_scm[toml]>=6.2",
+  "setuptools_scm[toml]>=8.0.0",
   "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -9,37 +9,37 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dkist"
 description = "DKIST User Tools"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = { file = "licenses/LICENSE.rst" }
 authors = [
   { name = "NSO / AURA", email = "stuart@cadair.com" },
 ]
 dependencies = [
-  "aiohttp>=3.8",
+  "aiohttp>=3.9",
   # Provide minimum deps for all asdf packages used to generate or read asdf
   # files so that we test with these minimums and also generate asdf's with
   # them
   # Some of these schema dependencies are minimums because we generated asdf
   # files with them unpinned so they are now required to read generated asdf
   # files.
-  "asdf>=2.11.2",
-  "asdf-astropy>=0.2.0",
-  "asdf-coordinates-schemas>=0.1.0",
-  "asdf-standard>=1.0.3",
-  "asdf-transform-schemas>=0.3.0",
-  "asdf-wcs-schemas>=0.3.0",
-  "astropy>=5.3",
-  "dask[array]>=2021.8.0",
+  "asdf>=3.3.0",  # Required by gwcs 0.24
+  "asdf-astropy>=0.5.0",  # Required by gwcs 0.24
+  "asdf-coordinates-schemas>=0.3.0",  # required by wcs-schemas 0.4
+  "asdf-standard>=1.1.0",
+  "asdf-transform-schemas>=0.5.0",  # required by wcs-schemas 0.4
+  "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
+  "astropy>=6.0",  # required by gwcs 0.24
+  "dask[array]>=2023.2.0",
   "globus-sdk>=3.0",
-  "gwcs>=0.19.0",
-  "matplotlib>=3.5",
-  "ndcube[plotting,reproject]>=2.0",
-  "numpy>=1.22",
-  "parfive[ftp]>=1.5",
+  "gwcs>=0.24.0",  # Inverse transform fix
+  "matplotlib>=3.7",
+  "ndcube[plotting,reproject]>=2.1",
+  "numpy>=1.25",
+  "parfive[ftp]>=2.1",
   "platformdirs>=3.0",
-  "sunpy[net,asdf]>=4.0.7",
-  "tqdm>=4.63",
+  "sunpy[net,asdf]>=5.0.7",
+  "tqdm>=4.65",
 ]
 dynamic = ["version"]
 
@@ -55,6 +55,7 @@ tests = [
   "pytest-filter-subpackage",
   "pytest-benchmark",
   "pytest-xdist",
+  "pytest-lazy-fixtures",
   "hypothesis",
   "tox",
   "pydot",
@@ -69,12 +70,13 @@ docs = [
   "sphinx-gallery",
   "pytest",
   "sphinx_autodoc_typehints",
-  "dkist-sphinx-theme>=1.1.2",
+  "dkist-sphinx-theme>=2.0",
   "sphinx-design",
   "myst-nb",
   "ipywidgets",
   "accessible-pygments",
   "reproject[all]",
+  "sunpy[net,asdf]>=6.1.0",  # Needed for the VBI extent example
 ]
 
 [project.urls]
@@ -98,7 +100,7 @@ include = ["dkist*"]
 exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
-write_to = "dkist/_version.py"
+version_file = "dkist/_version.py"
 
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]

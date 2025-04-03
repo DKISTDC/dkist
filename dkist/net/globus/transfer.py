@@ -80,11 +80,11 @@ def start_transfer_from_file_list(
     tc = get_transfer_client()
 
     # Resolve to IDs and activate endpoints
-    src_endpoint = get_endpoint_id(src_endpoint, tc)
-    auto_activate_endpoint(src_endpoint, tc)
+    src_endpoint = get_endpoint_id(src_endpoint, tfr_client=tc)
+    auto_activate_endpoint(src_endpoint, tfr_client=tc)
 
-    dst_endpoint = get_endpoint_id(dst_endpoint, tc)
-    auto_activate_endpoint(dst_endpoint, tc)
+    dst_endpoint = get_endpoint_id(dst_endpoint, tfr_client=tc)
+    auto_activate_endpoint(dst_endpoint, tfr_client=tc)
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
@@ -273,7 +273,7 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
 
 
 def _orchestrate_transfer_task(file_list: list[PathLike],
-                               recursive: list[bool],
+                               recursive: bool | list[bool],
                                destination_path: PathLike | list[PathLike] = "/~/",
                                destination_endpoint: str = None,
                                *,

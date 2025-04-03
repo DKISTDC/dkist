@@ -77,7 +77,7 @@ The objective of these helpers is to provide the tools needed to quickly access 
 
 The `dkist` package provides two different interfaces for starting a Globus transfer.
 One is `~dkist.net.transfer_complete_datasets` which will stage the whole dataset directory for download.
-The other is the `~dkist.io.FileManager.download` method of ``Dataset.files``, this method allows you to only download some FITS files based on the slicing of a dataset object.
+The other is the `~dkist.io.DKISTFileManager.download` method of ``Dataset.files``, this method allows you to only download some FITS files based on the slicing of a dataset object.
 
 
 Downloading Files from a ``Dataset``
@@ -115,7 +115,7 @@ For example:
    All the following documentation assumes you have this running and wish to transfer files using GCP to the machine where your Python session is running.
    It is possible to use the `dkist` package to orchestrate transfers to remote endpoints or other more complex arrangements by specifying the ``destination_endpoint=`` keyword argument to all these functions.
 
-Once we have loaded the dataset, if we wish to transfer all the FITS files a single call to `~dkist.io.FileManager.download` will initiate the transfer:
+Once we have loaded the dataset, if we wish to transfer all the FITS files a single call to `~dkist.io.DKISTFileManager.download` will initiate the transfer:
 
 .. code-block:: python
 

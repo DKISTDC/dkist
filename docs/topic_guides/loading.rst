@@ -23,7 +23,7 @@ All of these components are available when an ASDF file is loaded, even if no FI
 
 * The `~dkist.Dataset.data` property is a `dask.array.Array` object which lazy loads the array data from the FITS files on demand.
 * The `~dkist.Dataset.wcs` property is a `gwcs.wcs.WCS` object which provides coordinate information for all the pixels in the array.
-* The `~dkist.Dataset.files` property is an instance of the `dkist.io.FileManager` class which allows you to access and modify information about how the FITS files are loaded by the array.
+* The `~dkist.Dataset.files` property is an instance of the `dkist.io.DKISTFileManager` class which allows you to access and modify information about how the FITS files are loaded by the array.
 * The `~dkist.Dataset.headers` property is an `astropy.table.QTable` instance which is a complete record of all the FITS headers for all the FITS files in the dataset. This provides access to all the available metadata about the dataset without having to retrieve or open any of the FITS files.
 
 The relationship between `~dkist.Dataset.data` and `~dkist.Dataset.files`
@@ -34,13 +34,13 @@ These FITS filenames are ordered in the correct way so that an array of the corr
 Depending on how the ASDF file was obtained, you may or may not have some or all of the corresponding FITS files.
 If any of the FITS files referenced by the ADSF file are in the same directory as the ASDF file they will be opened automatically when their slice of the array is requested.
 
-The `~dkist.io.FileManager` object is provided to let you inspect and modify how this loading occurs.
+The `~dkist.io.DKISTFileManager` object is provided to let you inspect and modify how this loading occurs.
 The two main functions it enables are: modifying the base path for where the FITS files are loaded from, and transferring FITS files using Globus.
-The `~dkist.io.FileManager.basepath` property sets the directory from which the FITS files will be loaded on demand; assigning this to a different directory will cause the FITS to be loaded from that path.
+The `~dkist.io.DKISTFileManager.basepath` property sets the directory from which the FITS files will be loaded on demand; assigning this to a different directory will cause the FITS to be loaded from that path.
 If at any point the file with the required filename as specified by the ASDF can not be found its slice of the array will be returned as NaN.
-The `~dkist.io.FileManager.download` method is designed to allow you to transfer some or all of the FITS files from the data center using Globus.
+The `~dkist.io.DKISTFileManager.download` method is designed to allow you to transfer some or all of the FITS files from the data center using Globus.
 For more details on how to use it see the :ref:`dkist:topic-guides:downloading-fits` section.
-It is important to note that `~dkist.io.FileManager.download` will set the `~dkist.io.FileManager.basepath` property to the destination directory when using a local personal endpoint.
+It is important to note that `~dkist.io.DKISTFileManager.download` will set the `~dkist.io.DKISTFileManager.basepath` property to the destination directory when using a local personal endpoint.
 
 The Dask Array
 ##############

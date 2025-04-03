@@ -12,8 +12,8 @@ class FileManagerConverter(Converter):
     types = ["dkist.io.file_manager.FileManager"]
 
     def from_yaml_tree(self, node, tag, ctx):
-        from dkist.io.file_manager import FileManager
-        from dkist.io.loaders import AstropyFITSLoader
+        from dkist.io.dask.loaders import AstropyFITSLoader
+        from dkist.io.dask.striped_array import FileManager
 
         url = urlparse(ctx.url or ".")
         if url.scheme not in ("file", ""):
@@ -24,13 +24,15 @@ class FileManagerConverter(Converter):
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
 
-        return FileManager.from_parts(node["fileuris"],
-                                              node["target"],
-                                              node["datatype"],
-                                              node["shape"],
-                                              chunksize=node.get("chunksize", None),
-                                              loader=AstropyFITSLoader,
-                                              basepath=base_path)
+        return FileManager.from_parts(
+            node["fileuris"],
+            node["target"],
+            node["datatype"],
+            node["shape"],
+            chunksize=node.get("chunksize", None),
+            loader=AstropyFITSLoader,
+            basepath=base_path,
+        )
 
     def to_yaml_tree(self, obj, tag, ctx):
         node = {}

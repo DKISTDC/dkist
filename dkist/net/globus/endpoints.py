@@ -70,7 +70,7 @@ def get_data_center_endpoint_id():
 
 
 @ensure_globus_authorized
-def get_endpoint_id(endpoint, tfr_client):
+def get_endpoint_id(endpoint, *, tfr_client):
     """
     Resolve an endpoint description to an ID.
 
@@ -120,7 +120,7 @@ def get_endpoint_id(endpoint, tfr_client):
 
 
 @ensure_globus_authorized
-def auto_activate_endpoint(endpoint_id, tfr_client):  # pragma: no cover
+def auto_activate_endpoint(endpoint_id, *, tfr_client):  # pragma: no cover
     """
     Perform activation of a Globus endpoint.
 
@@ -176,8 +176,8 @@ def get_directory_listing(path, endpoint=None):
     tc = get_transfer_client()
 
     if endpoint_id is None:
-        endpoint_id = get_endpoint_id(endpoint, tc)
-        auto_activate_endpoint(endpoint_id, tc)
+        endpoint_id = get_endpoint_id(endpoint, tfr_client=tc)
+        auto_activate_endpoint(endpoint_id, tfr_client=tc)
 
     response = tc.operation_ls(endpoint_id, path=path.as_posix())
     names = [r["name"] for r in response]

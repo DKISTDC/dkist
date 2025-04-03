@@ -62,6 +62,9 @@ copyright = f"{datetime.datetime.now().year}, {author}"
 
 # -- General configuration ---------------------------------------------------
 
+# Wrap large function/method signatures
+maximum_signature_line_length = 80
+
 # Suppress warnings about overriding directives as we overload some of the
 # doctest extensions.
 suppress_warnings = ["app.add_directive", ]

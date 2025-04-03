@@ -11,3 +11,5 @@ If you're starting fresh you might want to check out the :ref:`dkist:tutorial:in
    :maxdepth: 1
 
    sample_data
+   replacing_asdfs
+   asdf_warnings
