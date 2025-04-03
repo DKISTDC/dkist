@@ -71,7 +71,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     ]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
+    _core_keys = TableAttribute(default=["Product ID", "Dataset ID", "Start Time", "End Time", "Instrument", "Wavelength"])
 
     total_available_results = TableAttribute(default=0)
 
@@ -187,8 +187,10 @@ class DKISTClient(BaseClient):
             data = json.loads(data.read())
             results.append(data)
 
+        res = DKISTQueryResponseTable.from_results(results, client=self)
+        res.display_keys = res._core_keys
 
-        return DKISTQueryResponseTable.from_results(results, client=self)
+        return res
 
     @staticmethod
     def _make_filename(path: os.PathLike, row: QueryResponseRow,
