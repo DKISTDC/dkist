@@ -472,7 +472,7 @@ class HeaderVersion(_SimpleAttr):
         super().__init__(version)
 
 
-#productID
+#productIds
 class ProductID(_SimpleAttr):
     """
     Unique identifier for a dataset's set of uncalibrated science frames.
