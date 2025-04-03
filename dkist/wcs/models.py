@@ -183,7 +183,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
                         raise ValueError("The shape of the pc, crval and crpix tables should match. "
                                         f"The pc table has shape {table_shape} and the "
                                         f"{table_name} table has shape {table.shape[:-1]}")
-                table_shape = crval_table.shape[:-1]
+                table_shape = table.shape[:-1]
 
         if pc_table.shape == (2, 2):
             pc_table = np.broadcast_to(pc_table, [*list(table_shape), 2, 2], subok=True)
