@@ -95,7 +95,7 @@ def test_varying_transform_no_lon_pole_unit():
     # Without a lon_pole passed, the transform was originally setting
     # the unit for it to be the same as crval, which is wrong.
     vct = VaryingCelestialTransform(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
         pc_table=varying_matrix_lt,
@@ -109,7 +109,7 @@ def test_varying_transform_pc():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransform(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
         pc_table=varying_matrix_lt,
@@ -144,7 +144,7 @@ def test_varying_transform_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)] * u.pix
 
     vct = VaryingCelestialTransform(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
         pc_table=varying_matrix_lt,
@@ -162,7 +162,7 @@ def test_varying_transform_pc_unitless():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 10)]
 
     vct = VaryingCelestialTransform(
-        crpix=(5, 5),
+        crpix_table=(5, 5),
         # without units everything is deg, so make this arcsec in deg
         cdelt=((1, 1)*u.arcsec).to_value(u.deg),
         crval_table=(0, 0),
@@ -188,7 +188,7 @@ def test_varying_transform_pc_unitless():
 def test_varying_transform_crval():
     crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
     vct = VaryingCelestialTransform(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=crval_table,
         pc_table=np.identity(2) * u.pix,
@@ -214,7 +214,7 @@ def test_varying_transform_crval():
 def test_vct_errors():
     with pytest.raises(ValueError, match="pc table should be"):
         VaryingCelestialTransform(
-            crpix=(5, 5),
+            crpix_table=(5, 5),
             cdelt=(1, 1),
             crval_table=(0, 0),
             pc_table=[[1, 2, 3],
@@ -225,7 +225,7 @@ def test_vct_errors():
 
     with pytest.raises(ValueError, match="crval table should be"):
         VaryingCelestialTransform(
-            crpix=(5, 5),
+            crpix_table=(5, 5),
             cdelt=(1, 1),
             crval_table=((0, 0, 0),),
             pc_table=[[1, 2],
@@ -234,9 +234,9 @@ def test_vct_errors():
         )
 
     with pytest.raises(ValueError,
-                       match="The shape of the pc and crval tables should match"):
+                       match="The shape of the pc, crval and crpix tables should match"):
         VaryingCelestialTransform(
-            crpix=(5, 5),
+            crpix_table=(5, 5),
             cdelt=(1, 1),
             crval_table=((0, 0), (1, 1), (2, 2)),
             pc_table=[[[1, 2],
@@ -249,7 +249,7 @@ def test_vct_errors():
     with pytest.raises(TypeError,
                        match="projection keyword should"):
         VaryingCelestialTransform(
-            crpix=(5, 5),
+            crpix_table=(5, 5),
             cdelt=(1, 1),
             crval_table=((0, 0), (1, 1)),
             pc_table=[[[1, 2],
@@ -266,7 +266,7 @@ def test_varying_transform_4d_pc():
     varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
 
     vct = VaryingCelestialTransform2D(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
         pc_table=varying_matrix_lt,
@@ -290,7 +290,7 @@ def test_varying_transform_4d_pc_unitless():
     varying_matrix_lt = varying_matrix_lt.reshape((3, 5, 2, 2))
 
     vct = VaryingCelestialTransform2D(
-        crpix=(5, 5),
+        crpix_table=(5, 5),
         cdelt=(1, 1),
         crval_table=(0, 0),
         pc_table=varying_matrix_lt,
@@ -319,7 +319,7 @@ def test_varying_transform_4d_pc_shapes(pixel, lon_shape):
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
     vct = VaryingCelestialTransform2D(
-        crpix=(5, 5) * u.pix,
+        crpix_table=(5, 5) * u.pix,
         cdelt=(1, 1) * u.arcsec/u.pix,
         crval_table=(0, 0) * u.arcsec,
         pc_table=varying_matrix_lt,
@@ -339,7 +339,7 @@ def test_vct_dispatch():
     crval_table = list(zip(np.arange(1, 17), np.arange(17, 33))) * u.arcsec
     crval_table = crval_table.reshape((2, 2, 2, 2, 2))
     kwargs = {
-        "crpix": (5, 5) * u.pix,
+        "crpix_table": (5, 5) * u.pix,
         "cdelt": (1, 1) * u.arcsec/u.pix,
         "lon_pole": 180 * u.deg,
     }
@@ -381,7 +381,7 @@ def test_vct_shape_errors():
     crval_table = crval_table.reshape((5, 3, 2))
 
     kwargs = {
-        "crpix": (5, 5) * u.pix,
+        "crpix_table": (5, 5) * u.pix,
         "cdelt": (1, 1) * u.arcsec/u.pix,
         "lon_pole": 180 * u.deg,
     }
@@ -407,7 +407,7 @@ def test_vct_slit_bounds(slit):
     with pytest.raises(ValueError,
                        match="must be one of the first two pixel dimensions"):
         varying_celestial_transform_from_tables(
-            crpix=crpix,
+            crpix_table=crpix,
             cdelt=cdelt,
             pc_table=pc_table,
             crval_table=crval_table,
@@ -463,7 +463,7 @@ def test_vct(has_units, slit, num_varying_axes):
     varying_axes_grid = grid[num_sensor_axes:]
 
     vct = varying_celestial_transform_from_tables(
-        crpix=crpix,
+        crpix_table=crpix,
         cdelt=cdelt,
         pc_table=pc_table,
         crval_table=crval_table,
@@ -693,3 +693,27 @@ def test_asymmetric_mapping_n_inputs():
     assert am.inverse(1, 2, 3, 4) == (1, 2)
 
     assert "TestModel" in repr(am)
+
+
+def test_varying_transform_crval_crpix():
+    crval_table=np.array([[2,2], [3,3]])
+    crpix_table=np.array([[5,5], [4,4]])
+
+    vct = VaryingCelestialTransform(
+        crpix_table=crpix_table * u.pix,
+        cdelt=(1, 1) * u.arcsec/u.pix,
+        crval_table=crval_table * u.arcsec,
+        pc_table=np.identity(2),
+    )
+    trans0 = vct.transform_at_index(0)
+    assert trans0[0].offset == -5
+    assert trans0[1].offset == -5
+
+    trans1 = vct.transform_at_index(1)
+    assert trans1[0].offset == -4
+    assert trans1[1].offset == -4
+
+    world_0 = trans0(0,0)
+    world_1 = trans1(0,0)
+
+    assert world_0 == world_1
