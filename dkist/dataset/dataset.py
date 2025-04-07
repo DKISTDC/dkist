@@ -7,7 +7,8 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
-from dkist.io.file_manager import FileManager
+from dkist.io.dask.striped_array import FileManager
+from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
 
 from .utils import dataset_info_str
@@ -33,9 +34,13 @@ class FileManagerDescriptor(NDCubeLinkedDescriptor):
         return getattr(obj, self._attribute_name, None)
 
     def __set__(self, obj, value):
+        # Upcast a FileManager to a DKISTFileManager
+        if isinstance(value, FileManager):
+            value = DKISTFileManager(value)
+
         # Do not allow setting by class not instance.
         if not isinstance(value, self._default_type) and issubclass(value, self._default_type):
-            raise ValueError("You must set this property with an instance of FileManager.")
+            raise ValueError("You must set this property with an instance of FileManager or DKISTFileManager.")
 
         super().__set__(obj, value)
 
@@ -97,7 +102,7 @@ class Dataset(NDCube):
     slicing creates a new object in this case.
     """
 
-    _file_manager = FileManagerDescriptor(default_type=FileManager)
+    _file_manager = FileManagerDescriptor(default_type=DKISTFileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
                  unit=None, copy=False, is_tile=False):
@@ -131,13 +136,13 @@ class Dataset(NDCube):
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
         if self._file_manager is not None:
-            sliced_dataset._file_manager = self._file_manager._slice_by_cube(item)
+            sliced_dataset._file_manager = self._file_manager._fm._slice_by_cube(item)
             sliced_dataset.meta = sliced_dataset.meta.copy()
             sliced_dataset.meta["headers"] = self._slice_headers(item)
         return sliced_dataset
 
     def _slice_headers(self, slice_):
-        idx = self.files._array_slice_to_loader_slice(slice_)
+        idx = self.files._fm._array_slice_to_loader_slice(slice_)
         if idx == (np.s_[:],):
             return self.headers.copy()
 
@@ -186,7 +191,7 @@ class Dataset(NDCube):
     @property
     def files(self):
         """
-        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
+        A `~.DKISTFileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
         return self._file_manager
 

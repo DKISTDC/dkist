@@ -1,3 +1,5 @@
+import copy
+
 from asdf.extension import Converter
 from astropy.table import Table
 
@@ -64,11 +66,14 @@ class DatasetConverter(Converter):
             raise ValueError("This Dataset object can not be saved to asdf as "
                              "it was not constructed from a set of FITS files.")
         node = {}
-        node["meta"] = dataset.meta or {}
+        # Copy the meta so we don't pop from the one in memory
+        node["meta"] = copy.copy(dataset.meta) or {}
         if dataset._is_mosaic_tile and node.get("meta"):
             node["meta"]["headers"] = None
+        # If the history key has been injected into the meta, do not save it
+        node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs
-        node["data"] = dataset.files
+        node["data"] = dataset.files._fm
         if dataset.unit:
             node["unit"] = dataset.unit
         if dataset.mask:

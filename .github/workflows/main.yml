@@ -38,8 +38,7 @@ jobs:
       posargs: '--color=yes'
       envs: |
         - linux: py313
-        - linux: py312
-        - windows: py312-online
+        - windows: py312
         - macos: py311
         - linux: py311-oldestdeps
     secrets:
@@ -59,6 +58,13 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  mypy:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      pytest: false
+      envs: |
+        - linux: mypy
+
   sdist_verify:
     runs-on: ubuntu-latest
     steps:
@@ -77,6 +83,7 @@ jobs:
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
+        - linux: py312-online
         - linux: py313-devdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -92,7 +99,7 @@ jobs:
     with:
       python-version: '3.13'
       test_extras: tests
-      test_command: pytest --pyargs dkist -k "not test_fail"
+      test_command: pytest --pyargs dkist -k "not test_fail" --remote-data=none --benchmark-skip
       # We have to work around a github runner bug here: https://github.com/actions/runner/issues/2788#issuecomment-2145922705
       upload_to_pypi: ${{ startsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), 'refs/tags/v') && !endsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), '.dev') }}
     secrets:
@@ -110,3 +117,4 @@ jobs:
           homeserver: ${{ secrets.matrix_homeserver }}
           roomid: '!RehafayCrAiXbzVpXI:openastronomy.org'
           ignore_pattern: '.*Load.*'
+          summarise_success: true

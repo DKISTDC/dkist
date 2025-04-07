@@ -16,7 +16,9 @@ properties:
     items:
       type: array
       items:
-        - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
+        anyOf:
+          - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
+          - null:true
 
   meta:
     description: Dataset metadata, describing the whole dataset.
@@ -30,9 +32,23 @@ properties:
         description: A copy of the inventory record for this dataset.
         type: object
 
+      headers:
+        description: A table of all the headers for the constituent files.
+        anyOf:
+          - tag: "tag:astropy.org:astropy/table/table-1.*"
+          - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
+
     required: [inventory]
     additionalProperties: true
 
-required: [datasets, meta]
+  mask:
+    description: A mask to indicate if invalid or missing Datasets should be ignored.
+    tag: tag:stsci.edu:asdf/core/ndarray-1.*
+    datatype: bool8
+    exact_datatype: true
+    ndim: 2
+
+
+required: [datasets, meta, mask]
 additionalProperties: false
 ...

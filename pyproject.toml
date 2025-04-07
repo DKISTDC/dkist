@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=62.1",
-  "setuptools_scm[toml]>=6.2",
+  "setuptools_scm[toml]>=8.0.0",
   "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -23,22 +23,22 @@ dependencies = [
   # Some of these schema dependencies are minimums because we generated asdf
   # files with them unpinned so they are now required to read generated asdf
   # files.
-  "asdf>=2.15.0",
-  "asdf-astropy>=0.4.0",
-  "asdf-coordinates-schemas>=0.2.0",
+  "asdf>=3.3.0",  # Required by gwcs 0.24
+  "asdf-astropy>=0.5.0",  # Required by gwcs 0.24
+  "asdf-coordinates-schemas>=0.3.0",  # required by wcs-schemas 0.4
   "asdf-standard>=1.1.0",
-  "asdf-transform-schemas>=0.4.0",
-  "asdf-wcs-schemas>=0.3.0",
-  "astropy>=5.3",
+  "asdf-transform-schemas>=0.5.0",  # required by wcs-schemas 0.4
+  "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
+  "astropy>=6.0",  # required by gwcs 0.24
   "dask[array]>=2023.2.0",
   "globus-sdk>=3.0",
-  "gwcs>=0.19.0",
+  "gwcs>=0.24.0",  # Inverse transform fix
   "matplotlib>=3.7",
   "ndcube[plotting,reproject]>=2.1",
   "numpy>=1.25",
   "parfive[ftp]>=2.1",
   "platformdirs>=3.0",
-  "sunpy[net,asdf]>=5.0",
+  "sunpy[net,asdf]>=5.0.7",
   "tqdm>=4.65",
 ]
 dynamic = ["version"]
@@ -55,6 +55,7 @@ tests = [
   "pytest-filter-subpackage",
   "pytest-benchmark",
   "pytest-xdist",
+  "pytest-lazy-fixtures",
   "hypothesis",
   "tox",
   "pydot",
@@ -75,6 +76,7 @@ docs = [
   "ipywidgets",
   "accessible-pygments",
   "reproject[all]",
+  "sunpy[net,asdf]>=6.1.0",  # Needed for the VBI extent example
 ]
 
 [project.urls]
@@ -98,7 +100,7 @@ include = ["dkist*"]
 exclude = ["dkist._dev*"]
 
 [tool.setuptools_scm]
-write_to = "dkist/_version.py"
+version_file = "dkist/_version.py"
 
 [tool.gilesbot]
   [ tool.gilesbot.pull_requests ]

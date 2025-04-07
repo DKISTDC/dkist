@@ -5,17 +5,24 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+import os
+import types
+import warnings
+from typing import Any, Self, Literal
 from textwrap import dedent
-from collections.abc import Collection
+from collections.abc import Iterable, Collection
 
+import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.gridspec import GridSpec
+from numpy.typing import NDArray
 
 import astropy
 from astropy.table import vstack
 
-from dkist.io.file_manager import FileManager, StripedExternalArray
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.file_manager import DKISTFileManager
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 from .dataset import Dataset
 from .utils import dataset_info_str
@@ -23,19 +30,52 @@ from .utils import dataset_info_str
 __all__ = ["TiledDataset"]
 
 
+class TiledDatasetFileManager:
+    """
+    Manage the collection of FITS files backing a `~dkist.TiledDataset`.
+    """
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    @property
+    def basepath(self) -> os.PathLike:
+        """
+        The path all arrays read data from.
+        """
+        basepath = self._parent.flat[0].files.basepath
+        for tile in self._parent.flat:
+            if basepath != tile.files.basepath:
+                raise ValueError("Not all tiles share the same basepath. Use 'TiledDataset.files.basepath = <new_path>' to set basepath on all tiles.")
+        return basepath
+
+    @basepath.setter
+    def basepath(self, basepath: str | os.PathLike):
+        for tile in self._parent.flat:
+            tile.files.basepath = basepath
+
+    @property
+    def filenames(self) -> list[str]:
+        return np.array([tile.files.filenames for tile in self._parent.flat]).flatten().tolist()
+
+
 class TiledDatasetSlicer:
     """
     Basic class to provide the slicing
     """
-    def __init__(self, data, inventory):
+    def __init__(self, data, meta):
         self.data = data
-        self.inventory = inventory
+        self.meta = meta
 
     def __getitem__(self, slice_):
-        new_data = []
-        for tile in self.data.flat:
-            new_data.append(tile[slice_])
-        return TiledDataset(np.array(new_data).reshape(self.data.shape), self.inventory)
+        new_data = np.zeros_like(self.data.data)
+
+        for i, ds in enumerate(self.data.flat):
+            if self.data.mask.flat[i]:
+                continue
+            new_data.flat[i] = ds[slice_]
+
+        return TiledDataset(new_data, meta=self.meta, mask=self.data.mask)
 
 
 class TiledDataset(Collection):
@@ -58,6 +98,18 @@ class TiledDataset(Collection):
         data. This functionality will be added in the future, see the reproject
         and montage packages for possible ways to achieve this.
 
+    Parameters
+    ----------
+    dataset_array
+        A numpy object array of Dataset objects. If ``mask=`` is
+        provided elements where the mask is `True` will be ignored so
+        can be other types, such as `None`.
+    mask
+        A numpy boolean array, `True` is masked.
+    meta
+        Associated metadata, the ``"inventory"`` key is used for
+        dataset inventory, and is required for download of FITS files
+        etc to work.
     """
 
     @classmethod
@@ -78,17 +130,33 @@ class TiledDataset(Collection):
         for i, (fm, wcs) in enumerate(zip(file_managers, wcses)):
             headers = all_headers[i*len(fm):(i+1)*len(fm)]
             meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm._generate_array(), wcs=wcs, meta=meta, is_tile=True)
+            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta, is_tile=True)
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
-        return cls(datasets, inventory, all_headers)
+        return cls(datasets, meta={"inventory": inventory, "headers": all_headers})
 
-    def __init__(self, dataset_array, inventory=None, headers=None):
-        self._data = np.array(dataset_array, dtype=object)
-        self._inventory = inventory or {}
+    def __init__(
+        self,
+        dataset_array: NDArray[np.object_],
+        inventory: dict[Any, Any] | None = None,
+        mask: NDArray[np.bool_] | None = None,
+        *,
+        meta: dict[Any, Any] | None = None
+    ):
+        if inventory is not None:
+            warnings.warn(
+                "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
+                DKISTDeprecationWarning,
+            )
+        self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
+        meta = meta or {}
+        inventory = meta.get("inventory", inventory or {})
         self.combined_headers = vstack(headers) if headers else None
         self._validate_component_datasets(self._data, inventory)
+        self._meta = meta
+        self._meta["inventory"] = inventory
+        self._files = DKISTFileManager(TiledDatasetFileManager(parent=self), parent_ndcube=self)
 
     def __contains__(self, x):
         return any(ele is x for ele in self._data.flat)
@@ -101,14 +169,14 @@ class TiledDataset(Collection):
 
     def __getitem__(self, aslice):
         new_data = self._data[aslice]
-        if isinstance(new_data, Dataset):
+        if isinstance(new_data, (Dataset, np.ma.core.MaskedConstant)):
             return new_data
 
-        return type(self)(new_data, inventory=self.inventory)
+        return type(self)(new_data.data, mask=new_data.mask, meta=self.meta)
 
     @staticmethod
     def _validate_component_datasets(datasets, inventory):
-        datasets = datasets.flat
+        datasets = [ds for ds in datasets.compressed() if ds is not None]
         inv_1 = datasets[0].meta["inventory"]
         if inv_1 and inv_1 is not inventory:
             raise ValueError("The inventory record of the first dataset does not match the one passed to TiledDataset")
@@ -121,32 +189,52 @@ class TiledDataset(Collection):
         return True
 
     @property
-    def flat(self):
+    def mask(self) -> NDArray[np.bool_]:
+        """
+        The mask for tiles in this dataset.
+
+        An element where the mask is `True` will ignore any dataset in that tile position.
+        """
+        return self._data.mask
+
+    @mask.setter
+    def mask(self, value: NDArray[np.bool_]):
+        self._data.mask = value
+
+    @property
+    def flat(self) -> Self:
         """
         Represent this `.TiledDataset` as a 1D array.
         """
-        return type(self)(self._data.flat, self.inventory)
+        return type(self)(self._data.compressed(), meta=self.meta)
 
     @property
-    def inventory(self):
+    def meta(self) -> dict[Any, Any]:
+        """
+        A dictionary of extra metadata about the dataset.
+        """
+        return self._meta
+
+    @property
+    def inventory(self) -> dict[str, Any]:
         """
         The inventory record as kept by the data center for this dataset.
         """
-        return self._inventory
+        return self._meta["inventory"]
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, int]:
         """
         The shape of the tiled grid.
         """
         return self._data.shape
 
     @property
-    def tiles_shape(self):
+    def tiles_shape(self) -> list[tuple[int, ...]]:
         """
         The shape of each individual tile in the TiledDataset.
         """
-        return [[tile.data.shape for tile in row] for row in self]
+        return [tuple(tile.data.shape for tile in row) for row in self]
 
     @staticmethod
     def _get_axislabels(ax):
@@ -162,49 +250,96 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
-    def plot(self, slice_index, share_zscale=False, figure=None, **kwargs):
+    def plot(
+        self,
+        slice_index: int | slice | Iterable[int | slice],
+        share_zscale: bool = False,
+        figure: matplotlib.figure.Figure | None = None,
+        swap_tile_limits: Literal["x", "y", "xy"] | None = None,
+        **kwargs
+    ):
         """
         Plot a slice of each tile in the TiledDataset
 
         Parameters
         ----------
-        slice_index : `int`, sequence of `int`s or `numpy.s_`
+        slice_index
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
-            ``TiledDataset.slice_tiles``
-        share_zscale : `bool`
+            `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
+        share_zscale
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
             Defaults to False
-        figure : `matplotlib.figure.Figure`
+        figure
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
+        swap_tile_limits
+            Invert the axis limits of each tile. Either the "x" or "y" axis limits can be inverted separately, or they
+            can both be inverted with "xy". This option is useful if the orientation of the tile data arrays is flipped
+            w.r.t. the WCS orientation implied by the mosaic keys. For example, most DL-NIRSP data should be plotted with
+            `swap_tile_limits="xy"`.
         """
-        if isinstance(slice_index, int):
+        if swap_tile_limits not in ["x", "y", "xy", None]:
+            raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
+
+        if len(self.meta.get("history", {}).get("entries", [])) == 0:
+            warnings.warn("The metadata ASDF file that produced this dataset is out of date and "
+                          "will result in incorrect plots. Please re-download the metadata ASDF file.",
+                          DKISTUserWarning)
+
+        if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
+
         vmin, vmax = np.inf, 0
 
         if figure is None:
             figure = plt.gcf()
 
-        tiles = self.slice_tiles[slice_index].flat
-        for i, tile in enumerate(tiles):
-            ax = figure.add_subplot(self.shape[0], self.shape[1], i+1, projection=tile.wcs)
-            tile.plot(axes=ax, **kwargs)
-            if i == 0:
-                xlabel, ylabel = self._get_axislabels(ax)
-                figure.supxlabel(xlabel, y=0.05)
-                figure.supylabel(ylabel, x=0.05)
-            axmin, axmax = ax.get_images()[0].get_clim()
-            vmin = axmin if axmin < vmin else vmin
-            vmax = axmax if axmax > vmax else vmax
-            ax.set_ylabel(" ")
-            ax.set_xlabel(" ")
+        sliced_dataset = self.slice_tiles[slice_index]
+        # This can change to just .shape once we support ndcube >= 2.3
+        if (nd_sliced := len(sliced_dataset.flat[0].data.shape)) != 2:
+            raise ValueError(
+                f"Applying slice '{slice_index}' to this dataset resulted in a {nd_sliced} "
+                "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile."
+            )
+        dataset_ncols, dataset_nrows = sliced_dataset.shape
+        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=figure)
+        for col in range(dataset_ncols):
+            for row in range(dataset_nrows):
+                tile = sliced_dataset[col, row]
+                if isinstance(tile, np.ma.core.MaskedConstant):
+                    continue
+
+                # Fill up grid from the bottom row
+                ax_gridspec = gridspec[dataset_nrows - row - 1, col]
+                ax = figure.add_subplot(ax_gridspec, projection=tile.wcs)
+
+                tile.plot(axes=ax, **kwargs)
+
+                if swap_tile_limits in ["x", "xy"]:
+                    ax.invert_xaxis()
+
+                if swap_tile_limits in ["y", "xy"]:
+                    ax.invert_yaxis()
+
+                ax.set_ylabel(" ")
+                ax.set_xlabel(" ")
+                if col == row == 0:
+                    xlabel, ylabel = self._get_axislabels(ax)
+                    figure.supxlabel(xlabel, y=0.05)
+                    figure.supylabel(ylabel, x=0.05)
+
+                axmin, axmax = ax.get_images()[0].get_clim()
+                vmin = axmin if axmin < vmin else vmin
+                vmax = axmax if axmax > vmax else vmax
+
         if share_zscale:
             for ax in figure.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
+
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
-        for i, (coord, val) in enumerate(list(tiles[0].global_coords.items())[::-1]):
+        for i, (coord, val) in enumerate(list(sliced_dataset.flat[0].global_coords.items())[::-1]):
             if coord == "time":
                 val = val.iso
             if coord == "stokes":
@@ -255,7 +390,7 @@ class TiledDataset(Collection):
              helioprojective latitude |        x        |        x
         """
 
-        return TiledDatasetSlicer(self._data, self.inventory)
+        return TiledDatasetSlicer(self._data, self.meta)
 
     # TODO: def regrid()
 
@@ -270,33 +405,8 @@ class TiledDataset(Collection):
         return dataset_info_str(self)
 
     @property
-    def files(self):
+    def files(self) -> DKISTFileManager:
         """
-        A `~.FileManager` helper for interacting with the files backing the data in this ``Dataset``.
+        A `~.DKISTFileManager` helper for interacting with the files backing the data in this `.TiledDataset`.
         """
-        fileuris = [[tile.files.filenames for tile in row] for row in self]
-        dtype = self[0, 0].files.fileuri_array.dtype
-        shape = self[0, 0].files.shape
-        basepath = self[0, 0].files.basepath
-        chunksize = self[0, 0]._data.chunksize
-
-        for tile in self.flat:
-            try:
-                assert dtype == tile.files.fileuri_array.dtype
-                assert shape == tile.files.shape
-                assert basepath == tile.files.basepath
-                assert chunksize == tile._data.chunksize
-            except AssertionError as err:
-                raise AssertionError("Attributes of TiledDataset.FileManager must be the same across all tiles.") from err
-
-        return FileManager(
-            StripedExternalArray(
-                fileuris=fileuris,
-                target=1,
-                dtype=dtype,
-                shape=shape,
-                loader=AstropyFITSLoader,
-                basepath=basepath,
-                chunksize=chunksize
-            )
-        )
+        return self._files
