@@ -48,8 +48,13 @@ class VaryingCelestialConverter(TransformConverterBase):
             if node["pc_table"].unit is u.arcsec:
                 node["pc_table"] = u.Quantity(node["pc_table"].value, unit=u.pix)
 
+        crpix_table = node.get("crpix_table", None)
+        crpix_table = node.get("crpix", None) if crpix_table is None else crpix_table
+        if crpix_table is None:
+            raise ValueError("The crpix table could not be found in either crpix_table or crpix keys")
+
         return varying_celestial_transform_from_tables(
-            crpix_table=node["crpix"],
+            crpix_table=crpix_table,
             cdelt=node["cdelt"],
             lon_pole=node["lon_pole"],
             crval_table=node["crval_table"],
@@ -61,7 +66,7 @@ class VaryingCelestialConverter(TransformConverterBase):
 
     def to_yaml_tree_transform(self, model, tag, ctx):
         return {
-            "crpix": parameter_to_value(model.crpix_table),
+            "crpix_table": parameter_to_value(model.crpix_table),
             "cdelt": parameter_to_value(model.cdelt),
             "lon_pole": parameter_to_value(model.lon_pole),
             "crval_table": parameter_to_value(model.crval_table),
