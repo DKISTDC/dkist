@@ -65,8 +65,12 @@ class VaryingCelestialConverter(TransformConverterBase):
         )
 
     def to_yaml_tree_transform(self, model, tag, ctx):
+        crpix_key = "crpix_table"
+        # for asdf standard < 1.6
+        if tag.endswith("varying_celestial_transform-1.1.0"):
+            crpix_key = "crpix"
         return {
-            "crpix_table": parameter_to_value(model.crpix_table),
+            crpix_key: parameter_to_value(model.crpix_table),
             "cdelt": parameter_to_value(model.cdelt),
             "lon_pole": parameter_to_value(model.lon_pole),
             "crval_table": parameter_to_value(model.crval_table),
