@@ -43,6 +43,7 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "originalFrameCount": "Level 0 Frame count",
         "primaryExperimentId": "Primary Experiment ID",
         "primaryProposalId": "Primary Proposal ID",
+        "productId": "Product ID",
         "qualityAverageFriedParameter": "Average Fried Parameter",
         "qualityAveragePolarimetricAccuracy": "Average Polarimetric Accuracy",
         "recipeId": "Recipe ID",
