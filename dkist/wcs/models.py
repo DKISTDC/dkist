@@ -15,6 +15,7 @@ import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, separable
 from astropy.utils.decorators import deprecated_renamed_argument
 
+from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 __all__ = [
@@ -200,7 +201,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             ind = ind.value
         return np.array(np.round(ind), dtype=int)
 
-    @deprecated_renamed_argument("crpix", "crpix_table", "1.10", warning_type=DKISTDeprecationWarning)
+    @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
     def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
         super().__init__(*args, **kwargs)
         (
@@ -232,6 +233,11 @@ class BaseVaryingCelestialTransform(Model, ABC):
             lon_pole=180,
             projection=projection,
         )
+
+    @property
+    @deprecated(since="1.12", alternative="crpix_table")
+    def crpix(self):
+        return self.crpix_table
 
     def transform_at_index(self, ind, cdelt=None, lon_pole=None):
         """
