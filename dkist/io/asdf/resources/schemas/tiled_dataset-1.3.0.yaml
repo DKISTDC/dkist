@@ -18,7 +18,7 @@ properties:
       items:
         anyOf:
           - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
-          - null:true
+          - null: true
 
   meta:
     description: Dataset metadata, describing the whole dataset.
