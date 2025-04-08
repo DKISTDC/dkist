@@ -25,7 +25,7 @@ class TiledDatasetConverter(Converter):
         # Support old files without meta, but with inventory
         meta = node.get("meta", {})
 
-        meta["headers"] = node.get("headers", vstack([Table(ds.headers) for ds in row for row in node["datasets"]]))
+        meta["headers"] = node.get("headers", vstack([Table(ds.headers if ds else None) for ds in row for row in node["datasets"]]))
 
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
@@ -41,6 +41,5 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         tree["datasets"] = tiled_dataset._data.tolist()
-        tree["headers"] = tiled_dataset.combined_headers.as_array()
         tree["mask"] = tiled_dataset.mask
         return tree
