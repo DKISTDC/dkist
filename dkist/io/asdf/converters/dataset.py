@@ -1,10 +1,12 @@
 import copy
 
 from asdf.extension import Converter
+from astropy.table import Table
 
 
 class DatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/dataset-1.3.0",
         "asdf://dkist.nso.edu/tags/dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/dataset-1.0.0",
@@ -52,7 +54,7 @@ class DatasetConverter(Converter):
         if tag in ("tag:dkist.nso.edu:dkist/dataset-0.1.0",
                    "tag:dkist.nso.edu:dkist/dataset-0.2.0"):
             meta["inventory"] = node.get("meta")
-            meta["headers"] = node["headers"]
+            meta["headers"] = Table(node["headers"])
 
         dataset = Dataset(data, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
@@ -66,6 +68,8 @@ class DatasetConverter(Converter):
         node = {}
         # Copy the meta so we don't pop from the one in memory
         node["meta"] = copy.copy(dataset.meta) or {}
+        if dataset._is_mosaic_tile and node.get("meta"):
+            node["meta"]["headers"] = None
         # If the history key has been injected into the meta, do not save it
         node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs

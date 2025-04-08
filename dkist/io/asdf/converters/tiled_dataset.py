@@ -1,22 +1,33 @@
 import copy
 
 from asdf.extension import Converter
+from astropy.table import Table, vstack
 
 
 class TiledDatasetConverter(Converter):
     tags = [
-        "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.0.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.2.0",
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.3.0",
+        "tag:dkist.nso.edu:dkist/tiled_dataset-0.1.0",
     ]
     types = ["dkist.dataset.tiled_dataset.TiledDataset"]
 
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
 
+        for row in node["datasets"]:
+            for ds in row:
+                if ds:
+                    ds._is_mosaic_tile = True
+
         # Support old files without meta, but with inventory
         meta = node.get("meta", {})
+
+        meta["headers"] = node.get("headers", vstack([Table(ds.headers if ds else None) for ds in row for row in node["datasets"]]))
+
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
 

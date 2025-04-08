@@ -19,7 +19,7 @@ from matplotlib.gridspec import GridSpec
 from numpy.typing import NDArray
 
 import astropy
-from astropy.table import Table, vstack
+from astropy.table import vstack
 
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
@@ -126,13 +126,15 @@ class TiledDataset(Collection):
         assert len(file_managers) == len(wcses) == len(header_tables)
 
         datasets = np.empty(len(file_managers), dtype=object)
-        for i, (fm, wcs, headers) in enumerate(zip(file_managers, wcses, header_tables)):
+        all_headers = vstack(header_tables)
+        for i, (fm, wcs) in enumerate(zip(file_managers, wcses)):
+            headers = all_headers[i*len(fm):(i+1)*len(fm)]
             meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta)
+            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta, is_tile=True)
             datasets[i]._file_manager = fm
         datasets = datasets.reshape(shape)
 
-        return cls(datasets, meta={"inventory": inventory})
+        return cls(datasets, meta={"inventory": inventory, "headers": all_headers})
 
     def __init__(
         self,
@@ -150,6 +152,8 @@ class TiledDataset(Collection):
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
+        headers = meta.get("headers", {})
+        self.combined_headers = vstack(headers) if headers else None
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
@@ -218,14 +222,6 @@ class TiledDataset(Collection):
         The inventory record as kept by the data center for this dataset.
         """
         return self._meta["inventory"]
-
-    @property
-    def combined_headers(self) -> Table:
-        """
-        A single `astropy.table.Table` containing all the FITS headers for all
-        files in this dataset.
-        """
-        return vstack([ds.meta["headers"] for ds in self._data.compressed()])
 
     @property
     def shape(self) -> tuple[int, int]:
