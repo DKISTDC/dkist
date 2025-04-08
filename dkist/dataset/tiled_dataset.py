@@ -152,6 +152,7 @@ class TiledDataset(Collection):
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
+        headers = meta.get("headers", {})
         self.combined_headers = vstack(headers) if headers else None
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
