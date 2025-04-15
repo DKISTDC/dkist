@@ -3,6 +3,7 @@ from textwrap import dedent
 import numpy as np
 
 import gwcs
+from astropy.table import Table
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
@@ -179,7 +180,7 @@ class Dataset(NDCube):
             so any modifications to the FITS files will not be reflected here.
 
         """
-        return self.meta["headers"]
+        return Table(np.asanyarray(self.meta["headers"]), copy=False)
 
     @property
     def quality_report(self):
