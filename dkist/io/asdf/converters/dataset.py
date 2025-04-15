@@ -67,8 +67,8 @@ class DatasetConverter(Converter):
         node = {}
         # Copy the meta so we don't pop from the one in memory
         node["meta"] = copy.copy(dataset.meta) or {}
-        if dataset._is_mosaic_tile and node.get("meta"):
-            node["meta"]["headers"] = None
+        # if dataset._is_mosaic_tile and node.get("meta"):
+        #     node["meta"]["headers"] = None
         # If the history key has been injected into the meta, do not save it
         node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs

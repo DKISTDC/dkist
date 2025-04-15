@@ -1,5 +1,7 @@
 import copy
 
+import numpy as np
+
 from asdf.extension import Converter
 from astropy.table import Table, vstack
 
@@ -17,15 +19,20 @@ class TiledDatasetConverter(Converter):
     def from_yaml_tree(cls, node, tag, ctx):
         from dkist.dataset.tiled_dataset import TiledDataset
 
+        # Support old files without meta, but with inventory
+        meta = node.get("meta", {})
+
+        headers = meta.get("headers")
+        # If headers are saved as one Table for the whole TiledDataset, use those first
+        # Otherwise stack the headers saved for conponent Datasets and stack them
+        meta["headers"] = Table(headers.view(np.recarray)) if headers else vstack([Table(ds.headers if ds else {}) for row in node["datasets"] for ds in row])
+        # Then distribute headers (back) out to component Datasets as slices of the main Table
+        all_fnames = meta["headers"]["FILENAME"]
         for row in node["datasets"]:
             for ds in row:
                 if ds:
                     ds._is_mosaic_tile = True
-
-        # Support old files without meta, but with inventory
-        meta = node.get("meta", {})
-
-        meta["headers"] = node.get("headers", vstack([Table(ds.headers if ds else None) for ds in row for row in node["datasets"]]))
+                    ds.meta["headers"] = meta["headers"][:3]#[[f in ds.files._fm.filenames for f in all_fnames]]
 
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
@@ -40,6 +47,7 @@ class TiledDatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         meta.pop("history", None)
         tree["meta"] = meta
+        tree["meta"]["headers"] = tiled_dataset.combined_headers.as_array()#.view(np.recarray)
         tree["datasets"] = tiled_dataset._data.tolist()
         tree["mask"] = tiled_dataset.mask
         return tree
