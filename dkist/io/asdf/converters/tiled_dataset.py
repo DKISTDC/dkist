@@ -47,7 +47,7 @@ class TiledDatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         meta.pop("history", None)
         tree["meta"] = meta
-        tree["meta"]["headers"] = tiled_dataset.combined_headers.as_array()#.view(np.recarray)
+        tree["meta"]["headers"] = tiled_dataset.combined_headers.as_array()
         tree["datasets"] = tiled_dataset._data.tolist()
         tree["mask"] = tiled_dataset.mask
         return tree
