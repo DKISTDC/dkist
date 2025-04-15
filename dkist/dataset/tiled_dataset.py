@@ -19,7 +19,7 @@ from matplotlib.gridspec import GridSpec
 from numpy.typing import NDArray
 
 import astropy
-from astropy.table import vstack
+from astropy.table import Table, vstack
 
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
@@ -128,8 +128,17 @@ class TiledDataset(Collection):
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
-        headers = meta.get("headers", {})
-        self.combined_headers = vstack(headers) if headers else None
+        # If headers are saved as one Table for the whole TiledDataset, use those first
+        # Otherwise stack the headers saved for component Datasets
+        headers = meta.get("headers")
+        self.combined_headers = Table(np.asanyarray(headers), copy=False) if headers else vstack([Table(ds.headers if ds else {}) for row in dataset_array for ds in row])
+        # Then distribute headers (back) out to component Datasets as slices of the main Table
+        i = 0
+        for row in dataset_array:
+            for ds in row:
+                if ds:
+                    ds.meta["headers"] = self.combined_headers[i*len(ds.files):(i+1)*len(ds.files)]
+                    i += 1
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
