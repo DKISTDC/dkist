@@ -112,30 +112,6 @@ class TiledDataset(Collection):
         etc to work.
     """
 
-    @classmethod
-    def _from_components(cls, shape, file_managers, wcses, header_tables, inventory):
-        """
-        Construct a TiledDataset from the component parts of all the sub-datasets.
-
-        This is intended to be used in the dkist-inventory package for creating
-        these objects to be saved to asdf.
-
-        The inputs need to be in numpy order, as the flat list of datasets will
-        be reshaped into the given shape.
-        """
-        assert len(file_managers) == len(wcses) == len(header_tables)
-
-        datasets = np.empty(len(file_managers), dtype=object)
-        all_headers = vstack(header_tables)
-        for i, (fm, wcs) in enumerate(zip(file_managers, wcses)):
-            headers = all_headers[i*len(fm):(i+1)*len(fm)]
-            meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta, is_tile=True)
-            datasets[i]._file_manager = fm
-        datasets = datasets.reshape(shape)
-
-        return cls(datasets, meta={"inventory": inventory, "headers": all_headers})
-
     def __init__(
         self,
         dataset_array: NDArray[np.object_],
