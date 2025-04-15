@@ -13,6 +13,10 @@ except ImportError:
 import astropy.modeling.models as m
 import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, separable
+from astropy.utils.decorators import deprecated_renamed_argument
+
+from dkist.utils.decorators import deprecated
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 __all__ = [
     "AsymmetricMapping",
@@ -156,38 +160,40 @@ class BaseVaryingCelestialTransform(Model, ABC):
     _input_units_strict = True
     _is_inverse = False
 
-    crpix = Parameter()
     cdelt = Parameter()
     lon_pole = Parameter(default=180)
 
     n_outputs = 2
 
     @staticmethod
-    def _validate_table_shapes(pc_table, crval_table):
+    def _validate_table_shapes(pc_table, crval_table, crpix_table):
         table_shape = None
         if pc_table.shape != (2, 2):
             if pc_table.shape[-2:] != (2, 2):
                 raise ValueError("The pc table should be an array of 2x2 matrices.")
             table_shape = pc_table.shape[:-2]
 
-        if crval_table.shape != (2,):
-            if crval_table.shape[-1] != 2:
-                raise ValueError("The crval table should be an array of coordinate "
-                                 "pairs (the last dimension should have length 2).")
+        for table, table_name in ((crval_table, "crval"), (crpix_table, "crpix")):
+            if table.shape != (2,):
+                if table.shape[-1] != 2:
+                    raise ValueError(f"The {table_name} table should be an array of coordinate "
+                                     "pairs (the last dimension should have length 2).")
 
-            if table_shape is not None:
-                if table_shape != crval_table.shape[:-1]:
-                    raise ValueError("The shape of the pc and crval tables should match. "
-                                     f"The pc table has shape {table_shape} and the "
-                                     f"crval table has shape {crval_table.shape[:-1]}")
-            table_shape = crval_table.shape[:-1]
+                if table_shape is not None:
+                    if table_shape != table.shape[:-1]:
+                        raise ValueError("The shape of the pc, crval and crpix tables should match. "
+                                        f"The pc table has shape {table_shape} and the "
+                                        f"{table_name} table has shape {table.shape[:-1]}")
+                table_shape = table.shape[:-1]
 
         if pc_table.shape == (2, 2):
             pc_table = np.broadcast_to(pc_table, [*list(table_shape), 2, 2], subok=True)
         if crval_table.shape == (2,):
             crval_table = np.broadcast_to(crval_table, [*list(table_shape), 2], subok=True)
+        if crpix_table.shape == (2,):
+            crpix_table = np.broadcast_to(crpix_table, [*list(table_shape), 2], subok=True)
 
-        return table_shape, pc_table, crval_table
+        return table_shape, pc_table, crval_table, crpix_table
 
     @staticmethod
     def sanitize_index(ind):
@@ -195,13 +201,15 @@ class BaseVaryingCelestialTransform(Model, ABC):
             ind = ind.value
         return np.array(np.round(ind), dtype=int)
 
-    def __init__(self, *args, crval_table=None, pc_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
+    @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
+    def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
         super().__init__(*args, **kwargs)
         (
             self.table_shape,
             self.pc_table,
             self.crval_table,
-        ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table))
+            self.crpix_table
+        ) = self._validate_table_shapes(np.asanyarray(pc_table), np.asanyarray(crval_table), np.asanyarray(crpix_table))
 
         if not isinstance(projection, m.Pix2SkyProjection):
             raise TypeError("The projection keyword should be a Pix2SkyProjection model class.")
@@ -226,7 +234,12 @@ class BaseVaryingCelestialTransform(Model, ABC):
             projection=projection,
         )
 
-    def transform_at_index(self, ind, crpix=None, cdelt=None, lon_pole=None):
+    @property
+    @deprecated(since="1.12", alternative="crpix_table")
+    def crpix(self):
+        return self.crpix_table
+
+    def transform_at_index(self, ind, cdelt=None, lon_pole=None):
         """
         Generate a spatial model based on an index for the pc and crval tables.
 
@@ -254,11 +267,6 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
         # If we are being called from inside evaluate we can skip the lookup
         # but we have to handle both dimensionless and unitful parameters
-        if crpix is None:
-            if self.crpix.unit is not None:
-                crpix = u.Quantity(self.crpix)
-            else:
-                crpix = self.crpix.value
         if cdelt is None:
             if self.cdelt.unit is not None:
                 cdelt = u.Quantity(self.cdelt)
@@ -280,8 +288,10 @@ class BaseVaryingCelestialTransform(Model, ABC):
         else:
             crval = self.crval_table[ind]
 
-        if isinstance(crpix, u.Quantity):
-            crpix = crpix.to_value(u.pix)
+        if isinstance(self.crpix_table, u.Quantity):
+            crpix = self.crpix_table[ind].to_value(u.pix)
+        else:
+            crpix = self.crpix_table[ind]
 
         if isinstance(cdelt, u.Quantity):
             cdelt = cdelt.to_value(u.deg / u.pix)
@@ -298,7 +308,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
             lon_pole=lon_pole,
         )
 
-    def _map_transform(self, *arrays, crpix, cdelt, lon_pole, inverse=False):
+    def _map_transform(self, *arrays, cdelt, lon_pole, inverse=False):
         # We need to broadcast the arrays together so they are all the same shape
         barrays = np.broadcast_arrays(*arrays, subok=True)
         # # Convert the z, q, and m coordinates where present into indices to the lookup tables
@@ -319,7 +329,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         ranges = [np.unique(ind) for ind in inds]
         for ind in product(*ranges):
             # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(ind, crpix=crpix[0], cdelt=cdelt[0], lon_pole=lon_pole[0])
+            sct = self.transform_at_index(ind, cdelt=cdelt[0], lon_pole=lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
             masks = [inds[i] == ind[i] for i in range(len(ind))]
@@ -351,7 +361,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         # Anything extra is therefore a kwarg
         arrays = inputs[:self.n_inputs]
         kwargs = inputs[self.n_inputs:]
-        keys = ["crpix", "cdelt", "lon_pole"]
+        keys = ["cdelt", "lon_pole"]
         kwargs = dict(zip(keys, kwargs))
         return self._map_transform(*arrays, inverse=self._is_inverse, **kwargs)
 
@@ -385,7 +395,7 @@ class VaryingCelestialTransform(BaseVaryingCelestialTransform):
     @property
     def inverse(self):
         return InverseVaryingCelestialTransform(
-            crpix=self.crpix,
+            crpix_table=self.crpix_table,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
             pc_table=self.pc_table,
@@ -400,7 +410,7 @@ class VaryingCelestialTransform2D(BaseVaryingCelestialTransform):
     @property
     def inverse(self):
         return InverseVaryingCelestialTransform2D(
-            crpix=self.crpix,
+            crpix_table=self.crpix_table,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
             pc_table=self.pc_table,
@@ -415,7 +425,7 @@ class VaryingCelestialTransform3D(BaseVaryingCelestialTransform):
     @property
     def inverse(self):
         return InverseVaryingCelestialTransform3D(
-            crpix=self.crpix,
+            crpix_table=self.crpix_table,
             cdelt=self.cdelt,
             lon_pole=self.lon_pole,
             pc_table=self.pc_table,
@@ -623,8 +633,9 @@ varying_celestial_transform_dict = {
     (3, True): InverseVaryingCelestialTransform3D,
 }
 
+@deprecated_renamed_argument("crpix", "crpix_table", "1.10", warning_type=DKISTDeprecationWarning)
 def varying_celestial_transform_from_tables(
-        crpix: Iterable[float] | u.Quantity,
+        crpix_table: ArrayLike | u.Quantity,
         cdelt: Iterable[float] | u.Quantity,
         pc_table: ArrayLike | u.Quantity,
         crval_table: Iterable[float] | u.Quantity,
@@ -637,9 +648,10 @@ def varying_celestial_transform_from_tables(
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
     """
 
-    table_shape, _, _ = BaseVaryingCelestialTransform._validate_table_shapes(
-        pc_table,
-        crval_table,
+    table_shape, pc_table, crval_table, crpix_table = BaseVaryingCelestialTransform._validate_table_shapes(
+        np.asanyarray(pc_table),
+        np.asanyarray(crval_table),
+        np.asanyarray(crpix_table),
     )
     if (table_d := len(table_shape)) not in range(1, 4):
         raise ValueError("Only 1D, 2D and 3D lookup tables are supported.")
@@ -647,7 +659,7 @@ def varying_celestial_transform_from_tables(
 
     cls = varying_celestial_transform_dict[(table_d, inverse)]
     transform = cls(
-        crpix=crpix,
+        crpix_table=crpix_table,
         cdelt=cdelt,
         crval_table=crval_table,
         pc_table=pc_table,
