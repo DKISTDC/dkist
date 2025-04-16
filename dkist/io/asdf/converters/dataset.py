@@ -1,7 +1,6 @@
 import copy
 
 from asdf.extension import Converter
-from astropy.table import Table
 
 
 class DatasetConverter(Converter):
@@ -53,7 +52,7 @@ class DatasetConverter(Converter):
         if tag in ("tag:dkist.nso.edu:dkist/dataset-0.1.0",
                    "tag:dkist.nso.edu:dkist/dataset-0.2.0"):
             meta["inventory"] = node.get("meta")
-            meta["headers"] = Table(node["headers"])
+            meta["headers"] = node["headers"]
 
         dataset = Dataset(data, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
