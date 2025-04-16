@@ -128,9 +128,10 @@ class TiledDataset(Collection):
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
+
         # If headers are saved as one Table for the whole TiledDataset, use those first
         # Otherwise stack the heaers saved for component Datasets
-        if not meta.get("headers"):
+        if meta.get("headers") is None:
             meta["headers"] = vstack(
                 [Table(ds.headers if ds else {}) for row in dataset_array for ds in row]
             ).as_array()
@@ -142,6 +143,7 @@ class TiledDataset(Collection):
                 if ds:
                     ds.meta["headers"] = meta["headers"][i*len(ds.files):(i+1)*len(ds.files)]
                     i += 1
+
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
