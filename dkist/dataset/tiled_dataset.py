@@ -112,28 +112,6 @@ class TiledDataset(Collection):
         etc to work.
     """
 
-    @classmethod
-    def _from_components(cls, shape, file_managers, wcses, header_tables, inventory):
-        """
-        Construct a TiledDataset from the component parts of all the sub-datasets.
-
-        This is intended to be used in the dkist-inventory package for creating
-        these objects to be saved to asdf.
-
-        The inputs need to be in numpy order, as the flat list of datasets will
-        be reshaped into the given shape.
-        """
-        assert len(file_managers) == len(wcses) == len(header_tables)
-
-        datasets = np.empty(len(file_managers), dtype=object)
-        for i, (fm, wcs, headers) in enumerate(zip(file_managers, wcses, header_tables)):
-            meta = {"inventory": inventory, "headers": headers}
-            datasets[i] = Dataset(fm.dask_array, wcs=wcs, meta=meta)
-            datasets[i]._file_manager = fm
-        datasets = datasets.reshape(shape)
-
-        return cls(datasets, meta={"inventory": inventory})
-
     def __init__(
         self,
         dataset_array: NDArray[np.object_],
@@ -150,6 +128,27 @@ class TiledDataset(Collection):
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
         inventory = meta.get("inventory", inventory or {})
+
+        # If headers are saved as one Table for the whole TiledDataset, use those first
+        # Otherwise stack the headers saved for component Datasets
+        if meta.get("headers") is None:
+            meta["headers"] = vstack(
+                [ds.headers if ds else Table({}) for ds in self._data.compressed()]
+            )
+        # Then distribute headers (back) out to component Datasets as slices of the main Table
+        # for row in dataset_array:
+        #     for ds in row:
+
+        offset = 0
+        for ds in self._data.compressed():
+            if ds:
+                if isinstance(ds.headers, dict):
+                    thisoffset = ds.meta["headers"]["offset"]
+                    s = ds.meta["headers"]["size"]
+                    ds.meta["headers"] = meta["headers"][thisoffset:thisoffset+s]
+                else:
+                    ds.meta["headers"] = meta["headers"][offset:offset+len(ds.files)]
+
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
         self._meta["inventory"] = inventory
@@ -186,6 +185,10 @@ class TiledDataset(Collection):
         return True
 
     @property
+    def combined_headers(self):
+        return self._meta["headers"]
+
+    @property
     def mask(self) -> NDArray[np.bool_]:
         """
         The mask for tiles in this dataset.
@@ -218,14 +221,6 @@ class TiledDataset(Collection):
         The inventory record as kept by the data center for this dataset.
         """
         return self._meta["inventory"]
-
-    @property
-    def combined_headers(self) -> Table:
-        """
-        A single `astropy.table.Table` containing all the FITS headers for all
-        files in this dataset.
-        """
-        return vstack([ds.meta["headers"] for ds in self._data.compressed()])
 
     @property
     def shape(self) -> tuple[int, int]:

@@ -305,10 +305,12 @@ def eit_dataset():
                 ids=["simple-nomask", "simple-masked"])
 def simple_tiled_dataset(dataset, request):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
+    headers = []
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
+        headers.append(ds.headers)
     dataset_array = np.array(datasets).reshape((2,2))
-    meta = {"inventory": dataset.meta["inventory"]}
+    meta = {"inventory": dataset.meta["inventory"], "headers": headers}
     return TiledDataset(dataset_array, meta=meta, mask=request.param)
 
 
