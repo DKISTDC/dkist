@@ -30,7 +30,7 @@ __all__ = [
     "Page",
     "PageSize",
     "PolarimetricAccuracy",
-    "ProductID",
+    "Product",
     "Proposal",
     "Recipe",
     "SpatialSampling",
@@ -477,7 +477,7 @@ class HeaderVersion(_SimpleAttr):
 
 
 #productIds
-class ProductID(_SimpleAttr):
+class Product(_SimpleAttr):
     """
     Unique identifier for a dataset's set of uncalibrated science frames.
 

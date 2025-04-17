@@ -227,7 +227,7 @@ def _(wlk, attr, params):
     return params.update({"headerVersion": attr.value})
 
 
-@walker.add_applier(ProductID)
+@walker.add_applier(Product)
 def _(wlk, attr, params):
     return params.update({"productIds": attr.value})
 
