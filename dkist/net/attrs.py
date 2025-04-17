@@ -13,6 +13,7 @@ from sunpy.coordinates.utils import get_rectangle_coordinates as _get_rectangle_
 from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
+from sunpy.net.attr import or_
 
 __all__ = [
     "BoundingBox",
@@ -498,7 +499,12 @@ class Status(_SimpleAttr):
     ----------
     status
         The status of the dataset, can be one of ``ACTIVE``,
-        ``DEPRECATED`` or ``REMOVED``.
+        ``DEPRECATED`` or ``REMOVED`` or ``any`` to search for all three.
     """
-    def __init__(self, product_id: Literal["ACTIVE", "DEPRECATED", "REMOVED"]):
+    def __new__(cls, status: Literal["ACTIVE", "DEPRECATED", "REMOVED", "any"]):
+        if status == "any":
+            return or_(*map(Status, ["ACTIVE", "DEPRECATED", "REMOVED"]))
+        return super().__new__(cls, status)
+
+    def __init__(self, status: Literal["ACTIVE", "DEPRECATED", "REMOVED"]):
         super().__init__(status)
