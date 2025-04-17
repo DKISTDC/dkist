@@ -22,6 +22,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header
 
+from dkist import log
 from dkist.net.attrs_values import get_search_attrs_values
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
@@ -183,6 +184,7 @@ class DKISTClient(BaseClient):
             parsed = list(urllib.parse.urlparse(self._dataset_search_url))
             parsed[4] = urllib.parse.urlencode(url_parameters, doseq=True)
             full_url = urllib.parse.urlunparse(parsed)
+            log.debug("Making dkist query to %s", full_url)
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results.append(data)
