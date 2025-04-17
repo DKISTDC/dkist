@@ -54,7 +54,8 @@ def dataset_info_str(ds_in):
         s += f"consists of {nframes} frames.\n"
         s += f"Files are stored in {ds.files.basepath}\n"
 
-    s += f"\nThis calibration has Dataset ID {dsID} and the original frames have Product ID {pID}.\n"
+    s += f"\nThis calibration has Dataset ID {dsID}."
+    s += f"\nThe unique identifier for the input observe frames (Product ID) is {pID}.\n"
 
     if is_tiled:
         s += "\nEach "
