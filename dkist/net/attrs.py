@@ -75,6 +75,16 @@ class Dataset(_SimpleAttr):
     """
     Unique identifier for a dataset.
 
+    .. warning::
+
+        Only datasets with a Status of "ACTIVE" are returned by
+        default. If a Dataset is recalibrated, it will get a new
+        Dataset ID and the old one will no longer be marked as
+        "ACTIVE".
+        To search for the latest calibration of your data search by
+        `~dkist.net.attrs.Product` instead.  To search for a Dataset
+        ID irrespective of its Status use ``a.dkist.Status("any")``.
+
     Parameters
     ----------
     dataset_id
@@ -479,12 +489,16 @@ class HeaderVersion(_SimpleAttr):
 #productIds
 class Product(_SimpleAttr):
     """
-    Unique identifier for a dataset's set of uncalibrated science frames.
+    Unique identifier for a set of science frames
+
+    The Product ID identifies a unique set of data over multiple
+    recalibrations.  When data is recalibrated it will get a new
+    Dataset ID, but the Product ID will remain the same.
 
     Parameters
     ----------
     product_id
-        A random unique identifier for a dataset.
+        A unique identifier for a product.
     """
     def __init__(self, product_id: str):
         super().__init__(product_id)
