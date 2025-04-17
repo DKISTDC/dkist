@@ -34,8 +34,6 @@ def api_param_names():
         a.Physobs: ("hasAllStokes",),
         a.Provider: (),
         da.Dataset: ("datasetIds",),
-        da.WavelengthBand: ("filterWavelengths",),
-        da.Observable: ("observables",),
         da.Experiment: ("primaryExperimentIds",),
         da.Proposal: ("primaryProposalIds",),
         da.TargetType: ("targetTypes",),
