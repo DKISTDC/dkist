@@ -3,6 +3,8 @@ Search attributes which are specific to the `dkist.net.DKISTClient`.
 
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
+from typing import Literal
+
 import astropy.units as _u  # noqa: ICN001
 
 import sunpy.net._attrs as _sunpy_attrs
@@ -33,6 +35,7 @@ __all__ = [
     "Recipe",
     "SpatialSampling",
     "SpectralSampling",
+    "Status",
     "SummitSoftwareVersion",
     "TargetType",
     "TemporalSampling",
@@ -484,3 +487,18 @@ class ProductID(_SimpleAttr):
     """
     def __init__(self, product_id: str):
         super().__init__(product_id)
+
+
+#status
+class Status(_SimpleAttr):
+    """
+    Dataset Status
+
+    Parameters
+    ----------
+    status
+        The status of the dataset, can be one of ``ACTIVE``,
+        ``DEPRECATED`` or ``REMOVED``.
+    """
+    def __init__(self, product_id: Literal["ACTIVE", "DEPRECATED", "REMOVED"]):
+        super().__init__(status)

@@ -242,6 +242,6 @@ def _(wlk, attr, params):
     return params.update({"productIds": attr.value})
 
 
-@walker.add_applier(ProductID)
+@walker.add_applier(Status)
 def _(wlk, attr, params):
-    return params.update({"productIds": attr.value})
+    return params.update({"status": attr.value})
