@@ -130,19 +130,24 @@ class TiledDataset(Collection):
         inventory = meta.get("inventory", inventory or {})
 
         # If headers are saved as one Table for the whole TiledDataset, use those first
-        # Otherwise stack the heaers saved for component Datasets
+        # Otherwise stack the headers saved for component Datasets
         if meta.get("headers") is None:
             meta["headers"] = vstack(
-                [Table(ds.headers if ds else {}) for row in dataset_array for ds in row]
-            ).as_array()
-        self.combined_headers = Table(np.asanyarray(meta["headers"]), copy=False)
+                [ds.headers if ds else Table({}) for ds in self._data.compressed()]
+            )
         # Then distribute headers (back) out to component Datasets as slices of the main Table
-        i = 0
-        for row in dataset_array:
-            for ds in row:
-                if ds:
-                    ds.meta["headers"] = meta["headers"][i*len(ds.files):(i+1)*len(ds.files)]
-                    i += 1
+        # for row in dataset_array:
+        #     for ds in row:
+
+        offset = 0
+        for ds in self._data.compressed():
+            if ds:
+                if isinstance(ds.headers, dict):
+                    thisoffset = ds.meta["headers"]["offset"]
+                    s = ds.meta["headers"]["size"]
+                    ds.meta["headers"] = meta["headers"][thisoffset:thisoffset+s]
+                else:
+                    ds.meta["headers"] = meta["headers"][offset:offset+len(ds.files)]
 
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
@@ -178,6 +183,10 @@ class TiledDataset(Collection):
             if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
                 raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
         return True
+
+    @property
+    def combined_headers(self):
+        return self._meta["headers"]
 
     @property
     def mask(self) -> NDArray[np.bool_]:
