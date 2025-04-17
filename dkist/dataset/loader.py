@@ -57,7 +57,7 @@ def load_dataset(target):
 
     >>> from dkist.data.sample import VISP_BKPLX  # doctest: +REMOTE_DATA
     >>> print(dkist.load_dataset(VISP_BKPLX))  # doctest: +REMOTE_DATA
-    This VISP Dataset BKPLX consists of 1700 frames.
+    This VISP Dataset consists of 1700 frames.
     Files are stored in ...VISP_BKPLX
     <BLANKLINE>
     This calibration has Dataset ID BKPLX and the original frames have Product ID ...

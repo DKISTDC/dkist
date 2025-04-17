@@ -54,5 +54,6 @@ def api_param_names():
         da.ObservingProgramExecutionID: ("observingProgramExecutionId",),
         da.InstrumentProgramExecutionID: ("instrumentProgramExecutionId",),
         da.HeaderVersion: ("headerVersion",),
-        da.Product: ("productIds",)
+        da.Product: ("productIds",),
+        da.Status: ("status",),
     }

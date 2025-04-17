@@ -1,6 +1,7 @@
 """
 Hypothesis strategies for testing the DKIST client.
 """
+import typing
 import datetime
 from functools import cache
 
@@ -50,6 +51,7 @@ def _browse_movie(draw):
 
 def _unit_range(attr_type):
     unit = list(attr_type.__init__.__annotations__.values())
+    unit = [un.__metadata__[0] if isinstance(un, typing._AnnotatedAlias) else un for un in unit]
     unit = unit[0] if unit else u.one
 
     # Attrs which have unit decorations not type decorations need special
