@@ -36,7 +36,7 @@ properties:
         description: A table of all the headers for the constituent files.
         tag: "tag:astropy.org:astropy/table/table-1.*"
 
-    required: [inventory]
+    required: [inventory, headers]
     additionalProperties: true
 
   mask:
