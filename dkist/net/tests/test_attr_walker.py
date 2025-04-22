@@ -1,5 +1,6 @@
 import re
 import typing
+import inspect
 
 import pytest
 
@@ -86,9 +87,8 @@ def test_walker_single(all_attrs_classes, api_param_names):
         at = all_attrs_classes(10*u.nm, 20*u.nm)
 
     elif issubclass(all_attrs_classes, attr.Range):
-        unit = list(all_attrs_classes.__init__.__annotations__.values())
-        # TODO: How can you do this without a private attr?
-        unit = [un.__metadata__[0] if isinstance(un, typing._AnnotatedAlias) else un for un in unit]
+        unit = list(inspect.get_annotations(all_attrs_classes.__init__).values())
+        unit = [un.__metadata__[0] if typing.get_origin(un) is typing.Annotated else un for un in unit]
         unit = unit[0] if unit else u.one
         at = all_attrs_classes(10*unit, 10*unit)
 
