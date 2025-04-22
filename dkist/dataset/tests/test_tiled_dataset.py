@@ -80,24 +80,6 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
         TiledDataset(np.array((dataset, ds2)), meta=meta)
 
 
-@pytest.mark.accept_cli_dataset
-def test_tiled_dataset_from_components(dataset):
-    shape = (2, 2)
-    file_managers = [dataset._file_manager] * 4
-    wcses = [dataset.wcs] * 4
-    header_tables = [dataset.meta["headers"]] * 4
-    inventory = dataset.meta["inventory"]
-
-    tiled_ds = TiledDataset._from_components(shape, file_managers, wcses, header_tables, inventory)
-    assert isinstance(tiled_ds, TiledDataset)
-    assert tiled_ds.shape == shape
-    assert all(isinstance(t, Dataset) for t in tiled_ds.flat)
-    for ds, fm, headers in zip(tiled_ds.flat, file_managers, header_tables):
-        assert ds.files == fm
-        assert ds.meta["inventory"] is inventory
-        assert (ds.meta["headers"] == headers).all()
-
-
 @figure_test
 @pytest.mark.remote_data
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
