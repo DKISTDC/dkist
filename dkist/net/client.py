@@ -118,7 +118,11 @@ class DKISTQueryResponseTable(QueryResponseTable):
                     new_results[INVENTORY_KEY_MAP[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
-        data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
+        display_keys = list(cls._core_keys.default)
+        if "Status" in data.colnames and (data["Status"] != "ACTIVE").any():
+            display_keys.insert(2, "Status")
+
+        data = data._reorder_columns(display_keys, remove_empty=True)
         data.total_available_results = total_available_results
 
         return data
