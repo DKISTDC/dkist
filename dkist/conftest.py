@@ -13,7 +13,7 @@ import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, Parameter
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.time import Time
 
 from sunpy.coordinates.frames import Helioprojective
@@ -310,7 +310,7 @@ def simple_tiled_dataset(dataset, request):
         ds.meta["inventory"] = dataset.meta["inventory"]
         headers.append(ds.headers)
     dataset_array = np.array(datasets).reshape((2,2))
-    meta = {"inventory": dataset.meta["inventory"], "headers": headers}
+    meta = {"inventory": dataset.meta["inventory"], "headers": vstack(headers)}
     return TiledDataset(dataset_array, meta=meta, mask=request.param)
 
 
