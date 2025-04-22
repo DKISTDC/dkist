@@ -60,7 +60,8 @@ def load_dataset(target):
     This VISP Dataset consists of 1700 frames.
     Files are stored in ...VISP_BKPLX
     <BLANKLINE>
-    This calibration has Dataset ID BKPLX and the original frames have Product ID ...
+    This calibration has Dataset ID BKPLX.
+    The unique identifier for the input observe frames (Product ID) is (no ProductID).
     <BLANKLINE>
     This Dataset has 4 pixel and 5 world dimensions.
     <BLANKLINE>
