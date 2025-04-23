@@ -34,8 +34,10 @@ properties:
           - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
           - type: object
             properties:
-              offset: int
-              size: int
+              offset:
+                datatype: uint32
+              size:
+                datatype: uint32
             required: [offset, size]
             addtionalProperties: false
 
