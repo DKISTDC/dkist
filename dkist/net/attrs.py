@@ -3,6 +3,8 @@ Search attributes which are specific to the `dkist.net.DKISTClient`.
 
 Other attributes provided by `sunpy.net.attrs` are supported by the client.
 """
+from typing import Literal
+
 import astropy.units as _u  # noqa: ICN001
 
 import sunpy.net._attrs as _sunpy_attrs
@@ -11,6 +13,7 @@ from sunpy.coordinates.utils import get_rectangle_coordinates as _get_rectangle_
 from sunpy.net.attr import DataAttr as _DataAttr
 from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
+from sunpy.net.attr import or_
 
 __all__ = [
     "BoundingBox",
@@ -23,19 +26,19 @@ __all__ = [
     "FriedParameter",
     "HeaderVersion",
     "InstrumentProgramExecutionID",
-    "Observable",
     "ObservingProgramExecutionID",
     "Page",
     "PageSize",
     "PolarimetricAccuracy",
+    "Product",
     "Proposal",
     "Recipe",
     "SpatialSampling",
     "SpectralSampling",
+    "Status",
     "SummitSoftwareVersion",
     "TargetType",
     "TemporalSampling",
-    "WavelengthBand",
     "WorkflowName",
     "WorkflowVersion",
 ]
@@ -49,7 +52,7 @@ class PageSize(_SimpleAttr):
 
     Parameters
     ----------
-    page_size: `int`
+    page_size
     """
     def __init__(self, page_size: int):
         super().__init__(page_size)
@@ -61,7 +64,7 @@ class Page(_SimpleAttr):
 
     Parameters
     ----------
-    page: `int`
+    page
     """
     def __init__(self, page: int):
         super().__init__(page)
@@ -72,35 +75,23 @@ class Dataset(_SimpleAttr):
     """
     Unique identifier for a dataset.
 
+    .. warning::
+
+        Only datasets with a Status of "ACTIVE" are returned by
+        default. If a Dataset is recalibrated, it will get a new
+        Dataset ID and the old one will no longer be marked as
+        "ACTIVE".
+        To search for the latest calibration of your data search by
+        `~dkist.net.attrs.Product` instead.  To search for a Dataset
+        ID irrespective of its Status use ``a.dkist.Status("any")``.
+
     Parameters
     ----------
-    dataset_id : `str`
+    dataset_id
         A random unique identifier for a dataset.
     """
     def __init__(self, dataset_id: str):
         super().__init__(dataset_id)
-
-
-# filterWavelengths [array]
-class WavelengthBand(_SimpleAttr):
-    """
-    Known wavelength feature present in dataset.
-
-    Parameters
-    ----------
-    wavelength_band : `str`?
-    """
-    def __init__(self, wavelength_band: str):
-        super().__init__(wavelength_band)
-
-
-# observables [array]
-class Observable(_SimpleAttr):
-    """
-    Unused at this time.
-    """
-    def __init__(self, observable: str):
-        super().__init__(observable)
 
 
 # primaryExperimentIds [array]
@@ -111,11 +102,11 @@ class Experiment(_SimpleAttr):
     .. note::
 
         One `~dkist.net.attrs.Proposal` can consist of many
-        `~dkist.net.attrs.Experiment` which can consist of many datasets.
+        `~dkist.net.attrs.Experiment` which can consist of many products.
 
     Parameters
     ----------
-    experiment_id : `str`
+    experiment_id
         A unique identifier for an experiment.
     """
     def __init__(self, experiment_id: str):
@@ -130,11 +121,11 @@ class Proposal(_SimpleAttr):
     .. note::
 
         One `~dkist.net.attrs.Proposal` can consist of many
-        `~dkist.net.attrs.Experiment` which can consist of many datasets.
+        `~dkist.net.attrs.Experiment` which can consist of many products.
 
     Parameters
     ----------
-    proposal_id : `str`
+    proposal_id
         A unique identifier for a proposal.
     """
     def __init__(self, proposal_id: str):
@@ -148,7 +139,7 @@ class TargetType(_SimpleAttr):
 
     Parameters
     ----------
-    target_type: `str`
+    target_type
         A controlled string describing the target object.
     """
     def __init__(self, target_type: str):
@@ -162,7 +153,7 @@ class Recipe(_SimpleAttr):
 
     Parameters
     ----------
-    recipe_id: `str`
+    recipe_id
         A unique identifier for the calibration pipeline.
     """
     def __init__(self, recipe_id: str):
@@ -176,7 +167,7 @@ class Embargoed(_SimpleAttr):
 
     Parameters
     ----------
-    is_embargoed: `bool`
+    is_embargoed
         A boolean determining if a dataset currently under embargo.
     """
     def __init__(self, is_embargoed: bool):
@@ -202,13 +193,14 @@ class FriedParameter(_Range):
 
     Parameters
     ----------
-    friedmin : `u.Quantity`
+    friedmin
         The minimum value of the average fried parameter to search between.
 
-    friedmax : `u.Quantity`
+    friedmax
         The maximum value of the average fried parameter to search between.
     """
-    def __init__(self, friedmin: _u.cm, friedmax: _u.cm):
+    @_u.quantity_input
+    def __init__(self, friedmin: _u.Quantity[_u.cm], friedmax: _u.Quantity[_u.cm]):
         super().__init__(friedmin, friedmax)
 
     def collides(self, other):
@@ -220,7 +212,6 @@ class PolarimetricAccuracy(_Range):
     """
     The average polarimetric accuracy of a dataset.
     """
-
     def collides(self, other):
         return isinstance(other, self.__class__)
 
@@ -229,9 +220,16 @@ class PolarimetricAccuracy(_Range):
 class ExposureTime(_Range):
     """
     Most common exposure time of the calibrated data frames within the dataset.
+
+    Parameters
+    ----------
+    expmin
+        The minimum exposure time.
+    expmax
+        The maximum exposure time.
     """
     @_u.quantity_input
-    def __init__(self, expmin: _u.s, expmax: _u.s):
+    def __init__(self, expmin: _u.Quantity[_u.s], expmax: _u.Quantity[_u.s]):
         super().__init__(expmin, expmax)
 
     def collides(self, other):
@@ -242,16 +240,30 @@ class ExposureTime(_Range):
 class EmbargoEndTime(_sunpy_attrs.Time):
     """
     The time at which an embargo on the dataset lapses.
+
+    Parameters
+    ----------
+    start : time-like
+        The start time in a format parseable by `~sunpy.time.parse_time` or
+        a `sunpy.time.TimeRange` object.
+    end : time-like
+        The end time of the range.
     """
-
-
-# Custom Attrs
+    def __init__(self, start, end=None):
+        super().__init__(start, end)
 
 
 # browseMovieUrl & browseMovieObjectKey
 class BrowseMovie(_DataAttr):
     """
     The identifier for a browse move associated with a dataset.
+
+    Parameters
+    ----------
+    movieurl
+        The movieurl to match.
+    movieobjectkey
+        The movieobjectkey (filename) to match.
     """
     def __init__(self, *, movieurl: str = None, movieobjectkey: str = None):
         if movieurl is None and movieobjectkey is None:
@@ -313,8 +325,8 @@ class BoundingBox(_DataAttr):
     as seen by an observer on Earth **on Jan 1st 2020**.
     """
 
-    def __init__(self, bottom_left, *, top_right=None, width: _u.deg = None,
-                 height: _u.deg = None, search="containing"):
+    def __init__(self, bottom_left, *, top_right=None, width: _u.Quantity[_u.deg] = None,
+                 height: _u.Quantity[_u.deg] = None, search: str = "containing"):
         bottom_left, top_right = _get_rectangle_coordinates(bottom_left,
                                                             top_right=top_right,
                                                             width=width, height=height)
@@ -338,14 +350,14 @@ class SpectralSampling(_Range):
 
     Parameters
     ----------
-    spectralmin : `u.Quantity`
+    spectralmin
         The minimum value of the average spectral sampling to search between.
 
-    spectralmax : `u.Quantity`
+    spectralmax
         The maximum value of the average spectral sampling to search between.
     """
-    _u.quantity_input(equivalencies=_u.spectral())
-    def __init__(self, spectralmin: _u.nm, spectralmax: _u.nm):
+    @_u.quantity_input(equivalencies=_u.spectral())
+    def __init__(self, spectralmin: _u.Quantity[_u.nm], spectralmax: _u.Quantity[_u.nm]):
         super().__init__(spectralmin, spectralmax)
 
     def collides(self, other):
@@ -358,17 +370,19 @@ class SpatialSampling(_Range):
 
     Parameters
     ----------
-    spatialmin :
+    spatialmin
         The minimum value of the average spatial sampling to search between.
 
-    spatialmax :
+    spatialmax
         The maximum value of the average spatial sampling to search between.
     """
-    def __init__(self, spatialmin: _u.arcsec/_u.pix, spatialmax: _u.arcsec/_u.pix):
+    @_u.quantity_input
+    def __init__(self, spatialmin: _u.Quantity[_u.arcsec/_u.pix], spatialmax: _u.Quantity[_u.arcsec/_u.pix]):
         super().__init__(spatialmin, spatialmax)
 
     def collides(self, other):
         return isinstance(other, self.__class__)
+
 
 # averageDatasetTemporalSamplingMin, averageDatasetTemporalSamplingMax
 class TemporalSampling(_Range):
@@ -377,13 +391,14 @@ class TemporalSampling(_Range):
 
     Parameters
     ----------
-    temporalmin : `u.Quantity`
+    temporalmin
         The minimum value of the average temporal sampling to search between.
 
-    temporalmax : `u.Quantity`
+    temporalmax
         The maximum value of the average temporal sampling to search between.
     """
-    def __init__(self, temporalmin: _u.s, temporalmax: _u.s):
+    @_u.quantity_input
+    def __init__(self, temporalmin: _u.Quantity[_u.s], temporalmax: _u.Quantity[_u.s]):
         super().__init__(temporalmin, temporalmax)
 
     def collides(self, other):
@@ -397,7 +412,7 @@ class SummitSoftwareVersion(_SimpleAttr):
 
     Parameters
     ----------
-    version : `str`
+    version
         Version of the software to search for.
     """
     def __init__(self, version: str):
@@ -407,11 +422,11 @@ class SummitSoftwareVersion(_SimpleAttr):
 # workflowName
 class WorkflowName(_SimpleAttr):
     """
-    Name of the calibrarion workflow used.
+    Name of the calibration workflow used.
 
     Parameters
     ----------
-    workflow_name : `str`
+    workflow_name
         Name of the workflow.
     """
     def __init__(self, workflow_name: str):
@@ -425,7 +440,7 @@ class WorkflowVersion(_SimpleAttr):
 
     Parameters
     ----------
-    workflow : `str`
+    workflow
         Version of the workflow.
     """
     def __init__(self, workflow: str):
@@ -439,7 +454,7 @@ class ObservingProgramExecutionID(_SimpleAttr):
 
     Parameters
     ----------
-    obs_program : `str`
+    obs_program
     """
     def __init__(self, obs_program: str):
         super().__init__(obs_program)
@@ -452,7 +467,7 @@ class InstrumentProgramExecutionID(_SimpleAttr):
 
     Parameters
     ----------
-    instr_program : `str`
+    instr_program
     """
     def __init__(self, instr_program: str):
         super().__init__(instr_program)
@@ -465,7 +480,45 @@ class HeaderVersion(_SimpleAttr):
 
     Parameters
     ----------
-    version : `str`
+    version
     """
     def __init__(self, version: str):
         super().__init__(version)
+
+
+#productIds
+class Product(_SimpleAttr):
+    """
+    Unique identifier for a set of science frames
+
+    The Product ID identifies a unique set of data over multiple
+    recalibrations.  When data is recalibrated it will get a new
+    Dataset ID, but the Product ID will remain the same.
+
+    Parameters
+    ----------
+    product_id
+        A unique identifier for a product.
+    """
+    def __init__(self, product_id: str):
+        super().__init__(product_id)
+
+
+#status
+class Status(_SimpleAttr):
+    """
+    Dataset Status
+
+    Parameters
+    ----------
+    status
+        The status of the dataset, can be one of ``ACTIVE``,
+        ``DEPRECATED`` or ``REMOVED`` or ``any`` to search for all three.
+    """
+    def __new__(cls, status: Literal["ACTIVE", "DEPRECATED", "REMOVED", "any"]):
+        if status == "any":
+            return or_(*map(Status, ["ACTIVE", "DEPRECATED", "REMOVED"]))
+        return super().__new__(cls, status)
+
+    def __init__(self, status: Literal["ACTIVE", "DEPRECATED", "REMOVED"]):
+        super().__init__(status)

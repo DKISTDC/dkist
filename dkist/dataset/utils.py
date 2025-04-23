@@ -40,9 +40,10 @@ def dataset_info_str(ds_in):
     instr = ds.inventory.get("instrumentName", "")
     if instr:
         instr += " "
+    pID = ds.inventory.get("productId", "(no ProductID)")
     dsID = ds.inventory.get("datasetId", "(no DatasetID)")
 
-    s = f"This {instr}Dataset {dsID} "
+    s = f"This {instr}Dataset "
     if is_tiled:
         s += f"is an array of {tile_shape} Dataset objects "
         if ds.files:
@@ -54,6 +55,9 @@ def dataset_info_str(ds_in):
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in._data.compressed()])
         s += f"consists of {nframes} frames.\n"
         s += f"Files are stored in {ds.files.basepath}\n"
+
+    s += f"\nThis calibration has Dataset ID {dsID}."
+    s += f"\nThe unique identifier for the input observe frames (Product ID) is {pID}.\n"
 
     if is_tiled:
         s += "\nEach "
