@@ -199,7 +199,7 @@ class FriedParameter(_Range):
     friedmax
         The maximum value of the average fried parameter to search between.
     """
-    _u.quantity_input
+    @_u.quantity_input
     def __init__(self, friedmin: _u.Quantity[_u.cm], friedmax: _u.Quantity[_u.cm]):
         super().__init__(friedmin, friedmax)
 
@@ -356,7 +356,7 @@ class SpectralSampling(_Range):
     spectralmax
         The maximum value of the average spectral sampling to search between.
     """
-    _u.quantity_input(equivalencies=_u.spectral())
+    @_u.quantity_input(equivalencies=_u.spectral())
     def __init__(self, spectralmin: _u.Quantity[_u.nm], spectralmax: _u.Quantity[_u.nm]):
         super().__init__(spectralmin, spectralmax)
 
