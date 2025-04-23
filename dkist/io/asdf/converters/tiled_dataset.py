@@ -1,5 +1,7 @@
 import copy
 
+import numpy as np
+
 from asdf.extension import Converter
 
 
