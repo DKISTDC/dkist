@@ -31,6 +31,7 @@ properties:
         description: A table of all the headers for the constituent files.
         anyOf:
           - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
+          - null: true
 
       quality:
         description: A copy of the quality report of these observations.
