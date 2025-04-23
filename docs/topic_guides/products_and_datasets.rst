@@ -39,7 +39,7 @@ Dataset Status
 ==============
 
 The status of a Dataset indicates if it's the latest calibration for that Product (``ACTIVE``), if it's an older calibration but still available (``DEPRECATED``) or no longer available (``REMOVED``).
-It's possible to query a specific dataset ID irrespective of it's current status using the `~dkist.net.attrs.Status` attr:
+It's possible to query a specific dataset ID irrespective of its current status using the `~dkist.net.attrs.Status` attr:
 
 .. code-block:: python
 
@@ -64,4 +64,4 @@ It's possible to query a specific dataset ID irrespective of it's current status
    <BLANKLINE>
    <BLANKLINE>
 
-This currently returns one result table for each status.
+This query currently returns one result table for each status.
