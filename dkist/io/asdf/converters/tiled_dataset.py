@@ -19,11 +19,6 @@ class TiledDatasetConverter(Converter):
         # Support old files without meta, but with inventory
         meta = node.get("meta", {})
 
-        for row in node["datasets"]:
-            for ds in row:
-                if ds:
-                    ds._is_mosaic_tile = True
-
         if "inventory" not in meta and (inventory := node.get("inventory", None)):
             meta["inventory"] = inventory
 
