@@ -132,20 +132,13 @@ class TiledDataset(Collection):
         # If headers are saved as one Table for the whole TiledDataset, use those first
         # Otherwise stack the headers saved for component Datasets
         if meta.get("headers") is None:
-            meta["headers"] = vstack(
-                [Table(ds.headers) if ds else Table({}) for ds in self._data.compressed()]
-            )
+            ds_headers = [Table(ds.headers) if ds else Table({}) for ds in self._data.compressed()]
+            offsets, sizes = zip(*[(i, len(h)) for i, h in enumerate(ds_headers)])
+            meta["headers"] = vstack(ds_headers)
 
             # Then distribute headers (back) out to component Datasets as slices of the main Table
-            offset = 0
-            for ds in self._data.compressed():
-                if ds:
-                    if isinstance(ds.headers, dict) and "offset" in ds.headers.keys():
-                        thisoffset = ds.meta["headers"]["offset"]
-                        s = ds.meta["headers"]["size"]
-                        ds.meta["headers"] = meta["headers"][thisoffset:thisoffset+s]
-                    else:
-                        ds.meta["headers"] = meta["headers"][offset:offset+len(ds.files or [])]
+            for i, ds in enumerate(self._data.compressed()):
+                ds.meta["headers"] = meta["headers"][offsets[i]:offsets[i]+sizes[i]]
 
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
