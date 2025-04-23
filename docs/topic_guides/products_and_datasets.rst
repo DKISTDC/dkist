@@ -52,7 +52,7 @@ It's possible to query a specific dataset ID irrespective of its current status 
    Product ID Dataset ID        Start Time               End Time        Instrument   Wavelength
                                                                                           nm
    ---------- ---------- ----------------------- ----------------------- ---------- --------------
-     L1-YEVFH      ...  2022-06-02T17:22:50.176 2022-06-02T17:47:30.856        VBI 486.0 .. 486.0
+     L1-YEVFH      ...   2022-06-02T17:22:50.176 2022-06-02T17:47:30.856        VBI 486.0 .. 486.0
    <BLANKLINE>
    0 Results from the DKISTClient:
    <BLANKLINE>
