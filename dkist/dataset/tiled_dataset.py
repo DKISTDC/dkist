@@ -176,7 +176,11 @@ class TiledDataset(Collection):
         return True
 
     @property
-    def combined_headers(self):
+    def combined_headers(self) -> Table:
+        """
+        A single `astropy.table.Table` containing all the FITS headers for all
+        files in this dataset.
+        """
         return self._meta["headers"]
 
     @property
