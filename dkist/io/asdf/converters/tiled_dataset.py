@@ -1,7 +1,5 @@
 import copy
 
-import numpy as np
-
 from asdf.extension import Converter
 
 
@@ -39,7 +37,7 @@ class TiledDatasetConverter(Converter):
         offset = 0
         for ds in tiled_dataset.flat:
             s = len(ds.files)
-            ds.meta["headers"] = np.array({"offset": offset, "size": s})
+            ds.meta["headers"] = {"offset": offset, "size": s}
             offset += s
         tree["datasets"] = tiled_dataset._data.tolist()
         tree["mask"] = tiled_dataset.mask

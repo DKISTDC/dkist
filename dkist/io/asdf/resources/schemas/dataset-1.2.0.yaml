@@ -35,9 +35,9 @@ properties:
           - type: object
             properties:
               offset:
-                datatype: uint32
+                type: integer
               size:
-                datatype: uint32
+                type: integer
             required: [offset, size]
             addtionalProperties: false
 
