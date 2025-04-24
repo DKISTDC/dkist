@@ -1,3 +1,19 @@
+1.12.0 (2025-04-24)
+===================
+
+Deprecations and Removals
+-------------------------
+
+- The varying celestial transform models (derived from ``BaseVaryingCelestialTransform``) now support lookup tables of CRPIX.
+  This means that the ``crpix=`` kwarg is deprecated and replaced with ``crpix_table`` and the ``crpix`` parameter is now a ``crpix_table`` attribute. (`#501 <https://github.com/DKISTDC/dkist/pull/501>`__)
+
+
+Features
+--------
+
+- Add support for Product ID DKIST inventory keyword, which uniquely identifies a dataset's science frames. (`#549 <https://github.com/DKISTDC/dkist/pull/549>`__)
+
+
 1.11 (2025-03-20)
 =================
 
