@@ -38,8 +38,11 @@ def test_roundtrip_file_manager(file_manager):
 def assert_dataset_equal(new, old):
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
-    assert old_headers.columns == new_headers.columns
-    assert len(old_headers) == len(new_headers)
+    if isinstance(old_headers, dict):
+        assert old_headers == new_headers
+    else:
+        assert old_headers.columns == new_headers.columns
+        assert len(old_headers) == len(new_headers)
     assert old.meta == new.meta
     old.meta["headers"] = old_headers
     new.meta["headers"] = new_headers
