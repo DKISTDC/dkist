@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
       - '*.*'
-      - '!prepare-v*' 
+      - '!prepare-v*'
   # We also want this workflow triggered if the 'Run cron CI' label is added
   # or present when PR is updated
   pull_request:
