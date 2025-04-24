@@ -132,7 +132,7 @@ class TiledDataset(Collection):
         # If headers are saved as one Table for the whole TiledDataset, use those first
         # Otherwise stack the headers saved for component Datasets
         if meta.get("headers") is None:
-            ds_headers = [Table(ds.headers) if ds else Table({}) for ds in self._data.compressed()]
+            ds_headers = [Table(ds.headers) for ds in self._data.compressed()]
             offsets, sizes = zip(*[(i, len(h)) for i, h in enumerate(ds_headers)])
             meta["headers"] = vstack(ds_headers)
 
