@@ -32,7 +32,6 @@ class TiledDatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         meta.pop("history", None)
         tree["meta"] = meta
-        tree["meta"]["headers"] = tiled_dataset.combined_headers
         # Go into dataset header attributes and replace with {"offset": ..., "size": ...}
         offset = 0
         for ds in tiled_dataset.flat:
