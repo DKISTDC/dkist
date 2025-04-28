@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+from astropy.table import Table
+
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.tests.helpers import figure_test
 from dkist.utils.exceptions import DKISTUserWarning
@@ -217,3 +219,11 @@ def test_file_manager(large_tiled_dataset):
     ds[1, 1].files.basepath = "/not/a/dir/"
     with pytest.raises(ValueError, match="Not all tiles share the same basepath"):
         ds.files.basepath
+
+
+@pytest.mark.accept_cli_dataset
+def test_broadcast_headers(dataset):
+    dataset.meta["headers"] = Table([[0], [1]], names=["spam", "eggs"])
+    datasets = [dataset] * 4
+    tds = TiledDataset(datasets, meta={"inventory": dataset.meta["inventory"], "headers": None})
+    assert (tds.combined_headers == Table([[0, 0, 0, 0], [1, 1, 1, 1]], names=["spam", "eggs"])).all()
