@@ -59,7 +59,7 @@ def test_repr_numpy(dataset):
     assert f"{dataset.data.dtype}" in r
 
 
-@pytest.mark.accept_cli_dataset
+@pytest.mark.accept_cli_tiled_dataset
 def test_flat_repr(large_tiled_dataset):
     r = repr(large_tiled_dataset.flat)
     assert f"is an array of ({len(large_tiled_dataset.flat)},) Dataset objects" in r

@@ -409,8 +409,12 @@ def pytest_runtest_call(item):
             # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
             replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
             if ds:
+                if isinstance(item.funcargs[replace_arg], TiledDataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(ds)
             if tds:
+                if isinstance(item.funcargs[replace_arg], Dataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(tds)
 
         yield item
