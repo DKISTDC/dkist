@@ -8,12 +8,14 @@ on:
     branches:
       - 'main'
       - '*.*'
+      - '!prepare-v*'
   # We also want this workflow triggered if the 'Run cron CI' label is added
   # or present when PR is updated
   pull_request:
     types:
       - synchronize
       - labeled
+      - reopened
   schedule:
     #        ┌───────── minute (0 - 59)
     #        │ ┌───────── hour (0 - 23)

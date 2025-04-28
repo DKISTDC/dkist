@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
       - '*.*'
-      - 'prepare-v*'
+      - '!prepare-v*'
     tags:
       - 'v*'
       - '!*dev*'

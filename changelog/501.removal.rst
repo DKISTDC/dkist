@@ -1,2 +1,0 @@
-The varying celestial transform models (derived from ``BaseVaryingCelestialTransform``) now support lookup tables of CRPIX.
-This means that the ``crpix=`` kwarg is deprecated and replaced with ``crpix_table`` and the ``crpix`` parameter is now a ``crpix_table`` attribute.
