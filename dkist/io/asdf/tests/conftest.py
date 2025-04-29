@@ -18,6 +18,8 @@ def eit_dataset_asdf_path(request):
 @pytest.fixture(params=[
                         rootdir / "test_tiled_dataset-1.0.0_dataset-1.0.0.asdf",
                         rootdir / "test_tiled_dataset-1.0.0_dataset-1.1.0.asdf",
+                        rootdir / "test_tiled_dataset-1.1.0_dataset-1.1.0.asdf",
+                        rootdir / "test_tiled_dataset-1.2.0_dataset-1.1.0.asdf",
 ])
 def tiled_dataset_asdf_path(request):
     return request.param
