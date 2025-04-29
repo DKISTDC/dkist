@@ -223,7 +223,10 @@ def test_file_manager(large_tiled_dataset):
 
 @pytest.mark.accept_cli_dataset
 def test_broadcast_headers(dataset):
-    dataset.meta["headers"] = Table([[0], [1]], names=["spam", "eggs"])
-    datasets = [dataset] * 4
-    tds = TiledDataset(datasets, meta={"inventory": dataset.meta["inventory"], "headers": None})
-    assert (tds.combined_headers == Table([[0, 0, 0, 0], [1, 1, 1, 1]], names=["spam", "eggs"])).all()
+    datasets = np.array([copy.deepcopy(dataset) for _ in range(4)]).reshape([2, 2])
+    for i, ds in enumerate(datasets.flat):
+        ds.meta["headers"] = Table([[i], [i*10]], names=["spam", "eggs"])
+    tds = TiledDataset(datasets, meta={"inventory": datasets[0, 0].meta["inventory"], "headers": None})
+    assert (tds.combined_headers == Table([[0, 1, 2, 3], [0, 10, 20, 30]], names=["spam", "eggs"])).all()
+    tds.meta["headers"]["spam"][0] = 10
+    assert tds[0, 0].headers["spam"][0] == 10
