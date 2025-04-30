@@ -1,10 +1,12 @@
 import re
 import copy
+import importlib.resources as impres
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+import asdf
 from astropy.table import Table
 
 from dkist import Dataset, TiledDataset, load_dataset
@@ -231,3 +233,12 @@ def test_broadcast_headers(dataset):
     assert (tds.combined_headers == Table([[0, 1, 2, 3], [0, 10, 20, 30]], names=["spam", "eggs"])).all()
     tds.meta["headers"]["spam"][0] = 10
     assert tds[0, 0].headers["spam"][0] == 10
+
+
+@pytest.mark.accept_cli_tiled_dataset
+def test_copy_dataset_headers_on_write(large_tiled_dataset):
+    with impres.as_file(impres.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+        with asdf.AsdfFile(tree={"dataset": large_tiled_dataset}, custom_schema=schema_path.as_posix()) as afile:
+            afile.write_to("test-header-copies.asdf")
+    for ds in large_tiled_dataset.flat:
+        assert not isinstance(ds.headers, dict)
