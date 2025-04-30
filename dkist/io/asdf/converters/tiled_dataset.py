@@ -32,12 +32,14 @@ class TiledDatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         meta.pop("history", None)
         tree["meta"] = meta
+        # Copy the data as well so we aren't editing dataset headers in place
+        datasets = copy.copy(tiled_dataset._data)
         # Go into dataset header attributes and replace with {"offset": ..., "size": ...}
         offset = 0
-        for ds in tiled_dataset.flat:
+        for ds in datasets.compressed():
             s = len(ds.files)
             ds.meta["headers"] = {"offset": offset, "size": s}
             offset += s
-        tree["datasets"] = tiled_dataset._data.tolist()
+        tree["datasets"] = datasets.tolist()
         tree["mask"] = tiled_dataset.mask
         return tree
