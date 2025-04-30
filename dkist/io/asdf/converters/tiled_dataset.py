@@ -33,7 +33,7 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         # Copy the data as well so we aren't editing dataset headers in place
-        datasets = copy.copy(tiled_dataset._data)
+        datasets = copy.deepcopy(tiled_dataset._data)
         # Go into dataset header attributes and replace with {"offset": ..., "size": ...}
         offset = 0
         for ds in datasets.compressed():
