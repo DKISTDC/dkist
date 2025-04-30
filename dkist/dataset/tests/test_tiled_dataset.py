@@ -226,6 +226,7 @@ def test_broadcast_headers(dataset):
     datasets = np.array([copy.deepcopy(dataset) for _ in range(4)]).reshape([2, 2])
     for i, ds in enumerate(datasets.flat):
         ds.meta["headers"] = Table([[i], [i*10]], names=["spam", "eggs"])
+        ds.meta["inventory"] = dataset.meta["inventory"]
     tds = TiledDataset(datasets, meta={"inventory": datasets[0, 0].meta["inventory"], "headers": None})
     assert (tds.combined_headers == Table([[0, 1, 2, 3], [0, 10, 20, 30]], names=["spam", "eggs"])).all()
     tds.meta["headers"]["spam"][0] = 10

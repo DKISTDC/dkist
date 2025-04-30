@@ -171,7 +171,7 @@ class TiledDataset(Collection):
         for ds in datasets[1:]:
             if ds.wcs.world_axis_physical_types != pt_1:
                 raise ValueError("The physical types do not match between all datasets")
-            if ds.meta["inventory"] and ds.meta["inventory"] != inventory:
+            if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
                 raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
         return True
 
