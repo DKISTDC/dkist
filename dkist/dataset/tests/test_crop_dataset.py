@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 import astropy.units as u
@@ -5,6 +6,13 @@ from astropy.coordinates import SkyCoord, SpectralCoord, StokesCoord
 from astropy.time import Time
 
 gwcs = pytest.importorskip("gwcs", "0.22.2a1.dev2")
+
+
+def assert_skycoord_allclose(coord1, coord2):
+    assert coord1.is_equivalent_frame(coord2)
+    data1 = coord1.frame.cartesian.xyz
+    data2 = coord2.frame.cartesian.xyz
+    assert np.allclose(data1, data2)
 
 
 def test_crop_visp_by_only_stokes(croppable_visp_dataset):
@@ -52,11 +60,11 @@ def test_crop_visp_by_time(croppable_visp_dataset):
 
     orig_coords = croppable_visp_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
-    assert (cropped_coords[0][0] == orig_coords[0][200]).all()
-    assert (cropped_coords[0][-1] == orig_coords[0][400]).all()
-    assert (cropped_coords[1] == orig_coords[1]).all()
-    assert (cropped_coords[2] == orig_coords[2][200:401]).all()
-    assert (cropped_coords[3] == orig_coords[3]).all()
+    assert_skycoord_allclose(cropped_coords[0][0], orig_coords[0][200])
+    assert_skycoord_allclose(cropped_coords[0][-1], orig_coords[0][400])
+    assert np.allclose(cropped_coords[1], orig_coords[1])
+    assert np.allclose(cropped_coords[2].jd, orig_coords[2][200:401].jd)
+    assert np.allclose(cropped_coords[3], orig_coords[3])
 
 
 def test_crop_visp_by_lonlat(croppable_visp_dataset):
@@ -90,11 +98,11 @@ def test_crop_visp_by_lonlat(croppable_visp_dataset):
 
     orig_coords = croppable_visp_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
-    assert (cropped_coords[0][0] == orig_coords[0][200][500:1001]).all()
-    assert (cropped_coords[0][-1] == orig_coords[0][600][500:1001]).all()
-    assert (cropped_coords[1] == orig_coords[1]).all()
-    assert (cropped_coords[2] == orig_coords[2][200:601]).all()
-    assert (cropped_coords[3] == orig_coords[3]).all()
+    assert_skycoord_allclose(cropped_coords[0][0], orig_coords[0][200][500:1001])
+    assert_skycoord_allclose(cropped_coords[0][-1], orig_coords[0][600][500:1001])
+    assert np.allclose(cropped_coords[1], orig_coords[1])
+    assert np.allclose(cropped_coords[2].jd, orig_coords[2][200:601].jd)
+    assert np.allclose(cropped_coords[3], orig_coords[3])
 
 
 def test_crop_cryo_by_only_stokes(croppable_cryo_dataset):
@@ -144,12 +152,12 @@ def test_crop_cryo_by_time(croppable_cryo_dataset):
     cropped_coords = cropped.axis_world_coords()
 
     # Whole coordinate array is too large to compare, so check just the edges
-    assert (cropped_coords[0][0, 0, 0, :] == orig_coords[0][0, 0, 0, :]).all()
-    assert (cropped_coords[0][0, 0, -1, :] == orig_coords[0][0, 0, -1, :]).all()
-    assert (cropped_coords[0][0, 0, :, 0] == orig_coords[0][0, 0, :, 0]).all()
-    assert (cropped_coords[0][0, 0, :, -1] == orig_coords[0][0, 0, :, -1]).all()
-    assert (cropped_coords[1] == orig_coords[1][:2, :2]).all()
-    assert (cropped_coords[2] == orig_coords[2]).all()
+    assert_skycoord_allclose(cropped_coords[0][0, 0, 0, :], orig_coords[0][0, 0, 0, :])
+    assert_skycoord_allclose(cropped_coords[0][0, 0, -1, :], orig_coords[0][0, 0, -1, :])
+    assert_skycoord_allclose(cropped_coords[0][0, 0, :, 0], orig_coords[0][0, 0, :, 0])
+    assert_skycoord_allclose(cropped_coords[0][0, 0, :, -1], orig_coords[0][0, 0, :, -1])
+    assert np.allclose(cropped_coords[1].jd, orig_coords[1][:2, :2].jd)
+    assert np.allclose(cropped_coords[2], orig_coords[2])
 
 
 def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
@@ -180,6 +188,6 @@ def test_crop_cryo_by_only_lonlat(croppable_cryo_dataset):
     orig_coords = croppable_cryo_dataset.axis_world_coords()
     cropped_coords = cropped.axis_world_coords()
 
-    assert (cropped_coords[0][0, 0] == orig_coords[0][0, 0, :201, :201]).all()
-    assert (cropped_coords[1] == orig_coords[1]).all()
-    assert (cropped_coords[2] == orig_coords[2]).all()
+    assert_skycoord_allclose(cropped_coords[0][0, 0], orig_coords[0][0, 0, :201, :201])
+    assert np.allclose(cropped_coords[1].jd, orig_coords[1].jd)
+    assert np.allclose(cropped_coords[2], orig_coords[2])

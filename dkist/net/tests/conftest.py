@@ -34,8 +34,6 @@ def api_param_names():
         a.Physobs: ("hasAllStokes",),
         a.Provider: (),
         da.Dataset: ("datasetIds",),
-        da.WavelengthBand: ("filterWavelengths",),
-        da.Observable: ("observables",),
         da.Experiment: ("primaryExperimentIds",),
         da.Proposal: ("primaryProposalIds",),
         da.TargetType: ("targetTypes",),
@@ -56,4 +54,6 @@ def api_param_names():
         da.ObservingProgramExecutionID: ("observingProgramExecutionId",),
         da.InstrumentProgramExecutionID: ("instrumentProgramExecutionId",),
         da.HeaderVersion: ("headerVersion",),
+        da.Product: ("productIds",),
+        da.Status: ("status",),
     }

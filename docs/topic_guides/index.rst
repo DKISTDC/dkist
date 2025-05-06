@@ -9,6 +9,7 @@ If you’re starting fresh you might want to check out the Tutorial first.
 .. toctree::
   :maxdepth: 1
 
+  products_and_datasets
   level1data
   usertools
   net

@@ -1,6 +1,8 @@
 """
 Hypothesis strategies for testing the DKIST client.
 """
+import typing
+import inspect
 import datetime
 from functools import cache
 
@@ -49,8 +51,11 @@ def _browse_movie(draw):
 
 
 def _unit_range(attr_type):
-    unit = list(attr_type.__init__.__annotations__.values())
-    unit = unit[0] if unit else u.one
+    unit = list(inspect.get_annotations(attr_type.__init__).values())
+    if unit:
+        unit = unit[0].__metadata__[0] if typing.get_origin(unit[0]) is typing.Annotated else unit[0]
+    else:
+        unit = u.one
 
     # Attrs which have unit decorations not type decorations need special
     # handling or else hypothesis dies.
@@ -72,7 +77,7 @@ def _unit_range(attr_type):
 
 @st.composite
 def _embargo_end(draw, time=Times(
-                 max_value=datetime.datetime(datetime.datetime.utcnow().year, 1, 1, 0, 0),
+                 max_value=datetime.datetime(datetime.datetime.now(datetime.UTC).year, 1, 1, 0, 0),
                  min_value=datetime.datetime(1981, 1, 1, 0, 0)),
                  delta=TimeDelta()):
     t1 = draw(time)

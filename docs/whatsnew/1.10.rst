@@ -1,0 +1,43 @@
+.. _dkist:whatsnew:1.10:
+
+*****
+v1.10
+*****
+
+ASDF File Updates
+=================
+
+This release of ``dkist`` includes compatibility with new metadata ASDF files generated after 2025/02/07.
+
+.. warning::
+
+   You should re-download all ASDF files when upgrading to this version of ``dkist``, particularly for VBI data.
+
+These ASDF files change the ordering of the tiles inside a `.TiledDataset` object to correctly account for the differences between column-major (in FITS files) and row-major ordering (in numpy); this release of ``dkist`` updates the `.TiledDataset.plot` method to correctly plot these tiles in the expected order.
+It should be noted that with new metadata ASDF files the indexing of specific tiles will have changed.
+
+
+Dependency Updates
+==================
+
+This release of ``dkist`` includes both scheduled bumps to our dependencies as well as a special bump of gwcs to version 0.24, and associated dependencies.
+The version upgrade to gwcs 0.24 fixes the inverse transform (world to pixel) for VISP WCSs.
+
+* Python >= 3.11
+* dask >= 2023.2
+* gwcs >= 0.24
+* matplotlib >= 3.7
+* ndcube >= 2.1
+* numpy >= 1.25
+* parfive >= 2.1
+* sunpy >= 5.0.7
+* asdf >= 3.3
+* asdf-astropy >= 0.5
+* asdf-coordinate-schemas >= 0.3
+* asdf-transform-schemas >= 0.5
+* asdf-wcs-schemas >= 0.4
+
+ASDF File History
+=================
+
+History data from the metadata ASDF files is now accessible via ``Dataset.meta["history"]`` and ``TiledDataset.meta["history"]``, this history dictionary includes both entries relating to versions of packages used when writing the file and explicitly added history entries.

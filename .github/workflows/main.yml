@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
       - '*.*'
-      - 'prepare-v*'
+      - '!prepare-v*'
     tags:
       - 'v*'
       - '!*dev*'
@@ -33,22 +33,21 @@ jobs:
   tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: '3.10'
+      default_python: '3.13'
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
-        - linux: py312
-        - linux: py311
-        - windows: py311-online
-        - macos: py310
-        - linux: py310-oldestdeps
+        - linux: py313
+        - windows: py312
+        - macos: py311
+        - linux: py311-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: '3.10'
+      default_python: '3.12'
       coverage: 'codecov'
       envs: |
         - linux: build_docs-notebooks
@@ -59,13 +58,20 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  mypy:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      pytest: false
+      envs: |
+        - linux: mypy
+
   sdist_verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.13'
       - run: python -m pip install -U --user build
       - run: python -m build . --sdist
       - run: python -m pip install -U --user twine
@@ -77,7 +83,8 @@ jobs:
       coverage: 'codecov'
       posargs: '--color=yes'
       envs: |
-        - linux: py311-devdeps
+        - linux: py312-online
+        - linux: py313-devdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -90,9 +97,9 @@ jobs:
       )
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
-      python-version: '3.10'
+      python-version: '3.13'
       test_extras: tests
-      test_command: pytest --pyargs dkist -k "not test_fail"
+      test_command: pytest --pyargs dkist -k "not test_fail" --remote-data=none --benchmark-skip
       # We have to work around a github runner bug here: https://github.com/actions/runner/issues/2788#issuecomment-2145922705
       upload_to_pypi: ${{ startsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), 'refs/tags/v') && !endsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), '.dev') }}
     secrets:
@@ -110,3 +117,4 @@ jobs:
           homeserver: ${{ secrets.matrix_homeserver }}
           roomid: '!RehafayCrAiXbzVpXI:openastronomy.org'
           ignore_pattern: '.*Load.*'
+          summarise_success: true
