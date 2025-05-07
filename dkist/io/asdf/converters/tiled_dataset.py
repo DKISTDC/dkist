@@ -1,6 +1,8 @@
 import copy
+import numpy as np
 
 from asdf.extension import Converter
+from dkist.dataset import Dataset
 
 
 class TiledDatasetConverter(Converter):
@@ -33,13 +35,21 @@ class TiledDatasetConverter(Converter):
         meta.pop("history", None)
         tree["meta"] = meta
         # Copy the data as well so we aren't editing dataset headers in place
-        datasets = copy.deepcopy(tiled_dataset._data)
+        datasets = []
+        for ds in tiled_dataset._data.flat:
+            if ds:
+                new_ds = copy.copy(ds)
+                new_ds.meta = copy.copy(ds.meta)
+                datasets.append(new_ds)
+            else:
+                datasets.append(None)
         # Go into dataset header attributes and replace with {"offset": ..., "size": ...}
         offset = 0
-        for ds in datasets.compressed():
-            s = len(ds.files)
-            ds.meta["headers"] = {"offset": offset, "size": s}
-            offset += s
-        tree["datasets"] = datasets.tolist()
+        for ds in datasets:
+            if ds:
+                s = len(ds.files)
+                ds.meta["headers"] = {"offset": offset, "size": s}
+                offset += s
+        tree["datasets"] = np.array(datasets).reshape(tiled_dataset.shape).tolist()
         tree["mask"] = tiled_dataset.mask
         return tree
