@@ -7,7 +7,7 @@ from importlib.metadata import version as _version
 import platformdirs as _platformdirs
 
 from .logger import setup_default_dkist_logger as _setup_log
-import astropy.config as _config
+import dkist.config as _config
 
 log = _setup_log(__name__)
 

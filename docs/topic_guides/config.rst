@@ -17,8 +17,8 @@ For example to change the port used for the Globus authentication callback you c
 
 .. code-block:: python
 
-	>>> from dkist.net import conf
-	>>> conf.globus_auth_port = 8112
+    >>> from dkist.net import conf
+    >>> conf.globus_auth_port = 8112
 
 Other configuration options are documented below.
 
@@ -31,9 +31,9 @@ The easiest way to do this is to create a default config file using the `dkist.w
 
 .. code-block:: python
 
-	>>> import dkist
+    >>> import dkist
     >>> dkist.write_default_config()
-    INFO: The configuration file has been successfully written to /home/stuart/.dkist/config/dkist.cfg [astropy.config.configuration]
+    INFO: The configuration file has been successfully written to ...dkist.cfg [astropy.config.configuration]
     True
 
 This should print out the location where the file was written, then you can edit this file with the values of your configuration options.
