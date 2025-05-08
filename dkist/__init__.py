@@ -7,7 +7,7 @@ from importlib.metadata import version as _version
 import platformdirs as _platformdirs
 
 from .logger import setup_default_dkist_logger as _setup_log
-import dkist.config as _config
+import astropy.config as _config
 
 log = _setup_log(__name__)
 
@@ -17,7 +17,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-__all__ = ["Dataset", "TiledDataset", "conf", "load_dataset", "system_info"]
+__all__ = ["Dataset", "TiledDataset", "conf", "load_dataset", "system_info", "write_default_config"]
 
 
 def write_default_config(overwrite=False):
@@ -36,6 +36,7 @@ class Conf(_config.ConfigNamespace):
     """
     Configuration Parameters for the `dkist` Package.
     """
+    rootname = "dkist"
     sample_data_directory = _config.ConfigItem(
         _platformdirs.user_data_dir(appname="dkist"),
         "Location to download sample data to."
