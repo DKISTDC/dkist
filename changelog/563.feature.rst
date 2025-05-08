@@ -1,1 +1,0 @@
-Add a new ``dkist.net.conf.globus_auth_port`` config option to set the port used for the Globus authentication dance.
