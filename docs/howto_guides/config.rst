@@ -1,7 +1,7 @@
 .. _dkist:topic-guides:config:
 
-Configuring the `dkist` package
-===============================
+Configure the `dkist` package
+=============================
 
 There are a few parts of the `dkist` package which can be configured.
 The `dkist` configuration system makes use of the ``astropy`` config system, which you can read about here: :ref:`astropy_config`.
@@ -9,8 +9,8 @@ The `dkist` configuration system makes use of the ``astropy`` config system, whi
 Currently the `dkist` package provides config options as does the `dkist.net` subpackage.
 
 
-Configuring at runtime
-----------------------
+At runtime
+----------
 
 The configuration system provides a Python API to change config values at runtime.
 For example to change the port used for the Globus authentication callback you can do this:
@@ -23,8 +23,8 @@ For example to change the port used for the Globus authentication callback you c
 Other configuration options are documented below.
 
 
-Configuring with a file
------------------------
+With a file
+-----------
 
 To persist your configuration changes you can write a configuration file.
 The easiest way to do this is to create a default config file using the `dkist.write_default_config` function:
