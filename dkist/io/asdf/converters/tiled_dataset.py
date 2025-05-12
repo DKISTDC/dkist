@@ -1,8 +1,8 @@
 import copy
+
 import numpy as np
 
 from asdf.extension import Converter
-from dkist.dataset import Dataset
 
 
 class TiledDatasetConverter(Converter):
