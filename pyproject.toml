@@ -36,7 +36,7 @@ dependencies = [
   "matplotlib>=3.7",
   "ndcube[plotting,reproject]>=2.1",
   "numpy>=1.25",
-  "parfive[ftp]>=2.1",
+  "parfive[ftp]>=2.2.0",
   "platformdirs>=3.0",
   "sunpy[net,asdf]>=5.0.7",
   "tqdm>=4.65",
@@ -77,6 +77,7 @@ docs = [
   "accessible-pygments",
   "reproject[all]",
   "sunpy[net,asdf]>=6.1.0",  # Needed for the VBI extent example
+  "snowballstemmer<3",  # Not sure what package we have a transitive dep on this but 3.0 broke it
 ]
 
 [project.urls]

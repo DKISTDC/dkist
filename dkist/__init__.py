@@ -17,7 +17,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-__all__ = ["Dataset", "TiledDataset", "conf", "load_dataset", "system_info"]
+__all__ = ["Dataset", "TiledDataset", "conf", "load_dataset", "system_info", "write_default_config"]
 
 
 def write_default_config(overwrite=False):
@@ -36,6 +36,7 @@ class Conf(_config.ConfigNamespace):
     """
     Configuration Parameters for the `dkist` Package.
     """
+    rootname = "dkist"
     sample_data_directory = _config.ConfigItem(
         _platformdirs.user_data_dir(appname="dkist"),
         "Location to download sample data to."

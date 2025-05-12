@@ -10,6 +10,8 @@ class Conf(_config.ConfigNamespace):
     """
     Configuration Parameters for the `dkist.net` Package.
     """
+    rootname = "dkist"
+
     default_page_size = _config.ConfigItem(300, "Default number of datasets to return in search results.")
     dataset_endpoint = _config.ConfigItem("https://api.dkistdc.nso.edu/datasets/",
                                           "Base URL for dataset search.")
@@ -25,7 +27,10 @@ class Conf(_config.ConfigNamespace):
                                       "The path template to a dataset on the main endpoint.")
 
     attr_max_age = _config.ConfigItem(7,
-                                      "The number of days beyond which to refresh search attr values from the Data Center")
+                                      "The number of days beyond which to refresh search attr values from the Data Center.")
+
+    globus_auth_port = _config.ConfigItem(0,
+                                          "The port to be used for globus auth callbacks. 0 means randomly selected.")
 
 
 conf = Conf()
