@@ -1,6 +1,6 @@
 import re
 import copy
-import importlib.resources as impress
+from importlib import resources
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -237,7 +237,7 @@ def test_broadcast_headers(dataset):
 
 @pytest.mark.accept_cli_tiled_dataset
 def test_copy_dataset_headers_on_write(large_tiled_dataset):
-    with impress.as_file(impress.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+    with resources.as_file(resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
         with asdf.AsdfFile(tree={"dataset": large_tiled_dataset}, custom_schema=schema_path.as_posix()) as afile:
             afile.write_to("test-header-copies.asdf")
     for ds in large_tiled_dataset.flat:
