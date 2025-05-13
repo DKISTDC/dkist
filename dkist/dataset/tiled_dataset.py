@@ -6,6 +6,7 @@ but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
 import os
+import copy
 import types
 import warnings
 from typing import Any, Self, Literal
@@ -75,7 +76,10 @@ class TiledDatasetSlicer:
                 continue
             new_data.flat[i] = ds[slice_]
 
-        return TiledDataset(new_data, meta=self.meta, mask=self.data.mask)
+        meta = copy.copy(self.meta)
+        meta["headers"] = None
+
+        return TiledDataset(new_data, meta=meta, mask=self.data.mask)
 
 
 class TiledDataset(Collection):
