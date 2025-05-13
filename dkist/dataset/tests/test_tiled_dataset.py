@@ -70,6 +70,14 @@ def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
     assert simple_tiled_dataset.combined_headers.colnames == dataset.meta["headers"].colnames
 
 
+@pytest.mark.accept_cli_tiled_dataset
+def test_tiled_dataset_slice_tiles_headers(large_tiled_dataset):
+    sliced = large_tiled_dataset.slice_tiles[0]
+    for i, j in np.ndindex(sliced.shape):
+        assert i == sliced[i, j].headers["MINDEX1"] - 1
+        assert j == sliced[i, j].headers["MINDEX2"] - 1
+
+
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
     meta = {"inventory": dataset.meta["inventory"]}
     with pytest.raises(ValueError, match="inventory record of the first dataset"):
