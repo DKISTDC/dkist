@@ -7,6 +7,8 @@ from ndcube import NDCollection
 
 from dkist import Dataset
 
+__all__ = ["Inversion"]
+
 
 class Inversion(NDCollection):
     @classmethod
