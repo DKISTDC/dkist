@@ -53,7 +53,7 @@ class Inversion(NDCollection):
         return cls(newtree["inversion"]["quantities"].items(), aligned_axes="all", profiles=profiles)
 
     def __init__(self, *args, profiles=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(args[0], *args[1:], **kwargs)
         self.profiles = profiles
 
     def __str__(self):
