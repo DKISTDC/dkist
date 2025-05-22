@@ -1,0 +1,19 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/inversion-0.1.0"
+
+title: |
+  A DKIST Tiled Dataset object.
+description:
+  The container for a set of Dataset objects.
+
+type: object
+properties:
+  inversion:
+    description: An NDCollection object containing the inversion datasets
+    tag:  "tag:sunpy.org:ndcube/ndcube/ndcollection-0.*"
+
+required: [inversion]
+additionalProperties: true
+...
