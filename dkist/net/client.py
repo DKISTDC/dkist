@@ -293,3 +293,56 @@ class DKISTClient(BaseClient):
         }
 
         return {**return_values, **get_search_attrs_values()}
+
+
+class DKISTLevel2Client(DKISTClient):
+    """
+    """
+    @property
+    def _dataset_search_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
+
+        return conf.level2_data_endpoint + conf.level2_data_search_path
+
+    @property
+    def _metadata_streamer_url(self):
+        # Import here to avoid circular import
+        from dkist.net import conf
+
+        return conf.level2_download_endpoint
+
+    @classmethod
+    def _can_handle_query(cls, *query) -> bool:
+        # This enables the client to register what kind of searches it can
+        # handle, to prevent Fido using the incorrect client.
+        from sunpy.net import attrs as a
+
+        supported = set(walker.applymm.registry)
+        # This function is only called with arguments of the query where they are assumed to be ANDed.
+        supported.remove(attr.AttrAnd)
+        query_attrs = {type(x) for x in query}
+
+        # The DKIST client only requires that one or more of the support attrs be present.
+        if not query_attrs.issubset(supported) or len(query_attrs.intersection(supported)) < 1:
+            return False
+
+        for x in query:
+            # Not sure what will need to be here but it's not going to be the same things as for the level 1 client
+            if isinstance(x, a.Level):
+                if x.value not in (2, "2", "two"):
+                    return False
+
+        return True
+
+    @classmethod
+    def register_values(cls):
+        """
+        Known search values for DKIST data, currently manually specified.
+        """
+        return_values = {
+            # As above, other things will need to go here
+            sattrs.Level: [("2", "DKIST data calibrated to level 2.")],
+        }
+
+        return {**return_values, **get_search_attrs_values()}
