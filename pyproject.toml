@@ -27,8 +27,7 @@ dependencies = [
   "asdf-astropy>=0.5.0",  # Required by gwcs 0.24
   "asdf-coordinates-schemas>=0.3.0",  # required by wcs-schemas 0.4
   "asdf-standard>=1.1.0",
-  #"asdf-transform-schemas>=0.5.0",  # required by wcs-schemas 0.4
-  "asdf-transform-schemas @ git+https://github.com/asdf-format/asdf-transform-schemas",
+  "asdf-transform-schemas>=0.6.0",
   "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
   "astropy>=6.0",  # required by gwcs 0.24
   "dask[array]>=2023.2.0",
