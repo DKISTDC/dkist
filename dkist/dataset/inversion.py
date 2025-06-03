@@ -138,3 +138,58 @@ class Inversion(NDCollection):
                     ax.set_xlabel(xlabel)
 
         return figure
+
+    def plot_inversions(
+        self,
+        slice_index: int | slice | Iterable[int | slice],
+        figure: matplotlib.figure.Figure | None = None,
+        inversions: str | Iterable[str] = "all",
+        **kwargs
+    ):
+        """
+        Plot a slice of each tile in the TiledDataset
+
+        Parameters
+        ----------
+        slice_index
+            Object representing a slice which will reduce each component dataset
+            of the TiledDataset to a 2D image. This is passed to
+            `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
+        figure
+            A figure to use for the plot. If not specified the current pyplot
+            figure will be used, or a new one created.
+        """
+        if isinstance(slice_index, (int, slice, types.EllipsisType)):
+            slice_index = (slice_index,)
+
+        vmin, vmax = np.inf, 0
+
+        if figure is None:
+            figure = plt.gcf()
+
+        sliced_inversions = self[slice_index]
+        if inversions != "all":
+            sliced_inversions = Inversion({name: self[name] for name in inversions},
+                                          aligned_axes="all",
+                                          profiles=self.profiles)[slice_index]
+        ncols = len(inversions) if inversions != "all" else 4
+        nrows = int(np.ceil(len(sliced_inversions) / ncols))
+        gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
+        row = -1
+        for i, (name, inv) in enumerate(sliced_inversions.items()):
+            col = i % 4
+            if col == 0:
+                row += 1
+            ax_gridspec = gridspec[row, col]
+            ax = figure.add_subplot(ax_gridspec, projection=inv)
+
+            inv.plot(axes=ax, **kwargs)
+
+            if col != 0:
+                ax.set_ylabel(" ")
+            if row != nrows-1:
+                ax.set_xlabel(" ")
+
+            ax.set_title(name)
+
+        return figure
