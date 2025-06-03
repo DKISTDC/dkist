@@ -80,6 +80,12 @@ class Inversion(NDCollection):
 
         return textwrap.dedent(s).format(quants_repr, profiles_repr)
 
+    def __getitem__(self, aslice):
+        new_inv = super().__getitem__(aslice)
+        new_inv.profiles = self.profiles
+
+        return new_inv
+
     def plot_profiles(
         self,
         slice_index: int | slice | Iterable[int | slice],
