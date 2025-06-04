@@ -1,24 +1,23 @@
 from asdf.extension import Converter
 
-from dkist.dataset.inversion import Inversion
-
 
 class InversionConverter(Converter):
-    tags = [
-        "tag:dkist.nso.edu:dkist/inversion-0.1.0",
-    ]
-    types = ["dkist.dataset.inversion.Inversion"]
+    tags = ["asdf://dkist.nso.edu/tags/inversion-0.1.0"]
+    types = ["dkist.dataset.l2_dataset.Inversion"]
 
-    def from_yaml_tree(cls, node, tag, ctx):
-        return Inversion(node["inversion"], meta=node["meta"], profiles=node["profiles"])
+    def from_yaml_tree(self, node, tag, ctx):
+        from dkist.dataset.inversion import Inversion
 
-    def to_yaml_tree(cls, inversion, tag, ctx):
-        tree = {}
-        # Copy the meta so we don't pop from the one in memory
-        meta = copy.copy(inversion.meta)
-        # If the history key has been injected into the meta, do not save it
-        meta.pop("history", None)
-        tree["meta"] = meta
-        tree["inversion"] = inversion.items()
-        tree["profiles"] = inversion.profiles.items()
-        return tree
+        aligned_axes = list(node.get("aligned_axes").values())
+        aligned_axes = tuple(tuple(lst) for lst in aligned_axes)
+        return Inversion(node["items"], meta=node.get("meta"), aligned_axes=aligned_axes, profiles=node["profiles"])
+
+    def to_yaml_tree(self, inversion, tag, ctx):
+        node = {}
+        if inversion.meta is not None:
+            node["meta"] = inversion.meta
+        if inversion._aligned_axes is not None:
+            node["aligned_axes"] = inversion._aligned_axes
+        node["items"] = dict(inversion)
+        node["profiles"] = inversion.profiles
+        return node
