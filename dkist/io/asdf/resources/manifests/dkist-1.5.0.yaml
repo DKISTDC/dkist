@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
-id: asdf://dkist.nso.edu/manifests/dkist-1.4.0
-extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.4.0
+id: asdf://dkist.nso.edu/manifests/dkist-1.5.0
+extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.5.0
 title: DKIST extension
 description: ASDF schemas and tags for DKIST classes.
 
@@ -12,5 +12,5 @@ tags:
     tag_uri: "asdf://dkist.nso.edu/tags/dataset-1.2.0"
   - schema_uri: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.2.0"
     tag_uri: "asdf://dkist.nso.edu/tags/tiled_dataset-1.2.0"
-  - schema_uri: "asdf://dkist.nso.edu/schemas/inversion-0.1.0"
+  - schema_uri: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
     tag_uri: "asdf://dkist.nso.edu/tags/inversion-0.1.0"
