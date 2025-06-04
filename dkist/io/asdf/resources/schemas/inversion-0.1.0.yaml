@@ -3,17 +3,19 @@
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
 id: "asdf://dkist.nso.edu/schemas/inversion-0.1.0"
 
-title: |
-  A DKIST Tiled Dataset object.
-description:
-  The container for a set of Dataset objects.
+title:
+  Represents a DKIST Level 2 inversion
 
 type: object
 properties:
-  inversion:
-    description: An NDCollection object containing the inversion datasets
-    tag:  "tag:sunpy.org:ndcube/ndcube/ndcollection-0.*"
+  meta:
+    type: object
+  quantities:
+    $ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
+  profiles:
+    $ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
 
-required: [inversion]
+required: [meta, quantities, profiles]
 additionalProperties: true
+propertyOrder:  [meta, quantities, profiles]
 ...
