@@ -21,6 +21,7 @@ from sunpy.coordinates.frames import Helioprojective
 from dkist import load_dataset, log
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset
+from dkist.dataset.inversion import Inversion
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
@@ -436,3 +437,12 @@ def croppable_cryo_dataset(tmp_path_factory):
         with open(cryodir / "croppable_cryo.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(cryodir / "croppable_cryo.asdf")
+
+
+@pytest.fixture(scope="session")
+def inversion(tmp_path_factory):
+    invdir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "test_inversion.asdf.gz", mode="rb") as gfo:
+        with open(invdir / "test_inversion.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return Inversion.from_test_asdf(invdir / "test_inversion.asdf")
