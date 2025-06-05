@@ -17,7 +17,7 @@ from .dataset import Dataset
 __all__ = ["Inversion"]
 
 
-class Profile(NDCollection):
+class Profiles(NDCollection):
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
@@ -118,7 +118,7 @@ class Inversion(NDCollection):
                 profiles[k] = v
             for k, v in old_profiles["fit"].items():
                 profiles[k+"_fit"] = v
-            profiles = Profile(profiles.items(), aligned_axes=(0, 1, 3))
+            profiles = Profiles(profiles.items(), aligned_axes=(0, 1, 3))
 
         return cls(newtree["inversion"]["quantities"].items(), aligned_axes="all", profiles=profiles)
 
