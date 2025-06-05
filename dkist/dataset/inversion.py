@@ -12,7 +12,7 @@ import asdf
 
 from ndcube import NDCollection
 
-from dkist import Dataset
+from .dataset import Dataset
 
 __all__ = ["Inversion"]
 
