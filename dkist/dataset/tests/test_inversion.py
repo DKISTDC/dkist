@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 
 from dkist import Dataset, Inversion
 from dkist.dataset.inversion import Profiles
@@ -30,8 +31,9 @@ def test_get_item(inversion):
 
 
 @figure_test
-def test_inversion_plot(inversion):
+@pytest.mark.parametrize("inversions", ["all", ["temperature", "electronPressure", "velocity"]])
+def test_inversion_plot(inversion, inversions):
     fig = plt.figure(figsize=(12, 18))
-    inversion.plot(np.s_[:, :, 0])
+    inversion.plot(np.s_[:, :, 0], inversions=inversions)
 
     return plt.gcf()
