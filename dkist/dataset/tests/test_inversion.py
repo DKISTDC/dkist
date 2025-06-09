@@ -19,8 +19,10 @@ def test_str(inversion):
     r = repr(inversion)
     keys = "('opticalDepth', 'temperature', 'electronPressure', 'microTurbulence', 'magStrength', 'velocity', 'magInclination', 'magAzimuth', 'geoHeight', 'gasPressure', 'density')"
     assert keys in r
-    aligned = "[('pos.eq.ra', 'pos.eq.dec'), ('pos.eq.ra', 'pos.eq.dec'), ('custom:optical_depth',)]"
-    assert aligned in r
+    # Ordering of axes appears to be random causing 50% chance of test failure
+    aligned_order1 = "[('pos.eq.ra', 'pos.eq.dec'), ('pos.eq.ra', 'pos.eq.dec'), ('custom:optical_depth',)]"
+    aligned_order2 = "[('pos.eq.dec', 'pos.eq.ra'), ('pos.eq.dec', 'pos.eq.ra'), ('custom:optical_depth',)]"
+    assert aligned_order1 in r or aligned_order2 in r
 
 
 def test_get_item(inversion):
