@@ -1,9 +1,13 @@
 import re
 import copy
+from importlib import resources
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+
+import asdf
+from astropy.table import Table
 
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.tests.helpers import figure_test
@@ -66,6 +70,14 @@ def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
     assert simple_tiled_dataset.combined_headers.colnames == dataset.meta["headers"].colnames
 
 
+@pytest.mark.accept_cli_tiled_dataset
+def test_tiled_dataset_slice_tiles_headers(large_tiled_dataset):
+    sliced = large_tiled_dataset.slice_tiles[0]
+    for i, j in np.ndindex(sliced.shape):
+        assert i == sliced[i, j].headers["MINDEX1"] - 1
+        assert j == sliced[i, j].headers["MINDEX2"] - 1
+
+
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
     meta = {"inventory": dataset.meta["inventory"]}
     with pytest.raises(ValueError, match="inventory record of the first dataset"):
@@ -78,23 +90,6 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
     ds2.meta["inventory"] = {"hello": "world"}
     with pytest.raises(ValueError, match="inventory records of all the datasets"):
         TiledDataset(np.array((dataset, ds2)), meta=meta)
-
-
-def test_tiled_dataset_from_components(dataset):
-    shape = (2, 2)
-    file_managers = [dataset._file_manager] * 4
-    wcses = [dataset.wcs] * 4
-    header_tables = [dataset.meta["headers"]] * 4
-    inventory = dataset.meta["inventory"]
-
-    tiled_ds = TiledDataset._from_components(shape, file_managers, wcses, header_tables, inventory)
-    assert isinstance(tiled_ds, TiledDataset)
-    assert tiled_ds.shape == shape
-    assert all(isinstance(t, Dataset) for t in tiled_ds.flat)
-    for ds, fm, headers in zip(tiled_ds.flat, file_managers, header_tables):
-        assert ds.files == fm
-        assert ds.meta["inventory"] is inventory
-        assert ds.meta["headers"] is headers
 
 
 @figure_test
@@ -234,3 +229,24 @@ def test_file_manager(large_tiled_dataset):
     ds[1, 1].files.basepath = "/not/a/dir/"
     with pytest.raises(ValueError, match="Not all tiles share the same basepath"):
         ds.files.basepath
+
+
+@pytest.mark.accept_cli_dataset
+def test_broadcast_headers(dataset):
+    datasets = np.array([copy.deepcopy(dataset) for _ in range(4)]).reshape([2, 2])
+    for i, ds in enumerate(datasets.flat):
+        ds.meta["headers"] = Table([[i], [i*10]], names=["spam", "eggs"])
+        ds.meta["inventory"] = dataset.meta["inventory"]
+    tds = TiledDataset(datasets, meta={"inventory": datasets[0, 0].meta["inventory"], "headers": None})
+    assert (tds.combined_headers == Table([[0, 1, 2, 3], [0, 10, 20, 30]], names=["spam", "eggs"])).all()
+    tds.meta["headers"]["spam"][0] = 10
+    assert tds[0, 0].headers["spam"][0] == 10
+
+
+@pytest.mark.accept_cli_tiled_dataset
+def test_copy_dataset_headers_on_write(large_tiled_dataset):
+    with resources.as_file(resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
+        with asdf.AsdfFile(tree={"dataset": large_tiled_dataset}, custom_schema=schema_path.as_posix()) as afile:
+            afile.write_to("test-header-copies.asdf")
+    for ds in large_tiled_dataset.flat:
+        assert not isinstance(ds.headers, dict)
