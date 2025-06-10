@@ -29,7 +29,7 @@ from dkist.utils.inventory import INVENTORY_KEY_MAP
 from . import attrs as dattrs
 from .attr_walker import walker
 
-__all__ = ["DKISTClient", "DKISTQueryResponseTable"]
+__all__ = ["DKISTClient", "DKISTLevel2Client", "DKISTQueryResponseTable"]
 
 
 class DKISTQueryResponseTable(QueryResponseTable):
@@ -328,12 +328,16 @@ class DKISTLevel2Client(DKISTClient):
             return False
 
         for x in query:
-            # Not sure what will need to be here but it's not going to be the same things as for the level 1 client
+            # Presumably more things will need to be allowed here but I don't know yet what they'll be
             if isinstance(x, a.Level):
-                if x.value not in (2, "2", "two"):
-                    return False
+                if x.value in (2, "2", "two"):
+                    return True
 
-        return True
+        return False
+
+    @classmethod
+    def _attrs_module(cls):
+        return "dkist", "dkist.net.attrs"
 
     @classmethod
     def register_values(cls):
