@@ -41,6 +41,11 @@ def test_search_by_time(client, time):
         assert res[0]["Primary Proposal ID"] == "pid_1_50"
         assert res[0]["Start Time"].value == "2022-12-27T19:27:42.338"
         assert res[0]["End Time"].value == "2022-12-27T20:00:09.005"
+        downloader = parfive.Downloader()
+        client.fetch(res, downloader=downloader)
+        files = downloader.download()
+        assert len(files) == 1
+        assert len(files.errors) == 0
 
 @pytest.fixture
 def empty_query_response():

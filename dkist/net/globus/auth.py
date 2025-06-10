@@ -58,7 +58,7 @@ class RedirectHandler(BaseHTTPRequestHandler):
         return
 
 
-def start_local_server(listen=("localhost", 0)):
+def start_local_server(listen=None):
     """
     Start a server which will listen for the OAuth2 callback.
 
@@ -68,6 +68,9 @@ def start_local_server(listen=("localhost", 0)):
         ``(address, port)`` tuple, defaults to localhost and port 0, which
         leads to the system choosing a free port.
     """
+    # import conf here to prevent circular imports
+    from dkist.net import conf
+    listen = listen or ("localhost", conf.globus_auth_port)
     server = RedirectHTTPServer(listen, RedirectHandler)
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True
