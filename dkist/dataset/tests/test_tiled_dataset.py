@@ -74,8 +74,10 @@ def test_tiled_dataset_headers(simple_tiled_dataset, dataset):
 def test_tiled_dataset_slice_tiles_headers(large_tiled_dataset):
     sliced = large_tiled_dataset.slice_tiles[0]
     for i, j in np.ndindex(sliced.shape):
-        assert i == sliced[i, j].headers["MINDEX1"] - 1
-        assert j == sliced[i, j].headers["MINDEX2"] - 1
+        if isinstance(sliced[i, j], np.ma.core.MaskedConstant):
+            continue
+        assert 3 - j == sliced[i, j].headers["MINDEX1"]
+        assert i == sliced[i, j].headers["MINDEX2"] - 1
 
 
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
