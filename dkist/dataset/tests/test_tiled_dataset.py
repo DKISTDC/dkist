@@ -76,7 +76,7 @@ def test_tiled_dataset_slice_tiles_headers(large_tiled_dataset):
     for i, j in np.ndindex(sliced.shape):
         if isinstance(sliced[i, j], np.ma.core.MaskedConstant):
             continue
-        assert 3 - j == sliced[i, j].headers["MINDEX1"]
+        assert sliced.shape[1] - j == sliced[i, j].headers["MINDEX1"]
         assert i == sliced[i, j].headers["MINDEX2"] - 1
 
 
