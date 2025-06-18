@@ -78,7 +78,16 @@ def test_tiled_dataset_slice_tiles_headers(large_tiled_dataset):
             continue
         assert sliced.shape[1] - j == sliced[i, j].headers["MINDEX1"]
         assert i == sliced[i, j].headers["MINDEX2"] - 1
-
+    m1 = sliced.combined_headers["MINDEX1"]
+    m2 = sliced.combined_headers["MINDEX2"]
+    # Check that the headers are correctly ordered and sliced during the tile slicing
+    # Yes the masking bit here is horrible but we need to ignore headers from tiles that are there but masked out
+    expected_m1 = np.ma.MaskedArray(large_tiled_dataset.combined_headers["MINDEX1"][::3],
+                                    mask=large_tiled_dataset.mask.flat).compressed()
+    expected_m2 = np.ma.MaskedArray(large_tiled_dataset.combined_headers["MINDEX2"][::3],
+                                    mask=large_tiled_dataset.mask.flat).compressed()
+    assert (m1 == expected_m1).all()
+    assert (m2 == expected_m2).all()
 
 def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
     meta = {"inventory": dataset.meta["inventory"]}
