@@ -137,7 +137,8 @@ class TiledDataset(Collection):
         # Otherwise stack the headers saved for component Datasets
         if not meta.get("headers"):
             ds_headers = [Table(ds.headers) for ds in self._data.compressed()]
-            offsets, sizes = zip(*[(i, len(h)) for i, h in enumerate(ds_headers)])
+            sizes = [len(h) for h in ds_headers]
+            offsets = np.cumsum([0] + sizes[:-1])
             meta["headers"] = vstack(ds_headers)
 
             # Then distribute headers (back) out to component Datasets as slices of the main Table
