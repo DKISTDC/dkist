@@ -34,40 +34,20 @@ Globus will only be able to transfer files onto your machine in the specified pa
 
 You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
 If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-We will not be using the web app significantly for this tutorial, and generally we don't recommend downloading data this way, since the user tools are better suited to navigating the quantities of data that DKIST provides.
-However, we will be going over how to use the web app now so that we can demonstrate some of the underlying concepts.
+However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, though of course some may find the web app more convenient for obtaining smaller datasets or exploring the available data.
+In any case, the following underlying concepts are the same.
 
 **Endpoints** (also called **Collections** in the web app) are locations registered with Globus for data transfer.
 For example, you may want to define an endpoint for both your desktop machine in the office and your laptop, so that you can download data on each depending on where you're working.
 You would then be able to transfer data directly from one to the other using Globus.
 Many institutions will have their own Globus endpoints, such as a computing cluster, that you may have access to.
-DKIST has an endpoint called "DKIST Data Transfer", which is where DKIST data will be made available.
+DKIST has an endpoint called "DKIST Data Transfer", which is where DKIST data will be made available, and which is the default endpoint for the user tools.
 
 **Paths** When working with paths in Globus it's worth remembering that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 
-To start a data transfer from one endpoint to another, go to the "File Manager" tab of the web app.
-Here you will find a split screen - on either side you can select an endpoint in the "Collection" search box.
-(If you do not see the split screen, find and click the "set two pane" button in the top right hand corner of the page.)
-Select "DKIST Data Transfer" on the left hand side and the endpoint corresponding to your local machine on the right.
-Then you can navigate the file system on either machine (remembering that Globus will only have access to whichever local directories you've specified).
-
-Let's demonstrate a simple file transfer by grabbing the preview movie for a dataset.
-On the right hand side in your local endpoint, navigate to a suitable place to download the movie.
-Then on the left hand side navigate to `/data/pid_1_123/BEOGN/`.
-We will use this dataset for this and some other examples later in this session.
-You should see a list of the files available in this dataset, mostly the data stored in `.fits` format.
-Select the preview movie, `BEOGN.mp4`, by clicking the checkbox next to it, then click the "Start" button above the file list to begin the download.
-
-![](./globus1.png)
-
-You can check the progress of your transfer by going to the "Activity" tab, which shows both active and previous transfers.
-Various useful information is displayed here but for now the most important is whether the transfer task has failed or succeeded.
-
-![](./globus2.png)
-
-In either case Globus will also send an email to your registered email address when the task finishes.
-Of course in this trivial example this is unnecessary, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
-You do not need to leave the web app open for the transfer to continue, but remember that you do need to have GCP running - so if you stop it then your data download will stop as well.
+Whether you are using the web app or the user tools, Globus will send an email to your registered email address when the download task finishes.
+Of course this is unnecessary for many of the trivial examples in this tutorial, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
+Remember that you do need to have GCP running for the transfer to continue - so if you stop it then your data download will stop as well.
 
 If you try transferring the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
 This is to save download time and avoid duplication.
