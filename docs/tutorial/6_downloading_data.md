@@ -31,21 +31,18 @@ On Linux you can do this using the `-restrict-paths` command line argument, or b
 Globus will only be able to transfer files onto your machine in the specified paths.
 Remember that you do need to have GCP running for any transfers to complete - so if you stop it then your data download will stop as well.
 
-The first time you start a download task using the Python tools, GCP will open a new browser window prompting you to login and to provide an identifying label for the machine you're using.
+The first time you start a download task using the Python tools, GCP will open a new browser window prompting you to login.
 The Python tools will remember this authentication until it expires, so you will need to login again periodically, but not every time you start a download.
-
-You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
-If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, though of course some may find the web app more convenient for obtaining smaller datasets or exploring the available data.
-In any case, the following underlying concepts are the same.
 
 Finally, a couple of things to note on terminology:
 
 - **Endpoints** (also called **Collections** in the web app) are locations registered with Globus for data transfer.
 Many institutions will have their own Globus endpoints, such as a computing cluster, that you may have access to.
-DKIST has an endpoint called "DKIST Data Transfer", which is where DKIST data will be made available, and which is the default endpoint for the user tools.
+DKIST has an endpoint called "DKIST Data Transfer", which is where DKIST data will be made available.
+The user tools use this as the default remote endpoint, and define a local endpoint on your current machine.
 
-**Paths** When working with paths in Globus it's worth remembering that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
+- **Paths** When working with paths in Globus it's worth remembering that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
+However, note that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 
 Whether you are using the web app or the user tools, Globus will send an email to your registered email address when the download task finishes.
 Of course this is unnecessary for many of the trivial examples in this tutorial, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
