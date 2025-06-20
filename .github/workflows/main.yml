@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
       - '*.*'
-      - 'prepare-v*'
+      - '!prepare-v*'
     tags:
       - 'v*'
       - '!*dev*'
@@ -57,6 +57,13 @@ jobs:
               - graphviz
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  mypy:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      pytest: false
+      envs: |
+        - linux: mypy
 
   sdist_verify:
     runs-on: ubuntu-latest

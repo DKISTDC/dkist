@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from pytest_lazy_fixtures import lf
 
 import asdf
 import astropy.table
@@ -11,8 +12,8 @@ from asdf.testing.helpers import roundtrip_object
 
 import dkist
 from dkist.data.test import rootdir
-from dkist.io import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io import DKISTFileManager
+from dkist.io.dask.loaders import AstropyFITSLoader
 
 
 @pytest.fixture
@@ -25,13 +26,13 @@ def tagobj(request):
 
 @pytest.fixture
 def file_manager():
-    return FileManager.from_parts(["test1.fits", "test2.fits"], 0, "float", (10, 10),
-                                  loader=AstropyFITSLoader)
+    return DKISTFileManager.from_parts(["test1.fits", "test2.fits"], 0, "float", (10, 10),
+                                       loader=AstropyFITSLoader)
 
 
 def test_roundtrip_file_manager(file_manager):
-    newobj = roundtrip_object(file_manager)
-    assert newobj == file_manager
+    newobj = roundtrip_object(file_manager._fm)
+    assert newobj == file_manager._fm
 
 
 def assert_dataset_equal(new, old):
@@ -68,9 +69,8 @@ def test_roundtrip_tiled_dataset(simple_tiled_dataset):
 @pytest.mark.parametrize("tagobj",
                          [
                              "dataset",
-                             "simple_tiled_dataset",
-                         ],
-                         indirect=True)
+                             lf("simple_tiled_dataset"),
+                         ])
 def test_save_dataset_without_file_schema(tagobj, tmp_path):
     tree = {"dataset": tagobj}
     with asdf.AsdfFile(tree) as afile:
@@ -95,10 +95,9 @@ def test_asdf_tags(dataset, tmp_path):
 
 @pytest.mark.parametrize("tagobj",
                          [
-                             "dataset",
-                             "simple_tiled_dataset",
-                         ],
-                         indirect=True)
+                             lf("dataset"),
+                             lf("simple_tiled_dataset"),
+                         ])
 def test_save_dataset_with_file_schema(tagobj, tmpdir):
     tree = {"dataset": tagobj}
     with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
@@ -165,9 +164,9 @@ def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
     with asdf.open(eit_dataset_asdf_path) as tree:
         dataset = tree["dataset"]
         dataset.files.basepath = rootdir / "EIT"
-        dataset.files._striped_external_array.chunksize = chunksize
-        mocked = wrap_object(dataset.files._striped_external_array._loader, "__getitem__")
-        dataset._data = dataset.files._generate_array()
+        dataset.files._fm._striped_external_array.chunksize = chunksize
+        mocked = wrap_object(dataset.files._fm._striped_external_array._loader, "__getitem__")
+        dataset._data = dataset.files.dask_array
         dataset.data.compute()
 
     expected_call = call((slice(0, chunksize[0], None), slice(0, chunksize[1], None)))

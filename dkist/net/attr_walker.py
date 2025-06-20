@@ -99,16 +99,6 @@ def _(wlk, attr, params):
     return params.update({"datasetIds": attr.value})
 
 
-@walker.add_applier(WavelengthBand)
-def _(wlk, attr, params):
-    return params.update({"filterWavelengths": attr.value})
-
-
-@walker.add_applier(Observable)
-def _(wlk, attr, params):
-    return params.update({"observables": attr.value})
-
-
 @walker.add_applier(Experiment)
 def _(wlk, attr, params):
     return params.update({"primaryExperimentIds": attr.value})
@@ -159,13 +149,13 @@ def _(wlk, attr, params):
 
 @walker.add_applier(SpectralSampling)
 def _(wlk, attr, params):
-    return params.update({"averageDatasetSpectralSamplingMin": attr.min.to_value(equivalencies=float),
-                          "averageDatasetSpectralSamplingMax": attr.max.to_value(equivalencies=float)})
+    return params.update({"averageDatasetSpectralSamplingMin": attr.min.to_value(u.nm, equivalencies=u.spectral()),
+                          "averageDatasetSpectralSamplingMax": attr.max.to_value(u.nm, equivalencies=u.spectral())})
 
 @walker.add_applier(SpatialSampling)
 def _(wlk, attr, params):
-    return params.update({"averageDatasetSpatialSamplingMin": attr.min.to_value(equivalencies=float),
-                          "averageDatasetSpatialSamplingMax": attr.max.to_value(equivalencies=float)})
+    return params.update({"averageDatasetSpatialSamplingMin": attr.min.to_value(u.arcsec/u.pix),
+                          "averageDatasetSpatialSamplingMax": attr.max.to_value(u.arcsec/u.pix)})
 
 @walker.add_applier(TemporalSampling)
 def _(wlk, attr, params):
@@ -235,3 +225,13 @@ def _(wlk, attr, params):
 @walker.add_applier(HeaderVersion)
 def _(wlk, attr, params):
     return params.update({"headerVersion": attr.value})
+
+
+@walker.add_applier(Product)
+def _(wlk, attr, params):
+    return params.update({"productIds": attr.value})
+
+
+@walker.add_applier(Status)
+def _(wlk, attr, params):
+    return params.update({"status": attr.value})

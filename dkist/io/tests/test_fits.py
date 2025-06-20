@@ -7,8 +7,8 @@ from numpy.testing import assert_allclose
 import asdf
 
 from dkist.data.test import rootdir
-from dkist.io.file_manager import FileManager
-from dkist.io.loaders import AstropyFITSLoader
+from dkist.io.dask.loaders import AstropyFITSLoader
+from dkist.io.dask.striped_array import FileManager
 
 eitdir = Path(rootdir) / "EIT"
 

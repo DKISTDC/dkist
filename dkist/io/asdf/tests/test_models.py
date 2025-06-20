@@ -16,7 +16,7 @@ def test_roundtrip_vct():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2]
                          for a in np.linspace(0, 90, 10)] * u.pix
 
-    vct = VaryingCelestialTransform(crpix=(5, 5) * u.pix,
+    vct = VaryingCelestialTransform(crpix_table=(5, 5) * u.pix,
                                     cdelt=(1, 1) * u.arcsec/u.pix,
                                     crval_table=(0, 0) * u.arcsec,
                                     pc_table=varying_matrix_lt,
@@ -26,8 +26,8 @@ def test_roundtrip_vct():
     new_ivct = roundtrip_object(vct.inverse)
     assert isinstance(new_ivct, InverseVaryingCelestialTransform)
 
-    assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
-    assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)
+    assert u.allclose(u.Quantity(new_vct.crpix_table), (5, 5) * u.pix)
+    assert u.allclose(u.Quantity(new_ivct.crpix_table), (5, 5) * u.pix)
 
     assert u.allclose(u.Quantity(new_vct.pc_table), varying_matrix_lt)
     assert u.allclose(u.Quantity(new_ivct.pc_table), varying_matrix_lt)
@@ -43,7 +43,7 @@ def test_roundtrip_vct_2d():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    vct = VaryingCelestialTransform2D(crpix=(5, 5) * u.pix,
+    vct = VaryingCelestialTransform2D(crpix_table=(5, 5) * u.pix,
                                       cdelt=(1, 1) * u.arcsec/u.pix,
                                       crval_table=(0, 0) * u.arcsec,
                                       pc_table=varying_matrix_lt,
@@ -53,8 +53,8 @@ def test_roundtrip_vct_2d():
     new_ivct = roundtrip_object(vct.inverse)
     assert isinstance(new_ivct, InverseVaryingCelestialTransform2D)
 
-    assert u.allclose(u.Quantity(new_vct.crpix), (5, 5) * u.pix)
-    assert u.allclose(u.Quantity(new_ivct.crpix), (5, 5) * u.pix)
+    assert u.allclose(u.Quantity(new_vct.crpix_table), (5, 5) * u.pix)
+    assert u.allclose(u.Quantity(new_ivct.crpix_table), (5, 5) * u.pix)
 
     assert u.allclose(u.Quantity(new_vct.pc_table), varying_matrix_lt)
     assert u.allclose(u.Quantity(new_ivct.pc_table), varying_matrix_lt)
@@ -70,7 +70,7 @@ def test_roundtrip_vct_slit():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2]
                          for a in np.linspace(0, 90, 10)] * u.pix
 
-    vct = varying_celestial_transform_from_tables(crpix=(5, 5) * u.pix,
+    vct = varying_celestial_transform_from_tables(crpix_table=(5, 5) * u.pix,
                                                   cdelt=(1, 1) * u.arcsec/u.pix,
                                                   crval_table=(0, 0) * u.arcsec,
                                                   pc_table=varying_matrix_lt,
@@ -86,7 +86,7 @@ def test_roundtrip_vct_slit2d():
     varying_matrix_lt = [rotation_matrix(a)[:2, :2] for a in np.linspace(0, 90, 15)] * u.pix
     varying_matrix_lt = varying_matrix_lt.reshape((5, 3, 2, 2))
 
-    vct = varying_celestial_transform_from_tables(crpix=(5, 5) * u.pix,
+    vct = varying_celestial_transform_from_tables(crpix_table=(5, 5) * u.pix,
                                                   cdelt=(1, 1) * u.arcsec/u.pix,
                                                   crval_table=(0, 0) * u.arcsec,
                                                   pc_table=varying_matrix_lt,

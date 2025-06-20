@@ -22,6 +22,7 @@ from sunpy.net.base_client import (BaseClient, QueryResponseRow,
                                    QueryResponseTable, convert_row_to_table)
 from sunpy.util.net import parse_header
 
+from dkist import log
 from dkist.net.attrs_values import get_search_attrs_values
 from dkist.utils.inventory import INVENTORY_KEY_MAP
 
@@ -71,7 +72,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
     ]
 
     # These keys are shown in the repr and str representations of this class.
-    _core_keys = TableAttribute(default=["Start Time", "End Time", "Instrument", "Wavelength"])
+    _core_keys = TableAttribute(default=["Product ID", "Dataset ID", "Start Time", "End Time", "Instrument", "Wavelength"])
 
     total_available_results = TableAttribute(default=0)
 
@@ -117,7 +118,11 @@ class DKISTQueryResponseTable(QueryResponseTable):
                     new_results[INVENTORY_KEY_MAP[key]].append(value)
 
         data = cls._process_table(cls(new_results, client=client))
-        data = data._reorder_columns(cls._core_keys.default, remove_empty=True)
+        display_keys = list(cls._core_keys.default)
+        if "Status" in data.colnames and (data["Status"] != "ACTIVE").any():
+            display_keys.insert(2, "Status")
+
+        data = data._reorder_columns(display_keys, remove_empty=True)
         data.total_available_results = total_available_results
 
         return data
@@ -168,7 +173,7 @@ class DKISTClient(BaseClient):
 
     def search(self, *args) -> DKISTQueryResponseTable:
         """
-        Search for datasets provided by the DKIST data centre.
+        Search for datasets provided by the DKIST data center.
         """
         from dkist.net import conf
 
@@ -180,14 +185,18 @@ class DKISTClient(BaseClient):
             if "pageSize" not in url_parameters:
                 url_parameters.update({"pageSize": conf.default_page_size})
             # TODO make this accept and concatenate multiple wavebands in a search
-            query_string = urllib.parse.urlencode(url_parameters, doseq=True)
-            full_url = f"{self._dataset_search_url}?{query_string}"
+            parsed = list(urllib.parse.urlparse(self._dataset_search_url))
+            parsed[4] = urllib.parse.urlencode(url_parameters, doseq=True)
+            full_url = urllib.parse.urlunparse(parsed)
+            log.debug("Making dkist query to %s", full_url)
             data = urllib.request.urlopen(full_url)
             data = json.loads(data.read())
             results.append(data)
 
+        res = DKISTQueryResponseTable.from_results(results, client=self)
+        res.display_keys = res._core_keys
 
-        return DKISTQueryResponseTable.from_results(results, client=self)
+        return res
 
     @staticmethod
     def _make_filename(path: os.PathLike, row: QueryResponseRow,
@@ -227,7 +236,7 @@ class DKISTClient(BaseClient):
 
         for row in query_results:
             url = f"{self._metadata_streamer_url}/asdf?datasetId={row['Dataset ID']}"
-            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row))
+            downloader.enqueue_file(url, filename=partial(self._make_filename, path, row), checksum=True)
 
     @classmethod
     def _can_handle_query(cls, *query) -> bool:

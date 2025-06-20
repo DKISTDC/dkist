@@ -41,6 +41,11 @@ def test_search_by_time(client, time):
         assert res[0]["Primary Proposal ID"] == "pid_1_50"
         assert res[0]["Start Time"].value == "2022-12-27T19:27:42.338"
         assert res[0]["End Time"].value == "2022-12-27T20:00:09.005"
+        downloader = parfive.Downloader()
+        client.fetch(res, downloader=downloader)
+        files = downloader.download()
+        assert len(files) == 1
+        assert len(files.errors) == 0
 
 @pytest.fixture
 def empty_query_response():
@@ -60,6 +65,7 @@ def example_api_response():
                 "browseMovieObjectKey": "string",
                 "bucket": "string",
                 "datasetId": "string",
+                "productId": "L1-string",
                 "datasetSize": 0,
                 "endTime": "2020-02-28T17:05:53.330Z",
                 "contributingExperimentIds": ["string"],
@@ -90,7 +96,8 @@ def example_api_response():
                 "embargoEndDate": "2020-02-28T17:05:53.330Z",
                 "browseMovieUrl": "string",
                 "isDownloadable": True,
-                "averageDatasetSpectralSampling": None  # Some fields are optional
+                "averageDatasetSpectralSampling": None,  # Some fields are optional
+                "status": "ACTIVE",
             }
         ],
     }
@@ -116,6 +123,18 @@ def mocked_client(mocker, client, example_api_response):
     open_mock.read.return_value = json.dumps(example_api_response)
     urlopen.return_value = open_mock
     return client
+
+
+def test_display_table_status(mocker, client, example_api_response):
+    """
+    Given a query result with a non-ACTIVE status in it, check that Status is shown.
+    """
+    dclient = DKISTClient()
+    qr1 = DKISTQueryResponseTable.from_results([example_api_response], client=dclient)
+    assert qr1.colnames[2] == "Start Time"
+    example_api_response["searchResults"][0]["status"] = "DEPRECATED"
+    qr2 = DKISTQueryResponseTable.from_results([example_api_response], client=dclient)
+    assert qr2.colnames[2] == "Status"
 
 
 def test_query_response_from_results(empty_query_response, example_api_response, expected_table_keys):
