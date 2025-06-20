@@ -104,7 +104,7 @@ tds.slice_tiles[0]
 
 Notice that this gives us a new `TiledDataset` with the same number of tiles but smaller datasets.
 
-Similarly if we want to crop the edges of each tile we can index just as easily in the spatial dimensions:
+Similarly if we want to crop the edges of each tile, we can index just as easily in the spatial dimensions:
 
 
 ```{code-cell} ipython3
