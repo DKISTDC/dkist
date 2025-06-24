@@ -170,7 +170,7 @@ ds.files
 
 Here we can see that our initial starting point with the full dataset is an array of (4, 425, 980, 2554) datapoints stored in 1700 FITS files. Notice that the array in each file is of size (1, 980, 2554) - the dimensions match the spatial and dispersion axes of the data (with a dummy axis). Each file therefore effectively contains a single 2D image taken at a single raster location and polarization state, and many of these files put together make the full 4D dataset.
 
-Next let us slice our dataset as we did in the last chapter, and this time look at how that impacts the tracked files.
+Next let us slice our dataset and see how that impacts the tracked files.
 
 ```{code-cell} ipython3
 stokes_i = ds[0]
@@ -196,6 +196,7 @@ In this case, however, although the dataset is obviously smaller it still spans 
 feature = ds[0, 100:200, :, 638:-628]
 feature.data.shape
 ```
+
 ```{code-cell} ipython3
 feature.files
 ```
