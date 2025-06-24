@@ -127,7 +127,7 @@ ds.files.basepath
 When we download the data for this dataset later on, this is where it will be saved.
 This defaults to the location of the ASDF file.
 Remember that there may be thousands of FITS files in a dataset, so in general you may want to use the path interpolation feature of the various download functions to keep your them arranged sensibly.
-This is why for this example, we have downloaded the ASDF file to its own folder.
+This is why we have been downloading ASDF files to their own folders.
 
 We have mentioned already that slicing a dataset down to only the portion of it that interests us can be a way of reducing the size of the download once we want to actually get the data. We'll come back to both file tracking and downloads, but for now let us look at how our slicing operations impact the number of files.
 
@@ -135,9 +135,9 @@ We have mentioned already that slicing a dataset down to only the portion of it 
 ds.data.shape, ds.files
 ```
 
-Here we can see that our initial starting point with the full dataset was an array of (4, 425, 980, 2554) datapoints stored in 1700 FITS files. Notice that the array in each file is of size (1, 980, 2554) - the dimensions match the spatial and dispersion axes of the data (with a dummy axis). Each file therefore effectively contains a single 2D image taken at a single raster location and polarization state, and many of these files put together make the full 4D dataset.
+Here we can see that our initial starting point with the full dataset is an array of (4, 425, 980, 2554) datapoints stored in 1700 FITS files. Notice that the array in each file is of size (1, 980, 2554) - the dimensions match the spatial and dispersion axes of the data (with a dummy axis). Each file therefore effectively contains a single 2D image taken at a single raster location and polarization state, and many of these files put together make the full 4D dataset.
 
-Next let us look at our sliced datasets.
+Next let us slice our dataset and see how that impacts the tracked files.
 
 ```{code-cell} ipython3
 stokes_i = ds[0]
@@ -159,7 +159,7 @@ feature.data.shape, feature.files
 ```
 
 Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.
-It is therefore important to pay attention to how your data are stored across files. As noted before, slicing sensibly can significantly reduce how many files you need to download, but it can also be a relevant concern when doing some computational tasks and when plotting, as every file touched by the data will need to be opened and stored in memory.
+It is therefore important to pay attention to how your data are stored across files. As noted before, slicing sensibly can significantly reduce how many files you need to download, but it can also be a relevant concern when doing some computational tasks and when plotting, as every file touched by the data will need to be opened and loaded into memory.
 
 ## Downloading the quality report and preview movie
 
