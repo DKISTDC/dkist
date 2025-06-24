@@ -20,6 +20,7 @@ Firstly we need to re-create our dataset object from the last tutorial.
 ```{code-cell} ipython3
 :tags: [keep-inputs]
 
+import dkist
 from dkist.data.sample import VISP_BKPLX
 
 ds = dkist.load_dataset(VISP_BKPLX)
@@ -139,18 +140,21 @@ Here we can see that our initial starting point with the full dataset was an arr
 Next let us look at our sliced datasets.
 
 ```{code-cell} ipython3
+stokes_i = ds[0]
 stokes_i.data.shape, stokes_i.files
 ```
 
 Now since the dataset only contains Stokes I, we only need the files containing the corresponding data and those measured at the other polarization states have been dropped, leaving 425.
 
 ```{code-cell} ipython3
+scan = stokes_i[:, :, 0]
 scan.data.shape, scan.files
 ```
 
 In this case, however, although the dataset is obviously smaller it still spans the same 425 files. This is because we haven't sliced by raster location and are therefore taking one row of pixels from every file. To reduce the number of files any further we must look at fewer wavelengths:
 
 ```{code-cell} ipython3
+feature = stokes_i[:, 0, :]
 feature.data.shape, feature.files
 ```
 

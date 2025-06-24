@@ -113,7 +113,10 @@ In the case of VBI, this argument will be a single number which specifies the in
 
 
 ```{code-cell} ipython3
+from dkist.data.sample import VBI_AJQWW
 import matplotlib.pyplot as plt
+
+tds = dkist.load_dataset(VBI_AJQWW)
 tds.plot(0)
 ```
 
