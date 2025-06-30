@@ -57,7 +57,9 @@ In any case, the underlying concepts described above are the same.
 ## Dataset and downloading
 
 For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
-First let's reload the VISP dataset we were using before.
+First let's load the VISP dataset we were using before.
+This time we'll download the ASDF using Fido rather than loading the sample data.
+This is so that we can continue using a dataset we're familiar with but also go through the full process of downloading both the ASDF and data files.
 
 ```{code-cell} ipython3
 :tags: [keep-inputs]
@@ -66,7 +68,9 @@ import dkist
 import dkist.net
 from sunpy.net import Fido, attrs as a
 
-ds = dkist.load_dataset("~/sunpy/data/VISP/BKPLX")
+res = Fido.search(a.dkist.Dataset("BKPLX"))
+f = Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}/")
+ds = dkist.load_dataset(f)
 ```
 
 As we saw earlier, we can use the `files` attribute to access information about the number and names of files in the dataset even before downloading any.

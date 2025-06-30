@@ -28,7 +28,7 @@ We'll use the VISP data we downloaded at the end of the last notebook.
 import dkist
 import matplotlib.pyplot as plt
 
-ds = dkist.load_dataset('~/sunpy/data/BKPLX')
+ds = dkist.load_dataset('~/sunpy/data/VISP/BKPLX')
 ds
 ```
 
