@@ -112,17 +112,6 @@ class Dataset(NDCube):
             (isinstance(wcs, SlicedLowLevelWCS) and not isinstance(wcs._wcs, gwcs.WCS))):
             raise ValueError("DKIST Dataset objects expect gWCS objects as the wcs argument.")
 
-        if isinstance(wcs, gwcs.WCS):
-            # Set the array shape to be that of the data.
-            if wcs.array_shape is None:
-                wcs.array_shape = data.shape
-            if wcs.pixel_shape is None:
-                wcs.pixel_shape = data.shape[::-1]
-
-            if (wcs.pixel_shape != data.shape[::-1] or wcs.array_shape != data.shape):
-                raise ValueError("The pixel and array shape on the WCS object "
-                                 "do not match the given array.")
-
         if "headers" not in meta:
             raise ValueError("The meta dict must contain the headers table.")
         if "inventory" not in meta:

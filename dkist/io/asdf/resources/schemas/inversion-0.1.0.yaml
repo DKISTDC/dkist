@@ -17,5 +17,4 @@ properties:
 
 required: [meta, quantities, profiles]
 additionalProperties: true
-propertyOrder:  [meta, quantities, profiles]
 ...
