@@ -15,7 +15,13 @@ kernelspec:
 (dkist:tutorial:dataset-exploring-files)=
 # Exploring Files in a `Dataset`
 
-Firstly we need to re-create our dataset object from the last tutorial.
+In this chapter you will learn:
+
+- How to access dataset metadata from the FITS headers
+- How `Dataset` tracks FITS files and what to expect when slicing the data
+- How to obtain the quality report and preview movie for a dataset.
+
+First we need to re-create our dataset object from the last chapter.
 
 ```{code-cell} ipython3
 :tags: [keep-inputs]
@@ -137,28 +143,27 @@ ds.data.shape, ds.files
 
 Here we can see that our initial starting point with the full dataset is an array of (4, 425, 980, 2554) datapoints stored in 1700 FITS files. Notice that the array in each file is of size (1, 980, 2554) - the dimensions match the spatial and dispersion axes of the data (with a dummy axis). Each file therefore effectively contains a single 2D image taken at a single raster location and polarization state, and many of these files put together make the full 4D dataset.
 
-Next let us slice our dataset and see how that impacts the tracked files.
+Next let us slice our dataset as we did in the last chapter, and this time look at how that impacts the tracked files.
 
 ```{code-cell} ipython3
 stokes_i = ds[0]
 stokes_i.data.shape, stokes_i.files
 ```
 
-Now since the dataset only contains Stokes I, we only need the files containing the corresponding data and those measured at the other polarization states have been dropped, leaving 425.
+Since this slice only contains Stokes I, it only needs the files containing the corresponding data; those measured at the other polarization states have been dropped, leaving 425.
 
 ```{code-cell} ipython3
-scan = stokes_i[:, :, 0]
+scan = ds[0, :, 200]
 scan.data.shape, scan.files
 ```
 
 In this case, however, although the dataset is obviously smaller it still spans the same 425 files. This is because we haven't sliced by raster location and are therefore taking one row of pixels from every file. To reduce the number of files any further we must look at fewer wavelengths:
 
 ```{code-cell} ipython3
-feature = stokes_i[:, 0, :]
+feature = ds[0, 100:200, :, 638:-628]
 feature.data.shape, feature.files
 ```
 
-Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.
 It is therefore important to pay attention to how your data are stored across files. As noted before, slicing sensibly can significantly reduce how many files you need to download, but it can also be a relevant concern when doing some computational tasks and when plotting, as every file touched by the data will need to be opened and loaded into memory.
 
 ## Downloading the quality report and preview movie

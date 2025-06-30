@@ -15,8 +15,8 @@ kernelspec:
 # Searching for DKIST Datasets
 
 In this chapter we will cover how to search for DKIST datasets available at the DKIST Data Center.
-In DKIST data parlance, a "dataset" is the smallest unit of data that is searchable from the data centre, and represents a single observation from a single instrument at a single pass band.
 
+In DKIST data parlance, a "dataset" is the smallest unit of data that is searchable from the data centre, and represents a single observation from a single instrument at a single pass band.
 Each dataset comprises a number of different files:
   * An ASDF file containing all the metadata, and no data.
   * A quality report PDF.
@@ -75,7 +75,7 @@ Fido.search((a.Instrument.vbi | a.Instrument.visp) & a.dkist.Embargoed(False))
 
 As you can see this has returned two separate tables, one for VBI and one for VISP.
 
-Because `Fido` can search other clients in addition to the DKIST specific client. You can create more complex queries, for example a search for VISP data and context images from AIA at the same time:
+Because `Fido` can search other clients in addition to the DKIST specific client, you can create more complex queries. For example, a search for VISP data and context images from AIA at the same time:
 
 ```{code-cell} python
 time = a.Time("2022-06-02 17:00:00", "2022-06-02 18:00:00")
@@ -167,7 +167,7 @@ This will download the ASDF file as `data/mypath/filename.asdf`.
 
 With the nature of DKIST data being a large number of files - FITS + ASDF for a whole dataset - we probably want to keep each dataset in it's own folder.
 `Fido` makes this easy by allowing you to provide a path template rather than a specific path.
-To see the list of parameters we can use in these path templates we can run:
+To see the list of parameters we can use in these path templates we can use a helper method on the `DKISTQueryResponseTable`:
 ```{code-cell} python
 vbi.path_format_keys()
 ```

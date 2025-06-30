@@ -22,7 +22,7 @@ Instead the tiles are kept separate but must therefore be considered as separate
 
 For this purpose the Python tools have the {obj}`dkist.TiledDataset` class, which is essentially a 2D array of `Dataset` objects, with some helper functions to make it easier to work with those `Dataset`s either individually or together.
 
-To see `TiledDataset` in action we'll load some VBI data. We've already seen how to search for and download data, so we won't cover this again here. Instead, we will use one of the sample datasets distributed with the Python tools.
+To see `TiledDataset` in action we'll load some VBI data. We'll use the VBI data from the sample datasets, which is accessible in the same way as the VISP dataset we used before
 
 
 ```{code-cell} ipython3
@@ -31,9 +31,6 @@ from dkist.data.sample import VBI_AJQWW
 
 VBI_AJQWW
 ```
-
-This constant defines the path to a folder containing the metadata ASDF and a few data files for a small VBI dataset.
-These are automatically downloaded as a .tar file and unpacked the first time you import the sample data so that the dataset is always available.
 
 Now let's use that file path to create a `TiledDataset`. This is done in exactly the same way as for a regular `Dataset`, using `load_dataset()`:
 
@@ -109,4 +106,41 @@ Similarly if we want to crop the edges of each tile, we can index just as easily
 
 ```{code-cell} ipython3
 tds.slice_tiles[:, 1024:-1024, 1024:-1024]
+```
+
+## Irregular `TiledDataset`s
+
+As seen above, the default mode for VBI is to take data so that tiles overlap only slightly to form a larger image.
+However, some experiments might use an irregular arrangement of tiles with greater overlap, for with the main image being composed of four tiles together and a fifth in the centre overlapping all four.
+For cases like these, `TiledDataset` supports masking tiles.
+In this example the tiles would be stored as a 3x3 grid with the middle tile on each edge masked out.
+
+Which tiles should be masked is determined by the `.mask` attribute, which we can edit manually.
+
+```{code-cell} ipython3
+tds.mask = [[False, True, False], [True, False, True], [False, True, False]]
+tds
+```
+
+Notice that although the `TiledDataset` is still a 3x3 grid, the total number of frames given is 15 rather than 27, because it has skipped the masked tiles (even though in this case the data are still actually there).
+Other methods will also skip any masked tiles:
+
+```{code-cell} ipython3
+tds.tiles_shape
+```
+
+```{code-cell} ipython3
+for tile in tds.flat:
+	print(tile.headers['DATE-AVG'])
+```
+
+However, be careful of iterating over the whole grid of tiles manually, as this will not skip the masked tiles and may break.
+
+
+```{code-cell} ipython3
+:tags: [skip-execution]
+
+for row in tds:
+    for tile in row:
+        print(tile[0].headers['DATE-AVG'])
 ```

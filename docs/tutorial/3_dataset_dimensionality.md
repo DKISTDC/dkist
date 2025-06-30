@@ -15,10 +15,10 @@ kernelspec:
 (dkist:tutorial:dataset-dimensionality)=
 # Dimensionality of a `Dataset`
 
-In this tutorial you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
+In this chapter you will learn how to open a dataset and inspect it, then choose a subset of the data to download.
 
 As previously discussed we know that a "DKIST dataset" is comprised of multiple files, including an ASDF and many FITS files.
-The user tools represent all these files with the {obj}`dkist.Dataset` class.
+The Python tools represent all these files with the {obj}`dkist.Dataset` class.
 
 A `Dataset` object is constructed from the ASDF file for that dataset.
 This ASDF file contains the following information:
@@ -27,8 +27,24 @@ This ASDF file contains the following information:
 * A `gwcs` object which provides coordinate information for the whole dataset.
 * A list of all the component FITS files and the required order to combine them into a single array.
 
-In this tutorial we will create `Dataset`s using only the ASDF files.
+In this chapter we will create `Dataset`s using only the ASDF files.
 This will mean we won't have access to the data arrays in the FITS files, but everything else will function the same.
+
+## DKIST Sample data
+
+We will come back to searching for ASDF files in a later chapter, when we cover Globus and downloading the FITS data files.
+For this chapter and the next few, we will use some sample datasets which are provided with the `dkist` package.
+These sample datasets provide convenient examples to work with and contain some FITS files which do not require Globus to access.
+They can be imported from `dkist.data.sample` and for this chapter we will use the VISP one:
+
+```{code-cell} ipython3
+from dkist.data.sample import VISP_BKPLX
+
+VISP_BKPLX
+```
+
+This constant defines the path to a folder containing the metadata ASDF and a few data files for a small VISP dataset.
+These are automatically downloaded as a .tar file and unpacked the first time you import the sample data so that the dataset is always available.
 
 ## Constructing `Dataset` Objects
 
@@ -40,21 +56,15 @@ This function takes one of several different kinds of input:
 - a `parfive.results.Results` object as returned by `sunpy.Fido.fetch` (this will only work if _all_ results in the table are valid DKIST ASDF files); or
 - a list or tuple of any combination of the above.
 
-## Loading a VISP Dataset
-
-For the rest of this tutorial we are going to be using sample data provided with the `dkist` package.
-These sample datasets provide convenient examples to work with and contain some FITS files which do not require Globus to access.
-
-The sample datasets can be imported from `dkist.data.sample`, here we use a VISP one:
+Since we have a `Path` to our sample data as defined above, we can pass this straight to `load_dataset()`
 
 ```{code-cell} ipython3
 import dkist
-from dkist.data.sample import VISP_BKPLX
 
 ds = dkist.load_dataset(VISP_BKPLX)
 ```
 
-Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
+Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't assume the presence of any of the actual data.
 This may sound unhelpful but we'll see how it can be very powerful.
 
 First let's have a look at the basic representation of the `Dataset`.
@@ -156,7 +166,7 @@ Finally, it's possible to get the coordinates corresponding to each world axis u
 ds.axis_world_coords()
 ```
 
-This method (when called without any arguments) returns a tuple of coordinate objects covering all the different world axes, in this case it returns a `SkyCoord` for the two spataial axes, a `SpectralCoord` for the spectral axis, a `Time` object for the temporal axis and a `StokesCoord` for the Stokes axis.
+This method (when called without any arguments) returns a tuple of coordinate objects covering all the different world axes, in this case it returns a `SkyCoord` for the two spatial axes, a `SpectralCoord` for the spectral axis, a `Time` object for the temporal axis and a `StokesCoord` for the Stokes axis.
 
 +++
 
@@ -202,3 +212,5 @@ Again following usual NumPy slicing syntax, we can also slice out a section of a
 feature = ds[0, 100:200, :, 638:-638]
 feature
 ```
+
+Notice again that this has reduced the dimensionality of the world coordinates as well as of the data itself.

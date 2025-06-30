@@ -18,8 +18,8 @@ kernelspec:
 ## Setting up and using Globus
 
 We've seen how to search and download the ASDF metadata files with Fido.
-However, the actual data files are distributed using [Globus](https://www.globus.org/data-transfer)
-For the next portion of the workshop you will need to be running Globus Connect Personal, so follow the installation instructions for your platform [here](https://www.globus.org/globus-connect-personal) if you haven't already.
+However, the actual data files are distributed using [Globus](https://www.globus.org/data-transfer).
+For this chapter you will need to be running Globus Connect Personal, so follow the installation instructions for your platform [here](https://www.globus.org/globus-connect-personal) if you haven't already.
 During the setup, you will need to login to Globus.
 For this you can use your login for your institution, or alternatively you can login with Google or ORCID.
 
@@ -51,12 +51,11 @@ However, note that the paths are as the Globus endpoint sees them, so might not 
 
 You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
 If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, though of course some may find the web app more convenient for obtaining smaller datasets or exploring the available data.
+However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, and that is the method that will be covered in this chapter of the tutorial.
 In any case, the underlying concepts described above are the same.
 
 ## Dataset and downloading
 
-Now that we've been over the basic concepts of how data downloads work in Globus, let's see how to do it with the user tools.
 For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
 First let's reload the VISP dataset we were using before.
 
@@ -126,10 +125,6 @@ would save the file to `~/sunpy/data/BKPLX/VISP_2023_10_16T18_21_47_508_00630200
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
 ```{code-cell} ipython3
-ds[0].files.basepath
-```
-
-```{code-cell} ipython3
 :tags: [skip-execution]
 
 ds.files.download()
@@ -160,7 +155,7 @@ dkist.net.transfer_complete_datasets(results)
 This will iterate over the results and download each dataset in turn, with a progress bar for each.
 
 Of course, if this is a dataset you already know you will want to download all of - for example if it's your own observation - then you may not need to find it through Fido first.
-Fortunately, `transfer_complete_datasets()`, also lets you specify a dataset or datasets for which to download all files, by passing the dataset IDs.
+Fortunately, `transfer_complete_datasets()`, also lets you specify which datasets to download, by passing one or more dataset IDs.
 
 ```{code-cell} ipython3
 :tags: [skip-execution]
@@ -175,14 +170,11 @@ If you want to download a lot of data this is probably not useful, so you can tu
 This will set up the transfer in Globus but then return from the function.
 Of course, be cautious with this approach if the next step of your code depends on the data being present.
 Setting `wait=False` will also skip the wait at the end of each dataset if downloading more than one, so all the transfers will be set up on Globus and then the function will return.
-
-To demonstrate this, let's grab some data for the next session, which will be on visualisation.
+For example:
 
 ```{code-cell} ipython3
 :tags: [skip-execution]
 
-ds = dkist.Dataset.from_directory("~/sunpy/data/VISP/AGLKO")
-ds.files.download(wait=False, progress=False)
+results = Fido.search(a.dkist.Proposal("pid_1_123"))
+dkist.net.transfer_complete_datasets(results, wait=False, progress=False)
 ```
-
-Here we're setting the data to download, but notice that the function has returned almost immediately, so we can close the notebook and continue to the next session without interrupting it.

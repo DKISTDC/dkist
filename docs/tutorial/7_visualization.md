@@ -77,15 +77,16 @@ small_ds.plot(plot_axes=['y', None, 'x'])
 plt.show()
 ```
 
-You may have noticed this plot took somewhat longer to draw than the previous one.
+You may have noticed this plot took longer to draw than the previous one.
 This is for the same reason as we discussed when talking about reducing the size of dataset downloads: when you slice across the array in a different direction to how it's stored in the files, you have to reference multiple files to create the slice.
 So while the first plot only had to load values from one file at a time, the one above needs to get one line of the array from each of 150 files in order to draw the slice.
 If you try to animate it, it then needs to do this again at every step.
 
 ```{warning}
-For the above example we have very deliberately sliced the data to a size that is manageably small.
-Due to some known issues in the plotting code, plotting slices across the data in this way is extremely slow and is not really viable for a full-size dataset.
-See issue [#256](https://github.com/DKISTDC/dkist/issues/256) for more details.
+For the above example we have deliberately sliced the data to make it a more manageable size.
+Due to some known issues in the plotting code, plotting slices across the data in this way is still slower than we'd like.
+Full-sized datasets should therefore be plotted with caution.
+See issue [#226](https://github.com/DKISTDC/dkist/issues/226) for more details.
 ```
 
 You can also use `plot_axes` to create a line plot, by specifying only one axis of the data.
@@ -122,9 +123,11 @@ tds.plot(0)
 
 As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
 
-You may notice that in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
+You may notice in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
 
 
 ```{code-cell} ipython3
+:tags: [skip-execution]
+
 tds.plot(0, share_zscale=True)
 ```
