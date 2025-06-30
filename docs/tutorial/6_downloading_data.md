@@ -44,12 +44,10 @@ The user tools use this as the default remote endpoint, and define a local endpo
 - **Paths** When working with paths in Globus it's worth remembering that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 However, note that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 
-Whether you are using the web app or the user tools, Globus will send an email to your registered email address when the download task finishes.
-Of course this is unnecessary for many of the trivial examples in this tutorial, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
-Remember that you do need to have GCP running for the transfer to continue - so if you stop it then your data download will stop as well.
-
-If you try transferring the same file again to the same location, you will find that the task completes successfully but the file is not actually transferred.
-This is to save download time and avoid duplication.
+You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
+If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
+However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, and that is the method that will be covered in this chapter of the tutorial.
+In any case, the underlying concepts described above are the same.
 
 ## Dataset and downloading
 
@@ -178,7 +176,7 @@ Normally both of these functions will block the terminal while the download is a
 If you want to download a lot of data this is probably not useful, so you can turn this functionality off by passing `wait=False`.
 This will set up the transfer in Globus but then return from the function.
 Of course, be cautious with this approach if the next step of your code depends on the data being present.
-Setting `wait=False` will set up all the transfers on Globus before returning from the function.
+Setting `wait=False` will also skip the wait at the end of each dataset if downloading more than one, so all the transfers will be set up on Globus and then the function will return.
 For example:
 
 ```{code-cell} ipython3

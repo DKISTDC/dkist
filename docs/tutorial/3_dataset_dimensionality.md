@@ -76,7 +76,7 @@ import dkist
 ds = dkist.load_dataset(VISP_L1_KMUPT)
 ```
 
-Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't yet contain any of the actual data.
+Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't assume the presence of any of the actual data.
 This may sound unhelpful but we'll see how it can be very powerful.
 
 First let's have a look at the basic representation of the `Dataset`.
