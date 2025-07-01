@@ -152,6 +152,13 @@ If we want to download the first VBI dataset we searched for earlier, we can do 
 Fido.fetch(vbi[0])
 ```
 
+```{note}
+When downloading ASDF files with Fido, if the file already exists then the download will usually be skipped, to save unnecessary load.
+However, occasionally the ASDF files will be updated at the Data Center.
+Fido is able to check for this, and if the files are different, the newer one will be downloaded.
+It is therefore encouraged to keep the Fido download in your scripts even after downloading the ASDF file, as this will keep your metadata up to date.
+```
+
 This will download the ASDF file to the sunpy default data directory `~/sunpy/data`, we can customise this with the `path=` keyword argument.
 
 A simple example of specifying the path is:
