@@ -77,7 +77,7 @@ results
 ```
 
 ```{code-cell} ipython3
-aia_files = Fido.fetch(results)
+aia_files = Fido.fetch(results, site="NSO")
 ```
 
 Now we load the downloaded AIA file into a {obj}`sunpy.map.AIAMap` object.
