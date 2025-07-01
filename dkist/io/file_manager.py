@@ -43,6 +43,12 @@ class DKISTFileManager:
     """
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
 
+    def __str__(self) -> str:
+        return f"FileManager containing {len(self)} files with shape {self.shape}"
+
+    def __repr__(self) -> str:
+        return f"{object.__repr__(self)}\n{self}"
+
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
         return cls(
@@ -82,7 +88,6 @@ class DKISTFileManager:
             "__eq__",
             "__len__",
             "__str__",
-            "__repr__",
             "fileuri_array",
             "shape",
             "output_shape",
