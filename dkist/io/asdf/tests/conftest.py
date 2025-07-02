@@ -21,6 +21,7 @@ def eit_dataset_asdf_path(request):
                         rootdir / "test_tiled_dataset-1.0.0_dataset-1.2.0.asdf",
                         rootdir / "test_tiled_dataset-1.1.0_dataset-1.2.0.asdf",
                         rootdir / "test_tiled_dataset-1.2.0_dataset-1.2.0.asdf",
+                        rootdir / "test_tiled_dataset-1.3.0_dataset-1.2.0.asdf",
 ])
 def tiled_dataset_asdf_path(request):
     return request.param
