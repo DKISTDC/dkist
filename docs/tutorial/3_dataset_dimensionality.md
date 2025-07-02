@@ -30,6 +30,13 @@ This ASDF file contains the following information:
 In this chapter we will create `Dataset`s using only the ASDF files.
 This will mean we won't have access to the data arrays in the FITS files, but everything else will function the same.
 
+```{note}
+The `Dataset` object is the default structure for DKIST datasets.
+However, data from VBI and DL-NIRSP are presented to the user as multiple `Dataset` objects representing mosaic tiles.
+To handle these data, the we use the `TiledDataset` object instead.
+For more detail on `TiledDataset`, see :ref:`dkist:tutorial:tiled-dataset`.
+```
+
 ## DKIST Sample data
 
 We will come back to searching for ASDF files in a later chapter, when we cover Globus and downloading the FITS data files.

@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:tiled-dataset)=
 # TiledDataset
 
 So far all our examples have used the base {obj}`dkist.Dataset` class with VISP data.
