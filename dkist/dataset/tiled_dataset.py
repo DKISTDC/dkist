@@ -76,7 +76,10 @@ class TiledDatasetSlicer:
                 continue
             new_data.flat[i] = ds[slice_]
 
-        meta = copy.copy(self.meta)
+        # We want the TiledDataset constructor to reconstitute the
+        # header table from all the sliced header tables of the
+        # sub-datasets
+        meta = copy.copy(self.meta)  # shallow copy so we don't share the dict
         meta["headers"] = None
 
         return TiledDataset(new_data, meta=meta, mask=self.data.mask)
@@ -135,7 +138,7 @@ class TiledDataset(Collection):
 
         # If headers are saved as one Table for the whole TiledDataset, use those first
         # Otherwise stack the headers saved for component Datasets
-        if not meta.get("headers"):
+        if meta.get("headers", None) is None:
             ds_headers = [Table(ds.headers) for ds in self._data.compressed()]
             sizes = [len(h) for h in ds_headers]
             offsets = np.cumsum([0, *sizes[:-1]])
