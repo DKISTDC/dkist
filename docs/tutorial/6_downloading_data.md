@@ -54,6 +54,15 @@ First let's load a VISP dataset again.
 We'll use the same dataset as before, but to make sure the ASDF is up to date we'll download it using Fido.
 This also lets us go through the full process of downloading both the ASDF and data files, while still using a dataset we're familiar with.
 
+```{note}
+Normally the download functions will block the terminal while the download is active.
+For those people following along with this chapter during the live workshop this will cause delays as we go along.
+For that reason we recommend that you don't run the download commands as we go along, and revisit this notebook at another time.
+
+Alternatively, you can specify the `wait=False` keyword to these functions to turn off the blocking behaviour (More detail on this at the end of the chapter).
+If you do this, the data may not be downloaded yet when you run subsequent commands, so you may need to re-run them later to see the correct output.
+```
+
 ```{code-cell} ipython3
 :tags: [keep-inputs]
 
