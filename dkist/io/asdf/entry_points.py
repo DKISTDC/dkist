@@ -7,8 +7,9 @@ from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
 from dkist.io.asdf.converters import (AsymmetricMappingConverter, CoupledCompoundConverter,
-                                      DatasetConverter, FileManagerConverter, RavelConverter,
-                                      TiledDatasetConverter, VaryingCelestialConverter)
+                                      DatasetConverter, FileManagerConverter,
+                                      InversionConverter, RavelConverter, TiledDatasetConverter,
+                                      VaryingCelestialConverter)
 
 
 def get_resource_mappings():
@@ -36,9 +37,11 @@ def get_extensions():
     """
     Get the list of extensions.
     """
-    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
+    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter(), InversionConverter()]
     wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter(), AsymmetricMappingConverter()]
     return [
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.5.0",
+                                   converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.4.0",
                                    converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.3.0",
