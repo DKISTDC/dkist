@@ -1,6 +1,7 @@
 import copy
 
 import numpy as np
+from packaging.version import Version
 
 from asdf.extension import Converter
 
@@ -25,7 +26,23 @@ class TiledDatasetConverter(Converter):
             meta["inventory"] = inventory
 
         mask = node.get("mask", None)
-        return TiledDataset(node["datasets"], mask=mask, meta=meta)
+        datasets = np.array(node["datasets"])
+
+        # For all versions of tile_dataset newer than or equal to
+        # 1.3.0 the header table for each sub-dataset is stored as
+        # proxy dict
+        tag_version = Version(tag.rsplit("-")[1])
+        if tag_version >= Version("1.3.0"):
+            # Convert from offset / size dicts to header table slices
+            for ds in datasets.flat:
+                if ds is not None:  # skip masked elements
+                    if not isinstance(ds.headers, dict):  # pragma: nocover
+                        raise TypeError("Expected offset/size header proxy object")
+
+                    offset, size = ds.headers["offset"], ds.headers["size"]
+                    ds.meta["headers"] = meta["headers"][offset:offset+size]
+
+        return TiledDataset(datasets, mask=mask, meta=meta)
 
     def to_yaml_tree(cls, tiled_dataset, tag, ctx):
         tree = {}
