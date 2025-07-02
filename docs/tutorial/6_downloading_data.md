@@ -50,9 +50,9 @@ However, note that the paths are as the Globus endpoint sees them, so might not 
 For this section we don't recommend that you run all the download commands as you work through this notebook unless you're willing to wait for them to complete, which may take some time.
 ```
 
-First let's load the VISP dataset we were using before.
-This time we'll download the ASDF using Fido rather than loading the sample data.
-This is so that we can continue using a dataset we're familiar with but also go through the full process of downloading both the ASDF and data files.
+First let's load a VISP dataset again.
+We'll use the same dataset as before, but to make sure the ASDF is up to date we'll download it using Fido.
+This also lets us go through the full process of downloading both the ASDF and data files, while still using a dataset we're familiar with.
 
 ```{code-cell} ipython3
 :tags: [keep-inputs]
