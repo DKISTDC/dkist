@@ -44,7 +44,7 @@ class DKISTFileManager:
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
 
     def __str__(self) -> str:
-        return f"FileManager containing {len(self)} files with shape {self.shape}"
+        return f"DKISTFileManager containing {len(self)} files with each array having shape {self.shape}"
 
     def __repr__(self) -> str:
         return f"{object.__repr__(self)}\n{self}"
