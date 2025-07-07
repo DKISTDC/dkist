@@ -14,11 +14,11 @@ kernelspec:
 (dkist:tutorial:astropy-and-sunpy)=
 # Astropy and SunPy - A Quick Primer
 
-This tutorial will cover the basic functionality of SunPy and Astropy which is relevant to the `dkist` package.
+This chapter will cover the basic functionality of SunPy and Astropy which is relevant to the `dkist` package.
 There are many other parts of these packages which are useful when working with DKIST data, which you should explore in their respective documentation pages.
 See [here for SunPy's documentation](https://docs.sunpy.org/) and [here for astropy's](https://docs.astropy.org/).
 
-In this tutorial you will:
+In this chapter you will:
 
 * Convert values between different physical units
 * Define spatial and spectral coordinates
@@ -101,7 +101,7 @@ Currently, {obj}`astropy.coordinates` supports:
 
 * Spatial coordinates via {obj}`astropy.coordinates.SkyCoord`
 * Spectral coordinates via {obj}`astropy.coordinates.SpectralCoord`
-* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (coming soon)
+* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (introduced in astropy 7.0)
 
 ### Spatial Coordinates
 
@@ -176,7 +176,7 @@ print(repr(spc))
 
 One of the other core components of the ecosystem provided by Astropy is the {obj}`astropy.wcs` package which provides tools for mapping pixel to world coordinates and world to pixel.
 When loading a FITS file with complete (and standard compliant) WCS metadata we can create an `astropy.wcs.WCS` object.
-For the this example we will use a sample VISP header distributed with the `dkist` package.
+For this example we will use a sample VISP header distributed with the `dkist` package.
 
 ```{code-cell} python
 import sunpy.coordinates
@@ -231,4 +231,4 @@ wcs.axis_correlation_matrix
 
 This correlation matrix has the world dimensions as rows, and the pixel dimensions as columns.
 Here we have a 2D image, with two pixel and two world axes where both are coupled together.
-This means that to calculate either latitude or longitude you need both pixel coordinates. 
+This means that to calculate either latitude or longitude you need both pixel coordinates.

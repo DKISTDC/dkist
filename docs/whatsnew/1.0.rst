@@ -95,7 +95,7 @@ Working with ``Dataset``
 ------------------------
 
 The `dkist.Dataset` is a subclass of `ndcube.NDCube` with some special DKIST-specific functionality.
-For a complete guide to working with the ``Dataset`` object see :ref:`dkist:tutorial:visp-dataset`.
+For a complete guide to working with the ``Dataset`` object see :ref:`dkist:tutorial:index`.
 
 .. code-block:: python
 
