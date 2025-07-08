@@ -6,12 +6,14 @@ omit =
   dkist/version*
   dkist/__init__*
   dkist/utils/_model_to_graphviz.py
+  dkist/tests/test_benchmarks.py
   */dkist/conftest.py
   */dkist/*setup_package*
   */dkist/extern/*
   */dkist/version*
   */dkist/__init__*
   */dkist/utils/_model_to_graphviz.py
+  */dkist/tests/test_benchmarks.py
 
 [report]
 exclude_lines =
