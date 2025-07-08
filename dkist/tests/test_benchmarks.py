@@ -44,7 +44,8 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers, tmp_path):
 @pytest.mark.benchmark
 @pytest.mark.walltime
 @pytest.mark.remote_data
-def test_dataset_compute_data_full_files(benchmark):
+@pytest.mark.parametrize("load_files", [True, False])
+def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
     """
     Note that although this will load all the files to compute the data, the
     file IO overhead is *not* included in codspeed's timing of the benchmark,
@@ -53,9 +54,15 @@ def test_dataset_compute_data_full_files(benchmark):
     """
     from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
     ds = load_dataset(VISP_BKPLX)[0, :15]
+    # If we don't want to load files, set basepath to something where the files are not
+    if not load_files:
+        ds.files.basepath = tmp_path
     benchmark(ds.data.compute)
 
-    assert not np.isnan(ds.data.compute()).any()
+    if load_files:
+        assert not np.isnan(ds.data.compute()).any()
+    else:
+        assert np.isnan(ds.data.compute()).all()
 
 
 @pytest.mark.benchmark
