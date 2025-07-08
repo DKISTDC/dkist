@@ -35,7 +35,7 @@ def stack_loader_array(loader_array, output_shape, chunksize=None):
 
     dsk = dask.highlevelgraph.HighLevelGraph.from_collections("load_files", tasks, dependencies=())
     # Specifies that each chunk occupies a space of 1 pixel in the first dimension, and all the pixels in the others
-    chunks = (((1,) * loader_array.size,), *((s,) for s in file_shape))
+    chunks = (*((1,) * loader_array.size,), *((s,) for s in file_shape))
     array = dask.array.Array(dsk,
                              name="load_files",
                              chunks=chunks,
