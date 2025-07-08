@@ -64,6 +64,9 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     def data(self):
         pass
 
+    def __getitem__(self, slc):
+        return self.data[slc]
+
     @property
     def absolute_uri(self):
         """
@@ -93,7 +96,7 @@ class AstropyFITSLoader(BaseFITSLoader):
                        memmap=False,  # memmap is redundant with dask and delayed loading
                        do_not_scale_image_data=True,  # don't scale as we shouldn't need to
                        mode="denywrite") as hdul:
-            log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
+            log.debug("Accessing data from file %s", self.absolute_uri)
 
             hdu = hdul[self.target]
             return hdu.data
