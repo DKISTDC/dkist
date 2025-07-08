@@ -60,12 +60,13 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
     def __str__(self):
         return f"<FITS array in {self.fileuri} shape: {self.shape} dtype: {self.dtype}>"
 
-    @abc.abstractproperty
+    @property
     def data(self):
-        pass
+        return self[:]
 
+    @abc.abstractmethod
     def __getitem__(self, slc):
-        return self.data[slc]
+        pass
 
     @property
     def absolute_uri(self):
@@ -84,8 +85,7 @@ class AstropyFITSLoader(BaseFITSLoader):
     Resolve an `~asdf.ExternalArrayReference` to a FITS file using `astropy.io.fits`.
     """
 
-    @property
-    def data(self):
+    def __getitem__(self, slc):
         if not self.absolute_uri.exists():
             log.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
@@ -96,7 +96,7 @@ class AstropyFITSLoader(BaseFITSLoader):
                        memmap=False,  # memmap is redundant with dask and delayed loading
                        do_not_scale_image_data=True,  # don't scale as we shouldn't need to
                        mode="denywrite") as hdul:
-            log.debug("Accessing data from file %s", self.absolute_uri)
+            log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
             hdu = hdul[self.target]
-            return hdu.data
+            return hdu.section[slc]
