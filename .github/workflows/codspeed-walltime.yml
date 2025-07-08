@@ -11,7 +11,7 @@ on:
       - labeled
 
 jobs:
-  benchmarks:
+  walltime-benchmarks:
     if: |
       github.event_name != 'pull_request' ||
       (
