@@ -97,7 +97,3 @@ drawing.extent(ax, spatial_slice.wcs)
 # Zoom in on the VBI region using pixel coordinates
 _ = ax.axis((1500, 2000, 1900, 2400))
 ```
-
-```{code-cell} ipython3
-
-```
