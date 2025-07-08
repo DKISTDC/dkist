@@ -232,7 +232,7 @@ def _load_from_asdf(filepath):
     """
     Construct a dataset object from a filepath of a suitable asdf file.
     """
-    from dkist.dataset import TiledDataset
+    from dkist.dataset import TiledDataset  # noqa: PLC0415
     filepath = Path(filepath).expanduser()
     base_path = filepath.parent
     try:

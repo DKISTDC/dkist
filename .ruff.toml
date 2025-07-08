@@ -106,12 +106,17 @@ extend-ignore = [
 ]
 "dkist/tests/generate_*" = [
   "T20",
+  "PLC0415",
 ]
 "dkist/utils/sysinfo.py" = [
   "T20",
 ]
 "dkist/net/globus/auth.py" = [
   "T201",
+]
+# Converters have lots of imports not at the top of the file for load speed
+"dkist/io/asdf/**.py" = [
+  "PLC0415",
 ]
 
 [lint.flake8-import-conventions.extend-aliases]

@@ -101,7 +101,7 @@ def test_tiled_dataset_from_components(dataset):
 @pytest.mark.remote_data
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
 def test_tileddataset_plot(share_zscale):
-    from dkist.data.sample import VBI_AJQWW
+    from dkist.data.sample import VBI_AJQWW  # noqa: PLC0415
     ori_ds = load_dataset(VBI_AJQWW)
 
     newtiles = []
@@ -126,7 +126,7 @@ def test_tileddataset_plot(share_zscale):
 @figure_test
 @pytest.mark.remote_data
 def test_masked_tileddataset_plot():
-    from dkist.data.sample import VBI_AJQWW
+    from dkist.data.sample import VBI_AJQWW  # noqa: PLC0415
     ds = load_dataset(VBI_AJQWW)
     ds._data.mask[:2, 0] = True
     ds._data.mask[0, 1] = True
@@ -142,7 +142,7 @@ def test_masked_tileddataset_plot():
 def test_tileddataset_plot_limit_swapping(swap_tile_limits):
     # Also test that row/column sizes are correct
 
-    from dkist.data.sample import VBI_AJQWW
+    from dkist.data.sample import VBI_AJQWW  # noqa: PLC0415
     ori_ds = load_dataset(VBI_AJQWW)
 
     # Swap WCS to make the `swap_tile_limits` option more natural
@@ -185,7 +185,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
 
 @pytest.mark.remote_data
 def test_tileddataset_plot_non2d_sliceindex():
-    from dkist.data.sample import VBI_AJQWW
+    from dkist.data.sample import VBI_AJQWW  # noqa: PLC0415
     ds = load_dataset(VBI_AJQWW)
 
     newtiles = []

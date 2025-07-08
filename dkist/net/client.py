@@ -160,14 +160,14 @@ class DKISTClient(BaseClient):
     @property
     def _dataset_search_url(self):
         # Import here to avoid circular import
-        from dkist.net import conf
+        from dkist.net import conf  # noqa: PLC0415
 
         return conf.dataset_endpoint + conf.dataset_search_path
 
     @property
     def _metadata_streamer_url(self):
         # Import here to avoid circular import
-        from dkist.net import conf
+        from dkist.net import conf  # noqa: PLC0415
 
         return conf.download_endpoint
 
@@ -175,7 +175,7 @@ class DKISTClient(BaseClient):
         """
         Search for datasets provided by the DKIST data center.
         """
-        from dkist.net import conf
+        from dkist.net import conf  # noqa: PLC0415
 
         query = attr.and_(*args)
         queries = walker.create(query)
@@ -242,7 +242,7 @@ class DKISTClient(BaseClient):
     def _can_handle_query(cls, *query) -> bool:
         # This enables the client to register what kind of searches it can
         # handle, to prevent Fido using the incorrect client.
-        from sunpy.net import attrs as a
+        from sunpy.net import attrs as a  # noqa: PLC0415
 
         supported = set(walker.applymm.registry)
         # This function is only called with arguments of the query where they are assumed to be ANDed.
