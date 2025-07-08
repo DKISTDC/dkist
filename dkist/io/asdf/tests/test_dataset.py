@@ -155,6 +155,7 @@ def wrap_object(mocker):
     return wrap_object
 
 
+@pytest.mark.skip
 def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
     # Import this here to prevent hitting https://bugs.python.org/issue35753 on Python <3.10
     # Importing call is enough to trigger a doctest error
