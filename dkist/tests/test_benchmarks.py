@@ -29,6 +29,7 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers):
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.parametrize("axes", [
     ["y", None, None, "x"],
 ])
@@ -41,6 +42,7 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers, tmp_path):
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.remote_data
 def test_dataset_compute_data_full_files(benchmark):
     """
@@ -57,6 +59,7 @@ def test_dataset_compute_data_full_files(benchmark):
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.remote_data
 def test_dataset_compute_data_partial_files(benchmark):
     from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
