@@ -24,7 +24,7 @@ def get_array_repr(array):
 
 def dataset_info_str(ds_in):
     # Import here to remove circular import
-    from dkist.dataset import TiledDataset
+    from dkist.dataset import TiledDataset  # noqa: PLC0415
 
     is_tiled = isinstance(ds_in, TiledDataset)
     dstype = type(ds_in).__name__
