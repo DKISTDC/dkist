@@ -31,7 +31,7 @@ Searching by Product ID can be done using `~dkist.net.attrs.Product`:
     Product ID Dataset ID        Start Time               End Time        Instrument   Wavelength
                                                                                            nm
     ---------- ---------- ----------------------- ----------------------- ---------- --------------
-      L1-YEVFH      ...   2022-06-02T17:22:50.176 2022-06-02T17:47:30.856        VBI 486.0 .. 486.0
+      L1-YEVFH      ...   2022-06-02T17:23:08.456 2022-06-02T17:47:49.136        VBI 486.0 .. 486.0
     <BLANKLINE>
     <BLANKLINE>
 
@@ -43,7 +43,7 @@ It's possible to query a specific dataset ID irrespective of its current status 
 
 .. code-block:: python
 
-   >>> Fido.search(a.dkist.Dataset("BLKGA"), a.dkist.Status("any"))  # doctest: +REMOTE_DATA
+   >>> Fido.search(a.dkist.Product("L1-YEVFH"), a.dkist.Status("any"))  # doctest: +REMOTE_DATA
    <sunpy.net.fido_factory.UnifiedResponse object at ...>
    Results from 3 Providers:
    <BLANKLINE>
@@ -52,11 +52,14 @@ It's possible to query a specific dataset ID irrespective of its current status 
    Product ID Dataset ID        Start Time               End Time        Instrument   Wavelength
                                                                                           nm
    ---------- ---------- ----------------------- ----------------------- ---------- --------------
-     L1-YEVFH      ...   2022-06-02T17:22:50.176 2022-06-02T17:47:30.856        VBI 486.0 .. 486.0
+      L1-YEVFH     NLQWBO 2022-06-02T17:23:08.456 2022-06-02T17:47:49.136        VBI 486.0 .. 486.0
    <BLANKLINE>
-   0 Results from the DKISTClient:
+    1 Results from the DKISTClient:
    <BLANKLINE>
-   <No columns>
+    Product ID Dataset ID        Start Time               End Time        Instrument   Wavelength
+                                                                                           nm
+    ---------- ---------- ----------------------- ----------------------- ---------- --------------
+      L1-YEVFH      BLKGA 2022-06-02T17:22:50.176 2022-06-02T17:47:30.856        VBI 486.0 .. 486.0
    <BLANKLINE>
    0 Results from the DKISTClient:
    <BLANKLINE>

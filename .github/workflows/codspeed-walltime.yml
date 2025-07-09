@@ -1,19 +1,28 @@
-name: codspeed-benchmarks
+name: codspeed-walltime-benchmarks
 
 on:
   push:
     branches:
       - "main"
-  pull_request:
   workflow_dispatch:
+  pull_request:
+    types:
+      - synchronize
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  benchmarks:
-    runs-on: ubuntu-latest
+  walltime-benchmarks:
+    if: |
+      github.event_name != 'pull_request' ||
+      (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Run Walltime Benchmarks')
+      )
+    runs-on: codspeed-macro
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,4 +33,4 @@ jobs:
         uses: CodspeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any"
+          run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any -m walltime"
