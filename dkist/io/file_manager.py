@@ -98,13 +98,13 @@ class DKISTFileManager:
     @property
     def _metadata_streamer_url(self) -> str:
         # Import here to avoid circular import
-        from dkist.net import conf
+        from dkist.net import conf  # noqa: PLC0415
 
         return conf.download_endpoint
 
     @staticmethod
     def _get_inventory(dataset_id):
-        from dkist.net import conf
+        from dkist.net import conf  # noqa: PLC0415
 
         parsed = list(urllib.parse.urlparse(conf.dataset_endpoint))
         parsed[2] = parsed[2] + conf.dataset_search_path
@@ -251,8 +251,8 @@ class DKISTFileManager:
             Label for the Globus transfer. If `None` then a default will be used.
         """
         # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
-        from dkist.net import conf as net_conf
-        from dkist.net.helpers import _orchestrate_transfer_task
+        from dkist.net import conf as net_conf  # noqa: PLC0415
+        from dkist.net.helpers import _orchestrate_transfer_task  # noqa: PLC0415
 
         inv = self._inventory
         path_inv = path_format_inventory(humanize_inventory(inv))
