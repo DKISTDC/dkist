@@ -49,7 +49,7 @@ def test_dataset_compute_data_full_files(benchmark):
     because it doesn't support that. This test therefore only assesses the
     performance of the compute step.
     """
-    from dkist.data.sample import VISP_BKPLX
+    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
     ds = load_dataset(VISP_BKPLX)[0, :15]
     benchmark(ds.data.compute)
 
@@ -59,7 +59,7 @@ def test_dataset_compute_data_full_files(benchmark):
 @pytest.mark.benchmark
 @pytest.mark.remote_data
 def test_dataset_compute_data_partial_files(benchmark):
-    from dkist.data.sample import VISP_BKPLX
+    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
     ds = load_dataset(VISP_BKPLX)[0, :15, :100, :100]
     benchmark(ds.data.compute)
 
