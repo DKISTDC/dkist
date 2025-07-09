@@ -49,7 +49,10 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers, tmp_path):
 @pytest.mark.benchmark
 @pytest.mark.walltime
 @pytest.mark.remote_data
-@pytest.mark.parametrize("load_files", [True, False])
+@pytest.mark.parametrize("load_files", [
+    pytest.param(True, id="files"),
+    pytest.param(False, id="files missing"),
+])
 def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
     """
     Note that although this will load all the files to compute the data, the
