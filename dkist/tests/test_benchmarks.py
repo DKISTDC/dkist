@@ -17,8 +17,8 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
-def test_load_tiled_asdf(benchmark, large_tiled_dataset):
-    benchmark(load_dataset, large_tiled_dataset)
+def test_load_tiled_asdf(benchmark, large_tiled_dataset_asdf):
+    benchmark(load_dataset, large_tiled_dataset_asdf)
 
 
 @pytest.mark.benchmark
