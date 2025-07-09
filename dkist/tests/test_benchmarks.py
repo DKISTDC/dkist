@@ -17,6 +17,11 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
+def test_load_tiled_asdf(benchmark, large_tiled_dataset):
+    benchmark(load_dataset, large_tiled_dataset)
+
+
+@pytest.mark.benchmark
 def test_pixel_to_world(benchmark, visp_dataset_no_headers):
     ds = visp_dataset_no_headers
 
