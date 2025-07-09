@@ -69,7 +69,7 @@ def start_local_server(listen=None):
         leads to the system choosing a free port.
     """
     # import conf here to prevent circular imports
-    from dkist.net import conf
+    from dkist.net import conf  # noqa: PLC0415
     listen = listen or ("localhost", conf.globus_auth_port)
     server = RedirectHTTPServer(listen, RedirectHandler)
     thread = threading.Thread(target=server.serve_forever)

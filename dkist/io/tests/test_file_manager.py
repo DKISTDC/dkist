@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from dkist import net
+from dkist.net import conf
 
 
 @pytest.fixture
@@ -40,7 +41,6 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inve
 
 @pytest.fixture
 def httpserver_dataset_endpoint(httpserver):
-    from dkist.net import conf
     old = conf.dataset_endpoint
     conf.dataset_endpoint = httpserver.url_for("/datasets/")
 
@@ -166,7 +166,6 @@ def test_length_one_first_array_axis(small_visp_dataset):
 ])
 def test_download_quality(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
-    from dkist.net import conf
 
     small_visp_dataset.files.quality_report(**kwargs)
 
@@ -188,7 +187,6 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
 ])
 def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
-    from dkist.net import conf
 
     small_visp_dataset.files.preview_movie(**kwargs)
 

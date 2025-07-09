@@ -314,17 +314,23 @@ def simple_tiled_dataset(dataset, request):
     return TiledDataset(dataset_array, meta=meta, mask=request.param)
 
 
+@pytest.fixture
+def large_tiled_dataset_asdf(tmp_path_factory):
+    vbidir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
+        asdf_filename = vbidir / "test_vbi.asdf"
+        with open(asdf_filename, mode="wb") as afo:
+            afo.write(gfo.read())
+    return asdf_filename
+
+
 @pytest.fixture(params=[False,
                         [[True, True, False],
                          [True, False, False],
                          [False, False, False]]],
                 ids=["large-nomask", "large-masked"])
-def large_tiled_dataset(tmp_path_factory, request):
-    vbidir = tmp_path_factory.mktemp("data")
-    with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
-        with open(vbidir / "test_vbi.asdf", mode="wb") as afo:
-            afo.write(gfo.read())
-    ds = load_dataset(vbidir / "test_vbi.asdf")
+def large_tiled_dataset(large_tiled_dataset_asdf, request):
+    ds = load_dataset(large_tiled_dataset_asdf)
     ds.mask = request.param
     return ds
 
