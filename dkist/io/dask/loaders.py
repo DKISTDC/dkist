@@ -90,7 +90,7 @@ class AstropyFITSLoader(BaseFITSLoader):
             log.debug("File %s does not exist.", self.absolute_uri)
             # Use np.broadcast_to to generate an array of the correct size, but
             # which only uses memory for one value.
-            return np.broadcast_to(np.nan, self.shape) * np.nan
+            return np.broadcast_to((np.nan,), self.shape) * np.nan
 
         with fits.open(self.absolute_uri,
                        memmap=False,  # memmap is redundant with dask and delayed loading
@@ -99,7 +99,4 @@ class AstropyFITSLoader(BaseFITSLoader):
             log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
             hdu = hdul[self.target]
-            if hasattr(hdu, "section"):
-                return hdu.section[slc]
-
-            return hdu.data[slc]
+            return hdu.section[slc]
