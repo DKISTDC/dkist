@@ -49,7 +49,6 @@ def dataset_info_str(ds_in):
         if ds.files:
             s += "and \n"
 
-
     if ds.files:
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in.flat])
         s += f"consists of {nframes} frames.\n"
