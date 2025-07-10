@@ -59,6 +59,13 @@ class TiledDatasetFileManager:
     def filenames(self) -> list[str]:
         return np.array([tile.files.filenames for tile in self._parent.flat]).flatten().tolist()
 
+    def __len__(self):
+        return len(self.filenames)
+
+    @property
+    def shape(self):
+        return self._parent.flat[0].files.shape
+
 
 class TiledDatasetSlicer:
     """

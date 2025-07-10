@@ -1,6 +1,7 @@
 import json
 
 import hypothesis.strategies as st
+import numpy as np
 import parfive
 import pytest
 from hypothesis import HealthCheck, given, settings
@@ -78,7 +79,7 @@ def example_api_response():
                 "primaryExperimentId": "string",
                 "primaryProposalId": "string",
                 "contributingProposalIds": ["string"],
-                "qualityAverageFriedParameter": 0,
+                "qualityAverageFriedParameter": None,
                 "qualityAveragePolarimetricAccuracy": 0,
                 "recipeInstanceId": 0,
                 "recipeRunId": 0,
@@ -147,6 +148,7 @@ def test_query_response_from_results(empty_query_response, example_api_response,
     assert isinstance(qr[0], QueryResponseRow)
     assert not set(qr.colnames).difference(expected_table_keys)
     assert set(qr.colnames).isdisjoint(INVENTORY_KEY_MAP.keys())
+    assert np.isnan(qr["Average Fried Parameter"][0])
 
 
 def test_query_response_from_results_unknown_field(empty_query_response, example_api_response, expected_table_keys):

@@ -50,7 +50,6 @@ def dataset_info_str(ds_in):
         if ds.files:
             s += "and \n"
 
-
     if ds.files:
         # Not using .flat here for performance reasons
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in._data.compressed()])

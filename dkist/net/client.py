@@ -98,6 +98,11 @@ class DKISTQueryResponseTable(QueryResponseTable):
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
 
+        if "Average Fried Parameter" in results.colnames:
+            r_none_values = np.array(results["Average Fried Parameter"] == None)
+            if r_none_values.any():
+                results["Average Fried Parameter"][r_none_values] = np.nan
+
         if results and "Wavelength" not in results.colnames:
             results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
             results.remove_columns(("Wavelength Min", "Wavelength Max"))
