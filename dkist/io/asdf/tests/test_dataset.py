@@ -38,7 +38,7 @@ def test_roundtrip_file_manager(file_manager):
 def assert_dataset_equal(new, old):
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
-    assert old_headers.columns == new_headers.columns
+    assert old_headers.colnames == new_headers.colnames
     assert len(old_headers) == len(new_headers)
     assert old.meta == new.meta
     old.meta["headers"] = old_headers
@@ -47,7 +47,7 @@ def assert_dataset_equal(new, old):
     assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
     ac_new = new.files.fileuri_array
     ac_old = old.files.fileuri_array
-    assert ac_new == ac_old
+    assert (ac_new == ac_old).all()
     assert old.unit == new.unit
     assert old.mask == new.mask
 
@@ -57,12 +57,12 @@ def test_roundtrip_dataset(dataset):
     assert_dataset_equal(newobj, dataset)
 
 
-def test_roundtrip_tiled_dataset(simple_tiled_dataset):
-    newobj = roundtrip_object(simple_tiled_dataset)
+def test_roundtrip_tiled_dataset(large_tiled_dataset):
+    newobj = roundtrip_object(large_tiled_dataset)
 
-    assert simple_tiled_dataset.inventory == newobj.inventory
+    assert large_tiled_dataset.inventory == newobj.inventory
 
-    for old_ds, new_ds in zip(simple_tiled_dataset.flat, newobj.flat):
+    for old_ds, new_ds in zip(large_tiled_dataset.flat, newobj.flat):
         assert_dataset_equal(new_ds, old_ds)
 
 

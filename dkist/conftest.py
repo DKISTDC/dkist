@@ -13,7 +13,7 @@ import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, Parameter
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.time import Time
 
 from sunpy.coordinates.frames import Helioprojective
@@ -305,10 +305,12 @@ def eit_dataset():
                 ids=["simple-nomask", "simple-masked"])
 def simple_tiled_dataset(dataset, request):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
+    headers = []
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
+        headers.append(ds.headers)
     dataset_array = np.array(datasets).reshape((2,2))
-    meta = {"inventory": dataset.meta["inventory"]}
+    meta = {"inventory": dataset.meta["inventory"], "headers": vstack(headers)}
     return TiledDataset(dataset_array, meta=meta, mask=request.param)
 
 
@@ -413,8 +415,12 @@ def pytest_runtest_call(item):
             # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
             replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
             if ds:
+                if isinstance(item.funcargs[replace_arg], TiledDataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(ds)
             if tds:
+                if isinstance(item.funcargs[replace_arg], Dataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(tds)
 
         yield item

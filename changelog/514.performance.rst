@@ -1,0 +1,2 @@
+Make `TiledDataset.combined_headers` the canonical reference for the headers and make each tile's `.headers` reference it.
+This significantly improves read and write speed for large `TiledDataset` objects since only one table needs to be validated.
