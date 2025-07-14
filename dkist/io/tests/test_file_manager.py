@@ -216,7 +216,7 @@ def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_m
     base_path = Path(net.conf.dataset_path.format(**ds.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**ds.meta["inventory"]))
     file_list = [*ds.files.filenames,
-                 folder / "VBI_L1_20231016T184519_AJQWW.asdf",
+                 folder / "VBI_L1_20231016T184519_AJQWW_metadata.asdf",
                  folder / "{datasetId}.mp4".format(**ds.meta["inventory"]),
                  folder / "{datasetId}.pdf".format(**ds.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
