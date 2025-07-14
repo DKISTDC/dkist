@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from dkist import net
+from dkist.net import conf
 
 
 @pytest.fixture
@@ -40,7 +41,6 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inve
 
 @pytest.fixture
 def httpserver_dataset_endpoint(httpserver):
-    from dkist.net import conf
     old = conf.dataset_endpoint
     conf.dataset_endpoint = httpserver.url_for("/datasets/")
 
@@ -166,7 +166,6 @@ def test_length_one_first_array_axis(small_visp_dataset):
 ])
 def test_download_quality(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
-    from dkist.net import conf
 
     small_visp_dataset.files.quality_report(**kwargs)
 
@@ -188,7 +187,6 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
 ])
 def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
     simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
-    from dkist.net import conf
 
     small_visp_dataset.files.preview_movie(**kwargs)
 
@@ -218,7 +216,7 @@ def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_m
     base_path = Path(net.conf.dataset_path.format(**ds.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**ds.meta["inventory"]))
     file_list = [*ds.files.filenames,
-                 folder / "VBI_L1_20231016T184519_AJQWW.asdf",
+                 folder / "VBI_L1_20231016T184519_AJQWW_metadata.asdf",
                  folder / "{datasetId}.mp4".format(**ds.meta["inventory"]),
                  folder / "{datasetId}.pdf".format(**ds.meta["inventory"])]
     file_list = [base_path / fn for fn in file_list]
@@ -234,3 +232,13 @@ def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_m
         wait=True,
         label=None,
     )
+
+
+def test_dkist_file_manager_repr(large_visp_dataset):
+    assert "DKISTFileManager containing 80 files stored in" in repr(large_visp_dataset.files)
+    assert "Each file array has shape (1, 50, 128)" in repr(large_visp_dataset.files)
+
+
+def test_tiled_dataset_file_manager_repr(large_tiled_dataset):
+    assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files stored in" in repr(large_tiled_dataset.files)
+    assert "Each file array has shape (1, 4096, 4096)" in repr(large_tiled_dataset.files)

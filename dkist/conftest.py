@@ -13,7 +13,7 @@ import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.modeling import Model, Parameter
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.time import Time
 
 from sunpy.coordinates.frames import Helioprojective
@@ -305,11 +305,23 @@ def eit_dataset():
                 ids=["simple-nomask", "simple-masked"])
 def simple_tiled_dataset(dataset, request):
     datasets = [copy.deepcopy(dataset) for i in range(4)]
+    headers = []
     for ds in datasets:
         ds.meta["inventory"] = dataset.meta["inventory"]
+        headers.append(ds.headers)
     dataset_array = np.array(datasets).reshape((2,2))
-    meta = {"inventory": dataset.meta["inventory"]}
+    meta = {"inventory": dataset.meta["inventory"], "headers": vstack(headers)}
     return TiledDataset(dataset_array, meta=meta, mask=request.param)
+
+
+@pytest.fixture
+def large_tiled_dataset_asdf(tmp_path_factory):
+    vbidir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
+        asdf_filename = vbidir / "test_vbi.asdf"
+        with open(asdf_filename, mode="wb") as afo:
+            afo.write(gfo.read())
+    return asdf_filename
 
 
 @pytest.fixture(params=[False,
@@ -317,12 +329,8 @@ def simple_tiled_dataset(dataset, request):
                          [True, False, False],
                          [False, False, False]]],
                 ids=["large-nomask", "large-masked"])
-def large_tiled_dataset(tmp_path_factory, request):
-    vbidir = tmp_path_factory.mktemp("data")
-    with gzip.open(Path(rootdir) / "large_vbi.asdf.gz", mode="rb") as gfo:
-        with open(vbidir / "test_vbi.asdf", mode="wb") as afo:
-            afo.write(gfo.read())
-    ds = load_dataset(vbidir / "test_vbi.asdf")
+def large_tiled_dataset(large_tiled_dataset_asdf, request):
+    ds = load_dataset(large_tiled_dataset_asdf)
     ds.mask = request.param
     return ds
 
@@ -407,8 +415,12 @@ def pytest_runtest_call(item):
             # Replace either the fixture specified as the first arg of the marker, or the first fixture in the test definition
             replace_arg = mark.args[0] if mark.args else item.fixturenames[0]
             if ds:
+                if isinstance(item.funcargs[replace_arg], TiledDataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(ds)
             if tds:
+                if isinstance(item.funcargs[replace_arg], Dataset):
+                    pytest.skip()
                 item.funcargs[replace_arg] = load_dataset(tds)
 
         yield item

@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.2.0"
+id: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.3.0"
 
 title: |
   A DKIST Tiled Dataset object.
@@ -32,7 +32,11 @@ properties:
         description: A copy of the inventory record for this dataset.
         type: object
 
-    required: [inventory]
+      headers:
+        description: A table of all the headers for the constituent files.
+        tag: "tag:astropy.org:astropy/table/table-1.*"
+
+    required: [inventory, headers]
     additionalProperties: true
 
   mask:
@@ -41,6 +45,7 @@ properties:
     datatype: bool8
     exact_datatype: true
     ndim: 2
+
 
 required: [datasets, meta, mask]
 additionalProperties: false

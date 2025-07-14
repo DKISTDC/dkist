@@ -17,6 +17,11 @@ def test_load_asdf(benchmark, large_visp_dataset_file):
 
 
 @pytest.mark.benchmark
+def test_load_tiled_asdf(benchmark, large_tiled_dataset_asdf):
+    benchmark(load_dataset, large_tiled_dataset_asdf)
+
+
+@pytest.mark.benchmark
 def test_pixel_to_world(benchmark, visp_dataset_no_headers):
     ds = visp_dataset_no_headers
 
@@ -29,6 +34,7 @@ def test_pixel_to_world(benchmark, visp_dataset_no_headers):
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.parametrize("axes", [
     ["y", None, None, "x"],
 ])
@@ -41,25 +47,37 @@ def test_plot_dataset(benchmark, axes, visp_dataset_no_headers, tmp_path):
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.remote_data
-def test_dataset_compute_data_full_files(benchmark):
+@pytest.mark.parametrize("load_files", [
+    pytest.param(True, id="files"),
+    pytest.param(False, id="files missing"),
+])
+def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
     """
     Note that although this will load all the files to compute the data, the
     file IO overhead is *not* included in codspeed's timing of the benchmark,
     because it doesn't support that. This test therefore only assesses the
     performance of the compute step.
     """
-    from dkist.data.sample import VISP_BKPLX
+    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
     ds = load_dataset(VISP_BKPLX)[0, :15]
+    # If we don't want to load files, set basepath to something where the files are not
+    if not load_files:
+        ds.files.basepath = tmp_path
     benchmark(ds.data.compute)
 
-    assert not np.isnan(ds.data.compute()).any()
+    if load_files:
+        assert not np.isnan(ds.data.compute()).any()
+    else:
+        assert np.isnan(ds.data.compute()).all()
 
 
 @pytest.mark.benchmark
+@pytest.mark.walltime
 @pytest.mark.remote_data
 def test_dataset_compute_data_partial_files(benchmark):
-    from dkist.data.sample import VISP_BKPLX
+    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
     ds = load_dataset(VISP_BKPLX)[0, :15, :100, :100]
     benchmark(ds.data.compute)
 

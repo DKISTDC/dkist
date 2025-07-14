@@ -13,7 +13,7 @@ def get_hash_library_name():
     """
     Generate the hash library name for this env.
     """
-    import mpl_animators
+    import mpl_animators  # noqa: PLC0415
 
     animators_version = "dev" if (("dev" in mpl_animators.__version__) or ("rc" in mpl_animators.__version__)) else mpl_animators.__version__.replace(".", "")
     ft2_version = f"{mpl.ft2font.__freetype_version__.replace('.', '')}"

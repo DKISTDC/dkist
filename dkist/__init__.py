@@ -28,7 +28,7 @@ def write_default_config(overwrite=False):
     config file already exits this will write a config file appended with the
     version number, to facilitate comparison of changes.
     """
-    import astropy.config as _config
+    import astropy.config as _config  # noqa: PLC0415
     return _config.create_config_file("dkist", "dkist", overwrite=overwrite)
 
 
