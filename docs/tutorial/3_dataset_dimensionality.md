@@ -140,8 +140,6 @@ ds.array_axis_physical_types
 This property is a list with one element for every array axis containing a tuple of the world axis physical types of each world axis correlated with that array axis.
 So the first array axis has one physical type `'phys.polarization.stokes'` but the second has three (lat, lon and time).
 
-+++
-
 Using the WCS object, we can convert between pixel or array coordinates and world coordinates:
 
 ```{code-cell} ipython3
