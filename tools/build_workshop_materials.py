@@ -87,7 +87,7 @@ def write_conda_env(filepath):
         - conda-forge
 
       dependencies:
-        - python=3.13
+        - python=3.12
         - dkist
         - ipywidgets
         - distributed
