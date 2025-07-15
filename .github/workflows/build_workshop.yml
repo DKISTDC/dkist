@@ -52,6 +52,9 @@ jobs:
           token: '${{ secrets.WORKSHOP_DEPLOY_TOKEN }}'
           ref: '${{ env.BRANCHNAME }}'
 
+      - name: Purge all files
+        run: rm -r workshop/*
+
       - name: Run pipx
         run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
 
