@@ -18,6 +18,7 @@ import sys
 import argparse
 import subprocess
 from pathlib import Path
+from textwrap import dedent
 
 import nbformat
 from markdown_it import MarkdownIt
@@ -80,6 +81,23 @@ def parse_toctree_directive(filepath):
     return toctree_info.body
 
 
+def write_conda_env(filepath):
+    env = dedent("""\
+      channels:
+        - conda-forge
+
+      dependencies:
+        - python=3.12
+        - dkist
+        - ipywidgets
+        - distributed
+        - jupyterlab-myst
+        - notebook
+    """)
+    with open(filepath, "w") as fobj:
+        fobj.write(env)
+
+
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
     argp.add_argument("tutorial_dir", nargs=1, help="path to the tutorial directory")
@@ -121,3 +139,5 @@ if __name__ == "__main__":
             add_toctree_to_index(toc_files, instructor_file, instructor_file)
         print(f"[learner] transforming {instructor_file} to {learner_file}")  # noqa: T201
         strip_code_cells(instructor_file, learner_file)
+        print("Writing conda env file")  # noqa: T201
+        write_conda_env(output_dir / "environment.yml")
