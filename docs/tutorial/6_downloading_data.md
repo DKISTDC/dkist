@@ -59,9 +59,7 @@ This also lets us go through the full process of downloading both the ASDF and d
 
 ```{note}
 Normally the download functions will block the terminal while the download is active.
-For those people following along with this chapter during the live workshop this will cause delays as we go along.
-For that reason we recommend that you don't run the download commands during the workshop, and revisit this notebook at another time.
-
+If you wish to go through the notebook more quickly you may want to skip some of the download commands and come back to them when you have more time.
 Alternatively, you can specify the `wait=False` keyword to these functions to turn off the blocking behaviour (More detail on this at the end of the chapter).
 If you do this, the data may not be downloaded yet when you run subsequent commands, so you may need to re-run them later to see the correct output.
 ```
@@ -113,14 +111,7 @@ Since the `download()` method set up the transfer through globus, you can check 
 We can change the download location of the files using the `path` argument.
 But remember that whatever path you specify must be accessible by Globus Connect Personal.
 
-```{code-cell} ipython3
-:tags: [skip-execution]
-
-ds[0].files.download(path="~/somewhere/globus/can't/reach/")  # will hang for a while and then fail
-```
-
-The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`.
-Any key in the dataset inventory (`ds.meta['inventory']`) can be used for this.
+The `path` keyword will replace placeholders in the path in the same way as we saw with `Fido.fetch()`, using any of the keys in the results table's `path_format_keys()`.
 So for example:
 
 ```{code-cell} ipython3
@@ -183,7 +174,7 @@ Normally both of these functions will block the terminal while the download is a
 If you want to download a lot of data this is probably not useful, so you can turn this functionality off by passing `wait=False`.
 This will set up the transfer in Globus but then return from the function.
 Of course, be cautious with this approach if the next step of your code depends on the data being present.
-Setting `wait=False` will also skip the wait at the end of each dataset if downloading more than one, so all the transfers will be set up on Globus and then the function will return.
+Setting `wait=False` will set up all the transfers on Globus before returning from the function.
 For example:
 
 ```{code-cell} ipython3
