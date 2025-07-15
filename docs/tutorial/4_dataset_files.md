@@ -109,6 +109,29 @@ import astropy.units as u
 plt.scatter(ds[0].headers["CRVAL1"], ds[0].headers["CRVAL3"])
 ```
 
+## Downloading the quality report and preview movie
+
+For each dataset a quality report is produced during calibration which gives useful information about the quality of the data.
+This is accessible through the `Dataset`'s `quality_report()` method, which will download a PDF of the quality report to the base path of the dataset.
+This uses parfive underneath, which is the same library `Fido` uses, so it will return the same kind of `results` object.
+If the download has been successful, this can be treated as a list of filenames.
+
+```{code-cell} ipython3
+qr = ds.files.quality_report()
+qr
+```
+
+This method takes the optional arguments `path` and `overwrite`.
+`path` allows you to specify a different location for the download, and `overwrite` is a boolean which tells the method whether or not to download a new copy if the file already exists.
+
+Similarly, each dataset also has a short preview movie showing the data.
+This can be downloaded in exactly the same way as the quality report but using the `preview_movie()` method:
+
+```{code-cell} ipython3
+pm = ds.files.preview_movie()
+pm
+```
+
 ## Tracking files
 
 `Dataset` tracks information about the individual files that make up the dataset in the `files` attribute.
@@ -178,26 +201,3 @@ feature.files
 ```
 
 It is therefore important to pay attention to how your data are stored across files. As noted before, slicing sensibly can significantly reduce how many files you need to download, but it can also be a relevant concern when doing some computational tasks and when plotting, as every file touched by the data will need to be opened and loaded into memory.
-
-## Downloading the quality report and preview movie
-
-For each dataset a quality report is produced during calibration which gives useful information about the quality of the data.
-This is accessible through the `Dataset`'s `quality_report()` method, which will download a PDF of the quality report to the base path of the dataset.
-This uses parfive underneath, which is the same library `Fido` uses, so it will return the same kind of `results` object.
-If the download has been successful, this can be treated as a list of filenames.
-
-```{code-cell} ipython3
-qr = ds.files.quality_report()
-qr
-```
-
-This method takes the optional arguments `path` and `overwrite`.
-`path` allows you to specify a different location for the download, and `overwrite` is a boolean which tells the method whether or not to download a new copy if the file already exists.
-
-Similarly, each dataset also has a short preview movie showing the data.
-This can be downloaded in exactly the same way as the quality report but using the `preview_movie()` method:
-
-```{code-cell} ipython3
-pm = ds.files.preview_movie()
-pm
-```
