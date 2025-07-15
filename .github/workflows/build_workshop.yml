@@ -55,7 +55,7 @@ jobs:
       - name: Purge all files
         run: |
           rm -r workshop/*
-          git checkout README.md
+          git -C workshop checkout README.md
 
       - name: Run pipx
         run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
