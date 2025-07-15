@@ -1,5 +1,9 @@
+import warnings
+
 import dask
 import numpy as np
+
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 __all__ = ["stack_loader_array"]
 
@@ -43,6 +47,9 @@ def stack_loader_array(loader_array, output_shape, chunksize=None):
     # Now impose the higher dimensions on the data cube
     array = array.reshape(output_shape)
     if chunksize is not None:
+        warnings.warn("Using the dask file loader with a non-default chunksize is deprecated. "
+                      "If you see this warning loading an ASDF file please open an issue "
+                      "on GitHub: https://github.com/DKISTDC/dkist/issues", DKISTDeprecationWarning)
         # If requested, re-chunk the array. Not sure this is optimal
         new_chunks = (1,) * (array.ndim - len(chunksize)) + chunksize
         array = array.rechunk(new_chunks)

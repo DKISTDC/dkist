@@ -14,6 +14,7 @@ import dkist
 from dkist.data.test import rootdir
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
 @pytest.fixture
@@ -137,41 +138,20 @@ def test_read_all_schema_versions(eit_dataset_asdf_path):
     assert dataset.wcs.pixel_n_dim == 3
 
 
-@pytest.fixture
-def wrap_object(mocker):
+def test_loader_getitem_with_chunksize(eit_dataset_asdf_path):
+    """
+    This test is a legacy test, as chunksize is no longer really supported.
 
-    def wrap_object(target, attribute):
-        mock = mocker.MagicMock()
-        real_attribute = getattr(target, attribute)
-
-        def mocked_attribute(self, *args, **kwargs):
-            mock.__call__(*args, **kwargs)
-            return real_attribute(self, *args, **kwargs)
-
-        mocker.patch.object(target, attribute, mocked_attribute)
-
-        return mock
-
-    return wrap_object
-
-
-@pytest.mark.skip
-def test_loader_getitem_with_chunksize(eit_dataset_asdf_path, wrap_object):
-    # Import this here to prevent hitting https://bugs.python.org/issue35753 on Python <3.10
-    # Importing call is enough to trigger a doctest error
-    from unittest.mock import call
-
+    This test verifies that the chunksize of the output array changes.
+    """
     chunksize = (32, 16)
     with asdf.open(eit_dataset_asdf_path) as tree:
         dataset = tree["dataset"]
         dataset.files.basepath = rootdir / "EIT"
         dataset.files._fm._striped_external_array.chunksize = chunksize
-        mocked = wrap_object(dataset.files._fm._striped_external_array._loader, "__getitem__")
-        dataset._data = dataset.files.dask_array
-        dataset.data.compute()
-
-    expected_call = call((slice(0, chunksize[0], None), slice(0, chunksize[1], None)))
-    assert expected_call in mocked.mock_calls
+        with pytest.warns(DKISTDeprecationWarning, match="non-default chunksize"):
+            dask_array = dataset.files._fm.dask_array
+        assert dask_array.chunksize == (1, *chunksize)
 
 
 def test_read_wcs_with_backwards_affine():
