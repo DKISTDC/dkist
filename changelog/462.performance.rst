@@ -1,0 +1,1 @@
+Improve the dask graph which is used to load data from FITS files. This can have a large impact on data loading times in certain circumstances.
