@@ -31,8 +31,11 @@ On Linux you can do this using the `-restrict-paths` command line argument, or b
 Globus will only be able to transfer files onto your machine in the specified paths.
 Remember that you do need to have GCP running for any transfers to complete - so if you stop it then your data download will stop as well.
 
-When starting transfers with the ``dkist`` package, you may be asked to login to Globus (or authorize the device).
-This will pop open a web browser window where you can complete this flow.
+The first time you start a download task using the Python tools, GCP will open a new browser window prompting you to login and to provide an identifying label for the machine you're using.
+The Python tools will remember this authentication until it expires, so you will need to login again periodically, but not every time you start a download.
+
+If you try transferring the same file a second time to the same location, you will find that the task completes successfully but the file is not actually transferred.
+This is to save download time and avoid duplication.
 
 Finally, a couple of things to note on terminology:
 
