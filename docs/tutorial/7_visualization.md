@@ -23,6 +23,13 @@ Initially, we'll use the VISP sample data, but you can also use the data downloa
 :tags: [skip-execution]
 
 %matplotlib widget
+
+Then, as usual, first we'll need a dataset.
+We'll use the VISP data we downloaded at the end of the last notebook.
+
+```{note}
+If you haven't completed the [__previous chapter__](#dkist:tutorial:downloading-data) on downloading data files, you should do this now before continuing with this chapter.
+Alternatively, you can use the VISP_BKPLX sample dataset, but this only contains partial data and will not show the full plots properly.
 ```
 
 ```{code-cell} ipython3
