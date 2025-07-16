@@ -112,9 +112,10 @@ It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
 ```{code-cell} ipython3
-plt.figure()
 # Plot the same data as above
-ds[0, 0, :, 0].plot()
+fig = plt.figure()
+ax = ds[0, 0, :, 0].plot()
+plt.show()
 ```
 
 ## Plotting with `TiledDataset`
@@ -128,7 +129,6 @@ In the case of VBI, this argument will be a single number which specifies the in
 from dkist.data.sample import VBI_L1_NZJTB
 
 fig = plt.figure()
-tds = dkist.load_dataset(VBI_L1_NZJTB)
 fig = tds.plot(0, figure=fig)
 ```
 
