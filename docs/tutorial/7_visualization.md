@@ -23,6 +23,7 @@ Initially, we'll use the VISP sample data, but you can also use the data downloa
 :tags: [skip-execution]
 
 %matplotlib widget
+```
 
 Then, as usual, first we'll need a dataset.
 We'll use the VISP data we downloaded at the end of the last notebook.
