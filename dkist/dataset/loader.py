@@ -275,7 +275,10 @@ def _throw_error_dkist_version(filepath, asdf_file):
         log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
     asdf_dkist_version = Version(matching_extensions[0]["software"]["version"])
     if current_version < asdf_dkist_version:
-        msg = f"The asdf file you are trying to read ({filepath}) was written with dkist version {asdf_dkist_version} and you have {current_version} installed. From time to time metadata ASDF files provided by the DKIST data center need to require newer versions of the dkist library to support new instruments or new features. See https://docs.dkist.nso.edu/projects/python-tools/en/stable/howto_guides/asdf_warnings.html for more details."
+        msg = (f"The asdf file you are trying to read ({filepath}) was written with dkist version {asdf_dkist_version} "
+               f"and you have {current_version} installed. From time to time metadata ASDF files provided by the DKIST "
+               "data center need to require newer versions of the dkist library to support new instruments or new features.\n"
+               "See https://docs.dkist.nso.edu/projects/python-tools/en/stable/howto_guides/asdf_version_requirements.html for more details.")
         raise DKISTOutOfDateError(msg)
 
 
