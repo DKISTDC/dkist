@@ -5,11 +5,13 @@ from pathlib import Path
 from functools import singledispatch
 from collections import defaultdict
 
+from packaging.version import Version
 from parfive import Results
 
 import asdf
 
-from dkist.utils.exceptions import DKISTUserWarning
+import dkist
+from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
 
 try:
     # first try to import from asdf.exceptions for asdf 2.15+
@@ -19,7 +21,10 @@ except ImportError:
     from asdf import ValidationError
 
 
-ASDF_FILENAME_PATTERN = r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
+ASDF_FILENAME_PATTERN = re.compile(
+    r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
+)
+DKIST_EXTENSION_REGEX = re.compile(r"asdf:\/\/dkist\.nso\.edu\/dkist\/extensions\/dkist-\d\.\d\.\d")
 
 
 @singledispatch
@@ -175,7 +180,6 @@ def _load_from_directory(directory):
     if len(asdf_files) == 1:
         return _load_from_asdf(asdf_files[0])
 
-    pattern = re.compile(ASDF_FILENAME_PATTERN)
     candidates = []
     asdfs_to_load = []
     for filepath in asdf_files:
@@ -183,7 +187,7 @@ def _load_from_directory(directory):
 
         # If the asdf file doesn't match the data center pattern then we load it
         # as it's probably a custom user file
-        if pattern.match(filename) is None:
+        if ASDF_FILENAME_PATTERN.match(filename) is None:
             asdfs_to_load.append(filepath)
             continue
 
@@ -195,7 +199,7 @@ def _load_from_directory(directory):
         asdfs_to_load += candidates
     else:
         # Now we group by prefix
-        matches = [pattern.match(fp.name) for fp in candidates]
+        matches = [ASDF_FILENAME_PATTERN.match(fp.name) for fp in candidates]
         grouped = defaultdict(list)
         for m in matches:
             prefix = m.string.removesuffix(".asdf").removesuffix(m.group("suffix") or "")
@@ -218,7 +222,7 @@ def _load_from_directory(directory):
         warnings.warn(
             f"ASDF files with old names ({', '.join([a.name for a in ignored_files])}) "
             "were found in this directory and ignored. You may want to delete these files.",
-            DKISTUserWarning
+            DKISTUserWarning,
         )
 
     if len(asdfs_to_load) == 1:
@@ -227,18 +231,20 @@ def _load_from_directory(directory):
     return _load_from_iterable(asdfs_to_load)
 
 
-
 def _load_from_asdf(filepath):
     """
     Construct a dataset object from a filepath of a suitable asdf file.
     """
     from dkist.dataset import TiledDataset  # noqa: PLC0415
+
     filepath = Path(filepath).expanduser()
     base_path = filepath.parent
     try:
-        with importlib_resources.as_file(importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml") as schema_path:
-            with asdf.open(filepath, custom_schema=schema_path.as_posix(),
-                           lazy_load=False, memmap=False) as ff:
+        with importlib_resources.as_file(
+            importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"
+        ) as schema_path:
+            with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
+                _throw_error_dkist_version(filepath, ff)
                 ds = ff.tree["dataset"]
                 ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
@@ -251,6 +257,26 @@ def _load_from_asdf(filepath):
     except ValidationError as e:
         err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."
         raise TypeError(err) from e
+
+
+def _throw_error_dkist_version(filepath, asdf_file):
+    """
+    Throw an error if the asdf versions are wrong.
+    """
+    current_version = Version(dkist.__version__)
+    matching_extensions = [
+        ext
+        for ext in asdf_file.tree["history"]["extensions"]
+        if DKIST_EXTENSION_REGEX.match(ext.get("extension_uri", ""))
+    ]
+    if not matching_extensions:
+        return
+    if len(matching_extensions) > 1:
+        log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
+    asdf_dkist_version = Version(matching_extensions[0]["software"]["version"])
+    if current_version < asdf_dkist_version:
+        msg = f"The asdf file you are trying to read ({filepath}) was written with dkist version {asdf_dkist_version} and you have {current_version} installed. From time to time metadata ASDF files provided by the DKIST data center need to require newer versions of the dkist library to support new instruments or new features. See https://docs.dkist.nso.edu/projects/python-tools/en/stable/howto_guides/asdf_warnings.html for more details."
+        raise DKISTOutOfDateError(msg)
 
 
 def _known_types_docs():
@@ -270,5 +296,7 @@ def _formatted_types_docstring(known_types):
     return "\n        ".join(lines)
 
 
-load_dataset.__doc__ = load_dataset.__doc__.format(types_list=_formatted_types_docstring(_known_types_docs()),
-                                                   types=", ".join([f"`{t}`" for t in _known_types_docs().keys()]))
+load_dataset.__doc__ = load_dataset.__doc__.format(
+    types_list=_formatted_types_docstring(_known_types_docs()),
+    types=", ".join([f"`{t}`" for t in _known_types_docs().keys()]),
+)
