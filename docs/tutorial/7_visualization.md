@@ -97,7 +97,7 @@ If you try to animate it, it then needs to do this again at every step.
 For the above example we have deliberately sliced the data to make it a more manageable size.
 Due to some known issues in the plotting code, plotting slices across the data in this way is still slower than we'd like.
 Full-sized datasets should therefore be plotted with caution.
-See issue [#226](https://github.com/DKISTDC/dkist/issues/226) for more details.
+See issue [#256](https://github.com/DKISTDC/dkist/issues/256) for more details.
 ```
 
 You can also use `plot_axes` to create a line plot, by specifying only one axis of the data.
