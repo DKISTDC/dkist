@@ -12,6 +12,7 @@ kernelspec:
   name: python3
 ---
 
+(dkist:tutorial:visualizing-data)=
 # Visualizing DKIST Data
 
 In this chapter we will cover plotting and visualization of both VISP and VBI data.
