@@ -10,7 +10,7 @@ import asdf
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.data.test import rootdir
 from dkist.dataset.loader import ASDF_FILENAME_PATTERN
-from dkist.utils.exceptions import DKISTUserWarning
+from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
 
 
 @pytest.fixture
@@ -201,3 +201,12 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
         # paths but in a order-invariant way.
         assert len(calls) == 1
         assert set(calls[0].args[0]) == {asdf_file_paths[i] for i in indices}
+
+
+def test_version_error():
+    test_file = rootdir / "eit_dataset-1.2.0_dkist_version_99.asdf"
+    with pytest.raises(DKISTOutOfDateError, match="99.0.0"):
+        load_dataset(test_file)
+
+    ds = load_dataset(test_file, ignore_version_mismatch=True)
+    assert isinstance(ds, Dataset)

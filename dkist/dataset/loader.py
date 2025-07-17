@@ -28,7 +28,7 @@ DKIST_EXTENSION_REGEX = re.compile(r"asdf:\/\/dkist\.nso\.edu\/dkist\/extensions
 
 
 @singledispatch
-def load_dataset(target):
+def load_dataset(target, *, ignore_version_mismatch=False):
     """
     Load a DKIST dataset from a variety of inputs.
 
@@ -102,16 +102,16 @@ def load_dataset(target):
     raise TypeError(f"Input type {type(target).__name__} not recognised. It must be one of {', '.join(known_types)}.")
 
 
-@load_dataset.register(Results)
-def _load_from_results(results):
+@load_dataset.register
+def _load_from_results(results: Results, *, ignore_version_mismatch=False):
     """
     The results from a call to ``Fido.fetch``, all results must be valid DKIST ASDF files.
     """
     return _load_from_iterable(results)
 
 
-@load_dataset.register(tuple | list)
-def _load_from_iterable(iterable):
+@load_dataset.register
+def _load_from_iterable(iterable: tuple | list, *, ignore_version_mismatch=False):
     """
     A list or tuple of valid inputs to ``load_dataset``.
     """
@@ -122,7 +122,7 @@ def _load_from_iterable(iterable):
 
 
 @load_dataset.register
-def _load_from_string(path: str):
+def _load_from_string(path: str, *, ignore_version_mismatch=False):
     """
     A string representing a directory or an ASDF file.
     """
@@ -131,7 +131,7 @@ def _load_from_string(path: str):
 
 
 @load_dataset.register
-def _load_from_path(path: Path):
+def _load_from_path(path: Path, *, ignore_version_mismatch=False):
     """
     A path object representing a directory or an ASDF file.
     """
@@ -139,12 +139,12 @@ def _load_from_path(path: Path):
     if not path.is_dir():
         if not path.exists():
             raise ValueError(f"{path} does not exist.")
-        return _load_from_asdf(path)
+        return _load_from_asdf(path, ignore_version_mismatch=ignore_version_mismatch)
 
-    return _load_from_directory(path)
+    return _load_from_directory(path, ignore_version_mismatch=ignore_version_mismatch)
 
 
-def _load_from_directory(directory):
+def _load_from_directory(directory, *, ignore_version_mismatch=False):
     """
     Construct a `~dkist.dataset.Dataset` from a directory containing one (or
     more) ASDF files and a collection of FITS files.
@@ -178,7 +178,7 @@ def _load_from_directory(directory):
         raise ValueError(f"No asdf file found in directory {base_path}.")
 
     if len(asdf_files) == 1:
-        return _load_from_asdf(asdf_files[0])
+        return _load_from_asdf(asdf_files[0], ignore_version_mismatch=ignore_version_mismatch)
 
     candidates = []
     asdfs_to_load = []
@@ -226,12 +226,12 @@ def _load_from_directory(directory):
         )
 
     if len(asdfs_to_load) == 1:
-        return _load_from_asdf(asdfs_to_load[0])
+        return _load_from_asdf(asdfs_to_load[0], ignore_version_mismatch=ignore_version_mismatch)
 
-    return _load_from_iterable(asdfs_to_load)
+    return _load_from_iterable(asdfs_to_load, ignore_version_mismatch=ignore_version_mismatch)
 
 
-def _load_from_asdf(filepath):
+def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
     """
     Construct a dataset object from a filepath of a suitable asdf file.
     """
@@ -244,7 +244,8 @@ def _load_from_asdf(filepath):
             importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"
         ) as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
-                _throw_error_dkist_version(filepath, ff)
+                if not ignore_version_mismatch:
+                    _throw_error_dkist_version(filepath, ff)
                 ds = ff.tree["dataset"]
                 ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
