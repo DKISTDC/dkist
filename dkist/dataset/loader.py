@@ -2,7 +2,7 @@ import re
 import warnings
 import importlib.resources as importlib_resources
 from pathlib import Path
-from functools import singledispatch
+from functools import cache, singledispatch
 from collections import defaultdict
 
 from packaging.version import Version
@@ -261,6 +261,11 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
         raise TypeError(err) from e
 
 
+@cache
+def _get_dkist_uris():
+    return [e.extension_uri for e in get_dkist_extensions()]
+
+
 def _check_dkist_version(filepath, asdf_file):
     """
     Throw an error if the asdf versions are wrong.
@@ -275,7 +280,7 @@ def _check_dkist_version(filepath, asdf_file):
         dkist.log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
         return
 
-    dkist_uris = [e.extension_uri for e in get_dkist_extensions()]
+    dkist_uris = _get_dkist_uris()
 
     # If the extension URI is in the currently available extensions then we are ok
     if (dkist_ext_uri := matching_extensions[0]["extension_uri"]) in dkist_uris:
