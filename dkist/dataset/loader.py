@@ -24,7 +24,7 @@ except ImportError:
 ASDF_FILENAME_PATTERN = re.compile(
     r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
 )
-DKIST_EXTENSION_REGEX = re.compile(r"asdf:\/\/dkist\.nso\.edu\/dkist\/extensions\/dkist-\d\.\d\.\d")
+DKIST_EXTENSION_REGEX = re.compile(r"asdf:\/\/dkist\.nso\.edu\/dkist\/extensions\/dkist-\d{1,}\.\d{1,}\.\d{1,}")
 
 
 @singledispatch
@@ -245,7 +245,7 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
         ) as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
                 if not ignore_version_mismatch:
-                    _throw_error_dkist_version(filepath, ff)
+                    _check_dkist_version(filepath, ff)
                 ds = ff.tree["dataset"]
                 ds.meta["history"] = ff.tree["history"]
                 if isinstance(ds, TiledDataset):
@@ -260,7 +260,7 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
         raise TypeError(err) from e
 
 
-def _throw_error_dkist_version(filepath, asdf_file):
+def _check_dkist_version(filepath, asdf_file):
     """
     Throw an error if the asdf versions are wrong.
     """

@@ -137,7 +137,7 @@ def generate_asdf_folder(tmp_path, asdf_path, filenames):
     ("DL-NIRSP_L1_20231016T184519_AJQWW_metadata.asdf", True),
     ("VISP_L1_99999999T184519_AAAAAAA.asdf", True),
     ("VISP_L1_20231016T888888_AAAAAAA_user_tools.asdf", True),
-    ("VISP_L1_20231016T184519_AAAAAAA_metadata.asdf", True),
+    ("VISP_L1_20231016T184519_AAAAAA_metadata.asdf", True),
     ("VISP_L1_20231016T184519_AAAAAAA_unknown.asdf", False),
     ("VISP_L1_20231016T184519.asdf", False),
     ("wibble.asdf", False),
