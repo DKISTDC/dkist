@@ -1,3 +1,27 @@
+1.14.0 (2025-07-17)
+===================
+
+Features
+--------
+
+- Add support for new transform schemas in asdf-transform-schemas 0.6.0. (`#568 <https://github.com/DKISTDC/dkist/pull/568>`__)
+- Raise an exception when trying to load an ASDF file which requires a newer version than the version of `dkist` that is currently installed. (`#584 <https://github.com/DKISTDC/dkist/pull/584>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Update FileManager.__repr__ to provide basic information about shape and number of files. (`#574 <https://github.com/DKISTDC/dkist/pull/574>`__)
+
+
+Performance Improvements
+------------------------
+
+- Improve the dask graph which is used to load data from FITS files. This can have a large impact on data loading times in certain circumstances. (`#462 <https://github.com/DKISTDC/dkist/pull/462>`__)
+- Make `TiledDataset.combined_headers` the canonical reference for the headers and make each tile's `.headers` reference it.
+  This significantly improves read and write speed for large `TiledDataset` objects since only one table needs to be validated. (`#514 <https://github.com/DKISTDC/dkist/pull/514>`__)
+
+
 1.13.0 (2025-05-08)
 ===================
 

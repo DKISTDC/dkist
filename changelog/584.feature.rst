@@ -1,1 +1,0 @@
-Raise an exception when trying to load an ASDF file which requires a newer version than the version of `dkist` that is currently installed.
