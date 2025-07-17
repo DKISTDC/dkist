@@ -206,29 +206,45 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
 
 
 @pytest.fixture(
+    # (dkist_ext, error_match)
     params=[
-        # (dkist_ext, error_match)
         (
+            # Given a future uri and software version
             ExtensionMetadata(
                 extension_class="asdf.extension._manifest.ManifestExtension",
                 extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0",
                 software=Software(name="dkist", version="99.0.0"),
             ),
+            # then raise the software version error
             re.escape("dkist version 99.0.0"),
         ),
         (
+            # Given a future uri but no software info
             ExtensionMetadata(
                 extension_class="asdf.extension._manifest.ManifestExtension",
                 extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0",
             ),
+            # then raise the extension version error
             re.escape("ASDF extension asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0"),
         ),
         (
+            # Given a future uri but somehow an old software version
+            ExtensionMetadata(
+                extension_class="asdf.extension._manifest.ManifestExtension",
+                extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0",
+                software=Software(name="dkist", version="1.0.0"),
+            ),
+            # then raise the extension version error
+            re.escape("ASDF extension asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0"),
+        ),
+        (
+            # Given a supported URI
             ExtensionMetadata(
                 extension_class="asdf.extension._manifest.ManifestExtension",
                 extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0",
                 software=Software(name="dkist", version="1.0.0"),
             ),
+            # Then don't raise anything
             None,
         ),
     ]

@@ -291,13 +291,15 @@ def _check_dkist_version(filepath, asdf_file):
     )
 
     current_version = Version(dkist.__version__)
-    if not matching_extensions[0].get("software"):
-        msg = (
-            f"This file references a a version of the dkist ASDF extension {dkist_ext_uri} which is not available in "
-            f"this version of the dkist package ({current_version}) you probably need to upgrade the dkist package."
-        )
-    else:
+    # This is the msg if we can't ascertain the dkist version used to write the file
+    msg = (
+        f"This file references a a version of the dkist ASDF extension {dkist_ext_uri} which is not available in "
+        f"this version of the dkist package ({current_version}) you probably need to upgrade the dkist package."
+    )
+    if matching_extensions[0].get("software"):
         asdf_dkist_version = Version(matching_extensions[0]["software"]["version"])
+        # If somehow we end up here and the version is newer, we will
+        # return the generic message so as to not confuse people
         if current_version < asdf_dkist_version:
             msg = (
                 f"The asdf file you are trying to read ({filepath}) was written with "
