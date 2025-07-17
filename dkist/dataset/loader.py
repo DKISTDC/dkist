@@ -11,6 +11,7 @@ from parfive import Results
 import asdf
 
 import dkist
+from dkist.io.asdf.entry_points import get_extensions as get_dkist_extensions
 from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
 
 try:
@@ -264,23 +265,46 @@ def _check_dkist_version(filepath, asdf_file):
     """
     Throw an error if the asdf versions are wrong.
     """
-    current_version = Version(dkist.__version__)
     matching_extensions = [
         ext
         for ext in asdf_file.tree["history"]["extensions"]
         if DKIST_EXTENSION_REGEX.match(ext.get("extension_uri", ""))
     ]
+
     if not matching_extensions:
         return
+
     if len(matching_extensions) > 1:
-        log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
-    asdf_dkist_version = Version(matching_extensions[0]["software"]["version"])
-    if current_version < asdf_dkist_version:
-        msg = (f"The asdf file you are trying to read ({filepath}) was written with dkist version {asdf_dkist_version} "
-               f"and you have {current_version} installed. From time to time metadata ASDF files provided by the DKIST "
-               "data center need to require newer versions of the dkist library to support new instruments or new features.\n"
-               "See https://docs.dkist.nso.edu/projects/python-tools/en/stable/howto_guides/asdf_version_requirements.html for more details.")
-        raise DKISTOutOfDateError(msg)
+        dkist.log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
+        return
+
+    dkist_uris = [e.extension_uri for e in get_dkist_extensions()]
+
+    # If the extension URI is in the currently available extensions then we are ok
+    if (dkist_ext_uri := matching_extensions[0]["extension_uri"]) in dkist_uris:
+        return
+
+    more_info_msg = (
+        "\nFrom time to time metadata ASDF files provided by the DKIST data center need to require "
+        "newer versions of the dkist library to support new instruments or new features.\n"
+        "See https://docs.dkist.nso.edu/projects/python-tools/en/stable/howto_guides/asdf_version_requirements.html for more details."
+    )
+
+    current_version = Version(dkist.__version__)
+    if not matching_extensions[0].get("software"):
+        msg = (
+            f"This file references a a version of the dkist ASDF extension {dkist_ext_uri} which is not available in "
+            f"this version of the dkist package ({current_version}) you probably need to upgrade the dkist package."
+        )
+    else:
+        asdf_dkist_version = Version(matching_extensions[0]["software"]["version"])
+        if current_version < asdf_dkist_version:
+            msg = (
+                f"The asdf file you are trying to read ({filepath}) was written with "
+                f"dkist version {asdf_dkist_version} and you have {current_version} installed."
+            )
+
+    raise DKISTOutOfDateError(msg + more_info_msg)
 
 
 def _known_types_docs():

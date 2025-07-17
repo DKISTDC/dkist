@@ -1,15 +1,17 @@
 import re
 import shutil
 import numbers
+import contextlib
 
 import pytest
 from parfive import Results
 
 import asdf
+from asdf.tags.core import ExtensionMetadata, Software
 
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.data.test import rootdir
-from dkist.dataset.loader import ASDF_FILENAME_PATTERN
+from dkist.dataset.loader import ASDF_FILENAME_PATTERN, DKIST_EXTENSION_REGEX
 from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
 
 
@@ -22,7 +24,7 @@ def single_asdf_in_folder(tmp_path, asdf_path):
 @pytest.fixture
 def multiple_asdf_in_folder(tmp_path, asdf_path):
     shutil.copy(asdf_path, tmp_path)
-    shutil.copy(asdf_path, tmp_path  / "second_asdf.asdf")
+    shutil.copy(asdf_path, tmp_path / "second_asdf.asdf")
     return tmp_path
 
 
@@ -203,10 +205,70 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
         assert set(calls[0].args[0]) == {asdf_file_paths[i] for i in indices}
 
 
-def test_version_error():
-    test_file = rootdir / "eit_dataset-1.2.0_dkist_version_99.asdf"
-    with pytest.raises(DKISTOutOfDateError, match="99.0.0"):
+@pytest.fixture(
+    params=[
+        # (dkist_ext, error_match)
+        (
+            ExtensionMetadata(
+                extension_class="asdf.extension._manifest.ManifestExtension",
+                extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0",
+                software=Software(name="dkist", version="99.0.0"),
+            ),
+            re.escape("dkist version 99.0.0"),
+        ),
+        (
+            ExtensionMetadata(
+                extension_class="asdf.extension._manifest.ManifestExtension",
+                extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0",
+            ),
+            re.escape("ASDF extension asdf://dkist.nso.edu/dkist/extensions/dkist-99.0.0"),
+        ),
+        (
+            ExtensionMetadata(
+                extension_class="asdf.extension._manifest.ManifestExtension",
+                extension_uri="asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0",
+                software=Software(name="dkist", version="1.0.0"),
+            ),
+            None,
+        ),
+    ]
+)
+def asdf_extensions(request, tmp_path, mocker):
+    ext_info, match = request.param
+    test_file = rootdir / "eit_dataset-1.2.0.asdf"
+    output_file = tmp_path / "eit_dataset-1.2.0_modified.asdf"
+    with asdf.open(test_file) as ff:
+        extensions = ff.tree["history"]["extensions"]
+        new_extensions = []
+        for ext in extensions:
+            if not DKIST_EXTENSION_REGEX.match(ext.get("extension_uri", "")):
+                new_extensions.append(ext)
+        new_extensions.append(ext_info)
+        ff.tree["history"]["extensions"] = new_extensions
+
+        # We need to skip asdf's automatic population of the extensions list.
+        af = asdf.AsdfFile(ff.tree)
+        af._update_extension_history = mocker.MagicMock()
+        af.write_to(output_file)
+
+    return output_file, match
+
+
+@pytest.mark.filterwarnings("ignore::asdf.exceptions.AsdfPackageVersionWarning")
+def test_version_error(asdf_extensions):
+    test_file, match = asdf_extensions
+
+    raises = pytest.raises(DKISTOutOfDateError, match=match)
+    if match is None:
+        raises = contextlib.nullcontext()
+
+    with raises as exc_info:
         load_dataset(test_file)
+
+    # Check that all exceptions have the common help msg
+    # as well as the parameterized one
+    if match is not None:
+        assert exc_info.match("From time to time")
 
     ds = load_dataset(test_file, ignore_version_mismatch=True)
     assert isinstance(ds, Dataset)

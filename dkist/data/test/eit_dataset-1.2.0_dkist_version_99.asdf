@@ -1,664 +1,0 @@
-#ASDF 1.0.0
-#ASDF_STANDARD 1.5.0
-%YAML 1.1
-%TAG ! tag:stsci.edu:asdf/
---- !core/asdf-1.1.0
-asdf_library: !core/software-1.0.0 {author: The ASDF Developers, homepage: 'http://github.com/asdf-format/asdf',
-  name: asdf, version: 2.15.2}
-history:
-  extensions:
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension.BuiltinExtension
-    software: !core/software-1.0.0 {name: asdf, version: 2.15.2}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://asdf-format.org/astronomy/gwcs/extensions/gwcs-1.1.0
-    software: !core/software-1.0.0 {name: gwcs, version: 0.19.1.dev19+g50e2340}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://astropy.org/astropy/extensions/astropy-1.0.0
-    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf_astropy._manifest.CompoundManifestExtension
-    extension_uri: asdf://asdf-format.org/core/extensions/core-1.5.0
-    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://dkist.nso.edu/dkist/extensions/dkist-1.0.0
-    software: !core/software-1.0.0 {name: dkist, version: 99.0.0}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://asdf-format.org/transform/extensions/transform-1.5.0
-    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://sunpy.org/extensions/sunpy-1.0.0
-    software: !core/software-1.0.0 {name: sunpy, version: 5.0.1}
-  - !core/extension_metadata-1.0.0
-    extension_class: asdf.extension._manifest.ManifestExtension
-    extension_uri: asdf://asdf-format.org/astronomy/coordinates/extensions/coordinates-1.0.0
-    software: !core/software-1.0.0 {name: asdf-astropy, version: 0.4.0}
-dataset: !<asdf://dkist.nso.edu/tags/dataset-1.2.0>
-  data: !<asdf://dkist.nso.edu/tags/file_manager-1.0.0>
-    datatype: float64
-    fileuris: [efz20040301.000010_s.fits, efz20040301.020010_s.fits, efz20040301.030011_s.fits,
-      efz20040301.040010_s.fits, efz20040301.050010_s.fits, efz20040301.060010_s.fits,
-      efz20040301.080010_s.fits, efz20040301.090010_s.fits, efz20040301.100010_s.fits,
-      efz20040301.110010_s.fits, efz20040301.120010_s.fits]
-    shape: [128, 128]
-    target: 0
-  meta:
-    headers: !<tag:astropy.org:astropy/table/table-1.0.0>
-      colnames: [SIMPLE, BITPIX, NAXIS, NAXIS1, NAXIS2, DATE, TIME-OBS, DATE-OBS,
-        ORIGIN, DATASRC, TELESCOP, INSTRUME, OBJECT, BUNIT, WAVELNTH, FILTER, DATE_OBS,
-        SCI_OBJ, OBS_PROG, CMP_NO, EXPTIME, EXPMODE, FILENAME, CFTEMP, CCDTEMP, CTYPE1,
-        CTYPE2, CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, SOLAR_R, SOLAR_B0,
-        SC_X0, SC_Y0, SC_ROLL, HEC_X, HEC_Y, HEC_Z, CAR_ROT, DNAXIS, DNAXIS3, DAAXES,
-        DEAXES, DINDEX3]
-      columns:
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 0
-          datatype: bool8
-          byteorder: big
-          shape: [11]
-        name: SIMPLE
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 1
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: BITPIX
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 2
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: NAXIS
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 3
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: NAXIS1
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 4
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: NAXIS2
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 5
-          datatype: [ucs4, 10]
-          byteorder: little
-          shape: [11]
-        name: DATE
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 6
-          datatype: [ucs4, 8]
-          byteorder: little
-          shape: [11]
-        name: TIME-OBS
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 7
-          datatype: [ucs4, 23]
-          byteorder: little
-          shape: [11]
-        name: DATE-OBS
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 8
-          datatype: [ucs4, 14]
-          byteorder: little
-          shape: [11]
-        name: ORIGIN
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 9
-          datatype: [ucs4, 7]
-          byteorder: little
-          shape: [11]
-        name: DATASRC
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 10
-          datatype: [ucs4, 4]
-          byteorder: little
-          shape: [11]
-        name: TELESCOP
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 11
-          datatype: [ucs4, 3]
-          byteorder: little
-          shape: [11]
-        name: INSTRUME
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 12
-          datatype: [ucs4, 8]
-          byteorder: little
-          shape: [11]
-        name: OBJECT
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 13
-          datatype: [ucs4, 14]
-          byteorder: little
-          shape: [11]
-        name: BUNIT
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 14
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: WAVELNTH
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 15
-          datatype: [ucs4, 5]
-          byteorder: little
-          shape: [11]
-        name: FILTER
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 16
-          datatype: [ucs4, 24]
-          byteorder: little
-          shape: [11]
-        name: DATE_OBS
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 17
-          datatype: [ucs4, 13]
-          byteorder: little
-          shape: [11]
-        name: SCI_OBJ
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 18
-          datatype: [ucs4, 16]
-          byteorder: little
-          shape: [11]
-        name: OBS_PROG
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 19
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: CMP_NO
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 20
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: EXPTIME
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 21
-          datatype: [ucs4, 8]
-          byteorder: little
-          shape: [11]
-        name: EXPMODE
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 22
-          datatype: [ucs4, 18]
-          byteorder: little
-          shape: [11]
-        name: FILENAME
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 23
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CFTEMP
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 24
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CCDTEMP
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 25
-          datatype: [ucs4, 7]
-          byteorder: little
-          shape: [11]
-        name: CTYPE1
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 26
-          datatype: [ucs4, 7]
-          byteorder: little
-          shape: [11]
-        name: CTYPE2
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 27
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CRPIX1
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 28
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CRPIX2
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 29
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CRVAL1
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 30
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CRVAL2
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 31
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CDELT1
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 32
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CDELT2
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 33
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: SOLAR_R
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 34
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: SOLAR_B0
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 35
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: SC_X0
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 36
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: SC_Y0
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 37
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: SC_ROLL
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 38
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: HEC_X
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 39
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: HEC_Y
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 40
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: HEC_Z
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 41
-          datatype: float64
-          byteorder: little
-          shape: [11]
-        name: CAR_ROT
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 42
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: DNAXIS
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 43
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: DNAXIS3
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 44
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: DAAXES
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 45
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: DEAXES
-      - !core/column-1.0.0
-        data: !core/ndarray-1.0.0
-          source: 46
-          datatype: int64
-          byteorder: little
-          shape: [11]
-        name: DINDEX3
-      qtable: false
-    inventory: {}
-  unit: !unit/unit-1.0.0 count.pixel**-1
-  wcs: !<tag:stsci.edu:gwcs/wcs-1.1.0>
-    name: ''
-    steps:
-    - !<tag:stsci.edu:gwcs/step-1.1.0>
-      frame: !<tag:stsci.edu:gwcs/frame-1.0.0>
-        axes_names: [x, y, z]
-        axes_order: [0, 1, 2]
-        axes_type: [pixel, pixel, pixel]
-        axis_physical_types: ['custom:pixel', 'custom:pixel', 'custom:pixel']
-        name: detector
-        naxes: 3
-        unit: [!unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel, !unit/unit-1.0.0 pixel]
-      transform: !transform/concatenate-1.2.0
-        forward:
-        - !transform/compose-1.2.0
-          forward:
-          - !transform/compose-1.2.0
-            forward:
-            - !transform/compose-1.2.0
-              forward:
-              - !transform/compose-1.2.0
-                forward:
-                - !transform/concatenate-1.2.0
-                  forward:
-                  - !transform/shift-1.2.0
-                    inputs: [x]
-                    offset: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 pixel,
-                      value: -62.5}
-                    outputs: [y]
-                  - !transform/shift-1.2.0
-                    inputs: [x]
-                    offset: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 pixel,
-                      value: -62.5}
-                    outputs: [y]
-                  inputs: [x0, x1]
-                  outputs: [y0, y1]
-                - !transform/concatenate-1.2.0
-                  forward:
-                  - !transform/multiplyscale-1.0.0
-                    factor: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 arcsec.pixel**-1,
-                      value: 2.63}
-                    inputs: [x]
-                    outputs: [y]
-                  - !transform/multiplyscale-1.0.0
-                    factor: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 arcsec.pixel**-1,
-                      value: 2.63}
-                    inputs: [x]
-                    outputs: [y]
-                  inputs: [x0, x1]
-                  outputs: [y0, y1]
-                inputs: [x0, x1]
-                outputs: [y0, y1]
-              - !transform/affine-1.3.0
-                inputs: [x, y]
-                matrix: !unit/quantity-1.1.0
-                  unit: !unit/unit-1.0.0 arcsec
-                  value: !core/ndarray-1.0.0
-                    source: 47
-                    datatype: float64
-                    byteorder: little
-                    shape: [2, 2]
-                outputs: [x, y]
-                translation: !unit/quantity-1.1.0
-                  unit: !unit/unit-1.0.0 arcsec
-                  value: !core/ndarray-1.0.0
-                    source: 48
-                    datatype: float64
-                    byteorder: little
-                    shape: [2]
-              inputs: [x0, x1]
-              outputs: [x, y]
-            - !transform/gnomonic-1.2.0
-              direction: pix2sky
-              inputs: [x, y]
-              outputs: [phi, theta]
-            inputs: [x0, x1]
-            outputs: [phi, theta]
-          - !transform/rotate3d-1.3.0
-            direction: native2celestial
-            inputs: [phi_N, theta_N]
-            outputs: [alpha_C, delta_C]
-            phi: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 arcsec,
-              value: 0.0}
-            psi: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 deg,
-              value: 180.0}
-            theta: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 arcsec,
-              value: 0.0}
-          inputs: [x0, x1]
-          name: spatial
-          outputs: [alpha_C, delta_C]
-        - !transform/tabular-1.2.0
-          bounds_error: false
-          fill_value: .nan
-          inputs: [x]
-          lookup_table: !unit/quantity-1.1.0
-            unit: !unit/unit-1.0.0 s
-            value: !core/ndarray-1.0.0
-              source: 49
-              datatype: float64
-              byteorder: little
-              shape: [11]
-          method: linear
-          outputs: [y]
-          points:
-          - !unit/quantity-1.1.0
-            unit: !unit/unit-1.0.0 pixel
-            value: !core/ndarray-1.0.0
-              source: 50
-              datatype: float64
-              byteorder: little
-              shape: [11]
-        inputs: [x0, x1, x]
-        outputs: [alpha_C, delta_C, y]
-    - !<tag:stsci.edu:gwcs/step-1.1.0>
-      frame: !<tag:stsci.edu:gwcs/composite_frame-1.0.0>
-        frames:
-        - !<tag:stsci.edu:gwcs/celestial_frame-1.0.0>
-          axes_names: [helioprojective longitude, helioprojective latitude]
-          axes_order: [0, 1]
-          axis_physical_types: ['custom:helioprojective longitude', 'custom:helioprojective
-              latitude']
-          name: helioprojective
-          reference_frame: !<tag:sunpy.org:sunpy/coordinates/frames/helioprojective-1.0.0>
-            frame_attributes:
-              observer: !<tag:sunpy.org:sunpy/coordinates/frames/heliographic_stonyhurst-1.1.0>
-                data: !<tag:astropy.org:astropy/coordinates/representation-1.0.0>
-                  components:
-                    distance: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 m,
-                      value: 146719367831.4179}
-                    lat: !<tag:astropy.org:astropy/coordinates/latitude-1.0.0> {datatype: float64,
-                      unit: !unit/unit-1.0.0 deg, value: -7.26851085895077}
-                    lon: !<tag:astropy.org:astropy/coordinates/longitude-1.0.0>
-                      datatype: float64
-                      unit: !unit/unit-1.0.0 deg
-                      value: 0.8036951527737555
-                      wrap_angle: !<tag:astropy.org:astropy/coordinates/angle-1.0.0> {
-                        datatype: float64, unit: !unit/unit-1.0.0 deg, value: 360.0}
-                  type: SphericalRepresentation
-                frame_attributes:
-                  obstime: !time/time-1.1.0 2004-03-01T00:00:10.515
-                  rsun: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 km,
-                    value: 696425.1891951801}
-              obstime: !time/time-1.1.0 2004-03-01T00:00:10.515
-              rsun: !unit/quantity-1.1.0 {datatype: float64, unit: !unit/unit-1.0.0 km,
-                value: 696425.1891951801}
-          unit: [!unit/unit-1.0.0 deg, !unit/unit-1.0.0 deg]
-        - !<tag:stsci.edu:gwcs/temporal_frame-1.0.0>
-          axes_names: [time]
-          axes_order: [2]
-          axis_physical_types: [time]
-          name: TemporalFrame
-          reference_frame: !time/time-1.1.0 2004-03-01T00:00:10.515
-          unit: [!unit/unit-1.0.0 s]
-        name: world
-      transform: null
-...
-”BLK 0                             a“yÎïÍÇQçØLmj=˙”BLK 0               X       X       Xà".‚P4ï‘õU‘êZƒ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ¿ˇˇˇˇˇˇˇ”BLK 0               X       X       X≠€@)	/Éõ∑¶π[I@                                                                             ”BLK 0               X       X       Xªl#˙aâS6ªj∂Ù\ØôÄ       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       ”BLK 0               X       X       Xªl#˙aâS6ªj∂Ù\ØôÄ       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       Ä       ”BLK 0              ∏      ∏      ∏∫6Ù=móÉriIäD=ã.2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   2   0   0   4   -   0   3   -   0   1   ”BLK 0              `      `      `Ωëw¢-BÀ6L~˝\PÏN0   0   :   0   0   :   1   0   0   2   :   0   0   :   1   0   0   3   :   0   0   :   1   1   0   4   :   0   0   :   1   0   0   5   :   0   0   :   1   0   0   6   :   0   0   :   1   0   0   8   :   0   0   :   1   0   0   9   :   0   0   :   1   0   1   0   :   0   0   :   1   0   1   1   :   0   0   :   1   0   1   2   :   0   0   :   1   0   ”BLK 0              Ù      Ù      Ù]v≤%\≤jÆÒíC[L2   0   0   4   -   0   3   -   0   1   T   0   0   :   0   0   :   1   0   .   5   1   5   2   0   0   4   -   0   3   -   0   1   T   0   2   :   0   0   :   1   0   .   6   4   2   2   0   0   4   -   0   3   -   0   1   T   0   3   :   0   0   :   1   1   .   4   0   5   2   0   0   4   -   0   3   -   0   1   T   0   4   :   0   0   :   1   0   .   5   6   8   2   0   0   4   -   0   3   -   0   1   T   0   5   :   0   0   :   1   0   .   5   3   2   2   0   0   4   -   0   3   -   0   1   T   0   6   :   0   0   :   1   0   .   4   9   5   2   0   0   4   -   0   3   -   0   1   T   0   8   :   0   0   :   1   0   .   6   2   2   2   0   0   4   -   0   3   -   0   1   T   0   9   :   0   0   :   1   0   .   5   8   5   2   0   0   4   -   0   3   -   0   1   T   1   0   :   0   0   :   1   0   .   5   4   8   2   0   0   4   -   0   3   -   0   1   T   1   1   :   0   0   :   1   0   .   6   1   2   2   0   0   4   -   0   3   -   0   1   T   1   2   :   0   0   :   1   0   .   5   7   5   ”BLK 0              h      h      h≠rM?Äò°é¨®˜—±R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   R   o   c   k   e   t       S   c   i   e   n   c   e   ”BLK 0              4      4      4≥»mÄD»ª’-∑›î L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   L   Z       f   i   l   e   ”BLK 0               ∞       ∞       ∞pÎªØiÜÓV6&ìÊèﬂ*S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   S   O   H   O   ”BLK 0               Ñ       Ñ       Ñ¨∫Yê≠ª}ì—…£≈·E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   E   I   T   ”BLK 0              `      `      `hj«gkVOÑ·r GÇâf   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   f   u   l   l       F   O   V   ”BLK 0              h      h      hqÏLˆ—x⁄tx’¡¯d∏¶c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   c   o   u   n   t   s       /       p   i   x   e   l   ”BLK 0               X       X       XáóL—M◊íqÕ,9‰∂,N√       √       √       √       √       √       √       √       √       √       √       ”BLK 0               ‹       ‹       ‹¸ÆG˚W†XŸM@xïA   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   A   l       +   1   ”BLK 0                             ˜ú&#JÑ®¨Ûsç÷ô…˚2   0   0   4   -   0   3   -   0   1   T   0   0   :   0   0   :   1   0   .   5   1   5   Z   2   0   0   4   -   0   3   -   0   1   T   0   2   :   0   0   :   1   0   .   6   4   2   Z   2   0   0   4   -   0   3   -   0   1   T   0   3   :   0   0   :   1   1   .   4   0   5   Z   2   0   0   4   -   0   3   -   0   1   T   0   4   :   0   0   :   1   0   .   5   6   8   Z   2   0   0   4   -   0   3   -   0   1   T   0   5   :   0   0   :   1   0   .   5   3   2   Z   2   0   0   4   -   0   3   -   0   1   T   0   6   :   0   0   :   1   0   .   4   9   5   Z   2   0   0   4   -   0   3   -   0   1   T   0   8   :   0   0   :   1   0   .   6   2   2   Z   2   0   0   4   -   0   3   -   0   1   T   0   9   :   0   0   :   1   0   .   5   8   5   Z   2   0   0   4   -   0   3   -   0   1   T   1   0   :   0   0   :   1   0   .   5   4   8   Z   2   0   0   4   -   0   3   -   0   1   T   1   1   :   0   0   :   1   0   .   6   1   2   Z   2   0   0   4   -   0   3   -   0   1   T   1   2   :   0   0   :   1   0   .   5   7   5   Z   ”BLK 0              <      <      <HN≈·kÁ¶ÜŸSƒñ˙ns·C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   C   M   E       W   A   T   C   H       1   9   5   ”BLK 0              ¿      ¿      ¿f—¬∂˘7Dî∑·±˜˝LÕ1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   1   9   5   _   1   0   S   _   A   L   _   1   .   0   0   0   ”BLK 0               X       X       XˇÑkß˙;÷õµÊîK°˘                                                                             ”BLK 0               X       X       X]µÓ(}Ä∞~qKvô^€Ô      *@V-2)@˛‘xÈ&1)@q=
-◊£0)@¶õƒ ∞2)@…væü/)@ãlÁ˚©1)@„•õƒ 0)@q=
-◊£0)@„•õƒ 0)@q=
-◊£0)@”BLK 0              `      `      `N†[JcØ>pV»9b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   b   a   c   k   s   i   d   e   ”BLK 0                          ¢ p˛êXÜkNI6Ùze   f   z   2   0   0   4   0   3   0   1   .   0   0   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   2   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   3   0   0   1   1   e   f   z   2   0   0   4   0   3   0   1   .   0   4   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   5   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   6   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   8   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   0   9   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   1   0   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   1   1   0   0   1   0   e   f   z   2   0   0   4   0   3   0   1   .   1   2   0   0   1   0   ”BLK 0               X       X       X¬Zc¨ŒØhÂ{≤á¸ŒãF}=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿=
-◊£p≠P¿”BLK 0               X       X       X~ˇJù>i
-8¨¡·∑∆Ø\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@\è¬ı(\@”BLK 0              4      4      4◊CÇ{√ê≠≠SKC^îxXS   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   S   o   l   a   r   -   X   ”BLK 0              4      4      4≥òw◊ÉOŸC`¸õùKﬂS   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   S   o   l   a   r   -   Y   ”BLK 0               X       X       XtA3⁄+πYI2|û∏ÏÙ˚      P@      P@      P@      P@      P@      P@      P@      P@      P@      P@      P@”BLK 0               X       X       XtA3⁄+πYI2|û∏ÏÙ˚      P@      P@      P@      P@      P@      P@      P@      P@      P@      P@      P@”BLK 0               X       X       XÚ3RDúb%E6ﬂﬂ-                                                                                        ”BLK 0               X       X       XÚ3RDúb%E6ﬂﬂ-                                                                                        ”BLK 0               X       X       X
-`_‡°#òÜ¨m*öêwg
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@”BLK 0               X       X       X
-`_‡°#òÜ¨m*öêwg
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@
-◊£p=
-@”BLK 0               X       X       Xzv”'±¿uê˝
-N‹ œé∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@∏ÖÎQDw@”BLK 0               X       X       Xåxuwi–åi]§·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿·zÆG·¿”BLK 0               X       X       XÚ3RDúb%E6ﬂﬂ-                                                                                        ”BLK 0               X       X       XÚ3RDúb%E6ﬂﬂ-                                                                                        ”BLK 0               X       X       X^tY2ÛK◊èlÖ}r     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@     Äf@”BLK 0               X       X       XúÅü3@ògzÎè˘¥€#¯   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡   ¿Íï†¡”BLK 0               X       X       X9ú¯û˚f›‰}ßÜØ   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA   Äî5ÜA”BLK 0               X       X       Xú@≠Õπ*8<orÜº'≈à\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿\è¬ı+˜¿”BLK 0               X       X       X—√ÿùVnjä[∂≤ˆuCf      tü@     tü@     tü@     tü@     tü@     tü@     tü@     tü@     tü@     tü@     tü@”BLK 0               X       X       X'ü≤í=÷‰e`âM∆5û˘«                                                                             ”BLK 0               X       X       X◊WÇ:Múãbar@π)B¢                                                                             ”BLK 0               X       X       X≠€@)	/Éõ∑¶π[I@                                                                             ”BLK 0               X       X       XˇÑkß˙;÷õµÊîK°˘                                                                             ”BLK 0               X       X       X<êÉ/ä{à	Œ úî¶ó                                                        	       
-              ”BLK 0                                óÙhmÓBæ¨ÕÖáù,´Z      ?       Ä              ?”BLK 0                             JÁ6‰K˘øy“u.#H•                ”BLK 0               X       X       X'\b≈-Â˚óVçV≈ªÒË        ïnÉ  º@∏ÖÎq≈@W9¥» Ã@+áî—@ÖÎQ∏˛’@*áŸ ‹@ÆG·z§ﬂ@Vî·@wæüV„@∏ÖÎÂ@”BLK 0               X       X       X™ç!˙Z%¶∆,%®Í‡              ?       @      @      @      @      @      @       @      "@      $@#ASDF BLOCK INDEX
-%YAML 1.1
----
-- 18468
-- 18533
-- 18675
-- 18817
-- 18959
-- 19101
-- 19595
-- 20001
-- 21067
-- 21737
-- 22099
-- 22329
-- 22515
-- 22921
-- 23591
-- 23733
-- 24007
-- 25117
-- 25743
-- 26501
-- 26643
-- 26785
-- 27191
-- 28037
-- 28179
-- 28321
-- 28683
-- 29045
-- 29187
-- 29329
-- 29471
-- 29613
-- 29755
-- 29897
-- 30039
-- 30181
-- 30323
-- 30465
-- 30607
-- 30749
-- 30891
-- 31033
-- 31175
-- 31317
-- 31459
-- 31601
-- 31743
-- 31885
-- 31971
-- 32041
-- 32183
-...
