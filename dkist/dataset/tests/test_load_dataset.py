@@ -196,7 +196,7 @@ def test_select_asdf(tmp_path, asdf_path, filenames, indices, mocker):
             datasets = load_dataset(asdf_folder)
 
     if isinstance(indices, numbers.Integral):
-        load_from_asdf.assert_called_once_with(asdf_file_paths[indices])
+        load_from_asdf.assert_called_once_with(asdf_file_paths[indices], ignore_version_mismatch=False)
     else:
         calls = load_from_iterable.mock_calls
         # We need to assert that _load_from_iterable is called with the right

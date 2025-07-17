@@ -271,10 +271,7 @@ def _check_dkist_version(filepath, asdf_file):
         if DKIST_EXTENSION_REGEX.match(ext.get("extension_uri", ""))
     ]
 
-    if not matching_extensions:
-        return
-
-    if len(matching_extensions) > 1:
+    if not matching_extensions or len(matching_extensions) > 1:
         dkist.log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
         return
 
