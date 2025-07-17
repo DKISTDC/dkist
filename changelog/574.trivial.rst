@@ -1,1 +1,0 @@
-Update FileManager.__repr__ to provide basic information about shape and number of files.
