@@ -11,7 +11,7 @@ Features
 Trivial/Internal Changes
 ------------------------
 
-- Update FileManager.__repr__ to provide basic information about shape and number of files. (`#574 <https://github.com/DKISTDC/dkist/pull/574>`__)
+- Update ``FileManager.__repr__`` to provide basic information about shape and number of files. (`#574 <https://github.com/DKISTDC/dkist/pull/574>`__)
 
 
 Performance Improvements
