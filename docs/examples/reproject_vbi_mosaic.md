@@ -69,7 +69,7 @@ from ndcube import NDCube
 ```
 
 First, let us crop off the edges of all our tiles to remove some artifacts, and only select the first time step.
-To do this we use the {obj}`.TiledDataset.slice_tiles` helper which applies an array slice to each tile of the {obj}`.TiledDataset` object.
+To do this we use the {obj}`TiledDataset.slice_tiles` helper which applies an array slice to each tile of the {obj}`TiledDataset` object.
 
 ```{code-cell} ipython3
 first_tiles = ds.slice_tiles[0, 100:-100, 100:-100]
