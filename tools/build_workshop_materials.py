@@ -37,6 +37,8 @@ from myst_parser.parsers.mdit import create_md_parser
 from sphinx.directives.other import TocTree
 from sphobjinv import Inventory
 
+HREF_TEMPLATE = '<a href="{url}" target="_blank" style="text-decoration: underline">{name}</a>'
+
 
 def strip_code_cells(input_notebook, output_notebook):
     with open(input_notebook) as fp:
@@ -68,7 +70,11 @@ def build_toc_links(toc_files):
     links = []
     for name, title in titles.items():
         _, instructor, learner = toc_files[name]
-        links.append(f"[{title}]({learner!s}) - [Instructor]({instructor!s})")
+        links.append(
+            HREF_TEMPLATE.format(url=str(learner), name=title)
+            + " - "
+            + HREF_TEMPLATE.format(url=str(instructor), name="Instructor")
+        )
 
     return "\n".join(["## Contents"] + [f"1. {link}" for link in links])
 
@@ -137,7 +143,7 @@ def intersphinx_role_renderer(node, context):
     name, url = inv_map[node_content]
     if role_name == "obj":
         name = f"`{name}`"
-    return f'<a href="{url}" style="text-decoration: underline" target="_blank">{name}</a>'
+    return HREF_TEMPLATE.format(url=url, name=name)
 
 
 def md_format_cell(src):
