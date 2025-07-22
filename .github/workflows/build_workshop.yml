@@ -18,13 +18,14 @@ jobs:
   build_workshop:
     runs-on: ubuntu-latest
     steps:
-      - name: Branch name for not push
-        if: github.event_name != 'push'
-        run: echo 'BRANCHNAME=main' >> "$GITHUB_ENV"
+      # Make sure the branch name logic handles workflow_dispatch
+      - name: Branch name for releases
+        if: ${{ startsWith('v', github.ref_name) }}
+        run: echo 'BRANCHNAME=stable' >> "$GITHUB_ENV"
 
-      - name: Branch name for push
-        if: github.event_name == 'push'
-        run: echo 'BRANCHNAME=development' >> "$GITHUB_ENV"
+      - name: Branch name for not releases
+        if: ${{ !startsWith('v', github.ref_name) }}
+        run: echo 'BRANCHNAME=latest' >> "$GITHUB_ENV"
 
       - uses: actions/checkout@v4
         with:

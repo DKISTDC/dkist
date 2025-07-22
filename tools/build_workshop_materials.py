@@ -6,6 +6,9 @@
 #   "myst_parser",
 #   "sphinx",
 #   "jupytext",
+#   "sphobjinv",
+#   "mdformat",
+#   "mdformat_myst",
 # ]
 # ///
 """
@@ -14,16 +17,27 @@ This script converts the tutorial from the documentation into workshop.
 The learner notebooks will have all the code stripped from the code cells unless
 they have "keep-inputs" in their tags.
 """
+
 import sys
 import argparse
 import subprocess
 from pathlib import Path
 from textwrap import dedent
+from functools import cache
+from urllib.parse import urljoin
 
+import mdformat.plugins
 import nbformat
 from markdown_it import MarkdownIt
+from mdformat.renderer import MDRenderer
+from mdformat_myst.plugin import _role_renderer
+from myst_parser.config.main import MdParserConfig
 from myst_parser.parsers.directives import parse_directive_text
+from myst_parser.parsers.mdit import create_md_parser
 from sphinx.directives.other import TocTree
+from sphobjinv import Inventory
+
+HREF_TEMPLATE = '<a href="{url}" target="_blank" style="text-decoration: underline">{name}</a>'
 
 
 def strip_code_cells(input_notebook, output_notebook):
@@ -56,7 +70,11 @@ def build_toc_links(toc_files):
     links = []
     for name, title in titles.items():
         _, instructor, learner = toc_files[name]
-        links.append(f"[{title}]({learner!s}) - [Instructor]({instructor!s})")
+        links.append(
+            HREF_TEMPLATE.format(url=str(learner), name=title)
+            + " - "
+            + HREF_TEMPLATE.format(url=str(instructor), name="Instructor")
+        )
 
     return "\n".join(["## Contents"] + [f"1. {link}" for link in links])
 
@@ -81,6 +99,78 @@ def parse_toctree_directive(filepath):
     return toctree_info.body
 
 
+@cache
+def build_inventory_map():
+    inventory_map = {}
+    urls = (
+        "https://docs.dkist.nso.edu/projects/python-tools/en/stable/",
+        "https://docs.python.org/3/",
+        "https://numpy.org/doc/stable/",
+        "https://docs.scipy.org/doc/scipy/",
+        "https://matplotlib.org/stable/",
+        "https://docs.astropy.org/en/stable/",
+        "https://parfive.readthedocs.io/en/stable/",
+        "https://docs.sunpy.org/en/stable/",
+        "https://docs.sunpy.org/projects/ndcube/en/stable/",
+        "https://gwcs.readthedocs.io/en/latest/",
+        "https://asdf.readthedocs.io/en/stable/",
+        "https://dask.pydata.org/en/stable/",
+        "https://reproject.readthedocs.io/en/stable/",
+    )
+    for url in urls:
+        inv = Inventory(url=url + "objects.inv")
+        for i in inv.objects:
+            ourl = i.uri
+            if i.uri.endswith("$"):
+                ourl = i.uri.replace("$", i.name)
+            ourl = urljoin(url, ourl)
+            name = i.name if i.dispname == "-" else i.dispname
+            inventory_map[i.name] = (name, ourl)
+
+    return inventory_map
+
+
+def intersphinx_role_renderer(node, context):
+    role_name = node.meta["name"]
+    node_content = node.content.removeprefix("~")
+
+    inv_map = build_inventory_map()
+
+    # If it's not a special lookup then don't bother
+    if role_name not in ("ref", "obj") or node_content not in inv_map:
+        return _role_renderer(node, context)
+
+    name, url = inv_map[node_content]
+    if role_name == "obj":
+        name = f"`{name}`"
+    return HREF_TEMPLATE.format(url=url, name=name)
+
+
+def md_format_cell(src):
+    """
+    Given some markdown text format it and transform ref roles to http links.
+    """
+    # To do this we build a markdown it parser, with a mdformat render
+    # (to render back to markdown) but we modify the role renderer.
+
+    mdit = create_md_parser(MdParserConfig(), MDRenderer)
+    parser_extensions = mdformat.plugins.PARSER_EXTENSIONS
+    parser_extensions["myst"].RENDERERS["myst_role"] = intersphinx_role_renderer
+    mdit.options["parser_extension"] = list(parser_extensions.values())
+    return mdit.render(src)
+
+
+def parse_all_cells(input_notebook, output_notebook):
+    with open(input_notebook) as fp:
+        raw_notebook = nbformat.read(fp, as_version=4)
+
+    for cell in raw_notebook.get("cells"):
+        cell.source = md_format_cell(cell.source)
+
+    with open(output_notebook, "w") as fp:
+        nbformat.write(raw_notebook, fp)
+
+
 def write_conda_env(filepath):
     env = dedent("""\
       channels:
@@ -100,13 +190,15 @@ def write_conda_env(filepath):
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
-    argp.add_argument("tutorial_dir", nargs=1, help="path to the tutorial directory")
-    argp.add_argument("output_dir", nargs=1, help="path to the output directory")
+    argp.add_argument(
+        "tutorial_dir", nargs="?", help="path to the tutorial directory", default="./docs/tutorial", type=str
+    )
+    argp.add_argument("output_dir", nargs="?", help="path to the output directory", default="./workshop", type=str)
 
     args = argp.parse_args(sys.argv[1:])
 
-    tutorial_dir = Path(args.tutorial_dir[0])
-    output_dir = Path(args.output_dir[0])
+    tutorial_dir = Path(args.tutorial_dir).absolute()
+    output_dir = Path(args.output_dir).absolute()
     output_dir.mkdir(exist_ok=True)
 
     index_filename = tutorial_dir / "index.md"
@@ -126,18 +218,23 @@ if __name__ == "__main__":
         input_file = input_file[0]
         instructor_file = output_dir / "instructor"
         instructor_file.mkdir(exist_ok=True)
-        instructor_file /= (input_file.stem + ".ipynb")
+        instructor_file /= input_file.stem + ".ipynb"
         learner_file = output_dir / (input_file.stem + ".ipynb")
         if input_file.name != "index.md":
-            toc_files[stem] = (input_file,
-                               instructor_file.relative_to(output_dir),
-                               learner_file.relative_to(output_dir))
+            toc_files[stem] = (
+                input_file,
+                instructor_file.relative_to(output_dir),
+                learner_file.relative_to(output_dir),
+            )
 
         subprocess.run([sys.executable, "-m", "jupytext", "--to", "ipynb", input_file, "-o", instructor_file])
+        # Format the output notebook
+        parse_all_cells(instructor_file, instructor_file)
         # Replace the sphinx toctree with a simple list of links
         if input_file.name == "index.md":
             add_toctree_to_index(toc_files, instructor_file, instructor_file)
         print(f"[learner] transforming {instructor_file} to {learner_file}")  # noqa: T201
         strip_code_cells(instructor_file, learner_file)
-        print("Writing conda env file")  # noqa: T201
-        write_conda_env(output_dir / "environment.yml")
+
+    print("Writing conda env file")  # noqa: T201
+    write_conda_env(output_dir / "environment.yml")

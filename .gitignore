@@ -245,6 +245,7 @@ examples/**/*.csv
 figure_test_images*
 tags
 baseline
+workshop
 
 # Release script
 .github_cache
