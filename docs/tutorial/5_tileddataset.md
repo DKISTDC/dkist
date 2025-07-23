@@ -16,7 +16,7 @@ kernelspec:
 
 So far all our examples have used the base {obj}`dkist.Dataset` class with VISP data.
 In this way we have demonstrated the most important features of the Python tools for working with DKIST data, but some data do not quite fit into the base `Dataset` structure.
-Specifically, VBI data consist of distinct image tiles forming a larger mosaic image.
+Specifically, VBI and DL-NIRSP data consist of distinct image tiles forming a larger mosaic image.
 The individual tiles of the image are not combined by the Data Center into a single image, since this would involve interpolation at the tile edges and this is left to the user to make their own choices about.
 Instead the tiles are kept separate but must therefore be considered as separate images by the `Dataset` object.
 
@@ -108,14 +108,15 @@ Similarly if we want to crop the edges of each tile, we can index just as easily
 tds.slice_tiles[:, 1024:-1024, 1024:-1024]
 ```
 
-## Irregular `TiledDataset`s
+## `TiledDataset` objects with missing tiles
 
 As seen above, the default mode for VBI is to take data so that tiles overlap only slightly to form a larger image.
-However, some experiments might use an irregular arrangement of tiles with greater overlap, for with the main image being composed of four tiles together and a fifth in the centre overlapping all four.
-For cases like these, `TiledDataset` supports masking tiles.
+However, some experiments might use an irregular arrangement of tiles with greater overlap.
+One common example of this is the main image being composed of four tiles together and a fifth in the centre overlapping all four.
+`TiledDataset` exposes this as a regular grid with certain missing tiles masked out.
 In this example the tiles would be stored as a 3x3 grid with the middle tile on each edge masked out.
 
-Which tiles should be masked is determined by the `.mask` attribute, which we can edit manually.
+Which tiles should be masked is determined by the `.mask` attribute.
 
 ```{code-cell} ipython3
 tds.mask = [[False, True, False], [True, False, True], [False, True, False]]
@@ -138,7 +139,9 @@ However, be careful of iterating over the whole grid of tiles manually, as this 
 
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
+---
+tags: [raises-exception]
+---
 
 for row in tds:
     for tile in row:

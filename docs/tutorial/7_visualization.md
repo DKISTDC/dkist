@@ -14,21 +14,23 @@ kernelspec:
 
 # Visualizing DKIST Data
 
-In this session we will look at how to take a better look at the actual data once we've downloaded it.
+In this chapter we will cover plotting and visualization of both VISP and VBI data.
 As usual, first we'll need a dataset.
-We'll use the VISP data we downloaded at the end of the last notebook.
+Initially, we'll use the VISP sample data, but you can also use the data downloaded at the end of the last chapter.
 
 ```{code-cell} ipython3
 :tags: [skip-execution]
 
-%matplotlib tk
+%matplotlib widget
 ```
 
 ```{code-cell} ipython3
-import dkist
 import matplotlib.pyplot as plt
 
-ds = dkist.load_dataset('~/sunpy/data/VISP/BKPLX')
+import dkist
+from dkist.data.sample import VISP_BKPLX
+
+ds = dkist.load_dataset(VISP_BKPLX)
 ds
 ```
 
@@ -38,8 +40,8 @@ Getting started with plotting a dataset is straightforward.
 `Dataset` provides a `plot()` method which makes a decent default plot of the data.
 
 ```{code-cell} ipython3
-ds.plot()
-plt.show()
+fig = plt.figure()
+ds.plot(fig=fig)
 ```
 
 Since our dataset is 4D and most users will only have access to a 2D screen, a slice has to be taken through the data.
@@ -72,9 +74,9 @@ small_ds = ds[0, 150:300, :, 1010:-1010]
 Note that since this removes the first axis, the `plot_axes` argument is now only three items long.
 
 ```{code-cell} ipython3
+fig = plt.figure()
 # Plot 'raster scan step number' on the y axis and 'spatial along slit' on the x axis
-small_ds.plot(plot_axes=['y', None, 'x'])
-plt.show()
+small_ds.plot(fig=fig, plot_axes=['y', None, 'x'])
 ```
 
 You may have noticed this plot took longer to draw than the previous one.
@@ -93,17 +95,17 @@ You can also use `plot_axes` to create a line plot, by specifying only one axis 
 So to plot a spectrum at a fixed Stokes, time and raster location we can tell `plot` to use the dispersion axis as the x axis.
 
 ```{code-cell} ipython3
-ds.plot(plot_axes=[None, None, 'x', None])
-plt.show()
+fig = plt.figure()
+ds.plot(fig=fig, plot_axes=[None, None, 'x', None])
 ```
 
 It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
 ```{code-cell} ipython3
+plt.figure()
 # Plot the same data as above
 ds[0, 0, :, 0].plot()
-plt.show()
 ```
 
 ## Plotting with `TiledDataset`
@@ -115,10 +117,10 @@ In the case of VBI, this argument will be a single number which specifies the in
 
 ```{code-cell} ipython3
 from dkist.data.sample import VBI_AJQWW
-import matplotlib.pyplot as plt
 
+fig = plt.figure()
 tds = dkist.load_dataset(VBI_AJQWW)
-tds.plot(0)
+fig = tds.plot(0, figure=fig)
 ```
 
 As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
@@ -129,5 +131,6 @@ You may notice in the plots above that the colour scale is independent for each 
 ```{code-cell} ipython3
 :tags: [skip-execution]
 
-tds.plot(0, share_zscale=True)
+fig = plt.figure()
+fig = tds.plot(0, share_zscale=True, figure=fig)
 ```
