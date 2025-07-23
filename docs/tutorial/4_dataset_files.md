@@ -73,7 +73,7 @@ ds[:, 0].headers
 ```
 
 The table is an instance of {obj}`astropy.table.Table`, and can therefore be inspected and manipulated in any of the usual ways for Table objects.
-Details of how to work with `Table` can be found on the astropy documentation.
+Details of how to work with `Table` can be found in the astropy documentation: {ref}`astropy-table`.
 Notably though, columns can be used as arrays in many contexts.
 They can therefore be used for plotting, which allows us to visually inspect how metadata values vary over the many files in the dataset.
 For example, we might want to inspect the seeing conditions and plot the Fried parameter for all frames.
