@@ -165,7 +165,8 @@ def parse_all_cells(input_notebook, output_notebook):
         raw_notebook = nbformat.read(fp, as_version=4)
 
     for cell in raw_notebook.get("cells"):
-        cell.source = md_format_cell(cell.source)
+        if cell["cell_type"] == "markdown":
+            cell.source = md_format_cell(cell.source)
 
     with open(output_notebook, "w") as fp:
         nbformat.write(raw_notebook, fp)
