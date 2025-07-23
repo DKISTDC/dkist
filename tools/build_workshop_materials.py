@@ -189,6 +189,12 @@ def write_conda_env(filepath):
         fobj.write(env)
 
 
+def write_postBuild(directory):
+    content = "python -m dkist.data.sample"
+    with open(directory / "postBuild") as fobj:
+        fobj.write(content)
+
+
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
     argp.add_argument(
@@ -239,3 +245,5 @@ if __name__ == "__main__":
 
     print("Writing conda env file")  # noqa: T201
     write_conda_env(output_dir / "environment.yml")
+    print("Writing postBuild file")  # noqa: T201
+    write_postBuild(output_dir)
