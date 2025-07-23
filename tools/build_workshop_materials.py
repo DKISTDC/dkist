@@ -180,6 +180,7 @@ def write_conda_env(filepath):
       dependencies:
         - python=3.12
         - dkist
+        - ipympl
         - ipywidgets
         - distributed
         - jupyterlab-myst
