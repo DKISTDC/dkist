@@ -191,7 +191,7 @@ def write_conda_env(filepath):
 
 def write_postBuild(directory):
     content = "python -m dkist.data.sample"
-    with open(directory / "postBuild") as fobj:
+    with open(directory / "postBuild", "w") as fobj:
         fobj.write(content)
 
 
