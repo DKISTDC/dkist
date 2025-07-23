@@ -27,14 +27,14 @@ import dkist
 from dkist.data.sample import VISP_BKPLX
 import matplotlib.pyplot as plt
 
-ds = dkist.load_dataset(VISP_BKPLX)[0] # We'll just use Stokes I for this example
+ds = dkist.load_dataset(VISP_BKPLX)
 ```
 
 This Dask object behaves in many ways just like a numpy array.
 For instance, it can be indexed and sliced in the same way.
 
 ```{code-cell} python
-ds.data[:, :, :200]
+ds.data[0, :, :, :200]
 ```
 
 And it has many of the same methods for calculating useful properties of the data, such as `min()`, `max()`, `sum()`, etc.
@@ -42,7 +42,7 @@ These are in fact just wrappers around the numpy functions themselves, so they b
 For example, to find the sum over the spatial dimensions of our data to make a spectrum, we could do:
 
 ```{code-cell} python
-ds.data.sum(axis=(0,2))
+ds[0].data.sum(axis=(0,2)) # ds[0] because we only need Stokes I
 ```
 
 What you will notice when you call these functions that they don't return a number as you would expect.
@@ -51,7 +51,7 @@ This is because Dask delays the actual calculation of the value until you explic
 So to see the actual output of the above command we would do this:
 
 ```{code-cell} python
-ds.data.sum(axis=(0,2)).compute()
+ds[0].data.sum(axis=(0,2)).compute()
 ```
 
 A benefit of this is that since the operation returns us another Dask array, we can do more calculations with that, and those are also delayed.
@@ -59,7 +59,7 @@ This means that you can string together any number of calculations and only perf
 So if we want to find the location of the lowest value in this spectrum, we can do
 
 ```{code-cell} python
-spectrum = ds.data.sum(axis=(0, 2))
+spectrum = ds[0].data.sum(axis=(0, 2))
 wl_idx = spectrum.argmin()
 wl_idx
 ```
@@ -68,14 +68,14 @@ However, `Dataset` will automatically run the compute method in cases where it c
 For instance, `pixel_to_world` will assume that the output should be computed automatically instead of delayed.
 (BUT WHY?)
 ```{code-cell} python
-wl = ds.wcs.pixel_to_world(0, wl_idx, 0)[1]
+wl = ds[0].wcs.pixel_to_world(0, wl_idx, 0)[1]
 wl
 ```
 
 Similarly, plotting a Dask array will prompt it to compute - otherwise the plot would be empty.
 
 ```{code-cell} python
-spectrum = ds.data.sum(axis=(0,2))
+spectrum = ds[0].data.sum(axis=(0,2))
 plt.plot(spectrum)
 ```
 
@@ -98,12 +98,12 @@ This rebin method can reduce the resolution of a dataset, *by integer numbers of
 We'll therefore first crop the dataset so that it's divisible by the number of pixels we want to rebin.
 
 ```{code-cell} python
-ds = ds[:, :, :2540]
+ds = ds[..., :2540]
 ```
 
 So now if we wanted to combine groups of 4 pixels together along the slit dimension we can do this:
 ```{code-cell} python
-ds.rebin((1, 1, 4))
+ds.rebin((1, 1, 1, 4))
 ```
 
 ```{note}
@@ -112,7 +112,7 @@ Because we are using Dask, this hasn't actually done any computation yet, but is
 
 Let's compare two spectra, one from the rebinned dataset and one from the original:
 ```{code-cell} python
-ds_rebinned = ds.rebin((1, 1, 4))
+ds_rebinned = ds.rebin((1, 1, 1, 4))
 ```
 
 ```{code-cell} python
@@ -125,14 +125,14 @@ As one final example of rebin, let's rebin in both the rastering dimension and t
 Let's rebin to bins of 5x10 pixels.
 
 ```{code-cell} python
-ds_rebin2 = ds.rebin((5, 1, 10))
+ds_rebin2 = ds.rebin((1, 5, 1, 10))
 ```
 
 ```{code-cell} python
 plt.figure()
-ax = ds[100, :, 500].plot()
-ds_rebinned[100, :, 125)].plot(axes=ax, linestyle="--")
-ds_rebin2[20, :, 100].plot(axes=ax, linestyle="..")
+ax = ds[0, 100, :, 500].plot()
+ds_rebinned[0, 100, :, 125)].plot(axes=ax, linestyle="--")
+ds_rebin2[0, 20, :, 50].plot(axes=ax, linestyle="..")
 ```
 
 ## Rebinning in Parallel
@@ -155,7 +155,7 @@ client = Client()
 client
 ```
 ```{code-cell} python
-ds_rebin3 = ds.rebin((5, 1, 10))
+ds_rebin3 = ds.rebin((1, 5, 1, 10))
 ```
 
 ```{code-cell} python
