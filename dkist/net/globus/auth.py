@@ -49,7 +49,19 @@ class RedirectHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(b"You're all set, you can close this window!")
+        self.wfile.write(b"""
+        <html>
+        <head>
+        <script type="text/javascript">
+        window.onload = setTimeout(() => { window.close(); }, 1000);
+        </script>
+        </head>
+        <body>
+        Authentication with Globus successful.</br>
+        This window should close automatically, or you can close it.
+        </body>
+        </html>
+        """)
 
         code = parse_qs(urlparse(self.path).query).get("code", [""])[0]
         self.server.return_code(code)
