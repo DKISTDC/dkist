@@ -26,16 +26,13 @@ For this you can use your login for your institution, or alternatively you can l
 Once Globus is installed and set up, you will need to run Globus Connect Personal (GCP) as described on the installation page.
 You will need to do this every time you want to download data, either through the user tools or through the Globus web app.
 When you start GCP You may also want to define the location or locations on your computer which you want Globus to have access to.
-On Linux you can do this using the `-restrict-paths` command line argument, or by editing the config file.
 On Windows and Mac OS this option is in the "Access" tab of the configuration options.
+On Linux you can do this using the `-restrict-paths` command line argument, or by editing the config file.
 Globus will only be able to transfer files onto your machine in the specified paths.
+Remember that you do need to have GCP running for any transfers to complete - so if you stop it then your data download will stop as well.
 
-Globus will send an email to your registered email address when a download task finishes.
-Of course this is unnecessary for some of the more trivial examples in this tutorial, but if you're transferring a whole large dataset it will likely take some time to download and it may be useful to be notified when it's complete.
-Remember that you do need to have GCP running for the transfer to continue - so if you stop it then your data download will stop as well.
-
-If you try transferring the same file a second time to the same location, you will find that the task completes successfully but the file is not actually transferred.
-This is to save download time and avoid duplication.
+When starting transfers with the ``dkist`` package, you may be asked to login to Globus (or authorize the device).
+This will pop open a web browser window where you can complete this flow.
 
 Finally, a couple of things to note on terminology:
 
