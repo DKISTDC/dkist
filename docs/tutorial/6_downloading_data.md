@@ -47,16 +47,12 @@ The user tools use this as the default remote endpoint, and define a local endpo
 - **Paths** Paths in Globus are broadly what you expect them to be.
 However, note that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 
-### The Globus web app
-
-You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
-If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, and that is the method that will be covered in this chapter of the tutorial.
-In any case, the underlying concepts described above are the same.
-
 ## Dataset and downloading
 
-For this section we don't recommend that you run the download commands as we go through the workshop unless you're willing to wait for them to complete, which may take some time.
+```{note}
+For this section we don't recommend that you run all the download commands as you work through this notebook unless you're willing to wait for them to complete, which may take some time.
+```
+
 First let's load the VISP dataset we were using before.
 This time we'll download the ASDF using Fido rather than loading the sample data.
 This is so that we can continue using a dataset we're familiar with but also go through the full process of downloading both the ASDF and data files.
@@ -125,6 +121,11 @@ ds[0, 0].files.download(path="~/sunpy/data/{dataset_id}")
 ```
 
 would save the file to `~/sunpy/data/BKPLX/VISP_2023_10_16T18_21_47_508_00630200_I_BKPLX_L1.fits`.
+Downloading the files to a custom directory also sets the ``ds.files.basepath`` property so that the new files are loaded:
+
+```{code-cell} ipython3
+ds.files.basepath
+```
 
 If we know that we will want to download an entire dataset, this can be done in the same way but using the full dataset object.
 
