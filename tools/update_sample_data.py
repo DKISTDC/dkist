@@ -26,6 +26,11 @@ from dkist.net.globus import start_transfer_from_file_list, watch_transfer_progr
 from dkist.net.globus.endpoints import get_local_endpoint_id, get_transfer_client
 
 datasets = {
+    "AJQWW": {
+        "tiled": True,
+        "tile_slice": np.s_[0],
+        "filename": "AJQWW_single_mosaic.tar",
+    },
     "YCDRFH": {
         "tiled": True,
         "tile_slice": np.s_[0],
