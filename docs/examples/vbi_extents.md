@@ -27,7 +27,7 @@ from sunpy.visualization import drawing
 
 import dkist
 import dkist.net
-from dkist.data.sample import VBI_AJQWW
+from dkist.data.sample import VBI_L1_NZJTB
 ```
 
 ```{note}
@@ -44,7 +44,7 @@ If you want to replace this dataset with your own dataset, see {ref}`dkist:howto
 Let's load the data with {obj}`dkist.load_dataset`:
 
 ```{code-cell} ipython3
-ds = dkist.load_dataset(VBI_AJQWW)
+ds = dkist.load_dataset(VBI_L1_NZJTB)
 ds
 ```
 

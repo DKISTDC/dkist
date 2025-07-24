@@ -61,13 +61,13 @@ def load_dataset(target, *, ignore_version_mismatch=False):
 
     >>> dkist.load_dataset(Path("/path/to/ABCDE"))  # doctest: +SKIP
 
-    >>> from dkist.data.sample import VISP_BKPLX  # doctest: +REMOTE_DATA
-    >>> print(dkist.load_dataset(VISP_BKPLX))  # doctest: +REMOTE_DATA
+    >>> from dkist.data.sample import VISP_L1_KMUPT  # doctest: +REMOTE_DATA
+    >>> print(dkist.load_dataset(VISP_L1_KMUPT))  # doctest: +REMOTE_DATA
     This VISP Dataset consists of 1700 frames.
-    Files are stored in ...VISP_BKPLX
+    Files are stored in ...VISP_L1_KMUPT
     <BLANKLINE>
     This calibration has Dataset ID BKPLX.
-    The unique identifier for the input observe frames (Product ID) is (no ProductID).
+    The unique identifier for the input observe frames (Product ID) is ...
     <BLANKLINE>
     This Dataset has 4 pixel and 5 world dimensions.
     <BLANKLINE>

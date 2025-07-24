@@ -12,7 +12,7 @@ build:
     pre_build:
       # Note $DKIST_SAMPLE_DIR is set by RTD to ~/dkist_data
       - python -c "from dkist.data.sample import download_all_sample_data; download_all_sample_data()"
-      - python -c "from dkist.data.sample import VISP_BKPLX; print(VISP_BKPLX)"
+      - python -c "from dkist.data.sample import VISP_L1_KMUPT; print(VISP_L1_KMUPT)"
 
 conda:
   environment: .rtd-environment.yml
