@@ -27,9 +27,9 @@ First we need to re-create our dataset object from the last chapter.
 :tags: [keep-inputs]
 
 import dkist
-from dkist.data.sample import VISP_BKPLX
+from dkist.data.sample import VISP_L1_KMUPT
 
-ds = dkist.load_dataset(VISP_BKPLX)
+ds = dkist.load_dataset(VISP_L1_KMUPT)
 ds
 ```
 

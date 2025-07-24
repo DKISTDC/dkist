@@ -60,8 +60,8 @@ def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
     because it doesn't support that. This test therefore only assesses the
     performance of the compute step.
     """
-    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
-    ds = load_dataset(VISP_BKPLX)[0, :15]
+    from dkist.data.sample import VISP_L1_KMUPT  # noqa: PLC0415
+    ds = load_dataset(VISP_L1_KMUPT)[0, :15]
     # If we don't want to load files, set basepath to something where the files are not
     if not load_files:
         ds.files.basepath = tmp_path
@@ -77,8 +77,8 @@ def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
 @pytest.mark.walltime
 @pytest.mark.remote_data
 def test_dataset_compute_data_partial_files(benchmark):
-    from dkist.data.sample import VISP_BKPLX  # noqa: PLC0415
-    ds = load_dataset(VISP_BKPLX)[0, :15, :100, :100]
+    from dkist.data.sample import VISP_L1_KMUPT  # noqa: PLC0415
+    ds = load_dataset(VISP_L1_KMUPT)[0, :15, :100, :100]
     benchmark(ds.data.compute)
 
     assert not np.isnan(ds.data.compute()).any()

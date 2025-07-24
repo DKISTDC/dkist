@@ -27,16 +27,16 @@ To see `TiledDataset` in action we'll load some VBI data. We'll use the VBI data
 
 ```{code-cell} ipython3
 import dkist
-from dkist.data.sample import VBI_AJQWW
+from dkist.data.sample import VBI_L1_NZJTB
 
-VBI_AJQWW
+VBI_L1_NZJTB
 ```
 
 Now let's use that file path to create a `TiledDataset`. This is done in exactly the same way as for a regular `Dataset`, using `load_dataset()`:
 
 
 ```{code-cell} ipython3
-tds = dkist.load_dataset(VBI_AJQWW)
+tds = dkist.load_dataset(VBI_L1_NZJTB)
 tds
 ```
 

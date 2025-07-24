@@ -38,9 +38,9 @@ These sample datasets provide convenient examples to work with and contain some 
 They can be imported from `dkist.data.sample` and for this chapter we will use the VISP one:
 
 ```{code-cell} ipython3
-from dkist.data.sample import VISP_BKPLX
+from dkist.data.sample import VISP_L1_KMUPT
 
-VISP_BKPLX
+VISP_L1_KMUPT
 ```
 
 This constant defines the path to a folder containing the metadata ASDF and a few data files for a small VISP dataset.
@@ -61,7 +61,7 @@ Since we have a `Path` to our sample data as defined above, we can pass this str
 ```{code-cell} ipython3
 import dkist
 
-ds = dkist.load_dataset(VISP_BKPLX)
+ds = dkist.load_dataset(VISP_L1_KMUPT)
 ```
 
 Now we have a {obj}`dkist.Dataset` object which describes the shape, size and physical dimensions of the array, but doesn't assume the presence of any of the actual data.

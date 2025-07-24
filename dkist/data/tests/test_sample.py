@@ -16,11 +16,11 @@ def tmp_sample_dir(tmp_path):
 def test_module_dir():
     import dkist.data.sample  # noqa: PLC0415
 
-    assert "VBI_AJQWW" in dir(dkist.data.sample)
-    assert "VISP_BKPLX" in dir(dkist.data.sample)
+    assert "VBI_L1_NZJTB" in dir(dkist.data.sample)
+    assert "VISP_L1_KMUPT" in dir(dkist.data.sample)
 
 
-@pytest.mark.parametrize("attrname", ["VBI_AJQWW", "VISP_BKPLX"])
+@pytest.mark.parametrize("attrname", ["VBI_L1_NZJTB", "VISP_L1_KMUPT"])
 def test_module_getattr(mocker, attrname):
     mock = mocker.patch("dkist.data.sample._get_sample_datasets")
     import dkist.data.sample  # noqa: PLC0415
@@ -37,4 +37,4 @@ def test_fail(tmp_sample_dir):
     No remote data means this test should fail.
     """
     with pytest.raises(RuntimeError, match="1 sample data files failed"):
-        from dkist.data.sample import VISP_BKPLX  # noqa: F401 PLC0415
+        from dkist.data.sample import VISP_L1_KMUPT  # noqa: F401 PLC0415
