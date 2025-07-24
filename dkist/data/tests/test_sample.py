@@ -4,6 +4,8 @@ from unittest.mock import call
 
 import pytest
 
+from dkist.utils.exceptions import DKISTDeprecationWarning
+
 
 @pytest.fixture
 def tmp_sample_dir(tmp_path):
@@ -28,6 +30,18 @@ def test_module_getattr(mocker, attrname):
     getattr(dkist.data.sample, attrname)
 
     mock.assert_has_calls([call(attrname), call().__getitem__(0)])
+
+
+@pytest.mark.parametrize("attrname", ["VBI_AJQWW", "VISP_BKPLX"])
+def test_module_getattr_deprecated(mocker, attrname):
+    mock = mocker.patch("dkist.data.sample._get_sample_datasets")
+    import dkist.data.sample  # noqa: PLC0415
+    from dkist.data._sample import _DEPRECATED_NAMES  # noqa: PLC0415
+
+    with pytest.warns(DKISTDeprecationWarning, match=attrname):
+        getattr(dkist.data.sample, attrname)
+
+    mock.assert_has_calls([call(_DEPRECATED_NAMES[attrname]), call().__getitem__(0)])
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="Internet not properly disabled on Windows")

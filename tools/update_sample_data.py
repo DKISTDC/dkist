@@ -49,7 +49,7 @@ def main(datasets, working_directory, destination_path="/user_tools_tutorial_dat
     sample_files_for_upload = []
 
     for did, props in datasets.items():
-        res = Fido.search(a.dkist.Dataset(did))
+        res = Fido.search(a.dkist.Dataset(did), a.dkist.Status("any"))
         asdf_file = Fido.fetch(res, path=working_directory / "{dataset_id}", progress=False, overwrite=True)
 
         ds = dkist.load_dataset(asdf_file)

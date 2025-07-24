@@ -23,10 +23,10 @@ def __getattr__(name):
     if name in _DEPRECATED_NAMES:
         new_name = _DEPRECATED_NAMES[name]
         _warnings.warn(
-            "The sample data name {name} is deprecated and has been replaced by {new_name}.",
+            f"The sample data name {name} is deprecated and has been replaced by {new_name}.",
             _DKISTDeprecationWarning,
         )
-        return _get_sample_datasets(new_name[0])
+        return _get_sample_datasets(new_name)[0]
 
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
