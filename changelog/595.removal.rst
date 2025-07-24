@@ -1,0 +1,3 @@
+The ``dkist.data.sample.VBI_AJQWW`` and ``dkist.data.sample.VISP_BKPLX`` datasets have been renamed ``dkist.data.sample.VBI_L1_NZJTB`` and ``dkist.data.sample.VISP_L1_KMUPT`` respectively.
+These names use the new Product ID which does not change when the data is reprocessed.
+(Note that the VBI dataset has been reprocessed so the Dataset ID is also different.)
