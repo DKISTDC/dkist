@@ -103,7 +103,8 @@ ds = ds[..., :2540]
 
 So now if we wanted to combine groups of 4 pixels together along the slit dimension we can do this:
 ```{code-cell} python
-ds.rebin((1, 1, 1, 4))
+ds_rebinned = ds.rebin((1, 1, 1, 4))
+ds_rebinned
 ```
 
 ```{note}
@@ -111,9 +112,6 @@ Because we are using Dask, this hasn't actually done any computation yet, but is
 ```
 
 Let's compare two spectra, one from the rebinned dataset and one from the original:
-```{code-cell} python
-ds_rebinned = ds.rebin((1, 1, 1, 4))
-```
 
 ```{code-cell} python
 plt.figure()
