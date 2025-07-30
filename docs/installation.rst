@@ -16,31 +16,32 @@ First, download the installer for your system and architecture from the links be
 
 .. grid:: 3
 
-    .. grid-item-card:: Linux
+    .. grid-item-card:: :fab:`linux` Linux
 
         `x86-64 <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh>`__
 
         `aarch64 <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh>`__
 
-        `ppc64le <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-ppc64le.sh>`__
-
-    .. grid-item-card:: Windows
+    .. grid-item-card:: :fab:`windows` Windows
         :link: https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe
 
         `x86-64 <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe>`__
 
-    .. grid-item-card:: Mac
+    .. grid-item-card:: :fab:`apple` Mac
 
-        `x86-64 <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-x86_64.sh>`__
+        `arm64 (Apple Silicon) <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Darwin-arm64.sh>`__
 
-        `arm64 (Apple
-        Silicon) <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh>`__
+        `x86-64 <https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Darwin-x86_64.sh>`__
+
+.. note::
+
+    See the `Miniforge <https://github.com/conda-forge/miniforge>`__ page for more details and architectures.
 
 Then select your platform to install miniforge:
 
 .. tab-set::
 
-    .. tab-item:: Linux & Mac
+    .. tab-item:: :fab:`linux` :fab:`apple` Linux & Mac
         :sync: platform
 
         Linux & Mac Run the script downloaded above, with
@@ -52,7 +53,7 @@ Then select your platform to install miniforge:
 
         Once the installer has completed, close and reopen your terminal.
 
-    .. tab-item:: Windows
+    .. tab-item:: :fab:`windows` Windows
         :sync: platform
 
         Double click the executable file downloaded from
@@ -91,6 +92,8 @@ If you know what you are doing and have Python installed without conda, please m
 
     pip install dkist
 
+
+.. _dkist:installation:globus:
 
 Globus
 ------
