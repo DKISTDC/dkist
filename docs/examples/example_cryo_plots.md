@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.6
+    jupytext_version: 1.17.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -14,7 +14,6 @@ kernelspec:
 
 (dkist:examples:cryo-plots)=
 # Visualizing Cryo-NIRSP Data
-
 
 ```{code-cell} ipython3
 import dkist
@@ -25,7 +24,6 @@ from astropy.coordinates import SpectralCoord
 
 from dkist.data.sample import CRYO_L1_TJKGC, CRYO_L1_MSCGD
 ```
-
 
 ```{code-cell} ipython3
 sp = dkist.load_dataset(CRYO_L1_TJKGC)
@@ -45,11 +43,13 @@ sp_subtracted_peak = sp_subtracted[:,:,int(peak_idx)]
 
 Calculate pixel size
 First get a 2x2 pixel grid
+
 ```{code-cell} ipython3
 space_2 = sp[:2,:2,0].axis_world_coords()[0]
 ```
 
  We calculate pixel size by calculating the step in both lat and lon. (lon is backwards because bugs)
+
 ```{code-cell} ipython3
 dlon = np.abs(space_2[1,1].Tx - space_2[0,0].Tx)
 dlat = space_2[1,1].Ty - space_2[0,0].Ty
@@ -58,14 +58,14 @@ aspect = dlon / dlat
 ```
 
 ```{code-cell} ipython3
-fig = plt.figure(figsize=(12,6), layout="constrained")
+fig = plt.figure(figsize=(7, 5), layout="constrained")
 
-ax1 = fig.add_subplot(1, 2, 1, projection=sp_subtracted_peak)
+ax1 = fig.add_subplot(2, 1, 1, projection=sp_subtracted_peak)
 ax1.set_title("Mean subtracted line peak")
 sp_subtracted_peak.plot(axes=ax1, cmap="Greys_r")
 ax1.set_aspect(aspect)
 
-ax2 = fig.add_subplot(1, 2, 2, projection=sp_wave_mean)
+ax2 = fig.add_subplot(2, 1, 2, projection=sp_wave_mean)
 ax2.set_title("Mean wavelength")
 sp_wave_mean.plot(axes=ax2)
 ax2.set_aspect(aspect)
