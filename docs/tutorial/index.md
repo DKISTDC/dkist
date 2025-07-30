@@ -13,6 +13,15 @@ By the end of this tutorial you should be familiar with how to:
 
 Before you get started with this tutorial follow {ref}`dkist:installation` to get Python and the ``dkist`` package installed.
 
+```{note}
+If you want to follow this tutorial interactively, you have two options.
+
+The easiest is to use an online service to run notebooks called [Binder ![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/DKISTDC/DKIST-Workshop/stable?urlpath=%2Ftree%2Findex.ipynb).
+The downside of this is that you can't use Globus to download files and some more complex visualization examples fail because of memory limitations.
+
+Alternatively we have instructions for running the tutorial as Jupyter Notebooks locally: {ref}`dkist:workshop_install`
+```
+
 
 **Contents**
 
