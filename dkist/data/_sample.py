@@ -10,9 +10,12 @@ from astropy.io import fits
 from dkist import conf
 
 VISP_HEADER = fits.Header.fromtextfile(Path(__file__).parent / "VISP_HEADER.hdr")
+_BASE_URL = "https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/"
 _SAMPLE_DATASETS = {
-    "VISP_L1_KMUPT": ("https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "BKPLX_stokesI.tar"),
-    "VBI_L1_NZJTB": ("https://g-a36282.cd214.a567.data.globus.org/user_tools_tutorial_data/", "YCDRFH_single_mosaic.tar"),
+    "VISP_L1_KMUPT": (_BASE_URL, "BKPLX_stokesI.tar"),
+    "VBI_L1_NZJTB": (_BASE_URL, "YCDRFH_single_mosaic.tar"),
+    "CRYO_L1_TJKGC": (_BASE_URL, "DBXVEL_full.tar"),
+    "CRYO_L1_MSCGD": (_BASE_URL, "POKNUM_first_step.tar"),
 }
 _DEPRECATED_NAMES = {
     "VISP_BKPLX": "VISP_L1_KMUPT",
