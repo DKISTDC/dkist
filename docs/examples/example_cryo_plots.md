@@ -33,26 +33,42 @@ ci = dkist.load_dataset(CRYO_L1_MSCGD)
 ```{code-cell} ipython3
 sp_sum_wave = sp.rebin((-1,-1,1), function=np.sum).squeeze()
 sp_wave_mean = sp.rebin((1,1,-1), function=np.mean).squeeze()
+```
 
+We can plot the summed spectral profile:
+
+```{code-cell} ipython3
+fig = plt.figure()
+sp_sum_wave.plot()
+```
+
+Now we subtract the mean wavelength for every spatial pixel from every spatial pixel.
+To do this we have to subtract a {obj}`~astropy.units.Quantity` object with a dummy axis for wavelength.
+
+```{code-cell} ipython3
 sp_subtracted = sp - (sp_wave_mean.data * sp_wave_mean.unit)[..., None]
+```
 
+We can then extract the array index of the peak spectral line and use that to select that wavelength.
+
+```{code-cell} ipython3
 peak_idx = sp_sum_wave.wcs.world_to_array_index(SpectralCoord(1079.75, unit=u.nm))
 
 sp_subtracted_peak = sp_subtracted[:,:,int(peak_idx)]
 ```
 
-Calculate pixel size
-First get a 2x2 pixel grid
+Next, to scale the images correctly, we calculate pixel size in both Longitude and Latitude.
+First get a 2x2 grid of SkyCoord objects:
 
 ```{code-cell} ipython3
 space_2 = sp[:2,:2,0].axis_world_coords()[0]
 ```
 
- We calculate pixel size by calculating the step in both lat and lon. (lon is backwards because bugs)
+ We calculate pixel size by calculating the step in both lat and lon.
 
 ```{code-cell} ipython3
 dlon = np.abs(space_2[1,1].Tx - space_2[0,0].Tx)
-dlat = space_2[1,1].Ty - space_2[0,0].Ty
+dlat = np.abs(space_2[1,1].Ty - space_2[0,0].Ty)
 
 aspect = dlon / dlat
 ```
