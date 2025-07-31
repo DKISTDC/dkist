@@ -105,7 +105,7 @@ class Dataset(NDCube):
     _file_manager = FileManagerDescriptor(default_type=DKISTFileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
-                 unit=None, copy=False):
+                 unit=None, copy=False, psf=None):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
@@ -129,7 +129,7 @@ class Dataset(NDCube):
             raise ValueError("The meta dict must contain the inventory record.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
-                         unit=unit, copy=copy)
+                         unit=unit, copy=copy, psf=psf)
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
