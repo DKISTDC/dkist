@@ -42,7 +42,7 @@ Run the following command in a directory where you want to store the notebooks, 
 
 .. code-block:: bash
 
-	git clone https://github.com:DKISTDC/DKIST-Workshop.git
+	git clone https://github.com/DKISTDC/DKIST-Workshop.git
 
 If this doesn't work you can also download a zip file of the notebooks `here <https://github.com/DKISTDC/DKIST-Workshop/archive/refs/heads/stable.zip>`__.
 
