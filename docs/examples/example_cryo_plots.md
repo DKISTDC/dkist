@@ -15,13 +15,16 @@ kernelspec:
 (dkist:examples:cryo-plots)=
 # Visualizing Cryo-NIRSP Data
 
+In this example we will talk about visualising both spectrograph and context imager datasets.
+
 ```{code-cell} ipython3
-import dkist
 import numpy as np
 import astropy.units as u
 import matplotlib.pyplot as plt
 from astropy.coordinates import SpectralCoord
+from matplotlib.collections import LineCollection
 
+import dkist
 from dkist.data.sample import CRYO_L1_TJKGC, CRYO_L1_MSCGD
 ```
 
@@ -32,10 +35,12 @@ sp = dkist.load_dataset(CRYO_L1_TJKGC) # Load the spectropolimeter (SP) sample d
 ci = dkist.load_dataset(CRYO_L1_MSCGD) # Load the context imager (CI) sample dataset
 ```
 
-Next we'll sum the SP data over the spatial dimensions to produce a spectral profile, which we can plot.
+The first thing we want to plot is a line profile for the whole dataset.
+To do this we use the {obj}`dkist.Dataset.rebin` method to sum all the spatial pixels, to give us a summary profile for the whole dataset.
 
 ```{code-cell} ipython3
 sp_sum_wave = sp.rebin((-1,-1,1), function=np.sum).squeeze()
+sp_sum_wave
 ```
 
 ```{code-cell} ipython3
@@ -48,7 +53,10 @@ To do this we have to subtract a {obj}`~astropy.units.Quantity` object with a du
 
 ```{code-cell} ipython3
 sp_mean = sp.rebin((1,1,-1), function=np.mean).squeeze()
-sp_subtracted = sp - (sp_mean.data * sp_mean.unit)[..., None]
+```
+
+```{code-cell} ipython3
+sp_subtracted = sp - (sp_mean.data << sp_mean.unit)[..., None]
 ```
 
 We can then extract the array index of the peak spectral line and use that to select the scan at that wavelength position.
@@ -84,31 +92,111 @@ ax1 = fig.add_subplot(2, 1, 1, projection=sp_subtracted_peak)
 ax1.set_title("Mean subtracted line peak")
 sp_subtracted_peak.plot(axes=ax1, cmap="Greys_r", aspect=aspect)
 
+# Define keyword arguments in a dict so we can reuse them
+# Note we use the "contours" type due to the nature of the WCS
+grid_kwargs = {"grid_type": "contours", "linestyle": "dotted", "alpha": 0.6, "linewidth": 0.5}
+# Draw gridlines for HPC.
+ax1.coords[0].grid(color="w", **grid_kwargs)
+ax1.coords[1].grid(color="w", **grid_kwargs)
+
 ax2 = fig.add_subplot(2, 1, 2, projection=sp_mean)
 ax2.set_title("Mean counts")
 sp_mean.plot(axes=ax2, aspect=aspect)
+# Draw gridlines for HPC.
+ax2.coords[0].grid(color="k", **grid_kwargs)
+ax2.coords[1].grid(color="k", **grid_kwargs)
 plt.show()
 ```
 
 ## Plot Context Imager Data
 
-Using the CI data we can now also plot the slit positions on the context image.
+Cryo-NIRSP has both a slit-spectrograph and a context imager, which follows the position of the slit.
+
+The sample data we are using in this example only has the first context imager file downloaded, so here we plot the first context imager image.
 
 ```{code-cell} ipython3
-# We will just plot every tenth slit position from the first hundred
-slit_coords = sp[:100,:,0].axis_world_coords()[0][::10,:]
+fig = plt.figure(layout="constrained")
+
+# This data has many outliers, so we are going to clip it.
+vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
+ax = ci[0].plot(vmin=vmin, vmax=vmax)
+
+# Overlay coordinates grid
+ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
+               linewidth=0.5)
+
+plt.colorbar(label=f"{ci[0].unit:latex}")
+plt.show()
+```
+
+Now we can plot the slit position. We do this by taking the first raster step position of the sp dataset and computing the world coordinates of each pixel along the slit.
+
+```{code-cell} ipython3
+slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
 
 fig = plt.figure(layout="constrained")
 vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
 ax = ci[0].plot(vmin=vmin, vmax=vmax)
-# Slit is longer than CI so get the axis limits before plotting the slit
-lims = ax.axis()
-for slit_pos in slit_coords:
-    ax.plot_coord(slit_pos)
-# Crop back to CI
-ax.axis(lims)
+
+ax.plot_coord(slit_coords, color="green")
+
 # Overlay coordinates grid
 ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
                linewidth=0.5)
+plt.show()
+```
+
+Notice how the slit has a larger field of view along the latitude dimension. We can re-plot the image, and crop the extent of the plot back to the extent of the context imager.
+
+```{code-cell} ipython3
+slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
+
+fig = plt.figure(layout="constrained")
+vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
+ax = ci[0].plot(vmin=vmin, vmax=vmax)
+
+# Slit is longer than CI so get the axis limits before plotting the slit
+lims = ax.axis()
+
+ax.plot_coord(slit_coords, color="green")
+
+# Crop back to CI
+ax.axis(lims)
+
+# Overlay coordinates grid
+ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
+               linewidth=0.5)
+plt.show()
+```
+
+Although we don't have all the context imager data in the sample dataset, we can overplot the slit position as it rasters across the image.
+We set up multiple lines (plotted in pixel positions) and setup their colors to be mapped to the time delta from the first slit.
+
+```{code-cell} ipython3
+# Extract the first 100 slit positions
+slit_coords, times = sp[:100, :, 0].axis_world_coords()
+# Convert every 10th slit position to CI pixels
+slit_pixels = ci[0].wcs.world_to_pixel(slit_coords[::10])
+# Extract every 10th time
+times = times[::10]
+# Calculate the time delta from the first slit time.
+deltas = (times - times[0]).to_value(u.s)
+```
+
+```{code-cell} ipython3
+fig = plt.figure(layout="constrained")
+vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
+ax = ci[0].plot(vmin=vmin, vmax=vmax)
+
+# Construct a (n_slits, n_pixel, 2) array of slit coordinates
+pix = np.array([slit_pixels[0].T, slit_pixels[1].T]).T
+lines = LineCollection(pix, array=deltas, cmap="Greys")
+ax.add_collection(lines)
+
+# Overlay coordinates grid
+ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
+               linewidth=0.5)
+
+fig.colorbar(lines, label="Slit position at time delta from image [s]")
 plt.show()
 ```
