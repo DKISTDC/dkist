@@ -211,5 +211,7 @@ ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
                linewidth=0.5)
 
 fig.colorbar(lines, label="Slit position at time delta from image [s]")
+
+ax.set_title(f"Cryo-NIRSP Context Imager at {ci[0].global_coords['time'].iso}")
 plt.show()
 ```
