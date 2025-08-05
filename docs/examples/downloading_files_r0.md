@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from sunpy.net import Fido, attrs as a
 
 import dkist
+import dkist.net
 ```
 
 Let's find a dataset with the highest average value of r0 (this is bad?).
@@ -34,17 +35,18 @@ res['dkist'].sort("Average Fried Parameter", reverse=True)
 res['dkist'].show("Dataset ID", "Start Time", "Average Fried Parameter", "Primary Proposal ID")
 ```
 
-This gives us the dataset `BEOGN`.
+We'll ignore the datasets with anomalously high values and look at the next one with a value that is high but realistic.
+This gives us the dataset `AXVXL`.
 We can download the dataset ASDF with Fido to inspect it in more detail.
 Remember that this only downloads a single ASDF file with some more metadata about the dataset, not the actual science data.
 
 ```{code-cell} python
 :tags: [remove-stderr]
-asdf_files = Fido.fetch(res['dkist'][0], path="~/sunpy/data/{dataset_id}/")
-ds = dkist.Dataset.from_asdf(asdf_files[0])
+asdf_files = Fido.fetch(res['dkist'][3], path="~/sunpy/data/{dataset_id}/")
+ds = dkist.load_dataset(asdf_files[0])
 ```
 
-Now that we have access to the FITS headers we can inspect the $r_0$ more closely, just as we did in the previous session.
+Now that we have access to the FITS headers we can inspect the $r_0$ more closely, just as we did in the previous notebook.
 Remember that `DINDEX4` is the Stokes index, so we can plot the $r_0$ for just Stokes I like so:
 ```{code-cell} python
 plt.plot(ds.headers[ds.headers["DINDEX4"] == 1]["ATMOS_R0"])
