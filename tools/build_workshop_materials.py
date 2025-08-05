@@ -9,6 +9,8 @@
 #   "sphobjinv",
 #   "mdformat",
 #   "mdformat_myst",
+#   "distributed",
+#   "bokeh",
 # ]
 # ///
 """

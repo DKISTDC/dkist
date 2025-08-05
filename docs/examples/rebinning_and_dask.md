@@ -144,7 +144,7 @@ If you want to follow along with this bit you will need to install these package
 ---
 tags: [skip-execution]
 ---
-mamaba install distributed bokeh
+conda install distributed bokeh
 ```
 
 ```{code-cell} python
