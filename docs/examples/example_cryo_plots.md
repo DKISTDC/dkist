@@ -23,6 +23,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 from astropy.coordinates import SpectralCoord
 from matplotlib.collections import LineCollection
+from matplotlib.colors import PowerNorm
 
 import dkist
 from dkist.data.sample import CRYO_L1_TJKGC, CRYO_L1_MSCGD
@@ -128,9 +129,10 @@ ci.data = ci.data[:, ::-1, :]
 ```{code-cell} ipython3
 fig = plt.figure(layout="constrained")
 
-# This data has many outliers, so we are going to clip it.
+# This data has many outliers, so we are going to clip it and scale it with a power law scaling
 vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
-ax = ci[0].plot(vmin=vmin, vmax=vmax)
+norm = PowerNorm(0.3, vmin=vmin, vmax=vmax)
+ax = ci[0].plot(norm=norm)
 
 # Overlay coordinates grid
 ax.coords.grid(color='white', alpha=0.6, linestyle='dotted',
@@ -146,8 +148,8 @@ Now we can plot the slit position. We do this by taking the first raster step po
 slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
 
 fig = plt.figure(layout="constrained")
-vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
-ax = ci[0].plot(vmin=vmin, vmax=vmax)
+# Reuse the norm from the first plot
+ax = ci[0].plot(norm=norm)
 
 ax.plot_coord(slit_coords, color="green")
 
@@ -163,8 +165,8 @@ Notice how the slit has a larger field of view along the latitude dimension. We 
 slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
 
 fig = plt.figure(layout="constrained")
-vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
-ax = ci[0].plot(vmin=vmin, vmax=vmax)
+# Reuse the norm from the first plot
+ax = ci[0].plot(norm=norm)
 
 # Slit is longer than CI so get the axis limits before plotting the slit
 lims = ax.axis()
@@ -196,8 +198,8 @@ deltas = (times - times[0]).to_value(u.s)
 
 ```{code-cell} ipython3
 fig = plt.figure(layout="constrained")
-vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
-ax = ci[0].plot(vmin=vmin, vmax=vmax)
+# Reuse the norm from the first plot
+ax = ci[0].plot(norm=norm)
 
 # Construct a (n_slits, n_pixel, 2) array of slit coordinates
 pix = np.array([slit_pixels[0].T, slit_pixels[1].T]).T
