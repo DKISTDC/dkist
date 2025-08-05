@@ -139,12 +139,9 @@ By default dask will parallelise operations as much as is possible, over the ava
 The Dask project also supports parallelising over the distributed compute such as HPC or cloud computing.
 For this next section we are going to use this `distributed` package as a way of visualising the parallelisation.
 
-If you want to follow along with this bit you will need to install these packages, if you want to just watch that's also fine.
-```{code-cell} shell
----
-tags: [skip-execution]
----
-conda install distributed bokeh
+```{note}
+The following section requires the `distributed` and `bokeh` Python packages.
+These can be installed using either conda or pip (e.g. `conda install distributed bokeh`).
 ```
 
 ```{code-cell} python
