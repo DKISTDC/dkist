@@ -9,8 +9,6 @@
 #   "sphobjinv",
 #   "mdformat",
 #   "mdformat_myst",
-#   "distributed",
-#   "bokeh",
 # ]
 # ///
 """
@@ -193,6 +191,8 @@ def write_conda_env(filepath):
         - distributed
         - jupyterlab-myst
         - notebook
+        - distributed
+        - bokeh
     """)
     with open(filepath, "w") as fobj:
         fobj.write(env)
