@@ -115,8 +115,8 @@ Let's compare two spectra, one from the rebinned dataset and one from the origin
 
 ```{code-cell} python
 plt.figure()
-ax = ds[100, :, 500].plot()
-ds_rebinned[100, :, 125].plot(axes=ax, linestyle="--")
+ax = ds[0, 100, :, 500].plot()
+ds_rebinned[0, 100, :, 125].plot(axes=ax, linestyle="--")
 ```
 
 As one final example of rebin, let's rebin in both the rastering dimension and the slit.
@@ -129,7 +129,7 @@ ds_rebin2 = ds.rebin((1, 5, 1, 10))
 ```{code-cell} python
 plt.figure()
 ax = ds[0, 100, :, 500].plot()
-ds_rebinned[0, 100, :, 125)].plot(axes=ax, linestyle="--")
+ds_rebinned[0, 100, :, 125].plot(axes=ax, linestyle="--")
 ds_rebin2[0, 20, :, 50].plot(axes=ax, linestyle="..")
 ```
 

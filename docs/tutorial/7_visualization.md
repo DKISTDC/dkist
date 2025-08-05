@@ -120,14 +120,23 @@ plt.show()
 
 ## Plotting with `TiledDataset`
 
-Again like `Dataset`, `TiledDataset` provides a plotting helper method. This works slightly differently to `Dataset.plot()` though, in that it is not straightforward to animate a collection of tiles, which leaves the problem of how to display 3D data as a static image. `TiledDataset.plot()` therefore takes an argument which specifies a slice to be taken through each tile, which must reduce it to a plottable two dimensions.
+First, let us load the VBI sample data:
+
+```{code-cell} ipython3
+import dkist
+from dkist.data.sample import VBI_L1_NZJTB
+
+tds = dkist.load_dataset(VBI_L1_NZJTB)
+```
+
+Again like {obj}`~dkist.Dataset`, {obj}`~dkist.TiledDataset` provides a plotting helper method.
+This works slightly differently to `Dataset.plot()` though, in that it is not straightforward to animate a collection of tiles, which leaves the problem of how to display 3D data as a static image.
+`TiledDataset.plot()` therefore takes an argument which specifies a slice to be taken through each tile, which must reduce it to a plottable two dimensions.
 
 In the case of VBI, this argument will be a single number which specifies the index on the time axis to plot.
 
 
 ```{code-cell} ipython3
-from dkist.data.sample import VBI_L1_NZJTB
-
 fig = plt.figure()
 fig = tds.plot(0, figure=fig)
 ```
