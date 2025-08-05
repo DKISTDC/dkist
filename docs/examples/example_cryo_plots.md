@@ -56,7 +56,7 @@ sp_mean = sp.rebin((1,1,-1), function=np.mean).squeeze()
 ```
 
 ```{code-cell} ipython3
-sp_subtracted = sp - (sp_mean.data << sp_mean.unit)[..., None]
+sp_subtracted = sp - (sp_mean.data * sp_mean.unit)[..., None]
 ```
 
 We can then extract the array index of the peak spectral line and use that to select the scan at that wavelength position.
@@ -77,8 +77,8 @@ space_2 = sp[:2,:2,0].axis_world_coords()[0] # [0] because we only care about sp
  We calculate pixel size by calculating the step in both lat and lon.
 
 ```{code-cell} ipython3
-dlon = np.abs(space_2[1,1].Tx - space_2[0,0].Tx)
-dlat = np.abs(space_2[1,1].Ty - space_2[0,0].Ty)
+dlon = np.abs(space_2[1,0].Tx - space_2[0,0].Tx)
+dlat = np.abs(space_2[0,1].Ty - space_2[0,0].Ty)
 
 aspect = dlon / dlat
 ```
@@ -113,6 +113,17 @@ plt.show()
 Cryo-NIRSP has both a slit-spectrograph and a context imager, which follows the position of the slit.
 
 The sample data we are using in this example only has the first context imager file downloaded, so here we plot the first context imager image.
+
++++
+
+```{note}
+There's a known issue with the Cryo-NIRSP context imager currently where the WCS is incorrect for the ordering of the first spatial array dimension. To address this issue we will flip the data along this axis.
+```
+
+```{code-cell} ipython3
+# Correct ordering issue to make coordinates correct.
+ci.data = ci.data[:, ::-1, :]
+```
 
 ```{code-cell} ipython3
 fig = plt.figure(layout="constrained")
