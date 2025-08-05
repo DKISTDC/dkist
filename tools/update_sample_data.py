@@ -41,6 +41,15 @@ datasets = {
         "slice": np.s_[0],
         "filename": "BKPLX_stokesI.tar",
     },
+    "DBXVEL": {
+        "tiled": False,
+        "filename": "DBXVEL_full.tar",
+    },
+    "POKNUM": {
+        "tiled": False,
+        "slice": np.s_[0],
+        "filename": "POKNUM_first_step.tar",
+    },
 }
 
 def main(datasets, working_directory, destination_path="/user_tools_tutorial_data/"):
