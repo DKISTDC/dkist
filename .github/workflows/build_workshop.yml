@@ -59,7 +59,7 @@ jobs:
           git -C workshop checkout README.md
 
       - name: Run pipx
-        run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
+        run: pipx run ./tools/build_workshop_materials.py
 
       - name: Commit and Push
         run: |
