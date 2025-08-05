@@ -114,7 +114,7 @@ This of course creates a new dataset so it will only plot the axes that remain, 
 ```{code-cell} ipython3
 # Plot the same data as above
 fig = plt.figure()
-ax = ds[0, 0, :, 0].plot()
+ax = ds[0, 0, :, 0].plot(fig=fig)
 plt.show()
 ```
 
