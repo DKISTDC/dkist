@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - "dkist/**"
   pull_request:
+    paths:
+      - "dkist/**"
   workflow_dispatch:
 
 concurrency:

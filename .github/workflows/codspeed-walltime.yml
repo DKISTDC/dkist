@@ -8,6 +8,8 @@ on:
     types:
       - synchronize
       - labeled
+    paths:
+      - "dkist/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
