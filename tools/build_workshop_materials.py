@@ -24,6 +24,7 @@ import subprocess
 from pathlib import Path
 from textwrap import dedent
 from functools import cache
+from collections import defaultdict
 from urllib.parse import urljoin
 
 import mdformat.plugins
@@ -64,19 +65,24 @@ def get_first_h1(markdown_file):
 
 def build_toc_links(toc_files):
     titles = {}
-    for name, (source, instructor, learner) in toc_files.items():
+    for name, (source, *_) in toc_files.items():
         titles[name] = get_first_h1(source)
 
-    links = []
+    links = defaultdict(list)
     for name, title in titles.items():
-        _, instructor, learner = toc_files[name]
-        links.append(
+        _, instructor, learner, section = toc_files[name]
+        links[section].append(
             HREF_TEMPLATE.format(url=str(learner), name=title)
             + " - "
             + HREF_TEMPLATE.format(url=str(instructor), name="Instructor")
         )
 
-    return "\n".join(["## Contents"] + [f"1. {link}" for link in links])
+    parts = ["## Contents"]
+    for section, slinks in links.items():
+        parts += [f"### {section.capitalize()}"]
+        parts += [f"1. {link}" for link in slinks]
+
+    return "\n".join(parts)
 
 
 def add_toctree_to_index(toc_files, input_notebook, output_notebook):
@@ -199,50 +205,62 @@ def write_postBuild(directory):
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
     argp.add_argument(
-        "tutorial_dir", nargs="?", help="path to the tutorial directory", default="./docs/tutorial", type=str
+        "docs_dir", nargs="?", help="path to the documentation root", default="./docs/", type=str
     )
     argp.add_argument("output_dir", nargs="?", help="path to the output directory", default="./workshop", type=str)
+    argp.add_argument("extra_dirs", nargs="*", help="directories inside docs_dir to build notebooks for", default=["examples"], type=str)
+    argp.add_argument("tutorial_dir", nargs="?", help="The directory name for the main tutorial", default="tutorial", type=str)
 
     args = argp.parse_args(sys.argv[1:])
 
-    tutorial_dir = Path(args.tutorial_dir).absolute()
+    docs_dir = Path(args.docs_dir).absolute()
     output_dir = Path(args.output_dir).absolute()
     output_dir.mkdir(exist_ok=True)
 
-    index_filename = tutorial_dir / "index.md"
+    tutorial_dir = docs_dir / args.tutorial_dir
+    tutorial_index_file = tutorial_dir / "index.md"
 
-    file_stems = parse_toctree_directive(index_filename)
-
-    # For each file in the toc tree make an instructor notebook, then make a learner
-    # notebook without the source cells.
     toc_files = {}
-    for stem in [*file_stems, index_filename.stem]:
-        input_file = list(tutorial_dir.glob(stem + ".*"))
-        if len(input_file) > 1:
-            raise ValueError(f"More than one input file matching {stem}.* found")
-        if not input_file:
-            raise ValueError(f"File {stem} not found")
 
-        input_file = input_file[0]
-        instructor_file = output_dir / "instructor"
-        instructor_file.mkdir(exist_ok=True)
-        instructor_file /= input_file.stem + ".ipynb"
-        learner_file = output_dir / (input_file.stem + ".ipynb")
-        if input_file.name != "index.md":
-            toc_files[stem] = (
-                input_file,
-                instructor_file.relative_to(output_dir),
-                learner_file.relative_to(output_dir),
-            )
+    for inc_dir in [args.tutorial_dir, *args.extra_dirs]:
+        input_dir = docs_dir / inc_dir
+        index_filename = docs_dir / inc_dir / "index.md"
 
-        subprocess.run([sys.executable, "-m", "jupytext", "--to", "ipynb", input_file, "-o", instructor_file])
-        # Format the output notebook
-        parse_all_cells(instructor_file, instructor_file)
-        # Replace the sphinx toctree with a simple list of links
-        if input_file.name == "index.md":
-            add_toctree_to_index(toc_files, instructor_file, instructor_file)
-        print(f"[learner] transforming {instructor_file} to {learner_file}")  # noqa: T201
-        strip_code_cells(instructor_file, learner_file)
+        file_stems = parse_toctree_directive(index_filename)
+
+        # For each file in the toc tree make an instructor notebook, then make a learner
+        # notebook without the source cells.
+        for stem in [*file_stems] + ([index_filename.stem] if args.tutorial_dir == inc_dir else []):
+            input_file = list(input_dir.glob(stem + ".*"))
+            if len(input_file) > 1:
+                raise ValueError(f"More than one input file matching {stem}.* found")
+            if not input_file:
+                raise ValueError(f"File {stem} not found")
+
+            input_file = input_file[0]
+            instructor_file = output_dir / "instructor"
+            instructor_file.mkdir(exist_ok=True)
+            instructor_file /= input_file.stem + ".ipynb"
+            learner_file = output_dir / (input_file.stem + ".ipynb")
+            if input_file.name != "index.md":
+                toc_files[stem] = (
+                    input_file,
+                    instructor_file.relative_to(output_dir),
+                    learner_file.relative_to(output_dir),
+                    inc_dir
+                )
+
+            subprocess.run([sys.executable, "-m", "jupytext", "--to", "ipynb", input_file, "-o", instructor_file])
+            # Format the output notebook
+            parse_all_cells(instructor_file, instructor_file)
+            print(f"[learner] transforming {instructor_file} to {learner_file}")  # noqa: T201
+            strip_code_cells(instructor_file, learner_file)
+
+    # Write toctree to the tutorial index for all files in all dirs
+    index_notebooks = [output_dir / "index.ipynb", output_dir / "instructor" / "index.ipynb"]
+    # Replace the sphinx toctree with a simple list of links
+    for index in index_notebooks:
+        add_toctree_to_index(toc_files, index, index)
 
     print("Writing conda env file")  # noqa: T201
     write_conda_env(output_dir / "environment.yml")
