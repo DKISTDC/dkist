@@ -142,7 +142,7 @@ plt.colorbar(label=f"{ci[0].unit:latex}")
 plt.show()
 ```
 
-Now we can plot the slit position. We do this by taking the first raster step position of the sp dataset and computing the world coordinates of each pixel along the slit.
+Now we can plot the slit position. We do this by taking the first raster step position of the SP dataset and computing the world coordinates of each pixel along the slit.
 
 ```{code-cell} ipython3
 slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
