@@ -63,7 +63,7 @@ ax.set_ylabel("$r_0$ ($m$)")
 ax.set_ylim(0, 0.2)
 
 ax2 = plt.twinx()
-oobline, = ax2.plot(ds[0].headers["OOBSHIFT"], color="C1", label="OOB Shift"
+oobline, = ax2.plot(ds[0].headers["OOBSHIFT"], color="C1", label="OOB Shift")
 ax2.set_ylabel("# subapertures out of bounds")
 plt.legend(handles=[r0line, oobline])
 ```
