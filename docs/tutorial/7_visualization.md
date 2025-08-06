@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.1
+    jupytext_version: 1.17.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -26,22 +26,23 @@ Initially, we'll use the VISP sample data, but you can also use the data downloa
 ```
 
 Then, as usual, first we'll need a dataset.
-We'll use the VISP data we downloaded at the end of the last notebook.
-
-```{note}
-If you haven't completed the [__previous chapter__](#dkist:tutorial:downloading-data) on downloading data files, you should do this now before continuing with this chapter.
-Alternatively, you can use the VISP_BKPLX sample dataset, but this only contains partial data and will not show the full plots properly.
-```
 
 ```{code-cell} ipython3
+---
+tags: [keep-inputs]
+---
 import matplotlib.pyplot as plt
 
 import dkist
 from dkist.data.sample import VISP_L1_KMUPT
+```
 
+```{code-cell} ipython3
 ds = dkist.load_dataset(VISP_L1_KMUPT)
 ds
 ```
+
++++
 
 ## Plotting our data
 
@@ -52,6 +53,8 @@ Getting started with plotting a dataset is straightforward.
 fig = plt.figure()
 ds.plot(fig=fig)
 ```
+
++++
 
 Since our dataset is 4D and most users will only have access to a 2D screen, a slice has to be taken through the data.
 That slice is defined by how the data are ordered and stored in the FITS files.
@@ -72,6 +75,8 @@ The ordering for this is the same as for the pixel dimensions as shown in the `D
 ds
 ```
 
++++
+
 So the list needed to specify the default ordering would be `[None, None, 'y', 'x']`.
 If instead we want to plot the image formed by the raster scan at a particular wavelength and Stokes value, we can change which axes we specify as the x and y axes of the plot.
 For this example we will slice the data down to a particular region of interest.
@@ -80,6 +85,8 @@ For this example we will slice the data down to a particular region of interest.
 small_ds = ds[0, 150:300, :, 1010:-1010]
 ```
 
++++
+
 Note that since this removes the first axis, the `plot_axes` argument is now only three items long.
 
 ```{code-cell} ipython3
@@ -87,6 +94,8 @@ fig = plt.figure()
 # Plot 'raster scan step number' on the y axis and 'spatial along slit' on the x axis
 small_ds.plot(fig=fig, plot_axes=['y', None, 'x'])
 ```
+
++++
 
 You may have noticed this plot took longer to draw than the previous one.
 This is for the same reason as we discussed when talking about reducing the size of dataset downloads: when you slice across the array in a different direction to how it's stored in the files, you have to reference multiple files to create the slice.
@@ -108,6 +117,8 @@ fig = plt.figure()
 ds.plot(fig=fig, plot_axes=[None, None, 'x', None])
 ```
 
++++
+
 It is also possible to slice the data manually and just plot the result.
 This of course creates a new dataset so it will only plot the axes that remain, without sliders or the ability to step through the values of the other axes.
 
@@ -115,7 +126,10 @@ This of course creates a new dataset so it will only plot the axes that remain, 
 # Plot the same data as above
 fig = plt.figure()
 ax = ds[0, 0, :, 0].plot()
+plt.show()
 ```
+
++++
 
 ## Plotting with `TiledDataset`
 
@@ -128,26 +142,26 @@ from dkist.data.sample import VBI_L1_NZJTB
 tds = dkist.load_dataset(VBI_L1_NZJTB)
 ```
 
++++
+
 Again like {obj}`~dkist.Dataset`, {obj}`~dkist.TiledDataset` provides a plotting helper method.
 This works slightly differently to `Dataset.plot()` though, in that it is not straightforward to animate a collection of tiles, which leaves the problem of how to display 3D data as a static image.
 `TiledDataset.plot()` therefore takes an argument which specifies a slice to be taken through each tile, which must reduce it to a plottable two dimensions.
 
 In the case of VBI, this argument will be a single number which specifies the index on the time axis to plot.
 
-
 ```{code-cell} ipython3
 fig = plt.figure()
 fig = tds.plot(0, figure=fig)
 ```
 
++++
+
 As more DKIST instruments become available you may encounter tiled data with even more dimensions. In this case the slice argument would be either a tuple of integers or a numpy slice object. In either case it would be the indices required to reduce a tile to a 2D image.
 
 You may notice in the plots above that the colour scale is independent for each tile. This is the default behaviour as it will allow features in each tile to be seen without being washed out by features in other tiles. However, for a more unified look you can tell `.plot()` to use the same scale for all tiles, with the `share_zscale` argument.
 
-
 ```{code-cell} ipython3
-:tags: [skip-execution]
-
 fig = plt.figure()
 fig = tds.plot(0, share_zscale=True, figure=fig)
 ```

@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.1
+    jupytext_version: 1.17.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -13,7 +13,7 @@ kernelspec:
 ---
 
 (dkist:tutorial:tiled-dataset)=
-# TiledDataset
+# Working with Tiled Datasets
 
 So far all our examples have used the base {obj}`dkist.Dataset` class with VISP data.
 In this way we have demonstrated the most important features of the Python tools for working with DKIST data, but some data do not quite fit into the base `Dataset` structure.
@@ -25,8 +25,10 @@ For this purpose the Python tools have the {obj}`dkist.TiledDataset` class, whic
 
 To see `TiledDataset` in action we'll load some VBI data. We'll use the VBI data from the sample datasets, which is accessible in the same way as the VISP dataset we used before
 
-
 ```{code-cell} ipython3
+---
+tags: [keep-inputs]
+---
 import dkist
 from dkist.data.sample import VBI_L1_NZJTB
 
@@ -34,7 +36,6 @@ VBI_L1_NZJTB
 ```
 
 Now let's use that file path to create a `TiledDataset`. This is done in exactly the same way as for a regular `Dataset`, using `load_dataset()`:
-
 
 ```{code-cell} ipython3
 tds = dkist.load_dataset(VBI_L1_NZJTB)
@@ -47,13 +48,11 @@ We still have information about the number and type of pixel and world dimension
 
 Some of this basic information is also available as attributes on the `TiledDataset`, just as it is with `Dataset`. For instance the shape of the array of tiles:
 
-
 ```{code-cell} ipython3
 tds.shape
 ```
 
 This is not to be confused with the shapes of the tiles themselves:
-
 
 ```{code-cell} ipython3
 tds.tiles_shape
@@ -61,13 +60,11 @@ tds.tiles_shape
 
 `TiledDataset` also keeps the `.inventory` attribute containing important metadata about the dataset:
 
-
 ```{code-cell} ipython3
 tds.inventory
 ```
 
 And the headers for all the datasets are stored as `combined_headers`:
-
 
 ```{code-cell} ipython3
 tds.combined_headers
@@ -75,18 +72,15 @@ tds.combined_headers
 
 Of course, since `TiledDataset` is array-like, we can also index it to access individual tiles.
 
-
 ```{code-cell} ipython3
 tds[0, 0]
 ```
 
 And there is a `flat` attribute which can be used for things like iterating more easily:
 
-
 ```{code-cell} ipython3
 tds.flat[0]
 ```
-
 
 ```{code-cell} ipython3
 for tile in tds.flat:
@@ -95,7 +89,6 @@ for tile in tds.flat:
 
 However, if we want to look at all the component datasets but only a portion of each then we can index with `slice_tiles`. So to get only the first time step of each tile:
 
-
 ```{code-cell} ipython3
 tds.slice_tiles[0]
 ```
@@ -103,7 +96,6 @@ tds.slice_tiles[0]
 Notice that this gives us a new `TiledDataset` with the same number of tiles but smaller datasets.
 
 Similarly if we want to crop the edges of each tile, we can index just as easily in the spatial dimensions:
-
 
 ```{code-cell} ipython3
 tds.slice_tiles[:, 1024:-1024, 1024:-1024]
@@ -120,7 +112,14 @@ In this example the tiles would be stored as a 3x3 grid with the middle tile on 
 Which tiles should be masked is determined by the `.mask` attribute.
 
 ```{code-cell} ipython3
+---
+tags: [keep-inputs]
+---
+# Construct an example mask for demonstration with the sample dataset
 tds.mask = [[False, True, False], [True, False, True], [False, True, False]]
+```
+
+```{code-cell} ipython3
 tds
 ```
 
@@ -136,14 +135,14 @@ for tile in tds.flat:
 	print(tile.headers['DATE-AVG'])
 ```
 
-However, be careful of iterating over the whole grid of tiles manually, as this will not skip the masked tiles and may break.
++++
 
+However, be careful of iterating over the whole grid of tiles manually, as this will not skip the masked tiles and may break.
 
 ```{code-cell} ipython3
 ---
 tags: [raises-exception]
 ---
-
 for row in tds:
     for tile in row:
         print(tile[0].headers['DATE-AVG'])
