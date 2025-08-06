@@ -133,7 +133,7 @@ ds_rebinned[0, 100, :, 125].plot(axes=ax, linestyle="--")
 ds_rebin2[0, 20, :, 50].plot(axes=ax, linestyle="..")
 ```
 
-## Rebinning in Parallel
+## Computing in Parallel
 
 By default dask will parallelise operations as much as is possible, over the available cores in your machine.
 The Dask project also supports parallelising over the distributed compute such as HPC or cloud computing.
@@ -144,32 +144,23 @@ The following section requires the `distributed` and `bokeh` Python packages.
 These can be installed using either conda or pip (e.g. `conda install distributed bokeh`).
 ```
 
+First we'll set up the dask distributed client which will coordinate the computation.
+
 ```{code-cell} python
 from dask.distributed import Client
 client = Client()
 client
 ```
+
+This gives us a dashboard which can be viewed in the browser and will show us the progress of the computation.
+
+Then we can set up a rebinning operation on our dataset object.
+
 ```{code-cell} python
 ds_rebin3 = ds.rebin((1, 5, 1, 10))
 ```
 
-```{code-cell} python
----
-tags: [skip-execution]
----
-computed_data = ds_rebin3.data.compute()
-```
+Now when we run the actual compute, the client will distribute it over the available resources and the dashboard will show us the progress of all the required tasks.
+The result will look something like this:
 
-```{code-cell} python
----
-tags: [skip-execution]
----
-ds_rebin3._data = computed_data  # This is naughty
-```
-
-```{code-cell} python
----
-tags: [skip-execution]
----
-ds_rebin3.plot()
-```
+![](./dask-distributed-dashboard.png)
