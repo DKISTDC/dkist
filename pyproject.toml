@@ -78,6 +78,7 @@ docs = [
   "reproject[all]",
   "sunpy[net,asdf]>=6.1.0",  # Needed for the VBI extent example
   "snowballstemmer<3",  # Not sure what package we have a transitive dep on this but 3.0 broke it
+  "distributed",
 ]
 
 [project.urls]
