@@ -82,6 +82,8 @@ sds = ds[0, :bad_headers[0]["DINDEX3"]-1, :, :]
 ```
 
 We can now download only these files, remember you need globus-connect-personal running for this.
+(Note that these plots will show if you work through the tutorial notebooks but not on the main Python tools documentation, as the data will not be available.)
+
 ```{code-cell} python
 ---
 tags: [skip-execution]

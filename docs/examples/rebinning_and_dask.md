@@ -65,9 +65,8 @@ wl_idx = spectrum.argmin()
 wl_idx
 ```
 
-However, `Dataset` will automatically run the compute method in cases where it can be reasonably impled the user wants it.
-For instance, `pixel_to_world` will assume that the output should be computed automatically instead of delayed.
-(BUT WHY?)
+However, `Dataset` will automatically run the compute method in cases where it can be reasonably impled the user wants it, or if another package requires a plain numpy array.
+For instance, `pixel_to_world`'s underlying computation is not dask aware so it forces the array computation instead of delaying it.
 ```{code-cell} python
 wl = ds[0].wcs.pixel_to_world(0, wl_idx, 0)[1]
 wl
