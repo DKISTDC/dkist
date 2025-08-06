@@ -14,6 +14,9 @@ kernelspec:
 # Using headers to select data for download
 
 ```{code-cell} python
+---
+:tags: [keep-inputs]
+---
 import matplotlib.pyplot as plt
 from sunpy.net import Fido, attrs as a
 
