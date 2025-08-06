@@ -11,7 +11,7 @@ kernelspec:
   language: python
   name: python3
 ---
-# Downloading Data Based on Seeing
+# Using headers to select data for download
 
 ```{code-cell} python
 import matplotlib.pyplot as plt
