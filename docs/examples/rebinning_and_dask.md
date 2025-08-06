@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-# Rebinning and How to Use Dask
+# Using dask with Datasets
 
 ## Fundamentals of Dask
 
