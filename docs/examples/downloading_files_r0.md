@@ -24,38 +24,51 @@ import dkist
 import dkist.net
 ```
 
-Let's find a dataset with the highest average value of r0 (this is bad?).
+Let's find a dataset with the a high average value of $r_0$.
+Obviously this is not what we would normally want but this will allow us to find and disregard the portions of the dataset where the seeing is bad and keep the portions where it is good.
 First we'll search for all unembargoed VISP data.
 
 ```{code-cell} python
 res = Fido.search(a.Instrument("VISP"), a.dkist.Embargoed(False))
 ```
 
-Next, since we want to use the highest average $r_0$, we can have Fido sort the results and output just the useful columns.
+Next, since we want to use a high average $r_0$, we can have Fido sort the results and output just the useful columns.
+We'll ignore the datasets with anomalously high values and look at the next one with a value that is high but realistic.
 
 ```{code-cell} python
-res['dkist'].sort("Average Fried Parameter", reverse=True)
-res['dkist'].show("Dataset ID", "Start Time", "Average Fried Parameter", "Primary Proposal ID")
+res["dkist"].sort("Average Fried Parameter", reverse=True)
+res["dkist"][res["dkist"]["Average Fried Parameter"] < 2].show("Product ID", "Average Fried Parameter")
 ```
 
-We'll ignore the datasets with anomalously high values and look at the next one with a value that is high but realistic.
-This gives us the dataset `AXVXL`.
-We can download the dataset ASDF with Fido to inspect it in more detail.
+This gives us the product `L1-BAEPX`.
+We can download the ASDF for that product's latest dataset with Fido to inspect it in more detail.
 Remember that this only downloads a single ASDF file with some more metadata about the dataset, not the actual science data.
 
 ```{code-cell} python
+---
 :tags: [remove-stderr]
-asdf_files = Fido.fetch(res['dkist'][3], path="~/sunpy/data/{dataset_id}/")
-ds = dkist.load_dataset(asdf_files[0])
+---
+asdf_file = Fido.fetch(res["dkist"][res["dkist"]["Dataset ID"] == "L1-BAEPX"], path="~/sunpy/data/{dataset_id}/")
+ds = dkist.load_dataset(asdf_file)
 ```
 
 Now that we have access to the FITS headers we can inspect the $r_0$ more closely, just as we did in the previous notebook.
-Remember that `DINDEX4` is the Stokes index, so we can plot the $r_0$ for just Stokes I like so:
+We will only look at the values for Stokes I, and we can overplot the Out-Of-Bounds Shift value from the headers to see where the $r_0$ value is most reliable.
+
 ```{code-cell} python
-plt.plot(ds.headers[ds.headers["DINDEX4"] == 1]["ATMOS_R0"])
+fig, ax = plt.subplots()
+
+r0line, = plt.plot(ds[0].headers["ATMOS_R0"], label="$r_0$")
+ax.set_ylabel("$r_0$ ($m$)")
+ax.set_ylim(0, 0.2)
+
+ax2 = plt.twinx()
+oobline, = ax2.plot(ds[0].headers["OOBSHIFT"], color="C1", label="OOB Shift"
+ax2.set_ylabel("# subapertures out of bounds")
+plt.legend(handles=[r0line, oobline])
 ```
 
-Now let's slice down our dataset based on the first frame where $r_0$ is high:
+Now let's slice down our dataset based on the first frame where $r_0$ is too high:
 
 ```{code-cell} python
 # Select headers for only frames with bad r0
@@ -76,13 +89,13 @@ tags: [skip-execution]
 sds.files.download(path="~/sunpy/data/{dataset_id}/")
 ```
 
-Now let's plot the Stokes I data at some wavelength:
+Now let's plot the Stokes I data at the first wavelength:
 
 ```{code-cell} python
 ---
 tags: [skip-execution]
 ---
-ds[0, :, 466, :].plot(plot_axes=['x', 'y'], aspect="auto")
+ds[0, :, 0, :].plot(plot_axes=['x', 'y'], aspect="auto")
 ```
 
 You will notice that a lot of it is missing.
@@ -97,6 +110,6 @@ In this case we can use the sub-dataset we made earlier:
 ---
 tags: [skip-execution]
 ---
-sds[:, 466, :].plot(plot_axes=['x', 'y'], aspect="auto")
+sds[:, 0, :].plot(plot_axes=['x', 'y'], aspect="auto")
 ```
 Or of course we can make any arbitrary slice to look at whatever subset of the data we prefer.
