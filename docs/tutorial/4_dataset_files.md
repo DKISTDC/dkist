@@ -24,10 +24,22 @@ In this chapter you will learn:
 First we need to re-create our dataset object from the last chapter.
 
 ```{code-cell} ipython3
-:tags: [keep-inputs]
+---
+tags: [keep-inputs]
+editable: true
+slideshow:
+  slide_type: ''
+---
+import astropy.units as u
+from astropy.visualization import quantity_support
+import numpy as np
 
 import dkist
 from dkist.data.sample import VISP_L1_KMUPT
+```
+
+```{code-cell} ipython3
+:tags: [keep-inputs]
 
 ds = dkist.load_dataset(VISP_L1_KMUPT)
 ds
@@ -37,6 +49,8 @@ The `Dataset` object allows us to do some basic inspection of the dataset as a w
 This will save you a good amount of time and also ease the load on the DKIST servers.
 For example, we can check the seeing conditions during the observation and discount any data which will not be of high enough quality to be useful.
 We will go through this as an exercise in a later tutorial.
+
++++
 
 ## The `headers` table
 
@@ -78,8 +92,8 @@ Notably though, columns can be used as arrays in many contexts.
 They can therefore be used for plotting, which allows us to visually inspect how metadata values vary over the many files in the dataset.
 For example, we might want to inspect the seeing conditions and plot the Fried parameter for all frames.
 
-First, if you're not familiar with all of the keywords in the header, they can be checked in the documentation.
-Helpfully, `Dataset` provides some additional metadata which includes a link to that documentation:
+First, if you're not familiar with all of the keywords in the header, they can be checked in the documentation ({ref}`level-one-data-products`).
+Helpfully, `Dataset` provides some additional metadata which includes a link to the specific version of that documentation used when making these FITS files:
 
 ```{code-cell} ipython3
 ds.meta['inventory']['headerDocumentationUrl']
@@ -103,10 +117,15 @@ ds.headers.keys()
 ```
 
 ```{code-cell} ipython3
-import astropy.units as u
+fig, ax = plt.subplots()
+times = ds[0].axis_world_coords("time")[0]
+time_delta = (times - times[0]).to_value(u.s)
 
-# Pick a better example here?
-plt.scatter(ds[0].headers["CRVAL1"], ds[0].headers["CRVAL3"])
+with quantity_support():
+    sc = ax.scatter(ds[0].headers["TAZIMUTH"] * u.deg, ds[0].headers["ELEV_ANG"] * u.deg, c=time_delta)
+ax.set_ylabel("Elevation")
+ax.set_xlabel("Azimuth")
+fig.colorbar(sc, label="Time delta from start of scan [s]")
 ```
 
 ## Downloading the quality report and preview movie

@@ -122,6 +122,7 @@ def build_inventory_map():
         "https://asdf.readthedocs.io/en/stable/",
         "https://dask.pydata.org/en/stable/",
         "https://reproject.readthedocs.io/en/stable/",
+        "https://docs.dkist.nso.edu/projects/data-products/en/stable/",
     )
     for url in urls:
         inv = Inventory(url=url + "objects.inv")
