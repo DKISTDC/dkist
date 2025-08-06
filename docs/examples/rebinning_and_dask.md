@@ -130,7 +130,7 @@ ds_rebin2 = ds.rebin((1, 5, 1, 10))
 plt.figure()
 ax = ds[0, 100, :, 500].plot()
 ds_rebinned[0, 100, :, 125].plot(axes=ax, linestyle="--")
-ds_rebin2[0, 20, :, 50].plot(axes=ax, linestyle="..")
+ds_rebin2[0, 20, :, 50].plot(axes=ax, linestyle=":")
 ```
 
 ## Computing in Parallel
