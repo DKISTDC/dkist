@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.1
+    jupytext_version: 1.17.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -132,6 +132,16 @@ pm = ds.files.preview_movie()
 pm
 ```
 
+We can also embed the hosted version of the preview movie in our notebook:
+
+```{code-cell} ipython3
+from IPython.display import VimeoVideo
+
+# We need the ID of the video, which is the path component
+vimeo_id = ds.inventory["browseMovieUrl"].split("/")[-1]
+VimeoVideo(vimeo_id, width=600, height=450)
+```
+
 ## Tracking files
 
 `Dataset` tracks information about the individual files that make up the dataset in the `files` attribute.
@@ -176,6 +186,7 @@ Next let us slice our dataset as we did in the last chapter, and this time look 
 stokes_i = ds[0]
 stokes_i.data.shape
 ```
+
 ```{code-cell} ipython3
 stokes_i.files
 ```
@@ -186,6 +197,7 @@ Since this slice only contains Stokes I, it only needs the files containing the 
 scan = ds[0, :, 200]
 scan.data.shape
 ```
+
 ```{code-cell} ipython3
 scan.files
 ```
