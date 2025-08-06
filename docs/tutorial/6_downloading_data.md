@@ -43,12 +43,6 @@ The user tools use this as the default remote endpoint, and define a local endpo
 
 - **Paths** When working with paths in Globus it's worth remembering that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
 However, note that the paths are as the Globus endpoint sees them, so might not be identical to how you refer to them on your local system.
-
-You may already be familiar with using the [Globus web app](https://app.globus.org/) to download data.
-If you are not, you should read through the [getting started docs here](https://docs.globus.org/how-to/get-started/).
-However, given the quantities of data that DKIST provides, we recommend using the user tools as your primary way to download data for science, and that is the method that will be covered in this chapter of the tutorial.
-In any case, the underlying concepts described above are the same.
-
 ## Dataset and downloading
 
 ```{note}

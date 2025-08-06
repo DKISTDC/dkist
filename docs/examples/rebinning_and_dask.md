@@ -23,9 +23,10 @@ Dask is a Python package for out-of-memory and parallel computation in Python, i
 To demonstrate this let's load the VISP sample dataset.
 
 ```{code-cell} python
+import matplotlib.pyplot as plt
+
 import dkist
 from dkist.data.sample import VISP_BKPLX
-import matplotlib.pyplot as plt
 
 ds = dkist.load_dataset(VISP_BKPLX)
 ```
@@ -80,8 +81,7 @@ plt.plot(spectrum)
 ```
 
 When performing these operations, Dask breaks up the array into chunks, and operations will generally be faster and use less memory when they require fewer chunks.
-In the case of a `Dataset`, these chunks are aligned with the files, so each chunk essentially consists of the array stored in one FITS file.
-In the future FITS files may be broken down into more chunks, so the whole array does not always have to be read.
+In the case of a `Dataset`,  each chunk consists of the array stored in one FITS file.
 
 ## Rebinning with `NDCube`
 

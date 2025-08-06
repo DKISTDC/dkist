@@ -22,7 +22,7 @@ import dkist.net
 ```
 
 Let's find a dataset with the highest average value of r0 (this is bad?).
-First we'll search for all unembargoed VISP data, as embargoed data is no use to us for this exercise.
+First we'll search for all unembargoed VISP data.
 
 ```{code-cell} python
 res = Fido.search(a.Instrument("VISP"), a.dkist.Embargoed(False))
