@@ -1,1 +1,0 @@
-The webpage shown once authentication with Globus is successful should now autoclose.
