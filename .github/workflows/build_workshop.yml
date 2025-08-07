@@ -20,11 +20,11 @@ jobs:
     steps:
       # Make sure the branch name logic handles workflow_dispatch
       - name: Branch name for releases
-        if: ${{ startsWith('v', github.ref_name) }}
+        if: ${{ startsWith(github.ref_name, 'v') }}
         run: echo 'BRANCHNAME=stable' >> "$GITHUB_ENV"
 
       - name: Branch name for not releases
-        if: ${{ !startsWith('v', github.ref_name) }}
+        if: ${{ !startsWith(github.ref_name, 'v') }}
         run: echo 'BRANCHNAME=latest' >> "$GITHUB_ENV"
 
       - uses: actions/checkout@v4
