@@ -231,6 +231,12 @@ if __name__ == "__main__":
 
         file_stems = parse_toctree_directive(index_filename)
 
+        # This can probably made considerably more robust and flexible, but not today
+        # Copy all .png files to the new folder, both for learners and instructors
+        for img_file in input_dir.glob("*png"):
+            subprocess.run(["cp", img_file, output_dir])
+            subprocess.run(["cp", img_file, output_dir / "instructor"])
+
         # For each file in the toc tree make an instructor notebook, then make a learner
         # notebook without the source cells.
         for stem in [*file_stems] + ([index_filename.stem] if args.tutorial_dir == inc_dir else []):
