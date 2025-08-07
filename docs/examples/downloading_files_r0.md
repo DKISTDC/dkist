@@ -48,7 +48,7 @@ Remember that this only downloads a single ASDF file with some more metadata abo
 ---
 :tags: [remove-stderr]
 ---
-asdf_file = Fido.fetch(res["dkist"][res["dkist"]["Dataset ID"] == "L1-BAEPX"], path="~/sunpy/data/{dataset_id}/")
+asdf_file = Fido.fetch(res["dkist"][res["dkist"]["Product ID"] == "L1-BAEPX"], path="~/sunpy/data/{dataset_id}/")
 ds = dkist.load_dataset(asdf_file)
 ```
 
