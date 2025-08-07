@@ -98,5 +98,7 @@ If you know what you are doing and have Python installed without conda, please m
 Globus
 ------
 
-To download DKIST data you need `Globus Connect Personal (GCP) <https://www.globus.org/globus-connect-personal>`__, and a Globus account.
+To download DKIST science data you need `Globus Connect Personal (GCP) <https://www.globus.org/globus-connect-personal>`__, and a Globus account.
 The `DKIST Help Desk <https://nso.atlassian.net/servicedesk/customer/portal/3/article/247694160>`__ has some pages to help with this.
+However, this is not necessary for downloading ASDF metadata files, which can be done using the SunPy Fido client.
+See :ref:`dkist:topic-guides:searchdownload` for more detail on this distinction.

@@ -11,10 +11,10 @@ kernelspec:
   language: python
   name: python3
 ---
-(dkist:tutorial:astropy-and-sunpy)=
-# Astropy and SunPy - A Quick Primer
+(dkist:tutorial:coordinates)=
+# Coordinates - A Quick Primer
 
-This chapter will cover the basic functionality of SunPy and Astropy which is relevant to the `dkist` package.
+This chapter will cover the basic usage of the coordinates framework in SunPy and Astropy, and related functionality, which is relevant to the `dkist` package.
 There are many other parts of these packages which are useful when working with DKIST data, which you should explore in their respective documentation pages.
 See [here for SunPy's documentation](https://docs.sunpy.org/) and [here for astropy's](https://docs.astropy.org/).
 

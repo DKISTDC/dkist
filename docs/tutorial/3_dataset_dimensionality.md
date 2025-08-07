@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.1
+    jupytext_version: 1.17.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -30,10 +30,16 @@ This ASDF file contains the following information:
 In this chapter we will create `Dataset`s using only the ASDF files.
 This will mean we won't have access to the data arrays in the FITS files, but everything else will function the same.
 
+```{note}
+The `Dataset` object is the default structure for DKIST datasets.
+However, data from VBI and DL-NIRSP are presented to the user as multiple `Dataset` objects representing mosaic tiles.
+To handle these data, the we use the `TiledDataset` object instead.
+For more detail on `TiledDataset`, see {ref}`dkist:tutorial:tiled-dataset`.
+```
+
 ## DKIST Sample data
 
-We will come back to searching for ASDF files in a later chapter, when we cover Globus and downloading the FITS data files.
-For this chapter and the next few, we will use some sample datasets which are provided with the `dkist` package.
+In this chapter and the next few, we will use some sample datasets which are provided with the `dkist` package.
 These sample datasets provide convenient examples to work with and contain some FITS files which do not require Globus to access.
 They can be imported from `dkist.data.sample` and for this chapter we will use the VISP one:
 
@@ -44,7 +50,9 @@ VISP_L1_KMUPT
 ```
 
 This constant defines the path to a folder containing the metadata ASDF and a few data files for a small VISP dataset.
-These are automatically downloaded as a .tar file and unpacked the first time you import the sample data so that the dataset is always available.
+These are automatically downloaded the first time you import the sample data so that the dataset is always available.
+
++++
 
 ## Constructing `Dataset` Objects
 
@@ -56,7 +64,14 @@ This function takes one of several different kinds of input:
 - a `parfive.results.Results` object as returned by `sunpy.Fido.fetch` (this will only work if _all_ results in the table are valid DKIST ASDF files); or
 - a list or tuple of any combination of the above.
 
-Since we have a `Path` to our sample data as defined above, we can pass this straight to `load_dataset()`
++++
+
+## Loading a VISP Dataset
+
+For the rest of this tutorial we are going to be using sample data provided with the `dkist` package.
+These sample datasets provide convenient examples to work with and contain some FITS files which do not require Globus to access.
+
+The sample datasets can be imported from `dkist.data.sample`, here we use a VISP one:
 
 ```{code-cell} ipython3
 import dkist
@@ -76,6 +91,8 @@ ds
 This tells us that we have a 4-dimensional data cube and what values the axes correspond to.
 Importantly, it not only gives us information about the *pixel* axes (the actual dimensions of the array itself), but also the *world* axes (the physical quantities related to the observation).
 It also gives us a correlation matrix showing how the pixel axes relate to the world axes.
+
++++
 
 ## `Dataset` and `NDCube`: Coordinate aware arrays
 
@@ -132,8 +149,6 @@ ds.array_axis_physical_types
 
 This property is a list with one element for every array axis containing a tuple of the world axis physical types of each world axis correlated with that array axis.
 So the first array axis has one physical type `'phys.polarization.stokes'` but the second has three (lat, lon and time).
-
-+++
 
 Using the WCS object, we can convert between pixel or array coordinates and world coordinates:
 

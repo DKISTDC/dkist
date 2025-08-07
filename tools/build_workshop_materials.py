@@ -122,6 +122,7 @@ def build_inventory_map():
         "https://asdf.readthedocs.io/en/stable/",
         "https://dask.pydata.org/en/stable/",
         "https://reproject.readthedocs.io/en/stable/",
+        "https://docs.dkist.nso.edu/projects/data-products/en/stable/",
     )
     for url in urls:
         inv = Inventory(url=url + "objects.inv")
@@ -191,6 +192,8 @@ def write_conda_env(filepath):
         - distributed
         - jupyterlab-myst
         - notebook
+        - distributed
+        - bokeh
     """)
     with open(filepath, "w") as fobj:
         fobj.write(env)
@@ -227,6 +230,12 @@ if __name__ == "__main__":
         index_filename = docs_dir / inc_dir / "index.md"
 
         file_stems = parse_toctree_directive(index_filename)
+
+        # This can probably made considerably more robust and flexible, but not today
+        # Copy all .png files to the new folder, both for learners and instructors
+        for img_file in input_dir.glob("*png"):
+            subprocess.run(["cp", img_file, output_dir])
+            subprocess.run(["cp", img_file, output_dir / "instructor"])
 
         # For each file in the toc tree make an instructor notebook, then make a learner
         # notebook without the source cells.
