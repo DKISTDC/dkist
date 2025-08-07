@@ -1,3 +1,28 @@
+1.15.0 (2025-08-07)
+===================
+
+Deprecations and Removals
+-------------------------
+
+- The ``dkist.data.sample.VBI_AJQWW`` and ``dkist.data.sample.VISP_BKPLX`` datasets have been renamed ``dkist.data.sample.VBI_L1_NZJTB`` and ``dkist.data.sample.VISP_L1_KMUPT`` respectively.
+  These names use the new Product ID which does not change when the data is reprocessed.
+  (Note that the VBI dataset has been reprocessed so the Dataset ID is also different.) (`#595 <https://github.com/DKISTDC/dkist/pull/595>`__)
+
+
+Features
+--------
+
+- The webpage shown once authentication with Globus is successful should now autoclose. (`#592 <https://github.com/DKISTDC/dkist/pull/592>`__)
+- Sample data has been updated to use newly reprocessed datasets where available. (`#595 <https://github.com/DKISTDC/dkist/pull/595>`__)
+- Add two new datasets to the sample data for Cryo-NIRSP SP and CI. (`#598 <https://github.com/DKISTDC/dkist/pull/598>`__)
+
+
+Improved Documentation
+----------------------
+
+- Add an example of plotting Cryo-NIRSP data. (`#598 <https://github.com/DKISTDC/dkist/pull/598>`__)
+
+
 1.14.0 (2025-07-17)
 ===================
 
