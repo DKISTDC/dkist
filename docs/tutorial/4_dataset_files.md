@@ -154,6 +154,9 @@ pm
 We can also embed the hosted version of the preview movie in our notebook:
 
 ```{code-cell} ipython3
+---
+tags: [keep-inputs]
+---
 from IPython.display import VimeoVideo
 
 # We need the ID of the video, which is the path component
@@ -170,7 +173,7 @@ ds.files
 ```
 
 This tells us that our (4, 425, 980, 2554) data array is stored as 1700 files, each containing an array of (1, 980, 2554).
-Since the filenames are automatically generated from observation metadata, the `files` attribute can also track those before we even download the data.
+The list of filenames referenced by this dataset can also be accessed with:
 
 ```{code-cell} ipython3
 ds.files.filenames
@@ -221,7 +224,7 @@ scan.data.shape
 scan.files
 ```
 
-In this case, however, although the dataset is obviously smaller it still spans the same 425 files. This is because we haven't sliced by raster location and are therefore taking one row of pixels from every file. To reduce the number of files any further we must look at fewer wavelengths:
+In this case, however, although the dataset is obviously smaller it still spans the same 425 files. This is because we haven't sliced by raster location and are therefore taking one row of pixels from every file. To reduce the number of files any further we must look at fewer raster step positions:
 
 ```{code-cell} ipython3
 feature = ds[0, 100:200, :, 638:-628]
