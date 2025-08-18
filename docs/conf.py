@@ -142,6 +142,7 @@ intersphinx_mapping = {
     "asdf": ("https://asdf.readthedocs.io/en/stable/", None),
     "dask": ("https://dask.pydata.org/en/stable/", None),
     "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
+    "data-products": ("https://docs.dkist.nso.edu/projects/data-products/en/stable/", None),
 }
 
 # -- Options for HTML output ---------------------------------------------------

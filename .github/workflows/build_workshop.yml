@@ -1,6 +1,9 @@
 name: Build Workshop Repo
 
 on:
+  push:
+    branches:
+      - "main"
   # Allow manual runs through the web UI
   workflow_dispatch:
   # Push to the main branch of the workshop repo on release
@@ -15,6 +18,15 @@ jobs:
   build_workshop:
     runs-on: ubuntu-latest
     steps:
+      # Make sure the branch name logic handles workflow_dispatch
+      - name: Branch name for releases
+        if: ${{ startsWith(github.ref_name, 'v') }}
+        run: echo 'BRANCHNAME=stable' >> "$GITHUB_ENV"
+
+      - name: Branch name for not releases
+        if: ${{ !startsWith(github.ref_name, 'v') }}
+        run: echo 'BRANCHNAME=latest' >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -39,9 +51,15 @@ jobs:
           fetch-depth: 0
           path: 'workshop'
           token: '${{ secrets.WORKSHOP_DEPLOY_TOKEN }}'
+          ref: '${{ env.BRANCHNAME }}'
+
+      - name: Purge all files
+        run: |
+          rm -r workshop/*
+          git -C workshop checkout README.md
 
       - name: Run pipx
-        run: pipx run ./tools/build_workshop_materials.py docs/tutorial workshop
+        run: pipx run ./tools/build_workshop_materials.py
 
       - name: Commit and Push
         run: |

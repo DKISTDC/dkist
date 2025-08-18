@@ -45,9 +45,9 @@ class DKISTFileManager:
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
 
     def __str__(self) -> str:
-        return dedent(f"""
+        return dedent(f"""\
             DKISTFileManager containing {len(self)} files stored in {self.basepath}.
-            Each file array has shape {self.shape}.
+            Each file array has shape {self.shape}.\
         """)
 
     def __repr__(self) -> str:

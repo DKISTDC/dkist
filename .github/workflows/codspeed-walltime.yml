@@ -1,34 +1,50 @@
 name: codspeed-walltime-benchmarks
 
 on:
-  push:
-    branches:
-      - "main"
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # runs daily at 00:00
   pull_request:
     types:
       - synchronize
       - labeled
+    paths:
+      - "dkist/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  schedule_checker:
+    runs-on: ubuntu-latest
+    outputs:
+      new_commit_count: ${{ steps.commit.outputs.new_commit_count }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get new commits
+        id: commit
+        run: echo "new_commit_count=$(git log --oneline --since '24 hours ago' | wc -l)" >> $GITHUB_OUTPUT
+
   walltime-benchmarks:
+    needs: schedule_checker
     if: |
-      github.event_name != 'pull_request' ||
-      (
-        github.event_name == 'pull_request' &&
-        contains(github.event.pull_request.labels.*.name, 'Run Walltime Benchmarks')
-      )
+      (github.event_name == 'schedule' && needs.schedule_checker.outputs.new_commit_count != '0') ||
+      (github.event_name == 'pull_request' &&
+        (
+          github.event_name == 'pull_request' &&
+          contains(github.event.pull_request.labels.*.name, 'Run Walltime Benchmarks')
+        )
+      ) ||
+      github.event_name == 'workflow_dispatch'
     runs-on: codspeed-macro
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install .[tests] pytest-codspeed
+      - name: Install requirements
+        run: python -m pip install .[tests] pytest-codspeed
       - name: Run benchmarks
         uses: CodspeedHQ/action@v3
         with:
