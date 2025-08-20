@@ -1,6 +1,7 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+
 id: "asdf://dkist.nso.edu/schemas/inversion-0.1.0"
 
 title:
@@ -9,7 +10,19 @@ title:
 type: object
 properties:
   meta:
+    description: Inversion metadata.
     type: object
+    properties:
+      headers:
+        description: A table of all the headers for the constituent files.
+        tag: "tag:astropy.org:astropy/table/table-1.*"
+
+      inventory:
+        description: A copy of the inventory record for this dataset.
+        type: object
+
+    required: [headers, inventory]
+    additionalProperties: true
   quantities:
     $ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
   profiles:

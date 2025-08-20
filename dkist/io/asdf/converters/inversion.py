@@ -8,11 +8,12 @@ class InversionConverter(NDCollectionConverter):
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.dataset.inversion import Inversion
 
-        aligned_axes = list(node["quantities"].get("aligned_axes").values())
-        aligned_axes = tuple(tuple(lst) for lst in aligned_axes)
+        # We are "promoting" the quantities NDCollection object to being the Inversion object
+        quantities = node["quantities"]
+        aligned_axes = tuple(quantities.aligned_axes[key] for key in quantities.keys())
         return Inversion(
-            node["quantities"]["items"],
-            meta=node.get("meta"),
+            node["quantities"],
+            meta=node["meta"],
             aligned_axes=aligned_axes,
             profiles=node["profiles"],
         )
