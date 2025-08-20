@@ -66,7 +66,7 @@ def test_subclass_warning_capture(caplog_dkist, capsys):
 def test_no_warning_capture(caplog_dkist, capsys):
     log.disable_warnings_capture()
 
-    with pytest.warns(match="Test warning"):
+    with pytest.warns(match="Test warning"):  # noqa: PT031
         with warnings.catch_warnings():
             # To ensure that disable works, we enable it and then disable it
             # again after pytest is done with all it's stuff
@@ -83,7 +83,7 @@ def test_no_warning_capture(caplog_dkist, capsys):
 def test_not_class_warning_capture(caplog_dkist, capsys):
     log.disable_warnings_capture()
 
-    with pytest.warns(match="Test warning"):
+    with pytest.warns(match="Test warning"):  # noqa: PT031
         with warnings.catch_warnings():
             # We must re-enable capture in the context manager
             log.enable_warnings_capture()

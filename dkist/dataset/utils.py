@@ -24,12 +24,14 @@ def get_array_repr(array):
 
 def dataset_info_str(ds_in):
     # Import here to remove circular import
-    from dkist.dataset import TiledDataset
+    from dkist.dataset import TiledDataset  # noqa: PLC0415
+
     is_tiled = isinstance(ds_in, TiledDataset)
     dstype = type(ds_in).__name__
     if is_tiled:
         tile_shape = ds_in.shape
-        ds = ds_in.flat[0]
+        # Not using .flat here for performance reasons
+        ds = ds_in._data.compressed()[0]
     else:
         ds = ds_in
     wcs = ds.wcs.low_level_wcs
@@ -48,9 +50,9 @@ def dataset_info_str(ds_in):
         if ds.files:
             s += "and \n"
 
-
     if ds.files:
-        nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in.flat])
+        # Not using .flat here for performance reasons
+        nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in._data.compressed()])
         s += f"consists of {nframes} frames.\n"
         s += f"Files are stored in {ds.files.basepath}\n"
 

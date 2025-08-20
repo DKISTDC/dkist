@@ -105,7 +105,7 @@ class Dataset(NDCube):
     _file_manager = FileManagerDescriptor(default_type=DKISTFileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
-                 unit=None, copy=False, **kwargs):
+                 unit=None, copy=False, psf=None, **kwargs):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
@@ -118,7 +118,7 @@ class Dataset(NDCube):
             raise ValueError("The meta dict must contain the inventory record.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
-                         unit=unit, copy=copy, **kwargs)
+                         unit=unit, copy=copy, psf=psf, **kwargs)
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
@@ -200,7 +200,7 @@ class Dataset(NDCube):
         Construct a `~dkist.dataset.Dataset` from a directory containing one
         asdf file and a collection of FITS files.
         """
-        from .loader import load_dataset
+        from .loader import load_dataset  # noqa: PLC0415
         return load_dataset(directory)
 
     @classmethod
@@ -209,7 +209,7 @@ class Dataset(NDCube):
         """
         Construct a dataset object from a filepath of a suitable asdf file.
         """
-        from .loader import load_dataset
+        from .loader import load_dataset  # noqa: PLC0415
         return load_dataset(filepath)
 
     """

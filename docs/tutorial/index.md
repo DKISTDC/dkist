@@ -13,6 +13,15 @@ By the end of this tutorial you should be familiar with how to:
 
 Before you get started with this tutorial follow {ref}`dkist:installation` to get Python and the ``dkist`` package installed.
 
+```{note}
+If you want to follow this tutorial interactively, you have two options.
+
+The easiest is to use an online service to run notebooks called [Binder ![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/DKISTDC/DKIST-Workshop/stable?urlpath=%2Ftree%2Findex.ipynb).
+The downside of this is that you can't use Globus to download files and some more complex visualization examples fail because of memory limitations.
+
+Alternatively we have instructions for running the tutorial as Jupyter Notebooks locally: {ref}`dkist:workshop_install`
+```
+
 
 **Contents**
 
@@ -20,8 +29,9 @@ Before you get started with this tutorial follow {ref}`dkist:installation` to ge
 :maxdepth: 1
 1_astropy_and_sunpy
 2_search_and_asdf_download
-3_the_dataset
-4_more_dataset
-5_downloading_data
-6_visualization
+3_dataset_dimensionality
+4_dataset_files
+5_tileddataset
+6_downloading_data
+7_visualization
 ```

@@ -1,10 +1,13 @@
 """
 This module provides some (partial) sample datasets.
 """
+import warnings as _warnings
 
-from ._sample import _SAMPLE_DATASETS, VISP_HEADER, _get_sample_datasets
+from dkist.utils.exceptions import DKISTDeprecationWarning as _DKISTDeprecationWarning
 
-__all__ = ["download_all_sample_data", *sorted(_SAMPLE_DATASETS.keys()), "VISP_HEADER"]  # noqa: PLE0604
+from ._sample import _DEPRECATED_NAMES, _SAMPLE_DATASETS, VISP_HEADER, _get_sample_datasets
+
+__all__ = ["download_all_sample_data", *sorted(_SAMPLE_DATASETS.keys()), *sorted(_DEPRECATED_NAMES.keys()), "VISP_HEADER"]  # noqa: PLE0604
 
 
 # See PEP 562 (https://peps.python.org/pep-0562/) for module-level __dir__()
@@ -16,6 +19,14 @@ def __dir__():
 def __getattr__(name):
     if name in _SAMPLE_DATASETS:
         return _get_sample_datasets(name)[0]
+
+    if name in _DEPRECATED_NAMES:
+        new_name = _DEPRECATED_NAMES[name]
+        _warnings.warn(
+            f"The sample data name {name} is deprecated and has been replaced by {new_name}.",
+            _DKISTDeprecationWarning,
+        )
+        return _get_sample_datasets(new_name)[0]
 
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 

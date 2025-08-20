@@ -1,60 +1,63 @@
-from functools import partial
+import warnings
 
-import dask.array as da
+import dask
 import numpy as np
+
+from dkist.utils.exceptions import DKISTDeprecationWarning
 
 __all__ = ["stack_loader_array"]
 
 
-def stack_loader_array(loader_array, chunksize):
+def stack_loader_array(loader_array, output_shape, chunksize=None):
     """
-    Stack a loader array along each of its dimensions.
+    Converts an array of loaders to a dask array that loads a chunk from each loader
 
     This results in a dask array with the correct chunks and dimensions.
 
     Parameters
     ----------
-    loader_array : `dkist.io.reference_collections.BaseFITSArrayContainer`
+    loader_array : `dkist.io.loaders.BaseFITSLoader`
+        An array of loader objects
+    output_shape : tuple[int]
+        The intended shape of the final array
+    chunksize : tuple[int]
+        Can be used to set a chunk size. If not provided, each batch is one chunk
 
     Returns
     -------
     array : `dask.array.Array`
     """
-    # If the chunksize isn't specified then use the whole array shape
-    chunksize = chunksize or loader_array.flat[0].shape
+    file_shape = loader_array.flat[0].shape
 
-    if loader_array.size == 1:
-        return tuple(loader_to_dask(loader_array, chunksize))[0]
-    if len(loader_array.shape) == 1:
-        return da.stack(loader_to_dask(loader_array, chunksize))
-    stacks = []
-    for i in range(loader_array.shape[0]):
-        stacks.append(stack_loader_array(loader_array[i], chunksize))
-    return da.stack(stacks)
+    tasks = {}
+    for i, loader in enumerate(loader_array.flat):
+        # The key identifies this chunk's position in the (partially-flattened) final data cube
+        key = ("load_files", i)
+        key += (0,) * len(file_shape)
+        # Each task will be to call _call_loader, with the loader as an argument
+        tasks[key] = (_call_loader, loader)
+
+    dsk = dask.highlevelgraph.HighLevelGraph.from_collections("load_files", tasks, dependencies=())
+    # Specifies that each chunk occupies a space of 1 pixel in the first dimension, and all the pixels in the others
+    chunks = (*((1,) * loader_array.size,), *((s,) for s in file_shape))
+    array = dask.array.Array(dsk,
+                             name="load_files",
+                             chunks=chunks,
+                             dtype=loader_array.flat[0].dtype)
+    # Now impose the higher dimensions on the data cube
+    array = array.reshape(output_shape)
+    if chunksize is not None:
+        warnings.warn("Using the dask file loader with a non-default chunksize is deprecated. "
+                      "If you see this warning loading an ASDF file please open an issue "
+                      "on GitHub: https://github.com/DKISTDC/dkist/issues", DKISTDeprecationWarning)
+        # If requested, re-chunk the array. Not sure this is optimal
+        new_chunks = (1,) * (array.ndim - len(chunksize)) + chunksize
+        array = array.rechunk(new_chunks)
+    return array
 
 
-def _partial_to_array(loader, *, meta, chunks):
-    # Set the name of the array to the filename, that should be unique within the array
-    return da.from_array(loader, meta=meta, chunks=chunks, name=loader.fileuri)
-
-
-def loader_to_dask(loader_array, chunksize):
-    """
-    Map a call to `dask.array.from_array` onto all the elements in ``loader_array``.
-
-    This is done so that an explicit ``meta=`` argument can be provided to
-    prevent loading data from disk.
-    """
-    if loader_array.size != 1 and len(loader_array.shape) != 1:
-        raise ValueError("Can only be used on one dimensional arrays")
-
-    loader_array = np.atleast_1d(loader_array)
-
-    # The meta argument to from array is used to determine properties of the
-    # array, such as dtype. We explicitly specify it here to prevent dask
-    # trying to auto calculate it by reading from the actual array on disk.
-    meta = np.zeros((0,), dtype=loader_array[0].dtype)
-
-    to_array = partial(_partial_to_array, meta=meta, chunks=chunksize)
-
-    return map(to_array, loader_array)
+def _call_loader(loader):
+    data = loader.data
+    # The data needs an extra dimension for the leading index of the intermediate data cube, which has a leading
+    # index for file number
+    return np.expand_dims(data, 0)

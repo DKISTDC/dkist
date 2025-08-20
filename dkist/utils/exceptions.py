@@ -14,3 +14,8 @@ class DKISTDeprecationWarning(DeprecationWarning, DKISTWarning):
     """
     A warning class to use when functionality will be changed or removed in a future version.
     """
+
+class DKISTOutOfDateError(Exception):
+    """
+    An exception to use when the dkist package is too old to read an ASDF.
+    """

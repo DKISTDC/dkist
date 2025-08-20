@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 
 import dkist
-from dkist.data.sample import VBI_AJQWW
+from dkist.data.sample import VBI_L1_NZJTB
 ```
 
 ## Obtaining some data
@@ -44,7 +44,7 @@ If you want to replace this dataset with your own dataset, see {ref}`dkist:howto
 Let's load the data with {obj}`dkist.load_dataset`:
 
 ```{code-cell} ipython3
-ds = dkist.load_dataset(VBI_AJQWW)
+ds = dkist.load_dataset(VBI_L1_NZJTB)
 ds
 ```
 
@@ -69,7 +69,7 @@ from ndcube import NDCube
 ```
 
 First, let us crop off the edges of all our tiles to remove some artifacts, and only select the first time step.
-To do this we use the {obj}`.TiledDataset.slice_tiles` helper which applies an array slice to each tile of the {obj}`.TiledDataset` object.
+To do this we use the {obj}`~dkist.TiledDataset.slice_tiles` helper which applies an array slice to each tile of the {obj}`~dkist.TiledDataset` object.
 
 ```{code-cell} ipython3
 first_tiles = ds.slice_tiles[0, 100:-100, 100:-100]

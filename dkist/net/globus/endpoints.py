@@ -62,7 +62,7 @@ def get_data_center_endpoint_id():
 
     The endpoint ID is retrieved from the configured dataset searcher endpoint.
     """
-    from dkist.net import conf
+    from dkist.net import conf  # noqa: PLC0415
 
     data = urllib.request.urlopen(conf.dataset_endpoint + conf.dataset_config_path)
     data = json.loads(data.read())

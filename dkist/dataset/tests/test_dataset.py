@@ -59,7 +59,7 @@ def test_repr_numpy(dataset):
     assert f"{dataset.data.dtype}" in r
 
 
-@pytest.mark.accept_cli_dataset
+@pytest.mark.accept_cli_tiled_dataset
 def test_flat_repr(large_tiled_dataset):
     r = repr(large_tiled_dataset.flat)
     assert f"is an array of ({len(large_tiled_dataset.flat)},) Dataset objects" in r
@@ -107,19 +107,19 @@ def test_load_tiled_dataset():
 
 
 def test_load_with_old_methods():
-    with pytest.warns(DKISTDeprecationWarning):
+    with pytest.warns(DKISTDeprecationWarning, match="load_dataset"):
         ds = Dataset.from_directory(rootdir / "EIT")
-        assert isinstance(ds.data, da.Array)
-        assert isinstance(ds.wcs, gwcs.WCS)
-        assert_quantity_allclose(ds.data.shape, (11, 128, 128))
-        assert ds.files.basepath == Path(rootdir / "EIT")
+    assert isinstance(ds.data, da.Array)
+    assert isinstance(ds.wcs, gwcs.WCS)
+    assert_quantity_allclose(ds.data.shape, (11, 128, 128))
+    assert ds.files.basepath == Path(rootdir / "EIT")
 
-    with pytest.warns(DKISTDeprecationWarning):
+    with pytest.warns(DKISTDeprecationWarning, match="load_dataset"):
         ds = Dataset.from_asdf(rootdir / "EIT" / "eit_test_dataset.asdf")
-        assert isinstance(ds.data, da.Array)
-        assert isinstance(ds.wcs, gwcs.WCS)
-        assert_quantity_allclose(ds.data.shape, (11, 128, 128))
-        assert ds.files.basepath == Path(rootdir / "EIT")
+    assert isinstance(ds.data, da.Array)
+    assert isinstance(ds.wcs, gwcs.WCS)
+    assert_quantity_allclose(ds.data.shape, (11, 128, 128))
+    assert ds.files.basepath == Path(rootdir / "EIT")
 
 
 def test_from_directory_not_dir():

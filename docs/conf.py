@@ -102,8 +102,7 @@ extensions = [
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "jupyter_execute", "**/*_NOTES.md"]
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext"}
 
 myst_enable_extensions = ["colon_fence", "dollarmath", "substitution"]
 
@@ -142,6 +141,7 @@ intersphinx_mapping = {
     "asdf": ("https://asdf.readthedocs.io/en/stable/", None),
     "dask": ("https://dask.pydata.org/en/stable/", None),
     "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
+    "data-products": ("https://docs.dkist.nso.edu/projects/data-products/en/stable/", None),
 }
 
 # -- Options for HTML output ---------------------------------------------------

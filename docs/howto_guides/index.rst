@@ -12,5 +12,5 @@ If you're starting fresh you might want to check out the :ref:`dkist:tutorial:in
 
    sample_data
    replacing_asdfs
-   asdf_warnings
+   asdf_version_requirements
    config
