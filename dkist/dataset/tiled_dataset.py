@@ -5,6 +5,7 @@ A tiled dataset is a "dataset" in terms of how it's provided by the DKIST DC,
 but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
+
 import os
 import copy
 import types
@@ -47,7 +48,9 @@ class TiledDatasetFileManager:
         basepath = self._parent.flat[0].files.basepath
         for tile in self._parent.flat:
             if basepath != tile.files.basepath:
-                raise ValueError("Not all tiles share the same basepath. Use 'TiledDataset.files.basepath = <new_path>' to set basepath on all tiles.")
+                raise ValueError(
+                    "Not all tiles share the same basepath. Use 'TiledDataset.files.basepath = <new_path>' to set basepath on all tiles."
+                )
         return basepath
 
     @basepath.setter
@@ -71,6 +74,7 @@ class TiledDatasetSlicer:
     """
     Basic class to provide the slicing
     """
+
     def __init__(self, data, meta):
         self.data = data
         self.meta = meta
@@ -132,7 +136,7 @@ class TiledDataset(Collection):
         inventory: dict[Any, Any] | None = None,
         mask: NDArray[np.bool_] | None = None,
         *,
-        meta: dict[Any, Any] | None = None
+        meta: dict[Any, Any] | None = None,
     ):
         if inventory is not None:
             warnings.warn(
@@ -153,7 +157,7 @@ class TiledDataset(Collection):
 
             # Then distribute headers (back) out to component Datasets as slices of the main Table
             for i, ds in enumerate(self._data.compressed()):
-                ds.meta["headers"] = meta["headers"][offsets[i]:offsets[i]+sizes[i]]
+                ds.meta["headers"] = meta["headers"][offsets[i] : offsets[i] + sizes[i]]
 
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
@@ -187,7 +191,9 @@ class TiledDataset(Collection):
             if ds.wcs.world_axis_physical_types != pt_1:
                 raise ValueError("The physical types do not match between all datasets")
             if ds.meta["inventory"] and ds.meta["inventory"] is not inventory:
-                raise ValueError("The inventory records of all the datasets do not match the one passed to TiledDataset")
+                raise ValueError(
+                    "The inventory records of all the datasets do not match the one passed to TiledDataset"
+                )
         return True
 
     @property
@@ -266,7 +272,8 @@ class TiledDataset(Collection):
         share_zscale: bool = False,
         figure: matplotlib.figure.Figure | None = None,
         swap_tile_limits: Literal["x", "y", "xy"] | None = None,
-        **kwargs
+        hide_internal_tick_labels: bool = False,
+        **kwargs,
     ):
         """
         Plot a slice of each tile in the TiledDataset
@@ -294,9 +301,11 @@ class TiledDataset(Collection):
             raise RuntimeError("swap_tile_limits must be one of ['x', 'y', 'xy', None]")
 
         if len(self.meta.get("history", {}).get("entries", [])) == 0:
-            warnings.warn("The metadata ASDF file that produced this dataset is out of date and "
-                          "will result in incorrect plots. Please re-download the metadata ASDF file.",
-                          DKISTUserWarning)
+            warnings.warn(
+                "The metadata ASDF file that produced this dataset is out of date and "
+                "will result in incorrect plots. Please re-download the metadata ASDF file.",
+                DKISTUserWarning,
+            )
 
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
@@ -335,6 +344,11 @@ class TiledDataset(Collection):
 
                 ax.set_ylabel(" ")
                 ax.set_xlabel(" ")
+                if hide_internal_tick_labels:
+                    if col != 0:
+                        ax.tick_params(axis="y", labelsize=0)
+                    if row != 0:
+                        ax.tick_params(axis="x", labelsize=0)
                 if col == row == 0:
                     xlabel, ylabel = self._get_axislabels(ax)
                     figure.supxlabel(xlabel, y=0.05)
@@ -354,8 +368,10 @@ class TiledDataset(Collection):
                 val = val.iso
             if coord == "stokes":
                 val = val.symbol
-            title += f"{coord} {val}" + (", " if i != len(slice_index)-1 else " ")
-        title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace("slice(None, None, None)", ":")
+            title += f"{coord} {val}" + (", " if i != len(slice_index) - 1 else " ")
+        title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace(
+            "slice(None, None, None)", ":"
+        )
         figure.suptitle(title, y=0.95)
         return figure
 
