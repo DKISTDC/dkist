@@ -342,6 +342,8 @@ class TiledDataset(Collection):
                 if swap_tile_limits in ["y", "xy"]:
                     ax.invert_yaxis()
 
+                if col == row == 0:
+                    xlabel, ylabel = self._get_axislabels(ax)
                 ax.set_ylabel(" ")
                 ax.set_xlabel(" ")
                 if hide_internal_tick_labels:
@@ -350,7 +352,6 @@ class TiledDataset(Collection):
                     if row != 0:
                         ax.tick_params(axis="x", labelsize=0)
                 if col == row == 0:
-                    xlabel, ylabel = self._get_axislabels(ax)
                     figure.supxlabel(xlabel, y=0.05)
                     figure.supylabel(ylabel, x=0.05)
 
