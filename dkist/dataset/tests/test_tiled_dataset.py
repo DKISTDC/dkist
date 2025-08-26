@@ -189,6 +189,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
 
     return plt.gcf()
 
+@figure_test
 @pytest.mark.remote_data
 def test_tileddataset_plot_non2d_sliceindex():
     from dkist.data.sample import VBI_L1_NZJTB  # noqa: PLC0415
@@ -212,6 +213,9 @@ def test_tileddataset_plot_non2d_sliceindex():
         with pytest.raises(ValueError, match=re.escape("Applying slice '(0,)' to this dataset resulted in a 1 "
                 "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile.")):
             already_sliced_ds.plot(0, figure=fig)
+
+    return fig
+
 
 @pytest.mark.accept_cli_tiled_dataset
 def test_repr(simple_tiled_dataset):
