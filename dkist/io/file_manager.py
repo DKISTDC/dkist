@@ -46,7 +46,8 @@ class DKISTFileManager:
 
     def __str__(self) -> str:
         return dedent(f"""\
-            DKISTFileManager containing {len(self)} files stored in {self.basepath}.
+            DKISTFileManager containing {len(self)} files.
+            Once downloaded, these files will be stored in {self.basepath}.
             Each file array has shape {self.shape}.\
         """)
 
