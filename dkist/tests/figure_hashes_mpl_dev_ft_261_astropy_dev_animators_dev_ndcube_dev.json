@@ -1,4 +1,11 @@
 {
+  "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice0]": "f3cd5b87ef5d109090bf3183c7edbcdd8398d083417b2564991c4515bddbc8bf",
+  "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice1]": "753909f9ae5d03a03d18513783c22501784460d7f93851fd40e8ddfd493dcb6c",
+  "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice2]": "ca45c084e38d46e5e13ef16b50d1d1b0df170e560bf263330b11582f40a878c3",
+  "dkist.dataset.tests.test_plotting.test_2d_plot[aslice0]": "b31423d5ec45941849564f4ec7e276f2c52a0fa5038ce0b3c8d4af1b7f848a1d",
+  "dkist.dataset.tests.test_plotting.test_2d_plot[aslice1]": "cbb84fbae51d8238803f8f0d6820c575f024fe54b1656f1b181dc4ec645e9ff9",
+  "dkist.dataset.tests.test_plotting.test_2d_plot[aslice2]": "4b5be9cf1883d0ebd15ff091f52cea2822068e8238a8df7b0f594d69fba27597",
+  "dkist.dataset.tests.test_plotting.test_2d_plot2": "1c10e9db44b0b694a6bb1b493c4c2193278541df7c1302bb11fe3f6372682e35",
   "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[tick_labels_displayed-share_zscale]": "0111d4529c08fd20462b5e99c236386991990b001a5f01b8bcdecd1a3a0531e8",
   "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[tick_labels_displayed-indpendent_zscale]": "d407cbd2d550ceb1ca84e100ae0257480eeab2f0b5f11ffa0eac388946399968",
   "dkist.dataset.tests.test_tiled_dataset.test_tileddataset_plot[tick_labels_hidden-share_zscale]": "6b804b226ae9941dac17c79e6c5b13cb75a057e92aed11510f190bba97d90d8b",
