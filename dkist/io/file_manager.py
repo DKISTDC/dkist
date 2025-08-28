@@ -90,9 +90,6 @@ class DKISTFileManager:
     def __getattr__(self, attr):
         # We want to proxy a fixed list of public API:
         proxy_api = [
-            "__eq__",
-            "__len__",
-            "__str__",
             "fileuri_array",
             "shape",
             "output_shape",
