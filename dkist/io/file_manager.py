@@ -65,6 +65,12 @@ class DKISTFileManager:
     def __getitem__(self, item):
         return self._fm.__getitem__(item)
 
+    def __str__(self):
+        return FileManager.__str__(self)
+
+    def __repr__(self):
+        return FileManager.__repr__(self)
+
     @property
     def basepath(self) -> os.PathLike:
         """

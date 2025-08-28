@@ -187,12 +187,6 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     def __getattr__(self, attr):
         return getattr(self.parent, attr)
 
-    def __str__(self):
-        return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
-
-    def __repr__(self):
-        return f"{object.__repr__(self)}\n{self}"
-
     @property
     def basepath(self) -> os.PathLike:
         """
@@ -255,11 +249,11 @@ class FileManager:
     def __len__(self):
         return len(self._striped_external_array)
 
-    def __str__(self) -> str:
-        return f"FileManager containing {len(self)} files with each array having shape {self.shape}"
+    def __str__(self):
+        return StripedExternalArray.__str__(self)
 
     def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+        return StripedExternalArray.__repr__(self)
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)
