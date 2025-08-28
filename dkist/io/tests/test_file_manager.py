@@ -235,10 +235,10 @@ def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_m
 
 
 def test_dkist_file_manager_repr(large_visp_dataset):
-    assert "DKISTFileManager containing 80 files stored in" in repr(large_visp_dataset.files)
-    assert "Each file array has shape (1, 50, 128)" in repr(large_visp_dataset.files)
+    assert "DKISTFileManager containing 80 files." in repr(large_visp_dataset.files)
+    assert "(4, 20) array, and each file contains a (1, 50, 128) data array" in repr(large_visp_dataset.files)
 
 
 def test_tiled_dataset_file_manager_repr(large_tiled_dataset):
-    assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files stored in" in repr(large_tiled_dataset.files)
-    assert "Each file array has shape (1, 4096, 4096)" in repr(large_tiled_dataset.files)
+    assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files." in repr(large_tiled_dataset.files)
+    assert "each file contains a (1, 4096, 4096) data array" in repr(large_tiled_dataset.files)
