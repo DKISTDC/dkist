@@ -128,7 +128,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         return dedent(f"""\
             {type(self).__name__} containing {len(self)} files.
             Once downloaded, these files will be stored in {self.basepath}.
-            Each file array has shape {self.shape}.\
+            The files are arranged in a {self.fileuri_array.shape} array, and each file contains a {self.shape} data array."\
         """)
 
     def __repr__(self) -> str:
