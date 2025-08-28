@@ -187,6 +187,12 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     def __getattr__(self, attr):
         return getattr(self.parent, attr)
 
+    def __str__(self):
+        return self.parent.__str__()
+
+    def __repr__(self) -> str:
+        return self.parent.__repr__()
+
     @property
     def basepath(self) -> os.PathLike:
         """
