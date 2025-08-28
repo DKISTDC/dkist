@@ -16,6 +16,7 @@ import os
 import abc
 from typing import Any
 from pathlib import Path
+from textwrap import dedent
 from collections.abc import Iterable
 
 import dask.array
@@ -124,7 +125,11 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._loader_array = loader_array
 
     def __str__(self) -> str:
-        return f"FITSLoader {len(self)} files with shape {self.shape}"
+        return dedent(f"""\
+            {type(self).__name__} containing {len(self)} files.
+            Once downloaded, these files will be stored in {self.basepath}.
+            Each file array has shape {self.shape}.\
+        """)
 
     def __repr__(self) -> str:
         return f"{object.__repr__(self)}\n{self}"

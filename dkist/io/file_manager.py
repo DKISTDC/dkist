@@ -7,7 +7,6 @@ import json
 import urllib
 from typing import Any, Protocol
 from pathlib import Path
-from textwrap import dedent
 
 from parfive import Downloader, Results
 
@@ -43,16 +42,6 @@ class DKISTFileManager:
     files from.
     """
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
-
-    def __str__(self) -> str:
-        return dedent(f"""\
-            DKISTFileManager containing {len(self)} files.
-            Once downloaded, these files will be stored in {self.basepath}.
-            Each file array has shape {self.shape}.\
-        """)
-
-    def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
