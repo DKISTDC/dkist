@@ -27,7 +27,7 @@ jobs:
         if: ${{ !startsWith(github.ref_name, 'v') }}
         run: echo 'BRANCHNAME=latest' >> "$GITHUB_ENV"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -45,7 +45,7 @@ jobs:
         run: pip install -U pipx
 
       - name: Clone workshop repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'DKISTDC/DKIST-Workshop'
           fetch-depth: 0
