@@ -242,3 +242,12 @@ def test_dkist_file_manager_repr(large_visp_dataset):
 def test_tiled_dataset_file_manager_repr(large_tiled_dataset):
     assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files." in repr(large_tiled_dataset.files)
     assert "each file contains a (1, 4096, 4096) data array" in repr(large_tiled_dataset.files)
+
+    x, y = large_tiled_dataset.shape
+    for r in range(y):
+        for c in range(x):
+            tile = large_tiled_dataset[r, c]
+            if isinstance(tile, np.ma.core.MaskedConstant):
+                assert (large_tiled_dataset.files.fileuri_array[r, c] == "").all()
+            else:
+                assert (tile.files.fileuri_array == large_tiled_dataset.files.fileuri_array[r, c]).all()
