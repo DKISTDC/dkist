@@ -21,7 +21,7 @@ jobs:
     outputs:
       new_commit_count: ${{ steps.commit.outputs.new_commit_count }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get new commits
         id: commit
         run: echo "new_commit_count=$(git log --oneline --since '24 hours ago' | wc -l)" >> $GITHUB_OUTPUT
@@ -39,7 +39,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: codspeed-macro
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
