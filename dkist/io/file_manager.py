@@ -30,6 +30,12 @@ class FileManagerProtocol(Protocol):
     @property
     def filenames(self) -> list[str]: ...
 
+    @property
+    def fileuri_array(self) -> list: ...
+
+    @property
+    def shape(self) -> tuple: ...
+
 
 class DKISTFileManager:
     """

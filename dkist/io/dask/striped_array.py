@@ -132,7 +132,7 @@ class StripedExternalArray(BaseStripedExternalArray):
             The files are arranged in a {self.fileuri_array.shape} array, and each file contains a {self.shape} data array."\
         """)
 
-    def __repr__(self) -> str:
+    def __repr__(self: FileManagerProtocol) -> str:
         return f"{object.__repr__(self)}\n{self}"
 
     @property
