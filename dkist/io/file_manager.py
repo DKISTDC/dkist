@@ -44,8 +44,7 @@ class DKISTFileManager:
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
-        # Here to avoid circular import
-        from dkist.io.dask.striped_array import FileManager
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
         return cls(
             FileManager.from_parts(
                 fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=chunksize
@@ -68,12 +67,12 @@ class DKISTFileManager:
 
     def __str__(self):
         # Here to avoid circular import
-        from dkist.io.dask.striped_array import FileManager
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
         return FileManager.__str__(self)
 
     def __repr__(self):
         # Here to avoid circular import
-        from dkist.io.dask.striped_array import FileManager
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
         return FileManager.__repr__(self)
 
     @property
