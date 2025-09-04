@@ -188,10 +188,10 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         return getattr(self.parent, attr)
 
     def __str__(self):
-        return self.parent.__str__()
+        return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
 
     def __repr__(self) -> str:
-        return self.parent.__repr__()
+        return f"{object.__repr__(self)}\n{self}"
 
     @property
     def basepath(self) -> os.PathLike:
