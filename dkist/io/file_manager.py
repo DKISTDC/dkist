@@ -11,7 +11,6 @@ from pathlib import Path
 from parfive import Downloader, Results
 
 from dkist import log
-from dkist.io.dask.striped_array import FileManager
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
@@ -45,6 +44,8 @@ class DKISTFileManager:
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
+        # Here to avoid circular import
+        from dkist.io.dask.striped_array import FileManager
         return cls(
             FileManager.from_parts(
                 fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=chunksize
@@ -66,9 +67,13 @@ class DKISTFileManager:
         return self._fm.__getitem__(item)
 
     def __str__(self):
+        # Here to avoid circular import
+        from dkist.io.dask.striped_array import FileManager
         return FileManager.__str__(self)
 
     def __repr__(self):
+        # Here to avoid circular import
+        from dkist.io.dask.striped_array import FileManager
         return FileManager.__repr__(self)
 
     @property
