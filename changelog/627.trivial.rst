@@ -1,0 +1,2 @@
+Clarifies wording about size and arrangement of files.
+Restructures the internals of FileManager slightly to make it inherit more cleanly.

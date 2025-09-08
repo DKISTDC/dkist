@@ -7,12 +7,10 @@ import json
 import urllib
 from typing import Any, Protocol
 from pathlib import Path
-from textwrap import dedent
 
 from parfive import Downloader, Results
 
 from dkist import log
-from dkist.io.dask.striped_array import FileManager
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
@@ -32,6 +30,12 @@ class FileManagerProtocol(Protocol):
     @property
     def filenames(self) -> list[str]: ...
 
+    @property
+    def fileuri_array(self) -> list: ...
+
+    @property
+    def shape(self) -> tuple: ...
+
 
 class DKISTFileManager:
     """
@@ -44,17 +48,9 @@ class DKISTFileManager:
     """
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
 
-    def __str__(self) -> str:
-        return dedent(f"""\
-            DKISTFileManager containing {len(self)} files stored in {self.basepath}.
-            Each file array has shape {self.shape}.\
-        """)
-
-    def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
-
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
         return cls(
             FileManager.from_parts(
                 fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=chunksize
@@ -75,6 +71,16 @@ class DKISTFileManager:
     def __getitem__(self, item):
         return self._fm.__getitem__(item)
 
+    def __str__(self):
+        # Here to avoid circular import
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
+        return FileManager.__str__(self)
+
+    def __repr__(self):
+        # Here to avoid circular import
+        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
+        return FileManager.__repr__(self)
+
     @property
     def basepath(self) -> os.PathLike:
         """
@@ -89,9 +95,6 @@ class DKISTFileManager:
     def __getattr__(self, attr):
         # We want to proxy a fixed list of public API:
         proxy_api = [
-            "__eq__",
-            "__len__",
-            "__str__",
             "fileuri_array",
             "shape",
             "output_shape",

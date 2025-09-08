@@ -16,6 +16,7 @@ import os
 import abc
 from typing import Any
 from pathlib import Path
+from textwrap import dedent
 from collections.abc import Iterable
 
 import dask.array
@@ -26,6 +27,7 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
+from dkist.io.file_manager import FileManagerProtocol
 
 __all__ = ["FileManager", "StripedExternalArray"]
 
@@ -123,10 +125,14 @@ class StripedExternalArray(BaseStripedExternalArray):
 
         self._loader_array = loader_array
 
-    def __str__(self) -> str:
-        return f"FITSLoader {len(self)} files with shape {self.shape}"
+    def __str__(self: FileManagerProtocol) -> str:
+        return dedent(f"""\
+            {type(self).__name__} containing {len(self)} files.
+            Once downloaded, these files will be stored in {self.basepath}.
+            The files are arranged in a {self.fileuri_array.shape} array, and each file contains a {self.shape} data array."\
+        """)
 
-    def __repr__(self) -> str:
+    def __repr__(self: FileManagerProtocol) -> str:
         return f"{object.__repr__(self)}\n{self}"
 
     @property
@@ -185,7 +191,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     def __str__(self):
         return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{object.__repr__(self)}\n{self}"
 
     @property
@@ -250,11 +256,11 @@ class FileManager:
     def __len__(self):
         return len(self._striped_external_array)
 
-    def __str__(self) -> str:
-        return f"FileManager containing {len(self)} files with each array having shape {self.shape}"
+    def __str__(self):
+        return StripedExternalArray.__str__(self)
 
     def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+        return StripedExternalArray.__repr__(self)
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)
