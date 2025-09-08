@@ -17,7 +17,7 @@ def test_inversion(inversion):
 
 def test_str(inversion):
     r = repr(inversion)
-    keys = "('optical_depth', 'temperature', 'electron_pressure', 'micro_turbulence', 'mag_strength', 'velocity', 'mag_inclination', 'mag_azimuth', 'geo_height', 'gas_pressure', 'density')"
+    keys = "('optical_depth', 'temperature', 'electron_pressure', 'microturbulence', 'mag_strength', 'velocity', 'mag_inclination', 'mag_azimuth', 'geo_height', 'gas_pressure', 'density')"
     assert keys in r
     # Ordering of axes appears to be random causing 50% chance of test failure
     aligned_order1 = "[('pos.eq.ra', 'pos.eq.dec'), ('pos.eq.ra', 'pos.eq.dec'), ('custom:optical_depth',)]"
