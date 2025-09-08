@@ -274,7 +274,6 @@ def _load_l2_from_asdf(filepath, *, ignore_version_mismatch=False):
             importlib_resources.files("dkist.io") / "level_2_dataset_schema.yaml"
         ) as schema_path:
             with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
-            # with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
                 if not ignore_version_mismatch:
                     _check_dkist_version(filepath, ff)
                 inv = ff.tree["inversion"]
