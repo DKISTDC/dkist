@@ -106,7 +106,8 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
 @figure_test
 @pytest.mark.remote_data
 @pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
-def test_tileddataset_plot(share_zscale):
+@pytest.mark.parametrize("hide_labels", [True, False], ids=["tick_labels_displayed", "tick_labels_hidden"])
+def test_tileddataset_plot(share_zscale, hide_labels):
     from dkist.data.sample import VBI_L1_NZJTB  # noqa: PLC0415
     ori_ds = load_dataset(VBI_L1_NZJTB)
 
@@ -124,7 +125,7 @@ def test_tileddataset_plot(share_zscale):
                       match="The metadata ASDF file that produced this dataset is out of date and will result in "
                             "incorrect plots. Please re-download the metadata ASDF file."):
         #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
-        ds.plot(0, share_zscale=share_zscale, figure=fig)
+        ds.plot(0, share_zscale=share_zscale, hide_internal_tick_labels=hide_labels, figure=fig)
 
     return plt.gcf()
 
@@ -189,6 +190,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
 
     return plt.gcf()
 
+@figure_test
 @pytest.mark.remote_data
 def test_tileddataset_plot_non2d_sliceindex():
     from dkist.data.sample import VBI_L1_NZJTB  # noqa: PLC0415
@@ -212,6 +214,9 @@ def test_tileddataset_plot_non2d_sliceindex():
         with pytest.raises(ValueError, match=re.escape("Applying slice '(0,)' to this dataset resulted in a 1 "
                 "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile.")):
             already_sliced_ds.plot(0, figure=fig)
+
+    return fig
+
 
 @pytest.mark.accept_cli_tiled_dataset
 def test_repr(simple_tiled_dataset):
