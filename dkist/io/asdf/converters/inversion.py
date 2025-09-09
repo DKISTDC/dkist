@@ -11,9 +11,10 @@ class InversionConverter(NDCollectionConverter):
         # We are "promoting" the quantities NDCollection object to being the Inversion object
         quantities = node["quantities"]
         aligned_axes = tuple(quantities.aligned_axes[key] for key in quantities.keys())
+        meta = {**quantities.meta, **node["meta"]}
         return Inversion(
             node["quantities"],
-            meta=node["meta"],
+            meta=meta,
             aligned_axes=aligned_axes,
             profiles=node["profiles"],
         )
