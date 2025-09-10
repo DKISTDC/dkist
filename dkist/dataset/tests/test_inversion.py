@@ -1,3 +1,5 @@
+from itertools import product, permutations
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -12,17 +14,21 @@ def test_inversion(inversion):
     assert isinstance(inversion["temperature"], Dataset)
     assert len(inversion) == 11
     assert isinstance(inversion.profiles, Profiles)
-    assert len(inversion.profiles.items()) == 4
+    assert len(inversion.profiles.items()) == 6
 
 
 def test_str(inversion):
     r = repr(inversion)
     keys = "('optical_depth', 'temperature', 'electron_pressure', 'microturbulence', 'mag_strength', 'velocity', 'mag_inclination', 'mag_azimuth', 'geo_height', 'gas_pressure', 'density')"
     assert keys in r
-    # Ordering of axes appears to be random causing 50% chance of test failure
-    aligned_order1 = "[('pos.eq.ra', 'pos.eq.dec'), ('pos.eq.ra', 'pos.eq.dec'), ('custom:optical_depth',)]"
-    aligned_order2 = "[('pos.eq.dec', 'pos.eq.ra'), ('pos.eq.dec', 'pos.eq.ra'), ('custom:optical_depth',)]"
-    assert aligned_order1 in r or aligned_order2 in r
+    # Ordering of axes appears to be random causing high chance of test failure
+    # Therefore we need to check every possible combination of axis keys
+    item0keys = ("time", "custom:pos.helioprojective.lat", "custom:pos.helioprojective.lon")
+    item1keys = ("custom:pos.helioprojective.lat", "phys.polarization.stokes", "custom:pos.helioprojective.lon")
+    item0_pmtns = list(permutations(item0keys))
+    item1_pmtns = list(permutations(item1keys))
+    allorders = [str([i0, i1, ("phys.absorption.opticalDepth",)]) for (i0, i1) in product(item0_pmtns, item1_pmtns)]
+    assert any([s in r for s in allorders])  #noqa:C419
 
 
 def test_get_item(inversion):
