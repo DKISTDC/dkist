@@ -14,7 +14,7 @@ class ProfilesConverter(NDCollectionConverter):
 
     def to_yaml_tree(self, inversion, tag, ctx):
         node = {}
-        node["profiles"] = super().to_yaml_tree(profiles, tag, ctx)
+        node["profiles"] = super().to_yaml_tree(inversion, tag, ctx)
         if "meta" in node["profiles"]:
             node["meta"] = node["profiles"].pop("meta")
         return node
