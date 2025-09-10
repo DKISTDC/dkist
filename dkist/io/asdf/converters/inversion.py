@@ -3,7 +3,7 @@ from ndcube.asdf.converters.ndcollection_converter import NDCollectionConverter
 
 class InversionConverter(NDCollectionConverter):
     tags = ["asdf://dkist.nso.edu/tags/inversion-0.1.0"]
-    types = ["dkist.dataset.l2_dataset.Inversion"]
+    types = ["dkist.dataset.inversion.Inversion"]
 
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.dataset.inversion import Inversion

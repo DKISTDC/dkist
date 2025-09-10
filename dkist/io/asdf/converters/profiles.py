@@ -3,7 +3,7 @@ from ndcube.asdf.converters.ndcollection_converter import NDCollectionConverter
 
 class ProfilesConverter(NDCollectionConverter):
     tags = ["asdf://dkist.nso.edu/tags/profiles-0.1.0"]
-    types = ["dkist.dataset.l2_dataset.Profiles"]
+    types = ["dkist.dataset.inversion.Profiles"]
 
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.dataset.inversion import Profiles
