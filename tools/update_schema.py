@@ -28,7 +28,16 @@ def main(schema_name, schema_increment_type="minor", manifest_increment_type="mi
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
+    argp.add_argument("schema_name", help="Name of the schema to add or update.")
+    argp.add_argument("schema_increment_type", help="Increment to apply to the schema version."
+                      "Ignored when creating a new schema."
+                      "Must be 'major', 'minor' or 'bugfix'."
+                      "(Default 'minor')")
+    argp.add_argument("manifest_increment_type", help="Increment to apply to the manifest version."
+                      "Must be 'major', 'minor' or 'bugfix'."
+                      "(Default 'minor')")
+    argp.add_argument("base_branch", help="Branch of the git repo used to determine latest version numbers.")
 
     args = argp.parse_args(sys.argv[1:])
 
-    main()
+    main(schema_name, args.schema_increment_type, args.manifest_increment_type, argp.base_branch)
