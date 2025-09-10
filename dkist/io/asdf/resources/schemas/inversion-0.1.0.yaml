@@ -1,7 +1,6 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-
 id: "asdf://dkist.nso.edu/schemas/inversion-0.1.0"
 
 title:
@@ -26,7 +25,7 @@ properties:
   quantities:
     $ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
   profiles:
-    $ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
+    $ref: "asdf://dkist.nso.edu/schemas/profiles-0.1.0"
 
 required: [meta, quantities, profiles]
 additionalProperties: true
