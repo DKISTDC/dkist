@@ -1,3 +1,4 @@
+from ndcube import NDCollection
 from ndcube.asdf.converters.ndcollection_converter import NDCollectionConverter
 
 
@@ -21,8 +22,12 @@ class InversionConverter(NDCollectionConverter):
 
     def to_yaml_tree(self, inversion, tag, ctx):
         node = {}
-        node["quantities"] = super().to_yaml_tree(inversion, tag, ctx)
+        aligned_axes = list(inversion.aligned_axes.values())
+        aligned_axes = tuple(tuple(lst) for lst in aligned_axes)
+        node["quantities"] = NDCollection(inversion.items(), meta=inversion.meta, aligned_axes=aligned_axes)
+        meta = {}
         if "meta" in node["quantities"]:
-            node["meta"] = node["quantities"].pop("meta")
+            meta = node["quantities"].pop("meta")
+        node["meta"] = {**inversion.meta, **meta}
         node["profiles"] = inversion.profiles
         return node
