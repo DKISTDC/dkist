@@ -11,10 +11,3 @@ class ProfilesConverter(NDCollectionConverter):
         aligned_axes = list(node.get("aligned_axes").values())
         aligned_axes = tuple(tuple(lst) for lst in aligned_axes)
         return Profiles(node["items"], meta=node.get("meta"), aligned_axes=aligned_axes)
-
-    def to_yaml_tree(self, inversion, tag, ctx):
-        node = {}
-        node["profiles"] = super().to_yaml_tree(inversion, tag, ctx)
-        if "meta" in node["profiles"]:
-            node["meta"] = node["profiles"].pop("meta")
-        return node
