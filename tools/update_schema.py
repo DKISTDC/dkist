@@ -62,10 +62,26 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     lines.insert(linenum, new_ext_line)
     with open(entrypoints, mode="w") as f:
         f.write("".join(lines))
+
     # if schema exists on base_branch:
     if old_schema:
-        #   increment schema_uri and tag_uri
-        pass
+        #   increment schema_uri and tag_uri in manifest
+        with open(new_mani_file) as f:
+            lines = f.readlines()
+
+        old_id_line = f"id: asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}\n"
+        linenum = lines.index(old_id_line)
+        lines[linenum] = lines[linenum].replace(old_mani_ver, new_mani_ver)
+        lines[linenum+1] = lines[linenum+1].replace(old_mani_ver, new_mani_ver)
+
+        old_schema_line = f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-{old_sche_ver}"\n'
+        linenum = lines.index(old_schema_line)
+        lines[linenum] = lines[linenum].replace(old_sche_ver, new_sche_ver)
+        lines[linenum+1] = lines[linenum+1].replace(old_sche_ver, new_sche_ver)
+
+        with open(new_mani_file, mode="w") as f:
+            f.write("".join(lines))
+
     # if !(schema exists) on base branch:
     else:
         #   add schema_uri and tag_uri
