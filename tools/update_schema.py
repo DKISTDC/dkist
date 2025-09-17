@@ -6,7 +6,6 @@
 This script adds and updates the appropriate files to update the version of an ASDF schema.
 """
 
-import re
 import sys
 import shutil
 import pathlib
@@ -50,7 +49,7 @@ def make_new_file(dir, name):
 
 
 def pascalcase(string):
-    parts = re.split("-|_", string)
+    parts = string.split("_")
     return "".join([p.title() for p in parts])
 
 
@@ -77,6 +76,9 @@ def replace_line(file_, old_lines, old_ver, new_ver):
 
 
 def main(schema_name, manifest="dkist", schema_increment="minor", manifest_increment="minor", base_branch="main"):
+    # Sanitise your inputs
+    schema_name = schema_name.replace("-", "_")
+
     repodir = pathlib.Path(__file__).parent.parent.resolve()
     asdf_dir = repodir / "dkist" / "io" / "asdf"
 
