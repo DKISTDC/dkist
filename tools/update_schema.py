@@ -78,6 +78,7 @@ def replace_line(file_, old_lines, old_ver, new_ver):
 def main(schema_name, manifest="dkist", schema_increment="minor", manifest_increment="minor", base_branch="main"):
     # Sanitise your inputs
     schema_name = schema_name.replace("-", "_")
+    SchemaName = pascalcase(schema_name)
 
     repodir = pathlib.Path(__file__).parent.parent.resolve()
     asdf_dir = repodir / "dkist" / "io" / "asdf"
@@ -151,7 +152,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
             f.write("from asdf.extension import Converter\n"
                     "\n"
                     "\n"
-                    f"class {pascalcase(schema_name)}Converter(Converter):\n"
+                    f"class {SchemaName}Converter(Converter):\n"
                     "    tags = [\n"
                     f'        "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n'
                     f'        "tag:dkist.nso.edu:dkist/{schema_name}-0.1.0"\n'
@@ -170,9 +171,15 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
             )
         #   import new converter in converters/__init__.py
         with open(asdf_dir / "converters" / "__init__.py", "a") as f:
-            f.write(f"from .{schema_name} import {pascalcase(schema_name)}Converter")
-        #   import new converter in entry_points.py
-        #   add converter to dkist_converters list in entry_points.py
+            f.write(f"from .{schema_name} import {SchemaName}Converter")
+        #   import new converter in entry_points.py and add it to dkist_converters
+        with open(asdf_dir / "entry_points.py", "r+") as f:
+            lines = f.readlines()
+            lines[8] = lines[8].replace("import (", f"import ({SchemaName}, ")
+            list_linenum = 39 if manifest == "dkist-wcs" else 38 # Obviously not very robust
+            lines[list_linenum] = lines[list_linenum].replace("]\n", f", {SchemaName}()]\n")
+            f.seek(0)
+            f.write("".join(lines))
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
