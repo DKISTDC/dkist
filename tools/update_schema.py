@@ -49,6 +49,16 @@ def pascalcase(string):
     return "".join([p.title() for p in parts])
 
 
+def add_increment_line(file_, old_line, old_ver, new_ver, extra=""):
+    with open(file_, mode="r+") as f:
+        lines = f.readlines()
+        new_line = old_line[:-1].replace(old_ver, new_ver) + extra + "\n"
+        linenum = lines.index(old_line)
+        lines.insert(linenum, new_line)
+        f.seek(0)
+        f.write("".join(lines))
+
+
 def main(schema_name, manifest="dkist", schema_increment="minor", manifest_increment="minor", base_branch="main"):
     repodir = pathlib.Path(__file__).parent.parent.resolve()
     asdf_dir = repodir / "dkist" / "io" / "asdf"
@@ -81,15 +91,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     new_mani_file, old_mani_ver, new_mani_ver = increment_version(old_manifest, manifest_increment)
 
     # add ManifestExtension to entry_points.py
-    entrypoints = asdf_dir / "entry_points.py"
-    with open(entrypoints, mode="r+") as f:
-        lines = f.readlines()
-        old_ext_line = f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n'
-        new_ext_line = old_ext_line[:-1].replace(old_mani_ver, new_mani_ver) + " converters=dkist_converters),\n"
-        linenum = lines.index(old_ext_line)
-        lines.insert(linenum, new_ext_line)
-        f.seek(0)
-        f.write("".join(lines))
+    add_increment_line(asdf_dir / "entry_points.py",
+                       f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n',
+                       old_mani_ver, new_mani_ver, " converters=dkist_converters),")
 
     #   increment or add schema_uri and tag_uri in manifest
     with open(new_mani_file, mode="r+") as f:
