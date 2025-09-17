@@ -169,6 +169,8 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                     "        return tree\n"
             )
         #   import new converter in converters/__init__.py
+        with open(asdf_dir / "converters" / "__init__.py", "a") as f:
+            f.write(f"from .{schema_name} import {pascalcase(schema_name)}Converter")
         #   import new converter in entry_points.py
         #   add converter to dkist_converters list in entry_points.py
 
