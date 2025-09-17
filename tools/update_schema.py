@@ -112,12 +112,17 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
         f.seek(0)
         f.write("".join(lines))
 
-    # update tags list in converter
 
-    if not old_schema:
+    converter = asdf_dir / "converters" / f"{schema_name}.py"
+    if old_schema:
+        # update tags list in converter
+        add_increment_line(converter, f'        "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}"\n',
+                           old_sche_ver, new_sche_ver)
+        add_increment_line(converter, f'        "tag://dkist.nso.edu:dkist/{schema_name}-{old_sche_ver}"\n',
+                           old_sche_ver, new_sche_ver)
+    else:
         #   create converters/<schema>.py skeleton
-        converter_fname = asdf_dir / "converters" / f"{schema_name}.py"
-        with open(converter_fname, "w") as f:
+        with open(converter, "w") as f:
             f.write("from asdf.extension import Converter\n"
                     "\n"
                     "\n"
