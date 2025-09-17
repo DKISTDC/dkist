@@ -22,8 +22,7 @@ def get_latest(name, dir):
         return old_files[-1]
 
 
-def increment_version(old_file, increment):
-    old_version = old_file.name[-10:-5]
+def increment_version(old_version, increment):
     if increment == "major":
         new_version = f"{int(old_version[0])+1}.0.0"
     elif increment == "minor":
@@ -33,6 +32,12 @@ def increment_version(old_file, increment):
     else:
         # obviously make this more sophisticated
         raise InputError
+    return new_version
+
+
+def increment_file(old_file, increment):
+    old_version = old_file.name[-10:-5]
+    new_version = increment_version(old_version, increment)
     new_file = old_file.parent / old_file.name.replace(old_version, new_version)
     shutil.copy(old_file, new_file)
     return new_file, old_version, new_version
@@ -59,6 +64,18 @@ def add_increment_line(file_, old_line, old_ver, new_ver, extra=""):
         f.write("".join(lines))
 
 
+def replace_line(file_, old_lines, old_ver, new_ver):
+    if not isinstance(old_lines, list):
+        old_lines = [old_lines]
+    with open(file_, mode="r+") as f:
+        lines = f.readlines()
+        for old_line in old_lines:
+            linenum = lines.index(old_line)
+            lines[linenum] = lines[linenum].replace(old_ver, new_ver)
+        f.seek(0)
+        f.write("".join(lines))
+
+
 def main(schema_name, manifest="dkist", schema_increment="minor", manifest_increment="minor", base_branch="main"):
     repodir = pathlib.Path(__file__).parent.parent.resolve()
     asdf_dir = repodir / "dkist" / "io" / "asdf"
@@ -67,7 +84,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     old_manifest = get_latest(manifest, asdf_dir / "resources" / "manifests")
 
     if old_schema:
-        new_sche_file, old_sche_ver, new_sche_ver = increment_version(old_schema, schema_increment)
+        new_sche_file, old_sche_ver, new_sche_ver = increment_file(old_schema, schema_increment)
+        replace_line(new_sche_file, f'id: "asdf://dkist.nso.edu/schemas/{schema_name}-{old_sche_ver}"\n',
+                     old_sche_ver, new_sche_ver)
     else:
         new_sche_file = make_new_file(asdf_dir / "resources" / "schemas", schema_name)
         with open(new_sche_file, "w") as f:
@@ -88,42 +107,42 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                     'required: [] # Properties required byt his object\n'
                     'additionalProperties: # [true|false]\n'
                     '...')
-    new_mani_file, old_mani_ver, new_mani_ver = increment_version(old_manifest, manifest_increment)
+    new_mani_file, old_mani_ver, new_mani_ver = increment_file(old_manifest, manifest_increment)
 
     # add ManifestExtension to entry_points.py
     add_increment_line(asdf_dir / "entry_points.py",
                        f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n',
                        old_mani_ver, new_mani_ver, " converters=dkist_converters),")
 
+    replace_line(new_mani_file,
+                 [f"id: asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}\n",
+                  f"extension_uri: asdf://dkist.nso.edu/dkist/extensions/{manifest}-{old_mani_ver}\n"],
+                 old_mani_ver, new_mani_ver)
+
     #   increment or add schema_uri and tag_uri in manifest
-    with open(new_mani_file, mode="r+") as f:
-        lines = f.readlines()
-
-        old_id_line = f"id: asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}\n"
-        linenum = lines.index(old_id_line)
-        lines[linenum] = lines[linenum].replace(old_mani_ver, new_mani_ver)
-        lines[linenum+1] = lines[linenum+1].replace(old_mani_ver, new_mani_ver)
-
-        if old_schema:
-            old_schema_line = f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-{old_sche_ver}"\n'
-            linenum = lines.index(old_schema_line)
-            lines[linenum] = lines[linenum].replace(old_sche_ver, new_sche_ver)
-            lines[linenum+1] = lines[linenum+1].replace(old_sche_ver, new_sche_ver)
-        else:
-            lines.append(f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-0.1.0"\n')
-            lines.append(f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n')
-
-        f.seek(0)
-        f.write("".join(lines))
-
+    if old_schema:
+        replace_line(new_mani_file,
+                     [f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-{old_sche_ver}"\n',
+                      f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}"\n'],
+                     old_sche_ver, new_sche_ver)
+    else:
+        with open(new_mani_file, mode="a") as f:
+            f.write(f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-0.1.0"\n')
+            f.write(f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n')
 
     converter = asdf_dir / "converters" / f"{schema_name}.py"
     if old_schema:
         # update tags list in converter
-        add_increment_line(converter, f'        "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}"\n',
+        add_increment_line(converter, f'        "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}",\n',
                            old_sche_ver, new_sche_ver)
-        add_increment_line(converter, f'        "tag://dkist.nso.edu:dkist/{schema_name}-{old_sche_ver}"\n',
-                           old_sche_ver, new_sche_ver)
+        # Get latest tag value (which doesn't necessarily match the schema version)
+        with open(converter) as f:
+            lines = f.readlines()
+        latest_tag_line = [line for line in lines if f"tag:dkist.nso.edu:dkist/{schema_name}-" in line][0]
+        old_tag = latest_tag_line[-8:-3] # Not robust, assumes single-digit versions
+        new_tag = increment_version(old_tag, schema_increment) # assumes tag increment == schema increment
+        add_increment_line(converter, f'        "tag:dkist.nso.edu:dkist/{schema_name}-{old_tag}",\n',
+                           old_tag, new_tag)
     else:
         #   create converters/<schema>.py skeleton
         with open(converter, "w") as f:
