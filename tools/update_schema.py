@@ -192,8 +192,6 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     repo.index.add(converter)
     repo.index.add(entrypoints)
 
-    repo.index.commit(f"Create new asdf schema {schema_name}" if old_schema else f"Apply {increment} increment to {schema_name} asdf schema")
-
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
     argp.add_argument("schema_name", help="Name of the schema to add or update.")
