@@ -11,6 +11,8 @@ import shutil
 import pathlib
 import argparse
 
+from git import Repo
+
 
 def get_latest(name, dir):
     # ? here for the major number so that it only matches one character and "dkist" doesn't match "dkist-wcs-"
@@ -83,6 +85,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     repodir = pathlib.Path(__file__).parent.parent.resolve()
     asdf_dir = repodir / "dkist" / "io" / "asdf"
 
+    # Get the repo object for committing changes later
+    repo = Repo(repodir)
+
     old_schema = get_latest(schema_name, asdf_dir / "resources" / "schemas")
     old_manifest = get_latest(manifest, asdf_dir / "resources" / "manifests")
 
@@ -111,10 +116,11 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                     'additionalProperties: # [true|false]\n'
                     '...')
     new_mani_file, old_mani_ver, new_mani_ver = increment_file(old_manifest, manifest_increment)
+    repo.index.add(new_sche_file)
 
     # add ManifestExtension to entry_points.py
-    add_increment_line(asdf_dir / "entry_points.py",
-                       f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n',
+    entrypoints = asdf_dir / "entry_points.py"
+    add_increment_line(entrypoints, f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n',
                        old_mani_ver, new_mani_ver, " converters=dkist_converters),")
 
     replace_line(new_mani_file,
@@ -132,6 +138,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
         with open(new_mani_file, mode="a") as f:
             f.write(f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-0.1.0"\n')
             f.write(f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n')
+    repo.index.add(new_mani_file)
 
     converter = asdf_dir / "converters" / f"{schema_name}.py"
     if old_schema:
@@ -172,14 +179,20 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
         #   import new converter in converters/__init__.py
         with open(asdf_dir / "converters" / "__init__.py", "a") as f:
             f.write(f"from .{schema_name} import {SchemaName}Converter")
-        #   import new converter in entry_points.py and add it to dkist_converters
-        with open(asdf_dir / "entry_points.py", "r+") as f:
+        # import new converter in entry_points.py and add it to dkist_converters
+        with open(entrypoints, "r+") as f:
             lines = f.readlines()
             lines[8] = lines[8].replace("import (", f"import ({SchemaName}, ")
             list_linenum = 39 if manifest == "dkist-wcs" else 38 # Obviously not very robust
             lines[list_linenum] = lines[list_linenum].replace("]\n", f", {SchemaName}()]\n")
             f.seek(0)
             f.write("".join(lines))
+        repo.index.add(asdf_dir / "converters" / "__init__.py")
+
+    repo.index.add(converter)
+    repo.index.add(entrypoints)
+
+    repo.index.commit(f"Create new asdf schema {schema_name}" if old_schema else f"Apply {increment} increment to {schema_name} asdf schema")
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
