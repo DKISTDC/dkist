@@ -344,13 +344,13 @@ class TiledDataset(Collection):
 
                 if col == row == 0:
                     xlabel, ylabel = self._get_axislabels(ax)
-                ax.set_ylabel(" ")
-                ax.set_xlabel(" ")
+                ax.coords[0].set_axislabel("")
+                ax.coords[1].set_axislabel("")
                 if hide_internal_tick_labels:
                     if col != 0:
-                        ax.tick_params(axis="y", labelsize=0)
+                        ax.coords[1].set_ticklabel_position("")
                     if row != 0:
-                        ax.tick_params(axis="x", labelsize=0)
+                        ax.coords[0].set_ticklabel_position("")
                 if col == row == 0:
                     figure.supxlabel(xlabel, y=0.05)
                     figure.supylabel(ylabel, x=0.05)
