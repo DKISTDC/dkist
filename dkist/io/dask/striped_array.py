@@ -28,6 +28,7 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
 from dkist.io.file_manager import FileManagerProtocol
+from dkist.io.utils import filemanager_info_str
 
 __all__ = ["FileManager", "StripedExternalArray"]
 
@@ -126,14 +127,11 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._loader_array = loader_array
 
     def __str__(self: FileManagerProtocol) -> str:
-        return dedent(f"""\
-            {type(self).__name__} containing {len(self)} files.
-            Once downloaded, these files will be stored in {self.basepath}.
-            The files are arranged in a {self.fileuri_array.shape} array, and each file contains a {self.shape} data array."\
-        """)
+        return filemanager_info_str(self)
 
     def __repr__(self: FileManagerProtocol) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def ndim(self):
@@ -192,7 +190,8 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
 
     def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def basepath(self) -> os.PathLike:
@@ -257,10 +256,11 @@ class FileManager:
         return len(self._striped_external_array)
 
     def __str__(self):
-        return StripedExternalArray.__str__(self)
+        return filemanager_info_str(self)
 
     def __repr__(self) -> str:
-        return StripedExternalArray.__repr__(self)
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)

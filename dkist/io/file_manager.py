@@ -7,11 +7,14 @@ import json
 import urllib
 from typing import Any, Protocol
 from pathlib import Path
+from textwrap import dedent
 
 from parfive import Downloader, Results
 
 from dkist import log
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
+
+from .utils import filemanager_info_str
 
 __all__ = ["DKISTFileManager"]
 
@@ -72,14 +75,11 @@ class DKISTFileManager:
         return self._fm.__getitem__(item)
 
     def __str__(self):
-        # Here to avoid circular import
-        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
-        return FileManager.__str__(self)
+        return filemanager_info_str(self)
 
     def __repr__(self):
-        # Here to avoid circular import
-        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
-        return FileManager.__repr__(self)
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def basepath(self) -> os.PathLike:
