@@ -28,7 +28,8 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
 from dkist.io.file_manager import FileManagerProtocol
-from dkist.io.utils import filemanager_info_str
+
+from ..utils import filemanager_info_str  # noqa: TID252
 
 __all__ = ["FileManager", "StripedExternalArray"]
 

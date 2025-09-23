@@ -12,8 +12,9 @@ from textwrap import dedent
 from parfive import Downloader, Results
 
 from dkist import log
-from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
+
+from .utils import filemanager_info_str
 
 __all__ = ["DKISTFileManager"]
 
