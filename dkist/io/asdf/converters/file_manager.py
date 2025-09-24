@@ -9,7 +9,7 @@ class FileManagerConverter(Converter):
         "tag:dkist.nso.edu:dkist/array_container-0.2.0",
         "asdf://dkist.nso.edu/tags/file_manager-1.0.0",
     ]
-    types = ["dkist.io.file_manager.FileManager"]
+    types = ["dkist.io.dask.striped_array.FileManager"]
 
     def from_yaml_tree(self, node, tag, ctx):
         from dkist.io.dask.loaders import AstropyFITSLoader
