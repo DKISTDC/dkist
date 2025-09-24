@@ -28,6 +28,7 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
 from dkist.io.file_manager import FileManagerProtocol
+from dkist.io.utils import filemanager_info_str
 
 __all__ = ["FileManager", "StripedExternalArray"]
 
@@ -126,7 +127,6 @@ class StripedExternalArray(BaseStripedExternalArray):
         self._loader_array = loader_array
 
     def __str__(self: FileManagerProtocol) -> str:
-        from dkist.io.utils import filemanager_info_str  # noqa: PLC0415
         return filemanager_info_str(self)
 
     def __repr__(self: FileManagerProtocol) -> str:
@@ -256,7 +256,6 @@ class FileManager:
         return len(self._striped_external_array)
 
     def __str__(self):
-        from dkist.io.utils import filemanager_info_str  # noqa: PLC0415
         return filemanager_info_str(self)
 
     def __repr__(self) -> str:

@@ -12,6 +12,7 @@ from textwrap import dedent
 from parfive import Downloader, Results
 
 from dkist import log
+from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
@@ -73,7 +74,6 @@ class DKISTFileManager:
         return self._fm.__getitem__(item)
 
     def __str__(self):
-        from dkist.io.utils import filemanager_info_str  # noqa: PLC0415
         return filemanager_info_str(self)
 
     def __repr__(self):
