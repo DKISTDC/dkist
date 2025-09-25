@@ -164,6 +164,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                     f'        "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n'
                     f'        "tag:dkist.nso.edu:dkist/{schema_name}-0.1.0"\n'
                     "    ]\n"
+                    "    # Specify the fully qualified name of types that can be converted by this class\n"
+                    "    # e.g. `dkist.dataset.dataset.Dataset` instead of `Dataset`\n"
+                    '    types = [""]\n'
                     "\n"
                     "    def from_yaml_tree(cls, node, tag, ctx):\n"
                     "        # Construct and return an object of the appropriate type from the asdf yaml\n"
