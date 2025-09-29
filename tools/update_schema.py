@@ -51,7 +51,7 @@ def make_new_file(dir, name):
 
 
 def pascalcase(string):
-    parts = string.split("_")
+    parts = string.replace("_model", "").replace("_transform", "").split("_")
     return "".join([p.title() for p in parts])
 
 
