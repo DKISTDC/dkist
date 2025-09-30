@@ -157,7 +157,7 @@ class TiledDataset(Collection):
 
             # Then distribute headers (back) out to component Datasets as slices of the main Table
             for i, ds in enumerate(self._data.compressed()):
-                ds.meta["headers"] = meta["headers"][offsets[i] : offsets[i] + sizes[i]]
+                ds.meta["headers"] = meta["headers"][offsets[i]:offsets[i] + sizes[i]]
 
         self._validate_component_datasets(self._data, inventory)
         self._meta = meta
