@@ -272,6 +272,7 @@ class TiledDataset(Collection):
         share_zscale: bool = False,
         figure: matplotlib.figure.Figure | None = None,
         swap_tile_limits: Literal["x", "y", "xy"] | None = None,
+        *,
         hide_internal_tick_labels: bool = False,
         **kwargs,
     ):
