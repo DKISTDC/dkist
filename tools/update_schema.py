@@ -185,9 +185,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
         # import new converter in entry_points.py and add it to dkist_converters
         with open(entrypoints, "r+") as f:
             lines = f.readlines()
-            lines[8] = lines[8].replace("import (", f"import ({SchemaName}, ")
+            lines[8] = lines[8].replace("import (", f"import ({SchemaName}Converter, ")
             list_linenum = 39 if manifest == "dkist-wcs" else 38 # Obviously not very robust
-            lines[list_linenum] = lines[list_linenum].replace("]\n", f", {SchemaName}()]\n")
+            lines[list_linenum] = lines[list_linenum].replace("]\n", f", {SchemaName}Converter()]\n")
             f.seek(0)
             f.write("".join(lines))
         repo.index.add(asdf_dir / "converters" / "__init__.py")
