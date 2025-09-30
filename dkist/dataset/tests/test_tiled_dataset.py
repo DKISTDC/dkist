@@ -105,7 +105,9 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
 
 @figure_test
 @pytest.mark.remote_data
-@pytest.mark.parametrize(("share_zscale", "hide_labels"), [(True, True), (True, False), (False, True), (False, False)])
+@pytest.mark.parametrize(("share_zscale", "hide_labels"), [(True, True), (True, False), (False, True), (False, False)],
+                         ids=["share_zscale-tick_labels_displayed", "share_zscale-tick_labels_hidden",
+                              "independent_zscale-tick_labels_displayed", "independent_zscale-tick_labels_hidden"])
 def test_tileddataset_plot(share_zscale, hide_labels):
     from dkist.data.sample import VBI_L1_NZJTB  # noqa: PLC0415
     ori_ds = load_dataset(VBI_L1_NZJTB)
