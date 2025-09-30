@@ -30,14 +30,24 @@ def test_schema_infrastructure():
     schema_yamls = itertools.groupby(
         sorted((repodir / "io" / "asdf" / "resources" / "schemas").glob("*")), lambda x: tagname(x)[:-11]
     )
-    latest_sche_yamls = {sche.replace("_model", "").replace("_transform", ""): sorted(yamls)[-1] for sche, yamls in schema_yamls}
+    latest_sche_yamls = {sche: sorted(yamls)[-1] for sche, yamls in schema_yamls}
+    latest_schemas_in_manifest = {}
+    for yaml in latest_man_yamls.values():
+        with open(yaml) as f:
+            schema_uris = [l.replace('  - schema_uri: "', "").replace('"\n', "") for l in f.readlines() if "schema_uri" in l]
+            for tag in schema_uris:
+                latest_schemas_in_manifest[tagname(tag)[:-6]] = tag[-5:]
 
     for schema, yaml in latest_sche_yamls.items():
-        converter = "".join([p.title() for p in schema.split("_")]) + "Converter"
+        yaml_version = yaml.name[-10:-5]
+        converter = "".join([p.title() for p in schema.replace("_model", "").replace("_transform", "").split("_")]) + "Converter"
         # Check schema converter is imported in entry_points
         assert hasattr(entry_points, converter)
         # Check schema is in [dkist|wcs]_converters in entry_points
         assert eval(f"dkist.io.asdf.converters.{converter}") in converters
-        # For all schemas
         # Check that latest schema.yaml version == latest listed in manifest
+        assert yaml_version == latest_schemas_in_manifest[schema]
         # Check that schema version in schema matches filename
+        with open(yaml) as f:
+            schema_version_in_yaml = f.readlines()[3][-7:-2]
+        assert schema_version_in_yaml == yaml_version
