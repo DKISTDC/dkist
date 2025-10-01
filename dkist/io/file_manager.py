@@ -12,7 +12,7 @@ from textwrap import dedent
 from parfive import Downloader, Results
 
 from dkist import log
-from dkist.io.dask.striped_array import FileManager
+from dkist.io.dask.striped_array import FileManager, FileManagerProtocol
 from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
