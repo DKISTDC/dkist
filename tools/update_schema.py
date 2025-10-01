@@ -1,5 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
+# requires-gitpython
 # ///
 
 """
