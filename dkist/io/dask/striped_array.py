@@ -32,6 +32,27 @@ from dkist.io.utils import filemanager_info_str
 __all__ = ["FileManager", "StripedExternalArray"]
 
 
+class FileManagerProtocol(Protocol):
+    """
+    Protocol to quack like a `FileManager` object for the `DKISTFileManager`.
+    """
+
+    @property
+    def basepath(self) -> os.PathLike: ...
+
+    @basepath.setter
+    def basepath(self, path: str | os.PathLike) -> None: ...
+
+    @property
+    def filenames(self) -> list[str]: ...
+
+    @property
+    def fileuri_array(self) -> list: ...
+
+    @property
+    def shape(self) -> tuple: ...
+
+
 class BaseStripedExternalArray(abc.ABC):
     """
     Implements shared functionality between FITSLoader and FITSLoaderView.
@@ -223,27 +244,6 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         # array call here to ensure that a length one array is returned rather
         # than a single element.
         return np.array(self._loader_array[self.parent_slice])
-
-
-class FileManagerProtocol(Protocol):
-    """
-    Protocol to quack like a `FileManager` object for the `DKISTFileManager`.
-    """
-
-    @property
-    def basepath(self) -> os.PathLike: ...
-
-    @basepath.setter
-    def basepath(self, path: str | os.PathLike) -> None: ...
-
-    @property
-    def filenames(self) -> list[str]: ...
-
-    @property
-    def fileuri_array(self) -> list: ...
-
-    @property
-    def shape(self) -> tuple: ...
 
 
 class FileManager:
