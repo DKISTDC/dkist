@@ -22,6 +22,8 @@ jobs:
       new_commit_count: ${{ steps.commit.outputs.new_commit_count }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: Get new commits
         id: commit
         run: echo "new_commit_count=$(git log --oneline --since '24 hours ago' | wc -l)" >> $GITHUB_OUTPUT
@@ -40,6 +42,8 @@ jobs:
     runs-on: codspeed-macro
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
