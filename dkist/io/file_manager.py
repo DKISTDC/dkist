@@ -70,6 +70,9 @@ class DKISTFileManager:
     def __len__(self):
         return self._fm.__len__()
 
+    def __eq__(self, other):
+        return self._fm.__eq__(other)
+
     def __getitem__(self, item):
         return self._fm.__getitem__(item)
 
