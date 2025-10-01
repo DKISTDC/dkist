@@ -5,38 +5,18 @@ This file contains the DKIST specific FileManager code.
 import os
 import json
 import urllib
-from typing import Any, Protocol
+from typing import Any
 from pathlib import Path
 from textwrap import dedent
 
 from parfive import Downloader, Results
 
 from dkist import log
+from dkist.io.dask.striped_array import FileManager
 from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
-
-
-class FileManagerProtocol(Protocol):
-    """
-    Protocol to quack like a `FileManager` object for the `DKISTFileManager`.
-    """
-
-    @property
-    def basepath(self) -> os.PathLike: ...
-
-    @basepath.setter
-    def basepath(self, path: str | os.PathLike) -> None: ...
-
-    @property
-    def filenames(self) -> list[str]: ...
-
-    @property
-    def fileuri_array(self) -> list: ...
-
-    @property
-    def shape(self) -> tuple: ...
 
 
 class DKISTFileManager:
@@ -52,7 +32,6 @@ class DKISTFileManager:
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
-        from dkist.io.dask.striped_array import FileManager  # noqa: PLC0415
         return cls(
             FileManager.from_parts(
                 fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=chunksize
