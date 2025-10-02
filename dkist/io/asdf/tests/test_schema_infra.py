@@ -70,12 +70,18 @@ def schema_ver_matches_filename(yaml, yaml_version):
         return schema_version_in_yaml == yaml_version
 
 
+def num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas):
+    # varying_celestial_transform schema is reused for inverse_, so the list from entry_points will be one shorter
+    return len(latest_sche_yamls.values())+1 == len(schemas)
+
+
 def test_schema_infrastructure():
     latest_man_yamls, latest_extensions, latest_sche_yamls, converters, latest_schemas_in_manifest = get_infra_info()
 
     assert manifest_yaml_versions_match_entry_points(latest_man_yamls, latest_extensions)
 
-    # schemas = [tagname(tag.tag_uri) for ext in latest_extensions.values() for tag in ext.tags]
+    schemas = [tagname(tag.tag_uri) for ext in latest_extensions.values() for tag in ext.tags]
+    assert num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas)
     for schema, yaml in latest_sche_yamls.items():
         yaml_version, converter = get_schema_info(schema, yaml)
         assert schema_converter_imported(converter)
