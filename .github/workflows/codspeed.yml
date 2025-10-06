@@ -6,9 +6,12 @@ on:
       - "main"
     paths:
       - "dkist/**"
+
   pull_request:
     paths:
       - "dkist/**"
+
+
   workflow_dispatch:
 
 concurrency:
@@ -29,5 +32,12 @@ jobs:
       - name: Run benchmarks
         uses: CodspeedHQ/action@v4
         with:
+          mode: "instrumentation"
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any"
+
+
+
+
+
+
