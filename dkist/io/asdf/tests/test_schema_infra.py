@@ -1,10 +1,13 @@
 import pathlib
 import itertools
 
+import pytest
+
 import dkist
 from dkist.io.asdf import entry_points
 
 repodir = pathlib.Path(dkist.__file__).parent
+mandir = repodir / "io" / "asdf" / "resources" / "manifests"
 
 def tagname(fulltag):
     if isinstance(fulltag, pathlib.Path):
@@ -14,7 +17,7 @@ def tagname(fulltag):
 
 def get_infra_info():
     man_yamls = itertools.groupby(
-        sorted((repodir / "io" / "asdf" / "resources" / "manifests").glob("*")), lambda x: tagname(x)[:-11]
+        sorted(mandir.glob("*")), lambda x: tagname(x)[:-11]
     )
     latest_man_yamls = {man: sorted(yamls)[-1] for man, yamls in man_yamls}
     latest_extensions = {ext: list(manifests)[-1] for ext, manifests in itertools.groupby(sorted(entry_points.get_extensions(), key=lambda x: x.extension_uri),
@@ -88,3 +91,16 @@ def test_schema_infrastructure():
         assert schema_in_converters_list(converter, converters)
         assert schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest[schema])
         assert schema_ver_matches_filename(yaml, yaml_version)
+
+
+def test_incorrect_schema_infrastructure():
+    latest_dkist_manifest = sorted(mandir.glob("dkist-?.*.*.yaml"))[-1]
+    with open(latest_dkist_manifest, mode="r+") as f:
+        lines = f.readlines()
+        lines[2] = lines[2].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
+        f.seek(0)
+        f.write("".join(lines))
+
+    latest_man_yamls, latest_extensions, _, _, _ = get_infra_info()
+    with pytest.raises(AssertionError):
+        assert manifest_yaml_versions_match_entry_points(latest_man_yamls, latest_extensions)
