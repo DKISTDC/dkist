@@ -6,12 +6,9 @@ on:
       - "main"
     paths:
       - "dkist/**"
-
   pull_request:
     paths:
       - "dkist/**"
-
-
   workflow_dispatch:
 
 concurrency:
@@ -35,9 +32,3 @@ jobs:
           mode: "instrumentation"
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any"
-
-
-
-
-
-
