@@ -40,6 +40,7 @@ select = [
 extend-ignore = [
   # pycodestyle (E, W)
   "E501", # ignore line length will use a formatter instead
+<<<<<<<
   "E702",
   "E711",
   "E741",
@@ -49,6 +50,8 @@ extend-ignore = [
   "F841",
   # pyupgrade (UP)
   "UP038", # Use | in isinstance - not compatible with models and is slower
+=======
+>>>>>>>
   # pytest (PT)
   "PT001", # Always use pytest.fixture()
   "PT023", # Always use () on pytest decorators

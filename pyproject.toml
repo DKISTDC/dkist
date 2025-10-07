@@ -9,7 +9,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dkist"
 description = "DKIST User Tools"
+<<<<<<<
 requires-python = ">=3.11"
+=======
+requires-python = ">=3.12"
+>>>>>>>
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = { file = "licenses/LICENSE.rst" }
 authors = [
