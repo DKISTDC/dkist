@@ -94,7 +94,7 @@ class DKISTLogger(logging.Logger):
         # find the module object and thus the fully-package-specified module
         # name.  The module.__file__ is the original source file name.
         mod_name = None
-        mod_path, ext = os.path.splitext(mod_path)
+        mod_path, _ = os.path.splitext(mod_path)
         for name, mod in list(sys.modules.items()):
             try:
                 # Believe it or not this can fail in some cases:
