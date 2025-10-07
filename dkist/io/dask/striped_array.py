@@ -218,6 +218,8 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         """
         # array call here to ensure that a length one array is returned rather
         # than a single element.
+        if isinstance(self.parent, StripedExternalArrayView):
+            return self.parent.loader_array[self.parent_slice]
         return np.array(self._loader_array[self.parent_slice])
 
 

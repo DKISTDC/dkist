@@ -157,3 +157,12 @@ def test_reprs(file_manager):
     assert str(len(sliced_sea)) in repr(sliced_sea)
     assert str(sliced_sea.shape) in repr(sliced_sea)
     assert str(sea) in repr(sliced_sea)
+
+
+@pytest.mark.accept_cli_dataset
+def test_file_manager_slice_slice(large_visp_dataset):
+    stokesI = large_visp_dataset[0]
+    scan = stokesI[..., 0]
+    assert scan.files._fm.output_shape == stokesI.files._fm.output_shape
+    assert scan.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
+    assert scan.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
