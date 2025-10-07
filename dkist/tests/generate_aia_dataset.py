@@ -188,7 +188,7 @@ def main():
 
     print(repr(wcs))
 
-    print(wcs(*[1*u.pix]*4, with_units=True))
+    print(wcs.pixel_to_world(*[1*u.pix]*4))
 
     ea = references_from_filenames(cube, relative_to=str(path))
 
@@ -208,7 +208,7 @@ def main():
     ds = load_dataset(str(path))
     print(repr(ds))
     print(repr(ds.wcs))
-    print(ds.wcs(*[1*u.pix]*4, with_units=True))
+    print(ds.wcs.pixel_to_world(*[1*u.pix]*4))
 
 
 if __name__ == "__main__":
