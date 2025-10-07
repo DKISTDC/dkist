@@ -11,4 +11,5 @@ vbi_extents
 example_cryo_plots
 rebinning_and_dask
 downloading_files_r0
+using-dkist-colormaps
 ```
