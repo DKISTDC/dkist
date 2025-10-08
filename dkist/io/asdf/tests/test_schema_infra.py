@@ -30,7 +30,7 @@ def get_infra_info():
     latest_sche_yamls = {sche: sorted(yamls)[-1] for sche, yamls in schema_yamls}
     latest_schemas_in_manifest = {}
     for yaml in latest_man_yamls.values():
-        with open(yaml) as f:
+        with open(yaml, encoding="utf-8") as f:
             schema_uris = [l.replace('  - schema_uri: "', "").replace('"\n', "") for l in f.readlines() if "schema_uri" in l]
             for tag in schema_uris:
                 latest_schemas_in_manifest[tagname(tag)[:-6]] = tag[-5:]
@@ -68,7 +68,7 @@ def schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest):
 
 def schema_ver_matches_filename(yaml, yaml_version):
         # Check that schema version in schema matches filename
-        with open(yaml) as f:
+        with open(yaml, encoding="utf-8") as f:
             schema_version_in_yaml = f.readlines()[3][-7:-2]
         return schema_version_in_yaml == yaml_version
 
@@ -95,7 +95,7 @@ def test_schema_infrastructure():
 
 def test_incorrect_schema_infrastructure():
     latest_dkist_manifest = sorted(mandir.glob("dkist-?.*.*.yaml"))[-1]
-    with open(latest_dkist_manifest, mode="r+") as f:
+    with open(latest_dkist_manifest, mode="r+", encoding="utf-8") as f:
         lines = f.readlines()
         lines[2] = lines[2].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
         lines[3] = lines[3].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
