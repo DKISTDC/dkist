@@ -98,6 +98,7 @@ def test_incorrect_schema_infrastructure():
     with open(latest_dkist_manifest, mode="r+") as f:
         lines = f.readlines()
         lines[2] = lines[2].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
+        lines[3] = lines[3].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
         f.seek(0)
         f.write("".join(lines))
 
