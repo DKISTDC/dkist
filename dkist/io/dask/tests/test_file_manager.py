@@ -162,11 +162,20 @@ def test_reprs(file_manager):
 @pytest.mark.accept_cli_dataset
 def test_file_manager_slice_slice(large_visp_dataset):
     stokesI = large_visp_dataset[0]
+
     scan = stokesI[..., 0]
+    assert len(scan.files) == len(stokesI.files) == 20
     assert scan.files._fm.output_shape == stokesI.files._fm.output_shape
     assert scan.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
     assert scan.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+
     line = scan[..., 0]
+    assert len(line.files) == len(stokesI.files) == 20
     assert line.files._fm.output_shape == stokesI.files._fm.output_shape
     assert line.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
     assert line.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+
+    spectrum = stokesI[0]
+    assert len(spectrum.files) == 1
+    assert spectrum.files._fm.output_shape == stokesI.files._fm.output_shape[1:]
+    assert spectrum.files._fm._striped_external_array.loader_array.shape == ()
