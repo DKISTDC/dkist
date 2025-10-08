@@ -166,3 +166,7 @@ def test_file_manager_slice_slice(large_visp_dataset):
     assert scan.files._fm.output_shape == stokesI.files._fm.output_shape
     assert scan.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
     assert scan.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+    line = scan[..., 0]
+    assert line.files._fm.output_shape == stokesI.files._fm.output_shape
+    assert line.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
+    assert line.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
