@@ -36,10 +36,10 @@ def test_missing_quality(dataset):
 
 def test_init_missing_meta_keys(identity_gwcs):
     data = np.zeros(identity_gwcs.array_shape)
-    with pytest.raises(ValueError, match=".*must contain the headers table."):
+    with pytest.raises(ValueError, match=r".*must contain the headers table."):
         Dataset(data, wcs=identity_gwcs, meta={"inventory": {}})
 
-    with pytest.raises(ValueError, match=".*must contain the inventory record."):
+    with pytest.raises(ValueError, match=r".*must contain the inventory record."):
         Dataset(data, wcs=identity_gwcs, meta={"headers": {}})
 
 
@@ -128,7 +128,7 @@ def test_from_directory_not_dir():
 
 
 def test_load_with_invalid_input():
-    with pytest.raises(TypeError, match="Input type .* not recognised."):
+    with pytest.raises(TypeError, match=r"Input type .* not recognised."):
         load_dataset(42)
 
 
