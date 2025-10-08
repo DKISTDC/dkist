@@ -59,7 +59,7 @@ def pascalcase(string):
 
 
 def add_increment_line(file_, old_line, old_ver, new_ver, extra=""):
-    with open(file_, mode="r+") as f:
+    with open(file_, mode="r+", encoding="utf-8") as f:
         lines = f.readlines()
         new_line = old_line[:-1].replace(old_ver, new_ver) + extra + "\n"
         linenum = lines.index(old_line)
@@ -71,7 +71,7 @@ def add_increment_line(file_, old_line, old_ver, new_ver, extra=""):
 def replace_line(file_, old_lines, old_ver, new_ver):
     if not isinstance(old_lines, list):
         old_lines = [old_lines]
-    with open(file_, mode="r+") as f:
+    with open(file_, mode="r+", encoding="utf-8") as f:
         lines = f.readlines()
         for old_line in old_lines:
             linenum = lines.index(old_line)
@@ -100,7 +100,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                      old_sche_ver, new_sche_ver)
     else:
         new_sche_file = make_new_file(asdf_dir / "resources" / "schemas", schema_name)
-        with open(new_sche_file, "w") as f:
+        with open(new_sche_file, "w", encoding="utf-8") as f:
             f.write('%YAML 1.1\n'
                     '---\n'
                     '$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"\n'
@@ -138,7 +138,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                       f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}"\n'],
                      old_sche_ver, new_sche_ver)
     else:
-        with open(new_mani_file, mode="a") as f:
+        with open(new_mani_file, mode="a", encoding="utf-8") as f:
             f.write(f'  - schema_uri: "asdf://dkist.nso.edu/schemas/{schema_name}-0.1.0"\n')
             f.write(f'    tag_uri: "asdf://dkist.nso.edu/tags/{schema_name}-0.1.0"\n')
     repo.index.add(new_mani_file)
@@ -149,7 +149,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
         add_increment_line(converter, f'        "asdf://dkist.nso.edu/tags/{schema_name}-{old_sche_ver}",\n',
                            old_sche_ver, new_sche_ver)
         # Get latest tag value (which doesn't necessarily match the schema version)
-        with open(converter) as f:
+        with open(converter, encoding="utf-8") as f:
             lines = f.readlines()
         latest_tag_line = [line for line in lines if f"tag:dkist.nso.edu:dkist/{schema_name}-" in line][0]
         old_tag = latest_tag_line[-8:-3] # Not robust, assumes single-digit versions
@@ -158,7 +158,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                            old_tag, new_tag)
     else:
         #   create converters/<schema>.py skeleton
-        with open(converter, "w") as f:
+        with open(converter, "w", encoding="utf-8") as f:
             f.write("from asdf.extension import Converter\n"
                     "\n"
                     "\n"
@@ -183,10 +183,10 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
                     "        return tree\n"
             )
         #   import new converter in converters/__init__.py
-        with open(asdf_dir / "converters" / "__init__.py", "a") as f:
+        with open(asdf_dir / "converters" / "__init__.py", "a", encoding="utf-8") as f:
             f.write(f"from .{schema_name} import {SchemaName}Converter")
         # import new converter in entry_points.py and add it to dkist_converters
-        with open(entrypoints, "r+") as f:
+        with open(entrypoints, "r+", encoding="utf-8") as f:
             lines = f.readlines()
             lines[8] = lines[8].replace("import (", f"import ({SchemaName}Converter, ")
             list_linenum = 39 if manifest == "dkist-wcs" else 38 # Obviously not very robust
