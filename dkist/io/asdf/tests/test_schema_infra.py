@@ -93,29 +93,13 @@ def test_schema_infrastructure():
         assert schema_ver_matches_filename(yaml, yaml_version)
 
 
-def test_incorrect_schema_infrastructure():
-    latest_dkist_manifest = sorted(mandir.glob("dkist-?.*.*.yaml"))[-1]
-    # Fudge the version in the latest manifest file
-    with open(latest_dkist_manifest, mode="r+", encoding="utf-8") as f:
-        lines = f.readlines()
-        lines[2] = lines[2].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
-        lines[3] = lines[3].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
-        f.seek(0)
-        f.write("".join(lines))
-
-    # Create a schema file that isn't listed anywhere else
-    orphan_schema = repodir / "io" / "asdf" / "resources" / "schemas" / "null-0.1.0.yaml"
-    orphan_schema.touch()
-
+def test_incorrect_schema_infrastructure(break_manifest, orphan_schema):
     latest_man_yamls, latest_extensions, latest_sche_yamls, converters, latest_schemas_in_manifest = get_infra_info()
     schemas = [tagname(tag.tag_uri) for ext in latest_extensions.values() for tag in ext.tags]
     yaml_version, converter = get_schema_info("null", latest_sche_yamls["null"])
-    with pytest.raises(AssertionError):
-        assert manifest_yaml_versions_match_entry_points(latest_man_yamls, latest_extensions)
-    with pytest.raises(AssertionError):
-        assert num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas)
-    with pytest.raises(AssertionError):
-        assert schema_converter_imported(converter)
+    assert not manifest_yaml_versions_match_entry_points(latest_man_yamls, latest_extensions)
+    assert not num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas)
+    assert not schema_converter_imported(converter)
     with pytest.raises(AttributeError):
         assert schema_in_converters_list(converter, converters)
     with pytest.raises(KeyError):
