@@ -1,1 +1,0 @@
-Fix bug that caused a slice of a sliced dataset to return the full dataset's FileManager loader array
