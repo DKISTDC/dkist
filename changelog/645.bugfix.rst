@@ -1,1 +1,0 @@
-Add support for globus_sdk>=4.
