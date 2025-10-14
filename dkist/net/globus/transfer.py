@@ -89,16 +89,14 @@ def start_transfer_from_file_list(
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
+    td_kwargs = {"source_endpoint": src_endpoint,
+                 "destination_endpoint": dst_endpoint,
+                 "label": label,
+                 "sync_level": "checksum",
+                 "verify_checksum": True}
     if Version(globus_sdk.__version__) < Version("4.0.0"):
-        transfer_manifest = globus_sdk.TransferData(tc, src_endpoint, dst_endpoint,
-                                                    label=label,
-                                                    sync_level="checksum",
-                                                    verify_checksum=True)
-    else:
-        transfer_manifest = globus_sdk.TransferData(src_endpoint, dst_endpoint,
-                                                    label=label,
-                                                    sync_level="checksum",
-                                                    verify_checksum=True)
+        td_kwargs.update(transfer_client=tc)
+    transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
     src_file_list = file_list
     if not isinstance(dst_base_path, (list, tuple)):
