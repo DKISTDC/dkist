@@ -9,6 +9,7 @@ from os import PathLike
 from typing import Literal
 
 import globus_sdk
+from packaging.version import Version
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
@@ -88,10 +89,14 @@ def start_transfer_from_file_list(
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
-    transfer_manifest = globus_sdk.TransferData(tc, src_endpoint, dst_endpoint,
-                                                label=label,
-                                                sync_level="checksum",
-                                                verify_checksum=True)
+    td_kwargs = {"source_endpoint": src_endpoint,
+                 "destination_endpoint": dst_endpoint,
+                 "label": label,
+                 "sync_level": "checksum",
+                 "verify_checksum": True}
+    if Version(globus_sdk.__version__) < Version("4.0.0"):
+        td_kwargs.update(transfer_client=tc)
+    transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
     src_file_list = file_list
     if not isinstance(dst_base_path, (list, tuple)):

@@ -69,6 +69,21 @@ class TiledDatasetFileManager:
     def shape(self):
         return self._parent.flat[0].files.shape
 
+    @property
+    def fileuri_array(self):
+        # Can't use self._parent.flat here because it would remove the masked elements
+        # list() because .flat returns an iterator
+        flatds = list(self._parent._data.flat)
+        # This time we _do_ want to remove the masked elements to get one with a .files
+        tile0_files = self._parent.flat[0].files
+
+        filesarr = np.empty((len(flatds), *tile0_files.fileuri_array.shape),
+                            dtype=tile0_files.fileuri_array.dtype)
+        for t, tile in enumerate(flatds):
+            if not isinstance(tile, np.ma.core.MaskedConstant):
+                filesarr[t] = tile.files.fileuri_array
+        return filesarr.reshape(self._parent.shape+tile0_files.fileuri_array.shape)
+
 
 class TiledDatasetSlicer:
     """

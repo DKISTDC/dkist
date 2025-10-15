@@ -1,1 +1,0 @@
-Adds a `hide_internal_tick_labels` keyword to `TiledDataset.plot()` which removes the tick labels from tiels except along the bottom and left.
