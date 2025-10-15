@@ -20,6 +20,7 @@ The Python tools define a small number of custom colormaps designed for use with
 import matplotlib.pyplot as plt
 # Register dkist colormaps
 from dkist.visualization import colormaps
+from astropy.io import fits
 ```
 
 ## With VISP data
@@ -31,7 +32,7 @@ print(fitsfiles)
 ```{code-cell} ipython3
 images = [fits.open(f)[0] for f in fitsfiles]
 nims, nmaps = len(fitsfiles), len(colormaps.cmaps)
-for cmap in cmaps:
+for cmap in colormaps.cmaps:
 	fig, axes = plt.subplots(1, nims)
 	axes = axes.flatten()
 	for im, ax in zip(images, axes):
@@ -42,6 +43,7 @@ for cmap in cmaps:
 		ax.set_axis_off()
 
 	plt.tight_layout()
+	plt.show()
 ```
 
 ## With VBI data
