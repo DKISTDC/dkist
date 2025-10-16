@@ -159,7 +159,12 @@ class StripedExternalArray(BaseStripedExternalArray):
 
     @staticmethod
     def _sanitize_basepath(value):
-        return Path(value).expanduser() if value is not None else None
+        if value is None:
+            return
+        path = Path(value)
+        if "~" not in str(path):
+            return path
+        return path.expanduser().relative_to(Path("~").expanduser(), walk_up=True)
 
     @property
     def basepath(self) -> os.PathLike:
