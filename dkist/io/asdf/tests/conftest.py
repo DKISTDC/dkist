@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 from dkist.data.test import rootdir
@@ -25,3 +27,29 @@ def eit_dataset_asdf_path(request):
 ])
 def tiled_dataset_asdf_path(request):
     return request.param
+
+
+@pytest.fixture
+def break_manifest():
+    mandir = rootdir.parent.parent / "io" / "asdf" / "resources" / "manifests"
+    latest_dkist_manifest = sorted(mandir.glob("dkist-?.*.*.yaml"))[-1]
+    # Fudge the version in the latest manifest file
+    with open(latest_dkist_manifest, mode="r+", encoding="utf-8") as f:
+        oldlines = f.readlines()
+        newlines = copy.copy(oldlines)
+        newlines[2] = newlines[2].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
+        newlines[3] = newlines[3].replace(latest_dkist_manifest.name[-10:-5], "9.9.9")
+        f.seek(0)
+        f.write("".join(newlines))
+    yield
+    with open(latest_dkist_manifest, mode="w", encoding="utf-8") as f:
+        f.write("".join(oldlines))
+
+
+@pytest.fixture
+def orphan_schema():
+    # Create a schema file that isn't listed anywhere else
+    orphan_schema = rootdir.parent.parent / "io" / "asdf" / "resources" / "schemas" / "null-0.1.0.yaml"
+    orphan_schema.touch()
+    yield
+    orphan_schema.unlink()
