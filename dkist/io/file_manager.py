@@ -254,6 +254,8 @@ class DKISTFileManager:
         destination_path = path or self.basepath or "/~/"
         destination_path = Path(destination_path).as_posix()
         destination_path = Path(destination_path.format(**path_inv))
+        # Make the path relative to ~/ to avoid "C:" appearing on Windows
+        destination_path = destination_path.relative_to(Path("~").expanduser(), walk_up=True)
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.
