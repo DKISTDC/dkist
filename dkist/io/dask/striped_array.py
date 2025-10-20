@@ -162,9 +162,7 @@ class StripedExternalArray(BaseStripedExternalArray):
         if value is None:
             return
         path = Path(value)
-        if "~" not in str(path):
-            return path
-        return path.expanduser().relative_to(Path("~").expanduser(), walk_up=True)
+        return path.expanduser().relative_to(path.root)
 
     @property
     def basepath(self) -> os.PathLike:
