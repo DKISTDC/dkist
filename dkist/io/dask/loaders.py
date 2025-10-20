@@ -74,7 +74,7 @@ class BaseFITSLoader(metaclass=abc.ABCMeta):
         Construct a non-relative path to the file, using ``basepath`` if provided.
         """
         if self.basepath:
-            return Path.cwd().root / self.basepath / self.fileuri
+            return Path.home() / self.basepath / self.fileuri
 
         return Path(self.fileuri)
 

@@ -124,7 +124,7 @@ def test_download_keywords(dataset, orchestrate_transfer_mock, mock_inventory_re
     )
 
     if not keywords["destination_endpoint"]:
-        assert dataset.files.basepath == Path("test/")
+        assert dataset.files.basepath == Path("/test/")
 
 
 def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
@@ -145,7 +145,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
         label=None,
     )
 
-    assert dataset.files.basepath == Path("~/test_dataset").expanduser().relative_to("/")
+    assert dataset.files.basepath == Path("~/test_dataset").expanduser().relative_to(Path.home(), walk_up=True)
 
 
 def test_length_one_first_array_axis(small_visp_dataset):
@@ -208,7 +208,7 @@ def test_tiled_file_manager_basepath_setter(simple_tiled_dataset):
     ds.files.basepath = "/some_new_path/"
     new_basepaths = np.array([tile.files.basepath for tile in ds.flat])
     assert (old_basepaths != new_basepaths).all()
-    assert (new_basepaths == Path("some_new_path/")).all()
+    assert (new_basepaths == Path("/some_new_path/")).all()
 
 
 def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_mock, mock_inventory_refresh):
