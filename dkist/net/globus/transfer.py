@@ -70,6 +70,7 @@ def start_transfer_from_file_list(
     `str`
         Task ID.
     """
+    globus_lt_v4 = Version(globus_sdk.__version__) < Version("4.0.0")
     if isinstance(recursive, bool):
         recursive = [recursive] * len(file_list)
     if len(recursive) != len(file_list):
@@ -82,10 +83,12 @@ def start_transfer_from_file_list(
 
     # Resolve to IDs and activate endpoints
     src_endpoint = get_endpoint_id(src_endpoint, tfr_client=tc)
-    auto_activate_endpoint(src_endpoint, tfr_client=tc)
+    if globus_lt_v4:
+        auto_activate_endpoint(src_endpoint, tfr_client=tc)
 
     dst_endpoint = get_endpoint_id(dst_endpoint, tfr_client=tc)
-    auto_activate_endpoint(dst_endpoint, tfr_client=tc)
+    if globus_lt_v4:
+        auto_activate_endpoint(dst_endpoint, tfr_client=tc)
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
@@ -94,7 +97,7 @@ def start_transfer_from_file_list(
                  "label": label,
                  "sync_level": "checksum",
                  "verify_checksum": True}
-    if Version(globus_sdk.__version__) < Version("4.0.0"):
+    if globus_lt_v4:
         td_kwargs.update(transfer_client=tc)
     transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
