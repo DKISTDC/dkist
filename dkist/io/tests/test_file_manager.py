@@ -145,7 +145,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
         label=None,
     )
 
-    assert dataset.files.basepath == Path("~/test_dataset").expanduser().relative_to(Path.home(), walk_up=True)
+    assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
 def test_length_one_first_array_axis(small_visp_dataset):

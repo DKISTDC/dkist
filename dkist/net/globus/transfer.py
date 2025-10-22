@@ -15,6 +15,7 @@ from tqdm.notebook import tqdm as tqdm_notebook
 
 from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
                         get_endpoint_id, get_local_endpoint_id, get_transfer_client)
+from pathlib import Path
 
 __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 
@@ -117,6 +118,8 @@ def start_transfer_from_file_list(
         dst_file_list = dst_base_path
 
     for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
+        if dst_file.is_relative_to(Path.home()):
+            dst_file = dst_file.relative_to(Path.home(), walk_up=True)
         transfer_manifest.add_item(src_file.as_posix(), dst_file.as_posix(), recursive=rec)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
