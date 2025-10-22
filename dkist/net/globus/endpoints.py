@@ -8,6 +8,7 @@ import webbrowser
 from functools import cache
 
 import globus_sdk
+from packaging.version import Version
 
 from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
@@ -165,6 +166,8 @@ def get_directory_listing(path, endpoint=None):
         A list of all the files.
 
     """
+
+    globus_lt_v4 = Version(globus_sdk.__version__) < Version("4.0.0")
     path = pathlib.Path(path)
 
     endpoint_id = None
@@ -177,7 +180,8 @@ def get_directory_listing(path, endpoint=None):
 
     if endpoint_id is None:
         endpoint_id = get_endpoint_id(endpoint, tfr_client=tc)
-        auto_activate_endpoint(endpoint_id, tfr_client=tc)
+        if globus_lt_v4:
+            auto_activate_endpoint(endpoint_id, tfr_client=tc)
 
     response = tc.operation_ls(endpoint_id, path=path.as_posix())
     names = [r["name"] for r in response]
