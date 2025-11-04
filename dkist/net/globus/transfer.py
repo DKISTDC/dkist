@@ -118,7 +118,8 @@ def start_transfer_from_file_list(
         dst_file_list = dst_base_path
 
     for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
-        dst_file = re.sub("^([A-Z]):/", "/\1/", dst_file.as_posix(), flags=re.IGNORECASE)
+        # Globus can't handle ':', so replace eg 'C:/' in windows paths with '/C/'
+        dst_file = re.sub("^([A-Z]):/", r"/\1/", dst_file.as_posix(), flags=re.IGNORECASE)
         transfer_manifest.add_item(src_file.as_posix(), dst_file, recursive=rec)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
