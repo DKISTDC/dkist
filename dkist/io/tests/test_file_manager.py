@@ -164,8 +164,11 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
-def test_download_windows_path_correction(dataset, mock_inventory_refresh, mock_endpoint_id, submit_transfer_mock):
-    dataset.files.download()
+def test_download_windows_path_correction(dataset, mock_inventory_refresh, mock_endpoint_id, mock_dc_endpoint_id, submit_transfer_mock):
+    dataset.files.download(wait=False)
+    call_args = submit_transfer_mock.call_args_list[0]
+    dst_paths = [d["destination_path"] for d in call_args.args[0]["DATA"]]
+    assert all(":/" not in path for path in dst_paths)
 
 
 def test_length_one_first_array_axis(small_visp_dataset):
