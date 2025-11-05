@@ -22,11 +22,16 @@ def orchestrate_transfer_mock(mocker):
 
 @pytest.fixture
 def submit_transfer_mock(mocker):
-    return mocker.patch("globus_sdk.services.transfer.client.TransferClient")
-
+    return mocker.patch("globus_sdk.services.transfer.client.TransferClient.submit_transfer")
 
 @pytest.fixture
 def mock_endpoint_id(mocker):
+    return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
+                        return_value="")
+
+
+@pytest.fixture
+def mock_dc_endpoint_id(mocker):
     return mocker.patch("dkist.net.globus.transfer.get_data_center_endpoint_id",
                         return_value="")
 
