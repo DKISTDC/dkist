@@ -20,6 +20,17 @@ def orchestrate_transfer_mock(mocker):
                        autospec=True)
 
 
+@pytest.fixture
+def submit_transfer_mock(mocker):
+    return mocker.patch("globus_sdk.services.transfer.client.TransferClient")
+
+
+@pytest.fixture
+def mock_endpoint_id(mocker):
+    return mocker.patch("dkist.net.globus.transfer.get_data_center_endpoint_id",
+                        return_value="")
+
+
 def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
@@ -146,6 +157,10 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
+
+
+def test_download_windows_path_correction(dataset, mock_inventory_refresh, mock_endpoint_id, submit_transfer_mock):
+    dataset.files.download()
 
 
 def test_length_one_first_array_axis(small_visp_dataset):
