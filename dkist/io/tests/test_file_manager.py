@@ -24,9 +24,16 @@ def orchestrate_transfer_mock(mocker):
 def submit_transfer_mock(mocker):
     return mocker.patch("globus_sdk.services.transfer.client.TransferClient.submit_transfer")
 
+
 @pytest.fixture
 def mock_endpoint_id(mocker):
     return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
+                        return_value="")
+
+
+@pytest.fixture
+def mock_local_endpoint_id(mocker):
+    return mocker.patch("dkist.net.globus.transfer.get_local_endpoint_id",
                         return_value="")
 
 
@@ -164,7 +171,7 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
-def test_download_windows_path_correction(dataset, mock_inventory_refresh, mock_endpoint_id, mock_dc_endpoint_id, submit_transfer_mock):
+def test_download_windows_path_correction(dataset, mock_inventory_refresh, mock_endpoint_id, mock_local_endpoint_id, mock_dc_endpoint_id, submit_transfer_mock):
     dataset.files.download(wait=False)
     call_args = submit_transfer_mock.call_args_list[0]
     dst_paths = [d["destination_path"] for d in call_args.args[0]["DATA"]]
