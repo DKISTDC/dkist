@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import globus_sdk
 import numpy as np
 import pytest
 
@@ -146,6 +147,16 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
+
+
+def test_download_windows_path_correction(dataset_windows):
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(source_endpoint="",destination_endpoint=""),
+                                                      [Path("somepath")],
+                                                      dataset_windows.files.basepath,
+                                                      None,
+                                                      [False])
+    dst_paths = [d["destination_path"] for d in manifest["DATA"]]
+    assert all(":/" not in path for path in dst_paths)
 
 
 def test_length_one_first_array_axis(small_visp_dataset):
