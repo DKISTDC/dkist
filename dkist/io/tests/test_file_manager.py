@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import globus_sdk
 import numpy as np
 import pytest
 
@@ -21,8 +22,9 @@ def orchestrate_transfer_mock(mocker):
 
 
 @pytest.fixture
-def submit_transfer_mock(mocker):
-    return mocker.patch("globus_sdk.services.transfer.client.TransferClient.submit_transfer")
+def mock_get_transfer_client(mocker):
+    return mocker.patch("dkist.net.globus.transfer.get_transfer_client",
+                        return_value=mocker.MagicMock(spec=globus_sdk.services.transfer.client.TransferClient))
 
 
 @pytest.fixture
@@ -171,9 +173,10 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
-def test_download_windows_path_correction(dataset_windows, mock_inventory_refresh, mock_endpoint_id, mock_local_endpoint_id, mock_dc_endpoint_id, submit_transfer_mock):
+def test_download_windows_path_correction(dataset_windows, mock_inventory_refresh, mock_endpoint_id,
+                                          mock_local_endpoint_id, mock_dc_endpoint_id, mock_get_transfer_client):
     dataset_windows.files.download(wait=False)
-    call_args = submit_transfer_mock.call_args_list[0]
+    call_args = mock_get_transfer_client.submit_transfer.call_args_list[0]
     dst_paths = [d["destination_path"] for d in call_args.args[0]["DATA"]]
     assert all(":/" not in path for path in dst_paths)
 
