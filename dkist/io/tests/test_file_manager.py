@@ -21,30 +21,6 @@ def orchestrate_transfer_mock(mocker):
                        autospec=True)
 
 
-@pytest.fixture
-def mock_get_transfer_client(mocker):
-    return mocker.patch("dkist.net.globus.transfer.get_transfer_client",
-                        return_value=mocker.MagicMock(spec=globus_sdk.services.transfer.client.TransferClient))
-
-
-@pytest.fixture
-def mock_endpoint_id(mocker):
-    return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
-                        return_value="")
-
-
-@pytest.fixture
-def mock_local_endpoint_id(mocker):
-    return mocker.patch("dkist.net.globus.transfer.get_local_endpoint_id",
-                        return_value="")
-
-
-@pytest.fixture
-def mock_dc_endpoint_id(mocker):
-    return mocker.patch("dkist.net.globus.transfer.get_data_center_endpoint_id",
-                        return_value="")
-
-
 def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
     base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
     folder = Path("/{bucket}/{primaryProposalId}/{datasetId}/".format(**dataset.meta["inventory"]))
@@ -173,11 +149,13 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
-def test_download_windows_path_correction(dataset_windows, mock_inventory_refresh, mock_endpoint_id,
-                                          mock_local_endpoint_id, mock_dc_endpoint_id, mock_get_transfer_client):
-    dataset_windows.files.download(wait=False)
-    call_args = mock_get_transfer_client.submit_transfer.call_args_list[0]
-    dst_paths = [d["destination_path"] for d in call_args.args[0]["DATA"]]
+def test_download_windows_path_correction(dataset_windows):
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(source_endpoint="",destination_endpoint=""),
+                                                      [Path("somepath")],
+                                                      dataset_windows.files.basepath,
+                                                      None,
+                                                      [False])
+    dst_paths = [d["destination_path"] for d in manifest["DATA"]]
     assert all(":/" not in path for path in dst_paths)
 
 

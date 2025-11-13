@@ -20,6 +20,30 @@ from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
 __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 
 
+def _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_path, recursive):
+    src_file_list = file_list
+    if not isinstance(dst_base_path, (list, tuple)):
+        dst_base_path = pathlib.Path(dst_base_path)
+        dst_file_list = []
+        for src_file in src_file_list:
+            # If a common prefix is not specified just copy the filename or last directory
+            if not src_base_path:
+                src_filepath = src_file.name
+            else:
+                # Otherwise use the filepath relative to the base path
+                src_filepath = src_file.relative_to(src_base_path)
+            dst_file_list.append(dst_base_path / src_filepath)
+    else:
+        dst_file_list = dst_base_path
+
+    for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
+        # Globus can't handle ':', so replace eg 'C:/' in windows paths with '/C/'
+        dst_file = re.sub("^([A-Z]):/", r"/\1/", dst_file.as_posix(), flags=re.IGNORECASE)
+        transfer_manifest.add_item(src_file.as_posix(), dst_file, recursive=rec)
+
+    return transfer_manifest
+
+
 def start_transfer_from_file_list(
     src_endpoint: str,
     dst_endpoint: str,
@@ -102,25 +126,8 @@ def start_transfer_from_file_list(
         td_kwargs.update(transfer_client=tc)
     transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
-    src_file_list = file_list
-    if not isinstance(dst_base_path, (list, tuple)):
-        dst_base_path = pathlib.Path(dst_base_path)
-        dst_file_list = []
-        for src_file in src_file_list:
-            # If a common prefix is not specified just copy the filename or last directory
-            if not src_base_path:
-                src_filepath = src_file.name
-            else:
-                # Otherwise use the filepath relative to the base path
-                src_filepath = src_file.relative_to(src_base_path)
-            dst_file_list.append(dst_base_path / src_filepath)
-    else:
-        dst_file_list = dst_base_path
-
-    for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
-        # Globus can't handle ':', so replace eg 'C:/' in windows paths with '/C/'
-        dst_file = re.sub("^([A-Z]):/", r"/\1/", dst_file.as_posix(), flags=re.IGNORECASE)
-        transfer_manifest.add_item(src_file.as_posix(), dst_file, recursive=rec)
+    # This is factored out to its own function for testing purposes
+    transfer_manifest = _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_path, recursive)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 
