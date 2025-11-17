@@ -4,6 +4,7 @@ from pathlib import Path
 import globus_sdk
 import numpy as np
 import pytest
+from packaging.version import Version
 
 from dkist import net
 from dkist.net import conf
@@ -150,7 +151,10 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
 
 
 def test_download_windows_path_correction(dataset_windows):
-    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(source_endpoint="",destination_endpoint=""),
+    td_args = {"source_endpoint": "", "destination_endpoint": ""}
+    if Version(globus_sdk.__version__) < Version("4.0.0"):
+        td_args["transfer_client"] = ""
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(td_args),
                                                       [Path("somepath")],
                                                       dataset_windows.files.basepath,
                                                       None,
