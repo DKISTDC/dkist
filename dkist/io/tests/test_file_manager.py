@@ -150,10 +150,10 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
-def test_download_windows_path_correction(dataset_windows):
+def test_download_windows_path_correction(mocker, dataset_windows):
     td_args = {"source_endpoint": "", "destination_endpoint": ""}
     if Version(globus_sdk.__version__) < Version("4.0.0"):
-        td_args["transfer_client"] = ""
+        td_args["transfer_client"] = mocker.MagicMock(spec=globus_sdk.services.transfer.client.TransferClient)
     manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(**td_args),
                                                       [Path("somepath")],
                                                       dataset_windows.files.basepath,
