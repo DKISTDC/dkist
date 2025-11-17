@@ -154,7 +154,7 @@ def test_download_windows_path_correction(dataset_windows):
     td_args = {"source_endpoint": "", "destination_endpoint": ""}
     if Version(globus_sdk.__version__) < Version("4.0.0"):
         td_args["transfer_client"] = ""
-    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(td_args),
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(**td_args),
                                                       [Path("somepath")],
                                                       dataset_windows.files.basepath,
                                                       None,
