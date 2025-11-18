@@ -1,8 +1,10 @@
 import logging
 from pathlib import Path
 
+import globus_sdk
 import numpy as np
 import pytest
+from packaging.version import Version
 
 from dkist import net
 from dkist.net import conf
@@ -146,6 +148,19 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     )
 
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
+
+
+def test_download_windows_path_correction(mocker, dataset_windows):
+    td_args = {"source_endpoint": "", "destination_endpoint": ""}
+    if Version(globus_sdk.__version__) < Version("4.0.0"):
+        td_args["transfer_client"] = mocker.MagicMock(spec=globus_sdk.services.transfer.client.TransferClient)
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(**td_args),
+                                                      [Path("somepath")],
+                                                      dataset_windows.files.basepath,
+                                                      None,
+                                                      [False])
+    dst_paths = [d["destination_path"] for d in manifest["DATA"]]
+    assert all(":/" not in path for path in dst_paths)
 
 
 def test_length_one_first_array_axis(small_visp_dataset):
