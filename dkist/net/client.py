@@ -99,9 +99,13 @@ class DKISTQueryResponseTable(QueryResponseTable):
             results[colname] = u.Quantity(results[colname], unit=unit)
 
         if "Average Fried Parameter" in results.colnames:
-            r_none_values = np.array(results["Average Fried Parameter"] == None)
-            if r_none_values.any():
-                results["Average Fried Parameter"][r_none_values] = np.nan
+            # We need to replace Nones with nans here for sorting purposes
+            # We also need to recreate the whole row so that it can have a numerical dtype
+            # Without this is doesn't sort properly and any nans up in strange places
+            old_r = results["Average Fried Parameter"]
+            results["Average Fried Parameter"] = [np.nan] * len(results)
+            notnone = results["Average Fried Parameter"] != None
+            results["Average Fried Parameter"][notnone] = old_r[notnone]
 
         if results and "Wavelength" not in results.colnames:
             results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
