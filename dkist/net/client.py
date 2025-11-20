@@ -32,6 +32,17 @@ from .attr_walker import walker
 __all__ = ["DKISTClient", "DKISTQueryResponseTable"]
 
 
+def process_nones(results, key, replacement=np.nan):
+    # We need to replace Nones with nans here for sorting purposes
+    # We also need to recreate the whole row so that it can have a numerical dtype
+    # Without this is doesn't sort properly and any nans up in strange places
+    if key in results.colnames:
+        old_r = results[key]
+        results[key] = [replacement] * len(results)
+        notnone = results[key] != None
+        results[key][notnone] = old_r[notnone]
+
+
 class DKISTQueryResponseTable(QueryResponseTable):
     """
     Results of a DKIST Dataset search.
@@ -98,14 +109,7 @@ class DKISTQueryResponseTable(QueryResponseTable):
                 results[colname][none_values] = np.nan
             results[colname] = u.Quantity(results[colname], unit=unit)
 
-        if "Average Fried Parameter" in results.colnames:
-            # We need to replace Nones with nans here for sorting purposes
-            # We also need to recreate the whole row so that it can have a numerical dtype
-            # Without this is doesn't sort properly and any nans up in strange places
-            old_r = results["Average Fried Parameter"]
-            results["Average Fried Parameter"] = [np.nan] * len(results)
-            notnone = results["Average Fried Parameter"] != None
-            results["Average Fried Parameter"][notnone] = old_r[notnone]
+        process_nones(results, "Average Fried Parameter")
 
         if results and "Wavelength" not in results.colnames:
             results["Wavelength"] = u.Quantity([results["Wavelength Min"], results["Wavelength Max"]]).T
