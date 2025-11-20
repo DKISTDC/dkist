@@ -1,3 +1,4 @@
+import copy
 import json
 
 import hypothesis.strategies as st
@@ -105,6 +106,20 @@ def example_api_response():
 
 
 @pytest.fixture
+def example_api_response_multiple_r0(example_api_response):
+    """
+    A larger dummy API response with varied Fried parameter values to test sorting
+    """
+    for _ in range(4):
+        example_api_response["searchResults"].append(copy.copy(example_api_response["searchResults"][0]))
+    example_api_response["searchResults"][1]["qualityAverageFriedParameter"] = 5
+    example_api_response["searchResults"][3]["qualityAverageFriedParameter"] = 1
+    example_api_response["searchResults"][4]["qualityAverageFriedParameter"] = 3
+
+    return example_api_response
+
+
+@pytest.fixture
 def expected_table_keys():
     translated_keys = set(INVENTORY_KEY_MAP.values())
     removed_keys = {"Wavelength Min", "Wavelength Max"}
@@ -149,6 +164,13 @@ def test_query_response_from_results(empty_query_response, example_api_response,
     assert not set(qr.colnames).difference(expected_table_keys)
     assert set(qr.colnames).isdisjoint(INVENTORY_KEY_MAP.keys())
     assert np.isnan(qr["Average Fried Parameter"][0])
+
+
+def test_sort_fried_parameter(example_api_response_multiple_r0):
+    qr = DKISTQueryResponseTable.from_results([example_api_response_multiple_r0], client=DKISTClient())
+    qr.sort("Average Fried Parameter")
+    assert all(qr["Average Fried Parameter"][:3] == [1.0, 3.0, 5.0])
+    assert all(np.isnan(qr["Average Fried Parameter"][3:]))
 
 
 def test_query_response_from_results_unknown_field(empty_query_response, example_api_response, expected_table_keys):
