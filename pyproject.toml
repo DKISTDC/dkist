@@ -183,3 +183,6 @@ version_file = "dkist/_version.py"
     directory = "performance"
     name = "Performance Improvements"
     showcontent = true
+
+[tool.jupytext]
+  formats = "ipynb,py:percent"
