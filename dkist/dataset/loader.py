@@ -140,6 +140,8 @@ def _load_from_path(path: Path, *, ignore_version_mismatch=False):
     if not path.is_dir():
         if not path.exists():
             raise ValueError(f"{path} does not exist.")
+        if "_L2_" in path.name:
+            return _load_l2_from_asdf(Path(path), ignore_version_mismatch=ignore_version_mismatch)
         return _load_from_asdf(path, ignore_version_mismatch=ignore_version_mismatch)
 
     return _load_from_directory(path, ignore_version_mismatch=ignore_version_mismatch)
@@ -261,6 +263,28 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
         raise TypeError(err) from e
 
 
+def _load_l2_from_asdf(filepath, *, ignore_version_mismatch=False):
+    """
+    Construct a level 2 inversion object from a filepath of a suitable asdf file.
+    """
+    filepath = Path(filepath).expanduser()
+    base_path = filepath.parent
+    try:
+        with importlib_resources.as_file(
+            importlib_resources.files("dkist.io") / "level_2_dataset_schema.yaml"
+        ) as schema_path:
+            with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
+                if not ignore_version_mismatch:
+                    _check_dkist_version(filepath, ff)
+                inv = ff.tree["inversion"]
+                inv.meta["history"] = ff.tree["history"]
+                return inv
+
+    except ValidationError as e:
+        err = f"This file is not a valid DKIST Level 2 asdf file, it fails validation with: {e.message}."
+        raise TypeError(err) from e
+
+
 @cache
 def _get_dkist_uris():
     return [e.extension_uri for e in get_dkist_extensions()]
@@ -277,7 +301,7 @@ def _check_dkist_version(filepath, asdf_file):
     ]
 
     if not matching_extensions or len(matching_extensions) > 1:
-        dkist.log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
+        dkist.log.info(f"Failed to validate dkist version used by asdf file {asdf_file}.")
         return
 
     dkist_uris = _get_dkist_uris()
