@@ -101,7 +101,7 @@ Currently, {obj}`astropy.coordinates` supports:
 
 * Spatial coordinates via {obj}`astropy.coordinates.SkyCoord`
 * Spectral coordinates via {obj}`astropy.coordinates.SpectralCoord`
-* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (introduced in astropy 7.0)
+* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (introduced in astropy 5.3)
 
 ### Spatial Coordinates
 
