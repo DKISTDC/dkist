@@ -52,7 +52,7 @@ jobs:
 
       - name: Start redis
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
-        uses: supercharge/redis-github-action@ea9b21c6ecece47bd99595c532e481390ea0f044  # v1.8.0
+        uses: supercharge/redis-github-action@bc274cb7238cd63a45029db04ee48c07a72609fd  # v1.8.1
 
       - name: Start rabbitmq
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
