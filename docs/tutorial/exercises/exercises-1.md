@@ -196,6 +196,10 @@ Fido.fetch(large)
 
 Open the VBI sample dataset again. Choose two adjacent tiles and calculate the overlap between them in arcseconds.
 
+HINTS:
+- You will only need the first from of each tile.
+- You may find the `SkyCoord.separation()` method helpful
+
 ```{code-cell} ipython3
 ---
 editable: true
