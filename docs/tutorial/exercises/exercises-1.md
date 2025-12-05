@@ -177,14 +177,6 @@ large
 ```
 
 ```{code-cell} ipython3
-
-```
-
-```{code-cell} ipython3
-
-```
-
-```{code-cell} ipython3
 Fido.fetch(large)
 ```
 
