@@ -53,12 +53,11 @@ ci = dkist.load_dataset(CRYO_L1_MSCGD) # Load the context imager (CI) sample dat
 ```{code-cell} ipython3
 ---
 editable: true
-jupyter:
-  outputs_hidden: true
 slideshow:
   slide_type: skip
 ---
 fig = plt.figure()
+ci.data = ci.data.compute() # Let's compute the data here to make things a little easier
 vmin, vmax = np.nanpercentile(ci[0].data, [1,99])
 norm = PowerNorm(0.3, vmin=vmin, vmax=vmax)
 ax = ci[:50].plot(norm=norm)
@@ -80,8 +79,6 @@ ani
 ```{code-cell} ipython3
 ---
 editable: true
-jupyter:
-  outputs_hidden: true
 slideshow:
   slide_type: skip
 ---
