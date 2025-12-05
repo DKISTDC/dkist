@@ -45,7 +45,7 @@ slideshow:
   slide_type: skip
 ---
 ci = dkist.load_dataset(CRYO_L1_MSCGD) # Load the context imager (CI) sample dataset
-ci[:50].files.download("~/dkist_data/CRYO_L1_MSCGD")
+#ci[:50].files.download("~/dkist_data/CRYO_L1_MSCGD")
 ```
 
 ## Stage 2
