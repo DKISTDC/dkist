@@ -5,32 +5,18 @@ This file contains the DKIST specific FileManager code.
 import os
 import json
 import urllib
-from typing import Any, Protocol
+from typing import Any
 from pathlib import Path
 from textwrap import dedent
 
 from parfive import Downloader, Results
 
 from dkist import log
-from dkist.io.dask.striped_array import FileManager
+from dkist.io.dask.striped_array import FileManager, FileManagerProtocol
+from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
-
-
-class FileManagerProtocol(Protocol):
-    """
-    Protocol to quack like a `FileManager` object for the `DKISTFileManager`.
-    """
-
-    @property
-    def basepath(self) -> os.PathLike: ...
-
-    @basepath.setter
-    def basepath(self, path: str | os.PathLike) -> None: ...
-
-    @property
-    def filenames(self) -> list[str]: ...
 
 
 class DKISTFileManager:
@@ -43,15 +29,6 @@ class DKISTFileManager:
     files from.
     """
     __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
-
-    def __str__(self) -> str:
-        return dedent(f"""\
-            DKISTFileManager containing {len(self)} files stored in {self.basepath}.
-            Each file array has shape {self.shape}.\
-        """)
-
-    def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
 
     @classmethod
     def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
@@ -72,8 +49,18 @@ class DKISTFileManager:
     def __len__(self):
         return self._fm.__len__()
 
+    def __eq__(self, other):
+        return self._fm.__eq__(other)
+
     def __getitem__(self, item):
         return self._fm.__getitem__(item)
+
+    def __str__(self):
+        return filemanager_info_str(self)
+
+    def __repr__(self):
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def basepath(self) -> os.PathLike:
@@ -89,9 +76,6 @@ class DKISTFileManager:
     def __getattr__(self, attr):
         # We want to proxy a fixed list of public API:
         proxy_api = [
-            "__eq__",
-            "__len__",
-            "__str__",
             "fileuri_array",
             "shape",
             "output_shape",

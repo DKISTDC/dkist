@@ -1,3 +1,26 @@
+1.16.0 (2025-10-14)
+===================
+
+Features
+--------
+
+- Adds a `hide_internal_tick_labels` keyword to `TiledDataset.plot()` which removes the tick labels from tiels except along the bottom and left. (`#626 <https://github.com/DKISTDC/dkist/pull/626>`__)
+
+
+Bug Fixes
+---------
+
+- Fix bug that caused a slice of a sliced dataset to return the full dataset's FileManager loader array (`#644 <https://github.com/DKISTDC/dkist/pull/644>`__)
+- Add support for globus_sdk>=4. (`#645 <https://github.com/DKISTDC/dkist/pull/645>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Clarifies wording about size and arrangement of files.
+  Restructures the internals of FileManager slightly to make it inherit more cleanly. (`#627 <https://github.com/DKISTDC/dkist/pull/627>`__)
+
+
 1.15.0 (2025-08-07)
 ===================
 

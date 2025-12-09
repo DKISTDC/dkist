@@ -239,6 +239,13 @@ def dataset(array, identity_gwcs):
 
 
 @pytest.fixture
+def dataset_windows(dataset):
+    dataset.files.basepath = "C:/Users/somepath/"
+
+    return dataset
+
+
+@pytest.fixture
 def empty_meta():
     return {"inventory": {}, "headers": {}}
 

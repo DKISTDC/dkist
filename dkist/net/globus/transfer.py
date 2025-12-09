@@ -1,6 +1,7 @@
 """
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
+import re
 import json
 import time
 import pathlib
@@ -9,6 +10,7 @@ from os import PathLike
 from typing import Literal
 
 import globus_sdk
+from packaging.version import Version
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
@@ -16,6 +18,30 @@ from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
                         get_endpoint_id, get_local_endpoint_id, get_transfer_client)
 
 __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
+
+
+def _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_path, recursive):
+    src_file_list = file_list
+    if not isinstance(dst_base_path, (list, tuple)):
+        dst_base_path = pathlib.Path(dst_base_path)
+        dst_file_list = []
+        for src_file in src_file_list:
+            # If a common prefix is not specified just copy the filename or last directory
+            if not src_base_path:
+                src_filepath = src_file.name
+            else:
+                # Otherwise use the filepath relative to the base path
+                src_filepath = src_file.relative_to(src_base_path)
+            dst_file_list.append(dst_base_path / src_filepath)
+    else:
+        dst_file_list = dst_base_path
+
+    for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
+        # Globus can't handle ':', so replace eg 'C:/' in windows paths with '/C/'
+        dst_file = re.sub("^([A-Z]):/", r"/\1/", dst_file.as_posix(), flags=re.IGNORECASE)
+        transfer_manifest.add_item(src_file.as_posix(), dst_file, recursive=rec)
+
+    return transfer_manifest
 
 
 def start_transfer_from_file_list(
@@ -69,6 +95,7 @@ def start_transfer_from_file_list(
     `str`
         Task ID.
     """
+    globus_lt_v4 = Version(globus_sdk.__version__) < Version("4.0.0")
     if isinstance(recursive, bool):
         recursive = [recursive] * len(file_list)
     if len(recursive) != len(file_list):
@@ -81,35 +108,26 @@ def start_transfer_from_file_list(
 
     # Resolve to IDs and activate endpoints
     src_endpoint = get_endpoint_id(src_endpoint, tfr_client=tc)
-    auto_activate_endpoint(src_endpoint, tfr_client=tc)
+    if globus_lt_v4:
+        auto_activate_endpoint(src_endpoint, tfr_client=tc)
 
     dst_endpoint = get_endpoint_id(dst_endpoint, tfr_client=tc)
-    auto_activate_endpoint(dst_endpoint, tfr_client=tc)
+    if globus_lt_v4:
+        auto_activate_endpoint(dst_endpoint, tfr_client=tc)
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
-    transfer_manifest = globus_sdk.TransferData(tc, src_endpoint, dst_endpoint,
-                                                label=label,
-                                                sync_level="checksum",
-                                                verify_checksum=True)
+    td_kwargs = {"source_endpoint": src_endpoint,
+                 "destination_endpoint": dst_endpoint,
+                 "label": label,
+                 "sync_level": "checksum",
+                 "verify_checksum": True}
+    if globus_lt_v4:
+        td_kwargs.update(transfer_client=tc)
+    transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
-    src_file_list = file_list
-    if not isinstance(dst_base_path, (list, tuple)):
-        dst_base_path = pathlib.Path(dst_base_path)
-        dst_file_list = []
-        for src_file in src_file_list:
-            # If a common prefix is not specified just copy the filename or last directory
-            if not src_base_path:
-                src_filepath = src_file.name
-            else:
-                # Otherwise use the filepath relative to the base path
-                src_filepath = src_file.relative_to(src_base_path)
-            dst_file_list.append(dst_base_path / src_filepath)
-    else:
-        dst_file_list = dst_base_path
-
-    for src_file, dst_file, rec in zip(src_file_list, dst_file_list, recursive):
-        transfer_manifest.add_item(src_file.as_posix(), dst_file.as_posix(), recursive=rec)
+    # This is factored out to its own function for testing purposes
+    transfer_manifest = _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_path, recursive)
 
     return tc.submit_transfer(transfer_manifest)["task_id"]
 

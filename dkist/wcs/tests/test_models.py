@@ -365,7 +365,7 @@ def test_vct_dispatch():
     )
     assert isinstance(vct_3d, VaryingCelestialTransform3D)
 
-    with pytest.raises(ValueError, match="Only 1D, 2D and 3D lookup tables are supported."):
+    with pytest.raises(ValueError, match=r"Only 1D, 2D and 3D lookup tables are supported."):
         varying_celestial_transform_from_tables(
             pc_table=varying_matrix_lt,
             crval_table=crval_table,

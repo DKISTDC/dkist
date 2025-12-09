@@ -1,8 +1,10 @@
 import logging
 from pathlib import Path
 
+import globus_sdk
 import numpy as np
 import pytest
+from packaging.version import Version
 
 from dkist import net
 from dkist.net import conf
@@ -148,6 +150,19 @@ def test_download_path_interpolation(dataset, orchestrate_transfer_mock, mock_in
     assert dataset.files.basepath == Path("~/test_dataset").expanduser()
 
 
+def test_download_windows_path_correction(mocker, dataset_windows):
+    td_args = {"source_endpoint": "", "destination_endpoint": ""}
+    if Version(globus_sdk.__version__) < Version("4.0.0"):
+        td_args["transfer_client"] = mocker.MagicMock(spec=globus_sdk.services.transfer.client.TransferClient)
+    manifest = net.globus.transfer._populate_manifest(globus_sdk.TransferData(**td_args),
+                                                      [Path("somepath")],
+                                                      dataset_windows.files.basepath,
+                                                      None,
+                                                      [False])
+    dst_paths = [d["destination_path"] for d in manifest["DATA"]]
+    assert all(":/" not in path for path in dst_paths)
+
+
 def test_length_one_first_array_axis(small_visp_dataset):
     all_files = small_visp_dataset.files.filenames
 
@@ -235,10 +250,19 @@ def test_tiled_file_manager_download(large_tiled_dataset, orchestrate_transfer_m
 
 
 def test_dkist_file_manager_repr(large_visp_dataset):
-    assert "DKISTFileManager containing 80 files stored in" in repr(large_visp_dataset.files)
-    assert "Each file array has shape (1, 50, 128)" in repr(large_visp_dataset.files)
+    assert "DKISTFileManager containing 80 files." in repr(large_visp_dataset.files)
+    assert "(4, 20) array, and each file contains a (1, 50, 128) data array" in repr(large_visp_dataset.files)
 
 
 def test_tiled_dataset_file_manager_repr(large_tiled_dataset):
-    assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files stored in" in repr(large_tiled_dataset.files)
-    assert "Each file array has shape (1, 4096, 4096)" in repr(large_tiled_dataset.files)
+    assert f"DKISTFileManager containing {(9-large_tiled_dataset.mask.sum())*3} files." in repr(large_tiled_dataset.files)
+    assert "each file contains a (1, 4096, 4096) data array" in repr(large_tiled_dataset.files)
+
+    x, y = large_tiled_dataset.shape
+    for r in range(y):
+        for c in range(x):
+            tile = large_tiled_dataset[r, c]
+            if isinstance(tile, np.ma.core.MaskedConstant):
+                assert (large_tiled_dataset.files.fileuri_array[r, c] == "").all()
+            else:
+                assert (tile.files.fileuri_array == large_tiled_dataset.files.fileuri_array[r, c]).all()

@@ -105,8 +105,10 @@ def test_tiled_dataset_invalid_construction(dataset, dataset_4d):
 
 @figure_test
 @pytest.mark.remote_data
-@pytest.mark.parametrize("share_zscale", [True, False], ids=["share_zscale", "indpendent_zscale"])
-def test_tileddataset_plot(share_zscale):
+@pytest.mark.parametrize(("share_zscale", "hide_labels"), [(True, True), (True, False), (False, True), (False, False)],
+                         ids=["share_zscale-tick_labels_displayed", "share_zscale-tick_labels_hidden",
+                              "independent_zscale-tick_labels_displayed", "independent_zscale-tick_labels_hidden"])
+def test_tileddataset_plot(share_zscale, hide_labels):
     from dkist.data.sample import VBI_L1_NZJTB  # noqa: PLC0415
     ori_ds = load_dataset(VBI_L1_NZJTB)
 
@@ -124,7 +126,7 @@ def test_tileddataset_plot(share_zscale):
                       match="The metadata ASDF file that produced this dataset is out of date and will result in "
                             "incorrect plots. Please re-download the metadata ASDF file."):
         #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
-        ds.plot(0, share_zscale=share_zscale, figure=fig)
+        ds.plot(0, share_zscale=share_zscale, hide_internal_tick_labels=hide_labels, figure=fig)
 
     return plt.gcf()
 

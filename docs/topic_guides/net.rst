@@ -79,6 +79,24 @@ The `dkist` package provides two different interfaces for starting a Globus tran
 One is `~dkist.net.transfer_complete_datasets` which will stage the whole dataset directory for download.
 The other is the `~dkist.io.DKISTFileManager.download` method of ``Dataset.files``, this method allows you to only download some FITS files based on the slicing of a dataset object.
 
+Globus on Windows
+#################
+
+Allowed paths
++++++++++++++
+
+The UI for Globus Personal Connect on Windows does not prompt the user to specify an allowed location on startup.
+It uses whatever it assumes to be the user's home directory, but since this is not a well-defined concept on Windows the actual location it chooses may vary.
+If you encounter problems downloading data on Windows, first check the settings in Globus Personal Connect to see if the location you are trying to download to is listed in the allowed paths, and add it if not.
+
+Representation of paths
++++++++++++++++++++++++
+
+The `globus_sdk` package's transfer methods do not allow the `:` character in destination paths.
+On Windows, where absolute paths start with the drive letter followed by a `:` (e.g.: `C:/`), this is clearly a problem.
+Instead Globus uses `/<drive leter>/` (e.g.: `/C/`) to represent this location.
+The Python tools convert paths correspondingly before passing them on to Globus to initiate a transfer.
+The user-facing `files.basepath` still uses the usual `C:/` format for clarity.
 
 Downloading Files from a ``Dataset``
 ####################################

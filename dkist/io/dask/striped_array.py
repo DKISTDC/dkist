@@ -14,8 +14,9 @@ view into the original ``StripedExternalArray`` object through the
 """
 import os
 import abc
-from typing import Any
+from typing import Any, Protocol
 from pathlib import Path
+from textwrap import dedent
 from collections.abc import Iterable
 
 import dask.array
@@ -26,8 +27,30 @@ from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
+from dkist.io.utils import filemanager_info_str
 
 __all__ = ["FileManager", "StripedExternalArray"]
+
+
+class FileManagerProtocol(Protocol):
+    """
+    Protocol to quack like a `FileManager` object for the `DKISTFileManager`.
+    """
+
+    @property
+    def basepath(self) -> os.PathLike: ...
+
+    @basepath.setter
+    def basepath(self, path: str | os.PathLike) -> None: ...
+
+    @property
+    def filenames(self) -> list[str]: ...
+
+    @property
+    def fileuri_array(self) -> list: ...
+
+    @property
+    def shape(self) -> tuple: ...
 
 
 class BaseStripedExternalArray(abc.ABC):
@@ -123,11 +146,12 @@ class StripedExternalArray(BaseStripedExternalArray):
 
         self._loader_array = loader_array
 
-    def __str__(self) -> str:
-        return f"FITSLoader {len(self)} files with shape {self.shape}"
+    def __str__(self: FileManagerProtocol) -> str:
+        return filemanager_info_str(self)
 
-    def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+    def __repr__(self: FileManagerProtocol) -> str:
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def ndim(self):
@@ -185,8 +209,9 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     def __str__(self):
         return f"FITSLoader View <{self.parent_slice}> into {self.parent}"
 
-    def __repr__(self):
-        return f"{object.__repr__(self)}\n{self}"
+    def __repr__(self) -> str:
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
     def basepath(self) -> os.PathLike:
@@ -218,7 +243,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         """
         # array call here to ensure that a length one array is returned rather
         # than a single element.
-        return np.array(self._loader_array[self.parent_slice])
+        return np.array(self.parent.loader_array[self.parent_slice])
 
 
 class FileManager:
@@ -250,11 +275,12 @@ class FileManager:
     def __len__(self):
         return len(self._striped_external_array)
 
-    def __str__(self) -> str:
-        return f"FileManager containing {len(self)} files with each array having shape {self.shape}"
+    def __str__(self):
+        return filemanager_info_str(self)
 
     def __repr__(self) -> str:
-        return f"{object.__repr__(self)}\n{self}"
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)

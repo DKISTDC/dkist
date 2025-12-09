@@ -40,19 +40,19 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0
+      - uses: actions/setup-python@2e3e4b15a884dc73a63f962bff250a855150a234  # v5.5.0
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - run: python -m pip install -U tox
 
       - name: Start redis
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
-        uses: supercharge/redis-github-action@ea9b21c6ecece47bd99595c532e481390ea0f044  # v1.8.0
+        uses: supercharge/redis-github-action@bc274cb7238cd63a45029db04ee48c07a72609fd  # v1.8.1
 
       - name: Start rabbitmq
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
