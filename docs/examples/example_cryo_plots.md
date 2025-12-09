@@ -84,7 +84,7 @@ dlat = np.abs(space_2[0,1].Ty - space_2[0,0].Ty)
 aspect = dlon / dlat
 ```
 
-Finally, we can plot both our mean-subtracted scan at the peak wavelength and the mean values over all all wavelengths.
+Finally, we can plot both our mean-subtracted scan at the peak wavelength and the mean values over all wavelengths.
 
 ```{code-cell} ipython3
 fig = plt.figure(figsize=(7, 5), layout="constrained")
