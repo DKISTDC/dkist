@@ -18,8 +18,6 @@ kernelspec:
 In this example we will talk about visualising both spectrograph and context imager datasets.
 
 ```{code-cell} ipython3
-:tags: [keep-inputs]
-
 import numpy as np
 import astropy.units as u
 import matplotlib.pyplot as plt
