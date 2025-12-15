@@ -34,7 +34,7 @@ dependencies = [
   "globus-sdk>=3.0",
   "gwcs>=0.24.0",  # Inverse transform fix
   "matplotlib>=3.7",
-  "ndcube[plotting,reproject] @ git+https://github.com/SolarDrew/ndcube",
+  "ndcube[plotting,reproject] @ git+https://github.com/SolarDrew/ndcube@main",
   "numpy>=1.25",
   "parfive[ftp]>=2.2.0",
   "platformdirs>=3.0",
