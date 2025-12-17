@@ -111,5 +111,4 @@ def test_incorrect_schema_infrastructure(break_manifest, orphan_schema):
         assert schema_in_converters_list(converter, converters)
     with pytest.raises(KeyError):
         assert schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest["null"])
-    with pytest.raises(IndexError):
-        assert schema_ver_matches_filename(latest_sche_yamls["null"], yaml_version)
+    assert not schema_ver_matches_filename(latest_sche_yamls["null"], yaml_version)
