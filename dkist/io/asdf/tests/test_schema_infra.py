@@ -67,10 +67,17 @@ def schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest):
 
 
 def schema_ver_matches_filename(yaml, yaml_version):
-        # Check that schema version in schema matches filename
-        with open(yaml, encoding="utf-8") as f:
-            schema_version_in_yaml = f.readlines()[3][-7:-2]
-        return schema_version_in_yaml == yaml_version
+    # Check that schema version in schema matches filename
+    with open(yaml, encoding="utf-8") as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith("id:"):
+                schema_line = line
+                break
+        else:
+            raise ValueError(f"No id found in schema file {yaml}")
+    schema_version_in_yaml = schema_line[-7:-2]
+    return schema_version_in_yaml == yaml_version
 
 
 def num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas):
