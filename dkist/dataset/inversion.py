@@ -46,12 +46,12 @@ class Profiles(NDCollection):
             figure = plt.gcf()
 
         sliced_profiles = self[slice_index]
-        lines = [k for k in sliced_profiles.keys() if "_fit" not in k]
+        lines = {k[:k.index("_")] for k in sliced_profiles.keys()}
         ncols, nrows = len(lines), 4
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
         for l, line in enumerate(lines):
             for s, stokes in enumerate(["I", "Q", "U", "V"]):
-                profile = sliced_profiles[line][..., s]
+                profile = sliced_profiles[line+"_orig"][..., s]
                 fit = sliced_profiles[line+"_fit"][..., s]
 
                 ax_gridspec = gridspec[s, l]
