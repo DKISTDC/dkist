@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
           fetch-depth: 0
 
@@ -52,7 +52,7 @@ jobs:
 
       - name: Start redis
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
-        uses: supercharge/redis-github-action@ea9b21c6ecece47bd99595c532e481390ea0f044  # v1.8.0
+        uses: supercharge/redis-github-action@bc274cb7238cd63a45029db04ee48c07a72609fd  # v1.8.1
 
       - name: Start rabbitmq
         if: ${{ matrix.toxenv == 'dkist-processing-common' }}
