@@ -10,12 +10,11 @@ from os import PathLike
 from typing import Literal
 
 import globus_sdk
-from packaging.version import Version
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
-from .endpoints import (auto_activate_endpoint, get_data_center_endpoint_id,
-                        get_endpoint_id, get_local_endpoint_id, get_transfer_client)
+from .endpoints import (get_data_center_endpoint_id, get_endpoint_id,
+                        get_local_endpoint_id, get_transfer_client)
 
 __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 
@@ -95,7 +94,6 @@ def start_transfer_from_file_list(
     `str`
         Task ID.
     """
-    globus_lt_v4 = Version(globus_sdk.__version__) < Version("4.0.0")
     if isinstance(recursive, bool):
         recursive = [recursive] * len(file_list)
     if len(recursive) != len(file_list):
@@ -108,12 +106,8 @@ def start_transfer_from_file_list(
 
     # Resolve to IDs and activate endpoints
     src_endpoint = get_endpoint_id(src_endpoint, tfr_client=tc)
-    if globus_lt_v4:
-        auto_activate_endpoint(src_endpoint, tfr_client=tc)
 
     dst_endpoint = get_endpoint_id(dst_endpoint, tfr_client=tc)
-    if globus_lt_v4:
-        auto_activate_endpoint(dst_endpoint, tfr_client=tc)
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
@@ -122,8 +116,6 @@ def start_transfer_from_file_list(
                  "label": label,
                  "sync_level": "checksum",
                  "verify_checksum": True}
-    if globus_lt_v4:
-        td_kwargs.update(transfer_client=tc)
     transfer_manifest = globus_sdk.TransferData(**td_kwargs)
 
     # This is factored out to its own function for testing purposes

@@ -14,7 +14,6 @@ from dkist.net.globus.transfer import (_get_speed, _orchestrate_transfer_task,
 def mock_endpoints(mocker):
     def id_mock(endpoint, tfr_client):
         return endpoint
-    mocker.patch("dkist.net.globus.transfer.auto_activate_endpoint")
     return mocker.patch("dkist.net.globus.transfer.get_endpoint_id",
                         side_effect=id_mock)
 
