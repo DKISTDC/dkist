@@ -136,7 +136,7 @@ intersphinx_mapping = {
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "parfive": ("https://parfive.readthedocs.io/en/latest/", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
-    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/latest/", None),
     "gwcs": ("https://gwcs.readthedocs.io/en/latest/", None),
     "asdf": ("https://asdf.readthedocs.io/en/stable/", None),
     "dask": ("https://dask.pydata.org/en/stable/", None),
