@@ -145,7 +145,7 @@ plt.show()
 Now we can plot the slit position. We do this by taking the first raster step position of the SP dataset and computing the world coordinates of each pixel along the slit.
 
 ```{code-cell} ipython3
-slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
+slit_coords = sp[0,:,0].axis_world_coords("lon", "lat")[0]  # Again, [0] because this always returns a tuple
 
 fig = plt.figure(layout="constrained")
 # Reuse the norm from the first plot
@@ -162,7 +162,7 @@ plt.show()
 Notice how the slit has a larger field of view along the latitude dimension. We can re-plot the image, and crop the extent of the plot back to the extent of the context imager.
 
 ```{code-cell} ipython3
-slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
+slit_coords = sp[0,:,0].axis_world_coords("lon", "lat")[0]  # Again, [0] because this always returns a tuple
 
 fig = plt.figure(layout="constrained")
 # Reuse the norm from the first plot
