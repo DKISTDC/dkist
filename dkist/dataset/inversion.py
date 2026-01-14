@@ -9,7 +9,7 @@ from matplotlib.gridspec import GridSpec
 
 from ndcube import NDCollection
 
-__all__ = ["Inversion"]
+__all__ = ["Inversion", "Profiles"]
 
 
 class Profiles(NDCollection):
