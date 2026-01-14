@@ -9,18 +9,11 @@ from packaging.version import Version
 from parfive import Results
 
 import asdf
+from asdf.exceptions import ValidationError
 
 import dkist
 from dkist.io.asdf.entry_points import get_extensions as get_dkist_extensions
 from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
-
-try:
-    # first try to import from asdf.exceptions for asdf 2.15+
-    from asdf.exceptions import ValidationError
-except ImportError:
-    # fall back to top level asdf for older versions of asdf
-    from asdf import ValidationError
-
 
 ASDF_FILENAME_PATTERN = re.compile(
     r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
