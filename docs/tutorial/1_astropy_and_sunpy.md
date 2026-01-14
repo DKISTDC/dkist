@@ -142,6 +142,17 @@ There are few things to notice about the difference between these two `SkyCoord`
 1. The `obstime` and `rsun` attributes are still present, but the `observer` attribute isn't. This is because heliographic coordinates are not observer dependent.
 1. The `obstime` attribute is still important to transform to other frames, as the heliographic frame needs to know the location of Earth.
 
++++
+
+Sunpy provides more equivalencies that might be useful here, for example if we wish to convert the solar angle values used for this SkyCoord into distance:
+
+```{code-cell} ipython3
+from sunpy.coordinates.utils import solar_angle_equivalency
+
+print((hpc1.Tx).to(u.km, equivalencies=solar_angle_equivalency(observer=hpc1.observer)))
+print((hpc1.Ty).to(u.km, equivalencies=solar_angle_equivalency(observer=hpc1.observer)))
+```
+
 ### Spectral Coordinates
 
 {obj}`astropy.coordinates.SpectralCoord` is a `Quantity`-like object which also holds information about the observer and target coordinates and relative velocities.
