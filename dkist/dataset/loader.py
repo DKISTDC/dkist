@@ -1,6 +1,6 @@
 import re
 import warnings
-import importlib.resources as importlib_resources
+import importlib.resources as ilr
 from pathlib import Path
 from functools import cache, singledispatch
 from collections import defaultdict
@@ -133,8 +133,6 @@ def _load_from_path(path: Path, *, ignore_version_mismatch=False):
     if not path.is_dir():
         if not path.exists():
             raise ValueError(f"{path} does not exist.")
-        if "_L2_" in path.name:
-            return _load_l2_from_asdf(Path(path), ignore_version_mismatch=ignore_version_mismatch)
         return _load_from_asdf(path, ignore_version_mismatch=ignore_version_mismatch)
 
     return _load_from_directory(path, ignore_version_mismatch=ignore_version_mismatch)
@@ -228,54 +226,67 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
 
 
 def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
+    with (
+        ilr.as_file(ilr.files("dkist.io") / "level_1_dataset_schema.yaml") as l1_schema,
+        ilr.as_file(ilr.files("dkist.io") / "level_2_dataset_schema.yaml") as l2_schema,
+    ):
+        # Load the file without a custom schema so that we can validate it against multiple schemas
+        with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
+            if not ignore_version_mismatch:
+                _check_dkist_version(filepath, ff)
+
+            # First validate against level 1
+            try:
+                asdf.schema.validate(
+                    asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff), ctx=ff, schema=asdf.schema.load_schema(l1_schema)
+                )
+                return _load_l1_from_asdf(ff, filepath)
+            except ValidationError as e:
+                # Store the error message if validation fails, then move on
+                l1_failed_msg = e.message
+
+            # If l1 validation fails, assume l2
+            try:
+                asdf.schema.validate(
+                    asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff), ctx=ff, schema=asdf.schema.load_schema(l2_schema)
+                )
+                return _load_l2_from_asdf(ff, filepath)
+            except ValidationError as e:
+                # If l2 validation fails, store that message as well
+                l2_failed_msg = e.message
+
+            # If you get here, it's neither level 1 nor 2, user gets to know why each one failed
+            msg = ("This file is not a valid DKIST asdf file.\n"
+                f"Level 1 validation failed with message: {l1_failed_msg}\n"
+                f"Level 2 validation failed with message: {l2_failed_msg}")
+            raise ValidationError(msg)
+
+
+def _load_l1_from_asdf(asdf_file, filepath):
     """
     Construct a dataset object from a filepath of a suitable asdf file.
     """
     from dkist.dataset import TiledDataset  # noqa: PLC0415
 
-    filepath = Path(filepath).expanduser()
     base_path = filepath.parent
-    try:
-        with importlib_resources.as_file(
-            importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"
-        ) as schema_path:
-            with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
-                if not ignore_version_mismatch:
-                    _check_dkist_version(filepath, ff)
-                ds = ff.tree["dataset"]
-                ds.meta["history"] = ff.tree["history"]
-                if isinstance(ds, TiledDataset):
-                    for sub in ds.flat:
-                        sub.files.basepath = base_path
-                else:
-                    ds.files.basepath = base_path
-                return ds
-
-    except ValidationError as e:
-        err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."
-        raise TypeError(err) from e
+    ds = asdf_file.tree["dataset"]
+    ds.meta["history"] = asdf_file.tree["history"]
+    if isinstance(ds, TiledDataset):
+        for sub in ds.flat:
+            sub.files.basepath = base_path
+    else:
+        ds.files.basepath = base_path
+    return ds
 
 
-def _load_l2_from_asdf(filepath, *, ignore_version_mismatch=False):
+def _load_l2_from_asdf(asdf_file, filepath):
     """
     Construct a level 2 inversion object from a filepath of a suitable asdf file.
     """
-    filepath = Path(filepath).expanduser()
     base_path = filepath.parent
-    try:
-        with importlib_resources.as_file(
-            importlib_resources.files("dkist.io") / "level_2_dataset_schema.yaml"
-        ) as schema_path:
-            with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
-                if not ignore_version_mismatch:
-                    _check_dkist_version(filepath, ff)
-                inv = ff.tree["inversion"]
-                inv.meta["history"] = ff.tree["history"]
-                return inv
-
-    except ValidationError as e:
-        err = f"This file is not a valid DKIST Level 2 asdf file, it fails validation with: {e.message}."
-        raise TypeError(err) from e
+    inv = asdf_file.tree["inversion"]
+    inv.meta["history"] = asdf_file.tree["history"]
+    return inv
 
 
 @cache
