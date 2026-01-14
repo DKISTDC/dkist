@@ -120,8 +120,6 @@ class Inversion(NDCollection):
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
 
-        vmin, vmax = np.inf, 0
-
         if figure is None:
             figure = plt.gcf()
 
