@@ -72,7 +72,7 @@ Next we will need to calculate the pixel size in both Longitude and Latitude, wh
 First get a 2x2 grid of SkyCoord objects:
 
 ```{code-cell} ipython3
-space_2 = sp[:2,:2,0].axis_world_coords()[0] # [0] because we only care about space, not time
+space_2 = sp[:2,:2,0].axis_world_coords("lon", "lat")[0] # [0] because this always returns a tuple
 ```
 
  We calculate pixel size by calculating the step in both lat and lon.
