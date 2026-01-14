@@ -13,6 +13,21 @@ __all__ = ["Inversion", "Profiles"]
 
 
 class Profiles(NDCollection):
+    """
+    A `~Dataset`-like container for the raw data used to calculate inversion results.
+
+    Parameters
+    ----------
+    key_data_pairs: `dict` or sequence of `tuple` of (`str`, `~ndcube.NDCube` or `~ndcube.NDCubeSequence`)
+        Names and data cubes/sequences to hold in the collection.
+
+    aligned_axes: `tuple` of `int`, `tuple` of `tuple` of `int`, 'all', or None, optional
+        Axes of each cube/sequence that are aligned in numpy order.
+        See `~ndcube.NDCollection` for more detail.
+
+    meta: `dict`, optional
+        General metadata for the overall collection.
+    """
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
@@ -72,6 +87,21 @@ class Profiles(NDCollection):
 
 
 class Inversion(NDCollection):
+    """
+    A `~Dataset`-like container for level 2 inversion results.
+
+    Parameters
+    ----------
+    key_data_pairs: `dict` or sequence of `tuple` of (`str`, `~ndcube.NDCube` or `~ndcube.NDCubeSequence`)
+        Names and data cubes/sequences to hold in the collection.
+
+    aligned_axes: `tuple` of `int`, `tuple` of `tuple` of `int`, 'all', or None, optional
+        Axes of each cube/sequence that are aligned in numpy order.
+        See `~ndcube.NDCollection` for more detail.
+
+    meta: `dict`, optional
+        General metadata for the overall collection.
+    """
     def __init__(self, *args, profiles=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
