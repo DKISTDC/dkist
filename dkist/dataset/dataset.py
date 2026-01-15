@@ -105,23 +105,12 @@ class Dataset(NDCube):
     _file_manager = FileManagerDescriptor(default_type=DKISTFileManager)
 
     def __init__(self, data, wcs=None, uncertainty=None, mask=None, meta=None,
-                 unit=None, copy=False, psf=None):
+                 unit=None, copy=False, psf=None, **kwargs):
 
         # Do some validation
         if (not isinstance(wcs, gwcs.WCS) and
             (isinstance(wcs, SlicedLowLevelWCS) and not isinstance(wcs._wcs, gwcs.WCS))):
             raise ValueError("DKIST Dataset objects expect gWCS objects as the wcs argument.")
-
-        if isinstance(wcs, gwcs.WCS):
-            # Set the array shape to be that of the data.
-            if wcs.array_shape is None:
-                wcs.array_shape = data.shape
-            if wcs.pixel_shape is None:
-                wcs.pixel_shape = data.shape[::-1]
-
-            if (wcs.pixel_shape != data.shape[::-1] or wcs.array_shape != data.shape):
-                raise ValueError("The pixel and array shape on the WCS object "
-                                 "do not match the given array.")
 
         if "headers" not in meta:
             raise ValueError("The meta dict must contain the headers table.")
@@ -129,7 +118,7 @@ class Dataset(NDCube):
             raise ValueError("The meta dict must contain the inventory record.")
 
         super().__init__(data, wcs, uncertainty=uncertainty, mask=mask, meta=meta,
-                         unit=unit, copy=copy, psf=psf)
+                         unit=unit, copy=copy, psf=psf, **kwargs)
 
     def __getitem__(self, item):
         sliced_dataset = super().__getitem__(item)
