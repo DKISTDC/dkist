@@ -235,11 +235,10 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
             if not ignore_version_mismatch:
                 _check_dkist_version(filepath, ff)
 
+            tree = asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff)
             # First validate against level 1
             try:
-                asdf.schema.validate(
-                    asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff), ctx=ff, schema=asdf.schema.load_schema(l1_schema)
-                )
+                asdf.schema.validate(tree, ctx=ff, schema=asdf.schema.load_schema(l1_schema))
                 return _load_l1_from_asdf(ff, filepath)
             except ValidationError as e:
                 # Store the error message if validation fails, then move on
@@ -247,18 +246,18 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
 
             # If l1 validation fails, assume l2
             try:
-                asdf.schema.validate(
-                    asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff), ctx=ff, schema=asdf.schema.load_schema(l2_schema)
-                )
+                asdf.schema.validate(tree, ctx=ff, schema=asdf.schema.load_schema(l2_schema))
                 return _load_l2_from_asdf(ff, filepath)
             except ValidationError as e:
                 # If l2 validation fails, store that message as well
                 l2_failed_msg = e.message
 
             # If you get here, it's neither level 1 nor 2, user gets to know why each one failed
-            msg = ("This file is not a valid DKIST asdf file.\n"
+            msg = (
+                "This file is not a valid DKIST asdf file.\n"
                 f"Level 1 validation failed with message: {l1_failed_msg}\n"
-                f"Level 2 validation failed with message: {l2_failed_msg}")
+                f"Level 2 validation failed with message: {l2_failed_msg}"
+            )
             raise ValidationError(msg)
 
 
