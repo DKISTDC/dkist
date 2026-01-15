@@ -72,7 +72,7 @@ Next we will need to calculate the pixel size in both Longitude and Latitude, wh
 First get a 2x2 grid of SkyCoord objects:
 
 ```{code-cell} ipython3
-space_2 = sp[:2,:2,0].axis_world_coords()[0] # [0] because we only care about space, not time
+space_2 = sp[:2,:2,0].axis_world_coords("lon", "lat")[0] # [0] because this always returns a tuple
 ```
 
  We calculate pixel size by calculating the step in both lat and lon.
@@ -84,7 +84,7 @@ dlat = np.abs(space_2[0,1].Ty - space_2[0,0].Ty)
 aspect = dlon / dlat
 ```
 
-Finally, we can plot both our mean-subtracted scan at the peak wavelength and the mean values over all all wavelengths.
+Finally, we can plot both our mean-subtracted scan at the peak wavelength and the mean values over all wavelengths.
 
 ```{code-cell} ipython3
 fig = plt.figure(figsize=(7, 5), layout="constrained")
@@ -145,7 +145,7 @@ plt.show()
 Now we can plot the slit position. We do this by taking the first raster step position of the SP dataset and computing the world coordinates of each pixel along the slit.
 
 ```{code-cell} ipython3
-slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
+slit_coords = sp[0,:,0].axis_world_coords("lon", "lat")[0]  # Again, [0] because this always returns a tuple
 
 fig = plt.figure(layout="constrained")
 # Reuse the norm from the first plot
@@ -162,7 +162,7 @@ plt.show()
 Notice how the slit has a larger field of view along the latitude dimension. We can re-plot the image, and crop the extent of the plot back to the extent of the context imager.
 
 ```{code-cell} ipython3
-slit_coords = sp[0,:,0].axis_world_coords()[0]  # Again, [0] extracts the spatial coordinates and drops time.
+slit_coords = sp[0,:,0].axis_world_coords("lon", "lat")[0]  # Again, [0] because this always returns a tuple
 
 fig = plt.figure(layout="constrained")
 # Reuse the norm from the first plot
