@@ -9,7 +9,6 @@ from packaging.version import Version
 from parfive import Results
 
 import asdf
-from asdf.exceptions import ValidationError
 
 import dkist
 from dkist.io.asdf.entry_points import get_extensions as get_dkist_extensions
@@ -226,42 +225,25 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
 
 
 def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
-    # Need to override validation on read for speed purposes
-    with asdf.config.config_context() as cfg:
-        cfg.validate_on_read = False
-        with (
-            ilr.as_file(ilr.files("dkist.io") / "level_1_dataset_schema.yaml") as l1_schema,
-            ilr.as_file(ilr.files("dkist.io") / "level_2_dataset_schema.yaml") as l2_schema,
-        ):
-            # Load the file without a custom schema so that we can validate it against multiple schemas
-            with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
-                if not ignore_version_mismatch:
-                    _check_dkist_version(filepath, ff)
+    from dkist.dataset import Dataset, Inversion, TiledDataset  # noqa: PLC0415
+    with (
+        ilr.as_file(ilr.files("dkist.io") / "level_1_dataset_schema.yaml") as l1_schema,
+        ilr.as_file(ilr.files("dkist.io") / "level_2_dataset_schema.yaml") as l2_schema,
+    ):
+        # Load the file without a custom schema so that we can validate it against multiple schemas
+        with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
+            if not ignore_version_mismatch:
+                _check_dkist_version(filepath, ff)
 
-                tree = asdf.yamlutil.custom_tree_to_tagged_tree(ff.tree, ff)
-                # First validate against level 1
-                try:
-                    asdf.schema.validate(tree, ctx=ff, schema=asdf.schema.load_schema(l1_schema))
-                    return _load_l1_from_asdf(ff, filepath)
-                except ValidationError as e:
-                    # Store the error message if validation fails, then move on
-                    l1_failed_msg = e.message
+            # First validate against level 1
+            if isinstance(ff.tree.get("dataset"), (Dataset, TiledDataset)):
+                return _load_l1_from_asdf(ff, filepath)
+            # If l1 validation fails, assume l2
+            if isinstance(ff.tree.get("inversion"), Inversion):
+                return _load_l2_from_asdf(ff, filepath)
 
-                # If l1 validation fails, assume l2
-                try:
-                    asdf.schema.validate(tree, ctx=ff, schema=asdf.schema.load_schema(l2_schema))
-                    return _load_l2_from_asdf(ff, filepath)
-                except ValidationError as e:
-                    # If l2 validation fails, store that message as well
-                    l2_failed_msg = e.message
-
-                # If you get here, it's neither level 1 nor 2, user gets to know why each one failed
-                msg = (
-                    "This file is not a valid DKIST asdf file.\n"
-                    f"Level 1 validation failed with message: {l1_failed_msg}\n"
-                    f"Level 2 validation failed with message: {l2_failed_msg}"
-                )
-                raise ValidationError(msg)
+            # If you get here, it's neither level 1 nor 2
+            raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file.")
 
 
 def _load_l1_from_asdf(asdf_file, filepath):
