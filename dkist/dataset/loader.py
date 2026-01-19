@@ -232,14 +232,16 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
             _check_dkist_version(filepath, ff)
 
         # First validate against level 1
-        if isinstance(ff.tree.get("dataset"), (Dataset, TiledDataset)):
+        if "dataset" in ff.tree and isinstance(ff.tree["dataset"], (Dataset, TiledDataset)):
             return _load_l1_from_asdf(ff, filepath)
         # If l1 validation fails, assume l2
-        if isinstance(ff.tree.get("inversion"), Inversion):
+        if "inversion" in ff.tree and isinstance(ff.tree["inversion"], Inversion):
             return _load_l2_from_asdf(ff, filepath)
 
         # If you get here, it's neither level 1 nor 2
-        raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file. Expected a `dataset` or `inversion` key with the correct types.")
+        raise TypeError(
+            f"File {filepath} is not a valid level 1 or level 2 DKIST file. Expected a `dataset` or `inversion` key with the correct types."
+        )
 
 
 def _load_l1_from_asdf(asdf_file, filepath):
