@@ -1,0 +1,28 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "http://stsci.edu/schemas/asdf/core/asdf-1.1.0"
+
+title: DKIST Data Center Level 1 asdf file
+description: |
+  This describes the top-level schema for level 1 DKIST asdf files.
+
+tag: "tag:stsci.edu:asdf/core/asdf-1.1.0"
+type: object
+properties:
+  dataset:
+    anyOf:
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-0.1.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-0.2.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-0.3.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.0.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.1.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/dataset-1.2.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-0.1.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.0.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.1.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.2.0"
+      - $ref: "asdf://dkist.nso.edu/schemas/tiled_dataset-1.3.0"
+
+required: [dataset]
+additionalProperties: true
