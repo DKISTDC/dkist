@@ -7,7 +7,6 @@ import pytest
 import asdf
 import astropy.units as u
 import gwcs
-from asdf.exceptions import ValidationError
 from astropy.table.row import Row
 from astropy.tests.helper import assert_quantity_allclose
 
@@ -27,7 +26,7 @@ def invalid_asdf(tmp_path):
 
 
 def test_load_invalid_asdf(invalid_asdf):
-    with pytest.raises(ValidationError):
+    with pytest.raises(TypeError):
         load_dataset(invalid_asdf)
 
 

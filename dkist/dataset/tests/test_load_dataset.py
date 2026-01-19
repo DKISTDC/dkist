@@ -7,7 +7,6 @@ import pytest
 from parfive import Results
 
 import asdf
-from asdf.exceptions import ValidationError
 from asdf.tags.core import ExtensionMetadata, Software
 
 from dkist import Dataset, TiledDataset, load_dataset
@@ -119,7 +118,7 @@ def test_not_dkist_asdf(tmp_path):
     af = asdf.AsdfFile({"hello": "world"})
     af.write_to(tmp_path / "test.asdf")
 
-    with pytest.raises(ValidationError, match="not a valid DKIST"):
+    with pytest.raises(TypeError, match="not a valid level 1 or level 2 DKIST"):
         load_dataset(tmp_path / "test.asdf")
 
 
