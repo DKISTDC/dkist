@@ -1,6 +1,5 @@
 import re
 import warnings
-import importlib.resources as ilr
 from pathlib import Path
 from functools import cache, singledispatch
 from collections import defaultdict
@@ -226,24 +225,21 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
 
 def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
     from dkist.dataset import Dataset, Inversion, TiledDataset  # noqa: PLC0415
-    with (
-        ilr.as_file(ilr.files("dkist.io") / "level_1_dataset_schema.yaml") as l1_schema,
-        ilr.as_file(ilr.files("dkist.io") / "level_2_dataset_schema.yaml") as l2_schema,
-    ):
-        # Load the file without a custom schema so that we can validate it against multiple schemas
-        with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
-            if not ignore_version_mismatch:
-                _check_dkist_version(filepath, ff)
 
-            # First validate against level 1
-            if isinstance(ff.tree.get("dataset"), (Dataset, TiledDataset)):
-                return _load_l1_from_asdf(ff, filepath)
-            # If l1 validation fails, assume l2
-            if isinstance(ff.tree.get("inversion"), Inversion):
-                return _load_l2_from_asdf(ff, filepath)
+    # Load the file without a custom schema so that we can validate it against multiple schemas
+    with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
+        if not ignore_version_mismatch:
+            _check_dkist_version(filepath, ff)
 
-            # If you get here, it's neither level 1 nor 2
-            raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file.")
+        # First validate against level 1
+        if isinstance(ff.tree.get("dataset"), (Dataset, TiledDataset)):
+            return _load_l1_from_asdf(ff, filepath)
+        # If l1 validation fails, assume l2
+        if isinstance(ff.tree.get("inversion"), Inversion):
+            return _load_l2_from_asdf(ff, filepath)
+
+        # If you get here, it's neither level 1 nor 2
+        raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file.")
 
 
 def _load_l1_from_asdf(asdf_file, filepath):
