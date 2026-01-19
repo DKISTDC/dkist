@@ -243,7 +243,7 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
                 return _load_l2_from_asdf(ff, filepath)
 
             # If you get here, it's neither level 1 nor 2
-            raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file.")
+            raise TypeError(f"File {filepath} is not a valid level 1 or level 2 DKIST file. Expected a `dataset` or `inversion` key with the correct types.")
 
 
 def _load_l1_from_asdf(asdf_file, filepath):
