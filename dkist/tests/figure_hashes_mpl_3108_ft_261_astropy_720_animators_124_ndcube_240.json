@@ -1,6 +1,6 @@
 {
-  "dkist.dataset.tests.test_inversion.test_inversion_plot[all]": "b685e2d2531f223536ad53a8d6a969264aaec0faba0b79ff0195ca2210380eee",
-  "dkist.dataset.tests.test_inversion.test_inversion_plot[inversions1]": "93b7f4fb0ec4db2819eb208abeb843e8b46f19ed967b6942bb7788bb3a64f034",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[all]": "937ef819c94698a59e4b80e6c33a00408ab5dacd6ff478e1f1ecd68ec5db1084",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[inversions1]": "3cf4934b18d96d1da55e441c447250288228b72ca576eb66b97623462c0dc7cc",
   "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice0]": "f3cd5b87ef5d109090bf3183c7edbcdd8398d083417b2564991c4515bddbc8bf",
   "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice1]": "753909f9ae5d03a03d18513783c22501784460d7f93851fd40e8ddfd493dcb6c",
   "dkist.dataset.tests.test_plotting.test_dataset_projection[aslice2]": "ca45c084e38d46e5e13ef16b50d1d1b0df170e560bf263330b11582f40a878c3",
