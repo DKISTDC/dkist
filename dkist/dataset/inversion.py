@@ -146,6 +146,9 @@ class Inversion(NDCollection):
         figure
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
+        inversions
+            Iterable of strings defining which inversions to plot.
+            Defaults to 'all'.
         """
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
