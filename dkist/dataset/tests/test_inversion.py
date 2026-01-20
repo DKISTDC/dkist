@@ -42,6 +42,6 @@ def test_get_item(inversion):
 @pytest.mark.parametrize("inversions", ["all", ["temperature", "electron_pressure", "velocity"]])
 def test_inversion_plot(inversion, inversions):
     fig = plt.figure(figsize=(12, 18))
-    inversion.plot(np.s_[:, :, 0], inversions=inversions)
+    inversion.plot(np.s_[0], inversions=inversions)
 
     return plt.gcf()
