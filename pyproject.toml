@@ -63,7 +63,7 @@ tests = [
   "pydot",
 ]
 docs = [
-  "sphinx",
+  "sphinx<9",
   "sphinx-automodapi",
   "sphinx-changelog",
   "sunpy-sphinx-theme",
