@@ -58,7 +58,7 @@ class Profiles(NDCollection):
             figure = plt.gcf()
 
         if profiles != "all":
-            sliced_profiles = Profiles({name: self[name] for name in inversions},
+            sliced_profiles = Profiles({name: self[name] for name in profiles},
                                        aligned_axes="all")[slice_index]
         else:
             sliced_profiles = self[slice_index]
