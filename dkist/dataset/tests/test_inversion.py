@@ -45,3 +45,22 @@ def test_inversion_plot(inversion, inversions):
     inversion.plot(np.s_[0], inversions=inversions)
 
     return plt.gcf()
+
+
+@figure_test
+@pytest.mark.parametrize("profiles", ["all", ["temperature", "electron_pressure", "velocity"]])
+def test_profiles_plot(inversion, profiles):
+    fig = plt.figure(figsize=(12, 18))
+    inversion.profiles.plot(np.s_[0, 0], profiles=profiles)
+
+    return plt.gcf()
+
+
+def test_inversion_plot_invalid_slice(inversion):
+    with pytest.raises(ValueError, match="must reduce inversion data to 2D"):
+        inversion.plot(np.s_[0, 0])
+
+
+def test_profiles_plot_invalid_slice(inversion):
+    with pytest.raises(ValueError, match="must reduce profile data to 1D"):
+        inversion.profiles.plot(np.s_[0])
