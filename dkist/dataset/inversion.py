@@ -31,12 +31,12 @@ class Profiles(NDCollection):
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
-        share_zscale: bool = False,
         figure: matplotlib.figure.Figure | None = None,
+        profiles: str | Iterable[str] = "all",
         **kwargs
     ):
         """
-        Plot a slice of each tile in the TiledDataset
+        Plot a single original spectrum and its fit from each of some number of profiles in the Profiles object
 
         Parameters
         ----------
@@ -44,13 +44,12 @@ class Profiles(NDCollection):
             Object representing a slice which will reduce each component dataset
             of the TiledDataset to a 2D image. This is passed to
             `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
-        share_zscale
-            Determines whether the y-axis scale of the plots should be calculated
-            independently (``False``) or shared across all plots (``True``).
-            Defaults to False
         figure
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
+        profiles
+            iterable of strings defining which profiles to plot.
+            defaults to 'all'.
         """
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
@@ -58,7 +57,11 @@ class Profiles(NDCollection):
         if figure is None:
             figure = plt.gcf()
 
-        sliced_profiles = self[slice_index]
+        if profiles != "all":
+            sliced_profiles = Profiles({name: self[name] for name in inversions},
+                                       aligned_axes="all")[slice_index]
+        else:
+            sliced_profiles = self[slice_index]
         lines = {k[:k.index("_")] for k in sliced_profiles.keys()}
         ncols, nrows = len(lines), 4
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
@@ -66,6 +69,8 @@ class Profiles(NDCollection):
             for s, stokes in enumerate(["I", "Q", "U", "V"]):
                 profile = sliced_profiles[line+"_orig"][..., s]
                 fit = sliced_profiles[line+"_fit"][..., s]
+                if len(profile.shape) != 1:
+                    raise ValueError("Slice must reduce profile data to 1D")
 
                 ax_gridspec = gridspec[s, l]
                 ax = figure.add_subplot(ax_gridspec, projection=profile)
@@ -135,20 +140,20 @@ class Inversion(NDCollection):
         **kwargs
     ):
         """
-        Plot a slice of each tile in the TiledDataset
+        Plot a slice of physical parameters in the Inversion
 
         Parameters
         ----------
         slice_index
-            Object representing a slice which will reduce each component dataset
-            of the TiledDataset to a 2D image. This is passed to
-            `.TiledDataset.slice_tiles`, if each tile is already 2D pass ``slice_index=...``.
+            object representing a slice which will reduce each component dataset
+            of the tileddataset to a 2d image. this is passed to
+            `.tileddataset.slice_tiles`, if each tile is already 2d pass ``slice_index=...``.
         figure
-            A figure to use for the plot. If not specified the current pyplot
+            a figure to use for the plot. if not specified the current pyplot
             figure will be used, or a new one created.
         inversions
-            Iterable of strings defining which inversions to plot.
-            Defaults to 'all'.
+            iterable of strings defining which inversions to plot.
+            defaults to 'all'.
         """
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
@@ -156,16 +161,19 @@ class Inversion(NDCollection):
         if figure is None:
             figure = plt.gcf()
 
-        sliced_inversions = self[slice_index]
         if inversions != "all":
             sliced_inversions = Inversion({name: self[name] for name in inversions},
                                           aligned_axes="all",
                                           profiles=self.profiles)[slice_index]
+        else:
+            sliced_inversions = self[slice_index]
         ncols = len(inversions) if inversions != "all" else 4
         nrows = int(np.ceil(len(sliced_inversions) / ncols))
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
         row = -1
         for i, (name, inv) in enumerate(sliced_inversions.items()):
+            if len(inv.shape) != 2:
+                raise ValueError("Slice must reduce inversion data to 2D")
             col = i % 4
             if col == 0:
                 row += 1
