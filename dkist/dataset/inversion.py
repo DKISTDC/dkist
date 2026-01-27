@@ -58,8 +58,18 @@ class Profiles(NDCollection):
             figure = plt.gcf()
 
         if profiles != "all":
-            sliced_profiles = Profiles({name: self[name] for name in profiles},
-                                       aligned_axes="all")[slice_index]
+            selected_profiles = {}
+            aligned_axes = {}
+            for name in profiles:
+                name = name[:name.index("_")] if "_" in name else name
+                selected_profiles[name + "_orig"] = self[name + "_orig"]
+                selected_profiles[name + "_fit"] = self[name + "_fit"]
+                aligned_axes[name + "_orig"] = self.aligned_axes[name + "_orig"]
+                aligned_axes[name + "_fit"] = self.aligned_axes[name + "_fit"]
+            sliced_profiles = Profiles(
+                selected_profiles,
+                aligned_axes=tuple(aligned_axes.values()),
+            )[slice_index]
         else:
             sliced_profiles = self[slice_index]
         lines = {k[:k.index("_")] for k in sliced_profiles.keys()}
@@ -67,8 +77,8 @@ class Profiles(NDCollection):
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
         for l, line in enumerate(lines):
             for s, stokes in enumerate(["I", "Q", "U", "V"]):
-                profile = sliced_profiles[line+"_orig"][..., s]
-                fit = sliced_profiles[line+"_fit"][..., s]
+                profile = sliced_profiles[line + "_orig"][..., s]
+                fit = sliced_profiles[line + "_fit"][..., s]
                 if len(profile.shape) != 1:
                     raise ValueError("Slice must reduce profile data to 1D")
 
