@@ -28,12 +28,13 @@ class Profiles(NDCollection):
     meta: `dict`, optional
         General metadata for the overall collection.
     """
+
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
         figure: matplotlib.figure.Figure | None = None,
         profiles: str | Iterable[str] = "all",
-        **kwargs
+        **kwargs,
     ):
         """
         Plot a single original spectrum and its fit from each of some number of profiles in the Profiles object
@@ -48,8 +49,8 @@ class Profiles(NDCollection):
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
         profiles
-            iterable of strings defining which profiles to plot.
-            defaults to 'all'.
+            Iterable of strings defining which profiles to plot.
+            Defaults to 'all'.
         """
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
@@ -117,6 +118,7 @@ class Inversion(NDCollection):
     meta: `dict`, optional
         General metadata for the overall collection.
     """
+
     def __init__(self, *args, profiles=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
@@ -147,7 +149,7 @@ class Inversion(NDCollection):
         slice_index: int | slice | Iterable[int | slice],
         figure: matplotlib.figure.Figure | None = None,
         inversions: str | Iterable[str] = "all",
-        **kwargs
+        **kwargs,
     ):
         """
         Plot a slice of physical parameters in the Inversion
@@ -155,15 +157,15 @@ class Inversion(NDCollection):
         Parameters
         ----------
         slice_index
-            object representing a slice which will reduce each component dataset
+            Object representing a slice which will reduce each component dataset
             of the tileddataset to a 2d image. this is passed to
             `.tileddataset.slice_tiles`, if each tile is already 2d pass ``slice_index=...``.
         figure
-            a figure to use for the plot. if not specified the current pyplot
+            A figure to use for the plot. if not specified the current pyplot
             figure will be used, or a new one created.
         inversions
-            iterable of strings defining which inversions to plot.
-            defaults to 'all'.
+            Iterable of strings defining which inversions to plot.
+            Defaults to 'all'.
         """
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
@@ -172,9 +174,9 @@ class Inversion(NDCollection):
             figure = plt.gcf()
 
         if inversions != "all":
-            sliced_inversions = Inversion({name: self[name] for name in inversions},
-                                          aligned_axes="all",
-                                          profiles=self.profiles)[slice_index]
+            sliced_inversions = Inversion(
+                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles
+            )[slice_index]
         else:
             sliced_inversions = self[slice_index]
         ncols = len(inversions) if inversions != "all" else 4
@@ -194,7 +196,7 @@ class Inversion(NDCollection):
 
             if col != 0:
                 ax.set_ylabel(" ")
-            if row != nrows-1:
+            if row != nrows - 1:
                 ax.set_xlabel(" ")
 
             ax.set_title(name)
