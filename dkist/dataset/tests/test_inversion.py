@@ -48,7 +48,7 @@ def test_inversion_plot(inversion, inversions):
 
 
 @figure_test
-@pytest.mark.parametrize("profiles", ["all", ["NaID", "CaII854"]])
+@pytest.mark.parametrize("profiles", ["all", ["NaID", "CaII854"], "FeI630"])
 def test_profiles_plot(inversion, profiles):
     fig = plt.figure(figsize=(12, 18))
     inversion.profiles.plot(np.s_[0, 0], profiles=profiles)
