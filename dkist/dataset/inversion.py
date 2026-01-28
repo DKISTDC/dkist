@@ -75,7 +75,12 @@ class Profiles(NDCollection):
             )[slice_index]
         else:
             sliced_profiles = self[slice_index]
-        lines = {k[:k.index("_")] for k in sliced_profiles.keys()}
+            profiles = sliced_profiles.keys()
+        lines = []
+        for p in profiles:
+            line = p[:p.index("_")] if "_" in p else p
+            if line not in lines:
+                lines.append(line)
         ncols, nrows = len(lines), 4
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
         for l, line in enumerate(lines):
