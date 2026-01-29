@@ -1,7 +1,10 @@
 {
-  "dkist.dataset.tests.test_inversion.test_inversion_plot[all]": "f48e350923bb38ad2c29839b1226732c93593907e80cfecc94e9c9950b643e71",
-  "dkist.dataset.tests.test_inversion.test_inversion_plot[inversions1]": "ff266fb8a97407cb5ed6eb16044937a35501816aedb285d72e8f83c15438740f",
-  "dkist.dataset.tests.test_inversion.test_inversion_plot[temperature]": "1673a2bda645969330bcca17cd829e53f4d4f0e0eac29ffe47711f911326e5fd",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[0-all]": "f48e350923bb38ad2c29839b1226732c93593907e80cfecc94e9c9950b643e71",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[0-inversions1]": "ff266fb8a97407cb5ed6eb16044937a35501816aedb285d72e8f83c15438740f",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[0-temperature]": "1673a2bda645969330bcca17cd829e53f4d4f0e0eac29ffe47711f911326e5fd",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[slice1-all]": "f22d29892390557377d64610b86d43d84f847d10f53d6f3f78260a9cc414b19b",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[slice1-inversions1]": "594dfdc95b9d8228b38165668005c5e5da244d4460ecc4960cfcc61e4ca9b920",
+  "dkist.dataset.tests.test_inversion.test_inversion_plot[slice1-temperature]": "5804a5aa937409e927ab40ac8a171cf40b3d6d2dd834a44ccc5365eefb135b70",
   "dkist.dataset.tests.test_inversion.test_profiles_plot[all]": "18058eafdffcc07881208e6e784cd4099235068901824de1e032b4f0169927ab",
   "dkist.dataset.tests.test_inversion.test_profiles_plot[profiles1]": "d104fea840472ebfd216f4e2f068bc5bcf106ad20c3053ea506bfd72d250d45f",
   "dkist.dataset.tests.test_inversion.test_profiles_plot[FeI630]": "7a03936e6e10ed264db744071389435d66c62644cd16d4d2a1b298a08eb5f33f",
