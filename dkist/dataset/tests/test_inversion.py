@@ -40,7 +40,7 @@ def test_get_item(inversion):
 
 @figure_test
 @pytest.mark.parametrize("inversions", ["all", ["temperature", "electron_pressure", "velocity"], "temperature"])
-@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0,0,:]])
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0,0]])
 def test_inversion_plot(inversion, inversions, slice):
     fig = plt.figure(figsize=(12, 18))
     inversion.plot(slice, inversions=inversions)
@@ -58,7 +58,7 @@ def test_profiles_plot(inversion, profiles):
 
 
 def test_inversion_plot_invalid_slice(inversion):
-    with pytest.raises(ValueError, match="must reduce inversion data to 1D or 2D"):
+    with pytest.raises(ValueError, match="if you want to slice the NDData object without the WCS, you can remove"):
         inversion.plot(np.s_[0, 0, 0])
 
 
