@@ -19,7 +19,7 @@ class Profiles(NDCollection):
         This class and its functionality are experimental. It may not work as expected and desired features
         may be missing. Bug reports and feature requests can be made to https://github.com/DKISTDC/dkist/issues
 
-    A `~Dataset`-like container for the raw data used to calculate inversion results.
+    A `~.Dataset`-like container for the raw data used to calculate inversion results.
 
     Parameters
     ----------
@@ -121,7 +121,7 @@ class Inversion(NDCollection):
         This class and its functionality are experimental. It may not work as expected and desired features
         may be missing. Bug reports and feature requests can be made to https://github.com/DKISTDC/dkist/issues
 
-    A `~Dataset`-like container for level 2 inversion results.
+    A `~.Dataset`-like container for level 2 inversion results.
 
     Parameters
     ----------
