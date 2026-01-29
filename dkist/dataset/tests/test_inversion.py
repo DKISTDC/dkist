@@ -40,9 +40,10 @@ def test_get_item(inversion):
 
 @figure_test
 @pytest.mark.parametrize("inversions", ["all", ["temperature", "electron_pressure", "velocity"], "temperature"])
-def test_inversion_plot(inversion, inversions):
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0,0,:]])
+def test_inversion_plot(inversion, inversions, slice):
     fig = plt.figure(figsize=(12, 18))
-    inversion.plot(np.s_[0], inversions=inversions)
+    inversion.plot(slice, inversions=inversions)
 
     return plt.gcf()
 
