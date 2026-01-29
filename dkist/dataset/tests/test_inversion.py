@@ -58,8 +58,8 @@ def test_profiles_plot(inversion, profiles):
 
 
 def test_inversion_plot_invalid_slice(inversion):
-    with pytest.raises(ValueError, match="must reduce inversion data to 2D"):
-        inversion.plot(np.s_[0, 0])
+    with pytest.raises(ValueError, match="must reduce inversion data to 1D or 2D"):
+        inversion.plot(np.s_[0, 0, 0])
 
 
 def test_profiles_plot_invalid_slice(inversion):

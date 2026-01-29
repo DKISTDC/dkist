@@ -193,8 +193,8 @@ class Inversion(NDCollection):
         gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
         row = -1
         for i, (name, inv) in enumerate(sliced_inversions.items()):
-            if len(inv.shape) != 2:
-                raise ValueError("Slice must reduce inversion data to 2D")
+            if len(inv.shape) not in (1, 2):
+                raise ValueError("Slice must reduce inversion data to 1D or 2D")
             col = i % 4
             if col == 0:
                 row += 1
