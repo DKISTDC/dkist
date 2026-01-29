@@ -1,6 +1,5 @@
 import re
 import warnings
-import importlib.resources as importlib_resources
 from pathlib import Path
 from functools import cache, singledispatch
 from collections import defaultdict
@@ -13,14 +12,6 @@ import asdf
 import dkist
 from dkist.io.asdf.entry_points import get_extensions as get_dkist_extensions
 from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
-
-try:
-    # first try to import from asdf.exceptions for asdf 2.15+
-    from asdf.exceptions import ValidationError
-except ImportError:
-    # fall back to top level asdf for older versions of asdf
-    from asdf import ValidationError
-
 
 ASDF_FILENAME_PATTERN = re.compile(
     r"^(?P<instrument>[A-Z-]+)_L1_(?P<timestamp>\d{8}T\d{6})_(?P<datasetid>[A-Z]{5,})(?P<suffix>_user_tools|_metadata)?.asdf$"
@@ -233,32 +224,51 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
 
 
 def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
+    from dkist.dataset import Dataset, Inversion, TiledDataset  # noqa: PLC0415
+
+    # Load the file without a custom schema so that we can validate it against multiple schemas
+    with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
+        if not ignore_version_mismatch:
+            _check_dkist_version(filepath, ff)
+
+        # First validate against level 1
+        if "dataset" in ff.tree and isinstance(ff.tree["dataset"], (Dataset, TiledDataset)):
+            return _load_l1_from_asdf(ff, filepath)
+        # If l1 validation fails, assume l2
+        if "inversion" in ff.tree and isinstance(ff.tree["inversion"], Inversion):
+            return _load_l2_from_asdf(ff, filepath)
+
+        # If you get here, it's neither level 1 nor 2
+        raise TypeError(
+            f"File {filepath} is not a valid level 1 or level 2 DKIST file. Expected a `dataset` or `inversion` key with the correct types."
+        )
+
+
+def _load_l1_from_asdf(asdf_file, filepath):
     """
     Construct a dataset object from a filepath of a suitable asdf file.
     """
     from dkist.dataset import TiledDataset  # noqa: PLC0415
 
-    filepath = Path(filepath).expanduser()
     base_path = filepath.parent
-    try:
-        with importlib_resources.as_file(
-            importlib_resources.files("dkist.io") / "level_1_dataset_schema.yaml"
-        ) as schema_path:
-            with asdf.open(filepath, custom_schema=schema_path.as_posix(), lazy_load=False, memmap=False) as ff:
-                if not ignore_version_mismatch:
-                    _check_dkist_version(filepath, ff)
-                ds = ff.tree["dataset"]
-                ds.meta["history"] = ff.tree["history"]
-                if isinstance(ds, TiledDataset):
-                    for sub in ds.flat:
-                        sub.files.basepath = base_path
-                else:
-                    ds.files.basepath = base_path
-                return ds
+    ds = asdf_file.tree["dataset"]
+    ds.meta["history"] = asdf_file.tree["history"]
+    if isinstance(ds, TiledDataset):
+        for sub in ds.flat:
+            sub.files.basepath = base_path
+    else:
+        ds.files.basepath = base_path
+    return ds
 
-    except ValidationError as e:
-        err = f"This file is not a valid DKIST Level 1 asdf file, it fails validation with: {e.message}."
-        raise TypeError(err) from e
+
+def _load_l2_from_asdf(asdf_file, filepath):
+    """
+    Construct a level 2 inversion object from a filepath of a suitable asdf file.
+    """
+    base_path = filepath.parent
+    inv = asdf_file.tree["inversion"]
+    inv.meta["history"] = asdf_file.tree["history"]
+    return inv
 
 
 @cache
@@ -277,7 +287,7 @@ def _check_dkist_version(filepath, asdf_file):
     ]
 
     if not matching_extensions or len(matching_extensions) > 1:
-        dkist.log.info("Failed to validate dkist version used by asdf file {asdf_file}.")
+        dkist.log.info(f"Failed to validate dkist version used by asdf file {asdf_file}.")
         return
 
     dkist_uris = _get_dkist_uris()
