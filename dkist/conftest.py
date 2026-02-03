@@ -455,3 +455,12 @@ def croppable_cryo_dataset(tmp_path_factory):
         with open(cryodir / "croppable_cryo.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(cryodir / "croppable_cryo.asdf")
+
+
+@pytest.fixture(scope="session")
+def inversion(tmp_path_factory):
+    invdir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "test_L2_inversion.asdf.gz", mode="rb") as gfo:
+        with open(invdir / "test_L2_inversion.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(invdir / "test_L2_inversion.asdf")
