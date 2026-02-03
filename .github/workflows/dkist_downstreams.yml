@@ -46,7 +46,7 @@ jobs:
 
       - uses: actions/setup-python@2e3e4b15a884dc73a63f962bff250a855150a234  # v5.5.0
         with:
-          python-version: '3.12'
+          python-version: '3.13'
 
       - run: python -m pip install -U tox
 
