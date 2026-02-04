@@ -210,7 +210,7 @@ class FriedParameter(_Range):
 
 
 # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
-@deprecated
+@deprecated(since="1.17.0")
 class PolarimetricAccuracy(_Range):
     """
     .. warning::
