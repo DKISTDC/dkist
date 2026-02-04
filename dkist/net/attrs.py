@@ -214,7 +214,10 @@ class PolarimetricAccuracy(_Range):
     """
     .. warning::
 
-        This parameter is no longer supported by the DKIST data servers and this class is now deprecated.
+        The API for downloading data from the DKIST Data Center no longer accepts the
+        PolarimetricAccuracy parameter. There are currently no plans to support a
+        replacement. This class is therefore deprecated and will not influence the results
+        returned when searching for data.
 
     The average polarimetric accuracy of a dataset.
     """

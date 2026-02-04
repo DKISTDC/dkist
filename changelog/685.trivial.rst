@@ -1,1 +1,1 @@
-Deprecate attrs.PolarimetricAccuracy
+Deprecate attrs.PolarimetricAccuracy. The API for downloading data from the DKIST Data Center no longer accepts the PolarimetricAccuracy parameter. The corresponding class is therefore deprecated and will not influence the results returned when searching for data.
