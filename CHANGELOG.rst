@@ -1,3 +1,27 @@
+0.17.0 (2026-02-04)
+===================
+
+Features
+--------
+
+- Adds experimental support for level 2 DKIST data with the `.Inversion` and `.Profiles` classes. (`#567 <https://github.com/DKISTDC/dkist/pull/567>`__)
+
+
+Bug Fixes
+---------
+
+- Fixes the format of paths being passed to `ds.files.download()` on Windows so that globus can understand it. (`#647 <https://github.com/DKISTDC/dkist/pull/647>`__)
+- Fix sorting of UnifiedResponse table (`#651 <https://github.com/DKISTDC/dkist/pull/651>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Adds a dev script to automate incrementing a schema version number. (`#631 <https://github.com/DKISTDC/dkist/pull/631>`__)
+- Remove support for globussdk<4 (`#663 <https://github.com/DKISTDC/dkist/pull/663>`__)
+- Deprecate attrs.PolarimetricAccuracy. The API for downloading data from the DKIST Data Center no longer accepts the PolarimetricAccuracy parameter. The corresponding class is therefore deprecated and will not influence the results returned when searching for data. (`#685 <https://github.com/DKISTDC/dkist/pull/685>`__)
+
+
 1.16.0 (2025-10-14)
 ===================
 

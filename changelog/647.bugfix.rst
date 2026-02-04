@@ -1,1 +1,0 @@
-Fixes the format of paths being passed to `ds.files.download()` on Windows so that globus can understand it.
