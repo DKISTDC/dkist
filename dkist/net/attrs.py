@@ -15,6 +15,8 @@ from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
 from sunpy.net.attr import or_
 
+from dkist.utils.decorators import deprecated
+
 __all__ = [
     "BoundingBox",
     "BrowseMovie",
