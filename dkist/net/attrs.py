@@ -31,7 +31,6 @@ __all__ = [
     "ObservingProgramExecutionID",
     "Page",
     "PageSize",
-    "PolarimetricAccuracy",
     "Product",
     "Proposal",
     "Recipe",
