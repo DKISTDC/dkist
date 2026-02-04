@@ -208,8 +208,13 @@ class FriedParameter(_Range):
 
 
 # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
+@deprecated
 class PolarimetricAccuracy(_Range):
     """
+    .. warning::
+
+        This parameter is no longer supported by the DKIST data servers and this class is now deprecated.
+
     The average polarimetric accuracy of a dataset.
     """
     def collides(self, other):
