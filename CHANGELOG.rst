@@ -1,6 +1,13 @@
 1.17.0 (2026-02-05)
 ===================
 
+Deprecations and Removals
+-------------------------
+
+- Deprecate attrs.PolarimetricAccuracy.
+  The API for downloading data from the DKIST Data Center no longer accepts the PolarimetricAccuracy parameter.
+  The corresponding class is therefore deprecated and will not influence the results returned when searching for data. (`#685 <https://github.com/DKISTDC/dkist/pull/685>`__)
+
 Features
 --------
 
@@ -19,7 +26,6 @@ Trivial/Internal Changes
 
 - Adds a dev script to automate incrementing a schema version number. (`#631 <https://github.com/DKISTDC/dkist/pull/631>`__)
 - Remove support for globussdk<4 (`#663 <https://github.com/DKISTDC/dkist/pull/663>`__)
-- Deprecate attrs.PolarimetricAccuracy. The API for downloading data from the DKIST Data Center no longer accepts the PolarimetricAccuracy parameter. The corresponding class is therefore deprecated and will not influence the results returned when searching for data. (`#685 <https://github.com/DKISTDC/dkist/pull/685>`__)
 
 
 1.16.0 (2025-10-14)
