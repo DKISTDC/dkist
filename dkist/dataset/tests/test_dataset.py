@@ -50,6 +50,7 @@ def test_repr(dataset, dataset_3d):
     r = repr(dataset_3d)
     assert str(dataset_3d.data) in r
 
+
 def test_repr_numpy(dataset):
     # Do it the old way to support old ndcube
     dataset._data = dataset.data.compute()
@@ -212,3 +213,21 @@ def test_file_slicing_without_dummy_axis(dataset_5d):
     assert len(ds[0, 0].files) == np.prod(shape[2])
     assert len(ds[0, 0, 0].files) == 1
     assert len(ds[0, 0, 0, 0].files) == 1
+
+
+
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
+def test_save_sliced_dataset(large_visp_dataset, slice):
+    fname = "/home/drew/ds-save-test.asdf"
+    ds = large_visp_dataset
+
+    ds1 = ds[slice]
+    ds1.save(fname)
+
+    ds2 = load_dataset(fname)
+
+    assert ds1.data.shape == ds2.data.shape
+    assert ds1.files.filenames == ds2.files.filenames
+    assert ds1.files.shape == ds2.files.shape
+    assert (ds1.meta["headers"] == ds2.meta["headers"]).all()
+    assert ds1.meta["inventory"] == ds2.meta["inventory"]
