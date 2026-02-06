@@ -2,6 +2,7 @@ from textwrap import dedent
 
 import numpy as np
 
+import asdf
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
@@ -192,6 +193,13 @@ class Dataset(NDCube):
     """
     Dataset loading and saving routines.
     """
+
+    def save(self, asdf_path):
+        """
+        Writes the dataset to an asdf file
+        """
+
+        asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
 
     @classmethod
     @deprecated(since="1.0.0", alternative="load_dataset")
