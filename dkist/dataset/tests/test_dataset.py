@@ -215,10 +215,9 @@ def test_file_slicing_without_dummy_axis(dataset_5d):
     assert len(ds[0, 0, 0, 0].files) == 1
 
 
-
 @pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
 def test_save_sliced_dataset(large_visp_dataset, slice):
-    fname = "/home/drew/ds-save-test.asdf"
+    fname = "ds-save-test.asdf"
     ds = large_visp_dataset
 
     ds1 = ds[slice]
