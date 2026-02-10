@@ -39,7 +39,7 @@ dependencies = [
   "parfive[ftp]>=2.2.0",
   "platformdirs>=4.5",
   "packaging>=25.0",
-  "sunpy[net,asdf]>=5.0.7",
+  "sunpy[net,asdf]>=6",
   "tqdm>=4.65",
 ]
 dynamic = ["version"]
