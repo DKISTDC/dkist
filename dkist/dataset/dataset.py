@@ -194,11 +194,15 @@ class Dataset(NDCube):
     Dataset loading and saving routines.
     """
 
+    ## TODO make asdf_path get the path of the original file by default
+    ## TODO make an overwrite keyword with default False
     def save(self, asdf_path):
         """
         Writes the dataset to an asdf file
         """
+        ## TODO better docstring
 
+        ## TODO validate?
         asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
 
     @classmethod
