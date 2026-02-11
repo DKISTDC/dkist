@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
+import asdf
+
 from ndcube import NDCollection
 
 __all__ = ["Inversion", "Profiles"]
@@ -221,3 +223,8 @@ class Inversion(NDCollection):
             ax.set_title(name)
 
         return figure
+
+    def save(self, asdf_path):
+        "Writes the inversion to an asdf file"
+
+        asdf.AsdfFile({"inversion": self}).write_to(asdf_path)
