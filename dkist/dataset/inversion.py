@@ -157,7 +157,12 @@ class Inversion(NDCollection):
 
     def __getitem__(self, aslice):
         new_inv = super().__getitem__(aslice)
-        new_inv.profiles = self.profiles
+        # If the keys are the same then it was a data slice so we should slice the profiles too
+        if hasattr(new_inv, "keys") and self.keys() == new_inv.keys():
+            new_inv.profiles = self.profiles[aslice]
+        # If the keys are different then the data is untouched and we can copy the profiles
+        else:
+            new_inv.profiles = self.profiles
 
         return new_inv
 
