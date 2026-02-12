@@ -39,7 +39,7 @@ def test_get_item(inversion):
     assert inversion.profiles == sliced_inv.profiles
 
 
-@pytest.mark.parametrize("slice", [np.s_[100:, 10:], np.s_[10:], np.s_[0]])
+@pytest.mark.parametrize("slice", [np.s_[100:, 10:20], np.s_[10:], np.s_[0], np.s_[:, :10], np.s_[:, :, :10]])
 def test_slice_all(inversion, slice):
     inv = inversion
     sliced_inv = inv[slice]
@@ -52,11 +52,12 @@ def test_slice_all(inversion, slice):
         if not isinstance(slice, collections.abc.Sequence):
             slice = [slice]
         new_ishape = tuple(
-            [(n - (s.start or 0) - (s.stop or 0)) // (s.step or 1) for n, s in zip(ishape, slice)]
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(ishape, slice)]
             + list(ishape[len(slice) :])
         )
+        slice = slice[:2] # Only the first two axes are aligned. May break if we change data
         new_pshape = tuple(
-            [(n - (s.start or 0) - (s.stop or 0)) // (s.step or 1) for n, s in zip(pshape, slice)]
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(pshape, slice)]
             + list(pshape[len(slice) :])
         )
     assert sliced_inv["temperature"].data.shape == new_ishape
