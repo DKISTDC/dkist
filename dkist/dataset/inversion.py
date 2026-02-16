@@ -210,7 +210,7 @@ class Inversion(NDCollection):
             if isinstance(inversions, str):
                 inversions = [inversions]
             sliced_inversions = Inversion(
-                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles
+                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles, meta=self.meta
             )[slice_index]
         else:
             sliced_inversions = self[slice_index]
