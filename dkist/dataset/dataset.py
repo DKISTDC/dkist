@@ -201,6 +201,7 @@ class Dataset(NDCube):
         Writes the dataset to an asdf file
         """
         ## TODO better docstring
+        # asdf_path = self.files.basepath / self.inventory['asdfObjectKey'].split('/')[-1]
         asdf_path = Path(asdf_path)
         if not overwrite and asdf_path.exists():
             raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
