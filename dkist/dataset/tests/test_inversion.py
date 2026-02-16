@@ -28,7 +28,7 @@ def test_str(inversion):
     item0_pmtns = list(permutations(item0keys))
     item1_pmtns = list(permutations(item1keys))
     allorders = [str([i0, i1, ("phys.absorption.opticalDepth",)]) for (i0, i1) in product(item0_pmtns, item1_pmtns)]
-    assert any([s in r for s in allorders])  #noqa:C419
+    assert any([s in r for s in allorders])  # noqa:C419
 
 
 def test_get_item(inversion):
