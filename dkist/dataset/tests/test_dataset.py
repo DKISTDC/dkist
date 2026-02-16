@@ -216,12 +216,12 @@ def test_file_slicing_without_dummy_axis(dataset_5d):
 
 
 @pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
-def test_save_sliced_dataset(large_visp_dataset, slice):
+def test_save_dataset_sliced(large_visp_dataset, slice):
     fname = "ds-save-test.asdf"
     ds = large_visp_dataset
 
     ds1 = ds[slice]
-    ds1.save(fname)
+    ds1.save(fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 
@@ -230,3 +230,23 @@ def test_save_sliced_dataset(large_visp_dataset, slice):
     assert ds1.files.shape == ds2.files.shape
     assert (ds1.meta["headers"] == ds2.meta["headers"]).all()
     assert ds1.meta["inventory"] == ds2.meta["inventory"]
+
+
+def test_save_dataset_to_existing_file(large_visp_dataset):
+    fname = "ds-overwrite-test.asdf"
+    ds = large_visp_dataset
+
+    ds.save(fname)
+    with pytest.raises(FileExistsError):
+        ds.save(fname)
+
+    ds1 = ds[0]
+    ds1.save(fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    # Just need to test enough to make sure it's the sliced ds and not the original in the file
+    assert ds1.data.shape == ds2.data.shape
+
+    # Tidying. I'm sure there's a better fixture-based way to do this
+    Path(fname).unlink()
