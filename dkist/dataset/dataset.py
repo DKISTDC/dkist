@@ -1,3 +1,4 @@
+from pathlib import Path
 from textwrap import dedent
 
 import numpy as np
@@ -195,12 +196,14 @@ class Dataset(NDCube):
     """
 
     ## TODO make asdf_path get the path of the original file by default
-    ## TODO make an overwrite keyword with default False
-    def save(self, asdf_path):
+    def save(self, asdf_path, overwrite=False):
         """
         Writes the dataset to an asdf file
         """
         ## TODO better docstring
+        asdf_path = Path(asdf_path)
+        if not overwrite and asdf_path.exists():
+            raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
 
         ## TODO validate?
         asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
@@ -213,6 +216,7 @@ class Dataset(NDCube):
         asdf file and a collection of FITS files.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(directory)
 
     @classmethod
@@ -222,6 +226,7 @@ class Dataset(NDCube):
         Construct a dataset object from a filepath of a suitable asdf file.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(filepath)
 
     """
