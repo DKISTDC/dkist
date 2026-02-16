@@ -5,7 +5,6 @@ Configuration file for the Sphinx documentation builder.
 
 import datetime
 import os
-import sys
 
 from packaging.version import Version
 
