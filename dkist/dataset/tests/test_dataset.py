@@ -250,3 +250,15 @@ def test_save_dataset_to_existing_file(large_visp_dataset):
 
     # Tidying. I'm sure there's a better fixture-based way to do this
     Path(fname).unlink()
+
+
+def test_save_dataset_default_file(large_visp_dataset):
+    ds = large_visp_dataset
+
+    ds.save()
+    ds_path = Path(ds.inventory["asdfObjectKey"].split("/")[-1])
+
+    assert ds_path.exists()
+
+    # Again, this probably wants a fixture
+    ds_path.unlink()
