@@ -1,3 +1,4 @@
+import collections.abc
 from itertools import product, permutations
 
 import matplotlib.pyplot as plt
@@ -36,6 +37,31 @@ def test_get_item(inversion):
     assert isinstance(inversion, Inversion)
     assert len(sliced_inv) == 3
     assert inversion.profiles == sliced_inv.profiles
+
+
+@pytest.mark.parametrize("slice", [np.s_[100:, 10:20], np.s_[10:], np.s_[0], np.s_[:, :10], np.s_[:, :, :10]])
+def test_slice_all(inversion, slice):
+    inv = inversion
+    sliced_inv = inv[slice]
+    ishape = inv["temperature"].data.shape
+    pshape = inv.profiles["NaID_orig"].data.shape
+    if isinstance(slice, int):
+        new_ishape = ishape[1:]
+        new_pshape = pshape[1:]
+    else:
+        if not isinstance(slice, collections.abc.Sequence):
+            slice = [slice]
+        new_ishape = tuple(
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(ishape, slice)]
+            + list(ishape[len(slice) :])
+        )
+        slice = slice[:2] # Only the first two axes are aligned. May break if we change data
+        new_pshape = tuple(
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(pshape, slice)]
+            + list(pshape[len(slice) :])
+        )
+    assert sliced_inv["temperature"].data.shape == new_ishape
+    assert sliced_inv.profiles["NaID_orig"].data.shape == new_pshape
 
 
 @figure_test

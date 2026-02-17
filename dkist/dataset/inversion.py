@@ -159,8 +159,24 @@ class Inversion(NDCollection):
 
     def __getitem__(self, aslice):
         new_inv = super().__getitem__(aslice)
-        new_inv.profiles = self.profiles
-
+        # If the keys are the same then it was a data slice so we should slice the profiles too
+        if hasattr(new_inv, "keys") and self.keys() == new_inv.keys():
+            # First we need to know which axes are common to the Inversion and the Profiles
+            i_ax = self.meta["axes"]
+            p_ax = self.profiles.meta["axes"]
+            shared_ax = []
+            for ax in i_ax:
+                if ax in p_ax:
+                    shared_ax.append(p_ax.index(ax))
+            # Then we construct a new set of slices that reference the correct axes
+            # We need a list if only one slice was given
+            aslice = [aslice] if isinstance(aslice, (slice, int)) else aslice
+            bslice = [aslice[shared_ax[a]] for a in range(min(len(aslice), len(shared_ax)))]
+            # Finally slice the Profiles along only the shared axes
+            new_inv.profiles = self.profiles[*bslice]
+        # If the keys are different then the data is untouched and we can copy the profiles
+        else:
+            new_inv.profiles = self.profiles
         return new_inv
 
     def plot(
@@ -196,7 +212,7 @@ class Inversion(NDCollection):
             if isinstance(inversions, str):
                 inversions = [inversions]
             sliced_inversions = Inversion(
-                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles
+                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles, meta=self.meta
             )[slice_index]
         else:
             sliced_inversions = self[slice_index]
