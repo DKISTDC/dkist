@@ -195,13 +195,13 @@ class Dataset(NDCube):
     Dataset loading and saving routines.
     """
 
-    ## TODO make asdf_path get the path of the original file by default
-    def save(self, asdf_path, overwrite=False):
+    def save(self, asdf_path=None, overwrite=False):
         """
         Writes the dataset to an asdf file
         """
         ## TODO better docstring
-        # asdf_path = self.files.basepath / self.inventory['asdfObjectKey'].split('/')[-1]
+        if not asdf_path:
+            asdf_path = self.inventory["asdfObjectKey"].split("/")[-1]
         asdf_path = Path(asdf_path)
         if not overwrite and asdf_path.exists():
             raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
