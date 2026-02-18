@@ -14,11 +14,14 @@ properties:
     description: A nested structure of Dataset objects
     type: array
     items:
-      type: array
-      items:
-        anyOf:
-          - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
-          - null: true
+      anyOf:
+        - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
+        - null: true
+        - type: array
+          items:
+            anyOf:
+            - tag: "asdf://dkist.nso.edu/tags/dataset-1.*"
+            - null: true
 
   meta:
     description: Dataset metadata, describing the whole dataset.
@@ -44,7 +47,9 @@ properties:
     tag: tag:stsci.edu:asdf/core/ndarray-1.*
     datatype: bool8
     exact_datatype: true
-    ndim: 2
+    anyOf:
+      - ndim: 1
+      - ndim: 2
 
 
 required: [datasets, meta, mask]
