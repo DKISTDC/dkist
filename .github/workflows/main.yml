@@ -35,12 +35,14 @@ jobs:
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
+      toxdeps: tox-pypi-filter>=0.14
       envs: |
         - linux: py314
         - macos: py313
         - windows: py312
         - linux: py311
         - linux: py311-oldestdeps
+          toxdeps: tox-uv tox-pypi-filter>=0.14
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -82,6 +84,7 @@ jobs:
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
+      toxdeps: tox-pypi-filter>=0.14
       envs: |
         - linux: py312-online
         - linux: py313-devdeps
