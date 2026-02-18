@@ -10,6 +10,7 @@ from dkist.io.asdf.converters import (
     AsymmetricMappingConverter,
     CoupledCompoundConverter,
     DatasetConverter,
+    DatasetExtraConverter,
     FileManagerConverter,
     InversionConverter,
     ProfilesConverter,
@@ -44,7 +45,7 @@ def get_extensions():
     """
     Get the list of extensions.
     """
-    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter(), InversionConverter(), ProfilesConverter()]
+    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter(), InversionConverter(), ProfilesConverter(), DatasetExtraConverter()]
     wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter(), AsymmetricMappingConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.7.0", converters=dkist_converters),
