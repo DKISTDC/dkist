@@ -8,6 +8,7 @@ from asdf.extension import Converter
 
 class TiledDatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/tiled_dataset-1.4.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.3.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/tiled_dataset-1.1.0",
