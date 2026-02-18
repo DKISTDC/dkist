@@ -265,3 +265,20 @@ def test_copy_dataset_headers_on_write(tmp_path, large_tiled_dataset):
             afile.write_to(tmp_path / "test-header-copies.asdf")
     for ds in large_tiled_dataset.flat:
         assert not isinstance(ds.headers, dict)
+
+
+@pytest.mark.parametrize("slice", [np.s_[:2, :2], np.s_[:, 1]])
+def test_save_tiled_dataset_sliced(large_tiled_dataset, slice):
+    fname = "tds-save-test.asdf"
+    ds = large_tiled_dataset
+
+    ds1 = ds[slice]
+    ds1.save(fname, overwrite=True)
+
+    ds2 = load_dataset(ds1.files.basepath / fname)
+
+    assert ds1.shape == ds2.shape
+    assert ds1.files.filenames == ds2.files.filenames
+    assert ds1.files.shape == ds2.files.shape
+    assert (ds1.meta["headers"] == ds2.meta["headers"]).all()
+    assert ds1.meta["inventory"] == ds2.meta["inventory"]

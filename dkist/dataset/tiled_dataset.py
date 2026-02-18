@@ -11,6 +11,7 @@ import copy
 import types
 import warnings
 from typing import Any, Self, Literal
+from pathlib import Path
 from textwrap import dedent
 from collections.abc import Iterable, Collection
 
@@ -20,6 +21,7 @@ import numpy as np
 from matplotlib.gridspec import GridSpec
 from numpy.typing import NDArray
 
+import asdf
 import astropy
 from astropy.table import Table, vstack
 
@@ -455,3 +457,20 @@ class TiledDataset(Collection):
         A `~.DKISTFileManager` helper for interacting with the files backing the data in this `.TiledDataset`.
         """
         return self._files
+
+    def save(self, asdf_path=None, basepath=None, overwrite=False):
+        """
+        Writes the dataset to an asdf file
+        """
+        ## TODO better docstring
+        ## TODO Make masks happen
+        if not basepath:
+            basepath = self.files.basepath
+        if not asdf_path:
+            asdf_path = self.inventory["asdfObjectKey"].split("/")[-1]
+        asdf_path = Path(basepath) / asdf_path
+        if not overwrite and asdf_path.exists():
+            raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
+
+        ## TODO validate?
+        asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
