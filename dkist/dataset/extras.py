@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import dask.array
 
 import asdf
@@ -10,10 +13,23 @@ class DatasetExtra:
     """
     This class represents information about all the files for a specific dataset extra.
     """
-    def __init__(self, name: str, headers: Table, ears: list[asdf.ExternalArrayReference]):
+
+    def __init__(self, name: str, headers: Table, ears: list[asdf.ExternalArrayReference], basepath: os.PathLike | None):
         self._name = name
         self._headers = headers
         self._ears = ears
+        self.basepath = basepath
+
+    @property
+    def basepath(self) -> Path | None:
+        return self._basepath
+
+    @basepath.setter
+    def basepath(self, basepath: os.PathLike | None):
+        if basepath is None:
+            self._basepath = basepath
+        else:
+            self._basepath = Path(basepath)
 
     @property
     def name(self) -> str:
@@ -25,10 +41,15 @@ class DatasetExtra:
 
     @property
     def data(self) -> list[dask.array.Array]:
-        return [dask.array.from_array(AstropyFITSLoader(
-            ear.fileuri,
-            ear.shape,
-            ear.dtype,
-            ear.target,
-            basepath=None,
-        )) for ear in self._ears]
+        return [
+            dask.array.from_array(
+                AstropyFITSLoader(
+                    ear.fileuri,
+                    ear.shape,
+                    ear.dtype,
+                    ear.target,
+                    basepath=self.basepath,
+                )
+            )
+            for ear in self._ears
+        ]
