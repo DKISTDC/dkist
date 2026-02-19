@@ -6,6 +6,7 @@ from pathlib import Path
 import dask.array as da
 import numpy as np
 import pytest
+from numpy.random import default_rng
 
 import asdf
 import astropy.modeling.models as m
