@@ -12,6 +12,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 import gwcs
 import gwcs.coordinate_frames as cf
+from astropy.io import fits
 from astropy.modeling import Model, Parameter
 from astropy.table import Table, vstack
 from astropy.time import Time
@@ -20,7 +21,7 @@ from sunpy.coordinates.frames import Helioprojective
 
 from dkist import load_dataset, log
 from dkist.data.test import rootdir
-from dkist.dataset import Dataset
+from dkist.dataset import Dataset, DatasetExtra
 from dkist.dataset.tiled_dataset import TiledDataset
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
@@ -464,3 +465,36 @@ def inversion(tmp_path_factory):
         with open(invdir / "test_L2_inversion.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(invdir / "test_L2_inversion.asdf")
+
+
+@pytest.fixture
+def dataset_extra_obj():
+    headers = Table({"col1": [1, 2], "col2": ["a", "b"]})
+    ears = [
+        asdf.ExternalArrayReference("file1.fits", 0, "float64", (10, 10)),
+        asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10)),
+    ]
+    return DatasetExtra(name="test_extra", headers=headers, ears=ears, basepath=".")
+
+
+@pytest.fixture
+def dataset_extra_dir(tmp_path, dataset_extra_obj):
+    rng = default_rng()
+    for header, ear in zip(dataset_extra_obj.headers, dataset_extra_obj._ears):
+        data = (rng.random(ear.shape)*100).astype(ear.dtype)
+        header = fits.Header(dict(header))
+        hdul = fits.HDUList()
+        if ear.target == 0:
+            hdul.append(fits.PrimaryHDU(data=data, header=header))
+        else:
+            hdul.append(fits.PrimaryHDU())
+            if ear.target == 1:
+                hdul.append(fits.CompImageHDU(data=data, header=header))
+            else:
+                raise ValueError("Only 1 or 0")
+
+        hdul.writeto(
+            tmp_path / ear.fileuri,
+        )
+    dataset_extra_obj.basepath = tmp_path
+    return tmp_path
