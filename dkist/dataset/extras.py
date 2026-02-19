@@ -14,11 +14,22 @@ class DatasetExtra:
     This class represents information about all the files for a specific dataset extra.
     """
 
-    def __init__(self, name: str, headers: Table, ears: list[asdf.ExternalArrayReference], basepath: os.PathLike | None):
+    def __init__(self, name: str, headers: Table, ears: list[asdf.ExternalArrayReference], basepath: os.PathLike | None = None):
         self._name = name
         self._headers = headers
         self._ears = ears
         self.basepath = basepath
+
+    def __str__(self) -> str:
+        shapes: list[tuple[int, ...]] = [e.shape for e in self._ears]
+        if len(set(shapes)) == 1:
+            shapes = list(shapes)[0]
+        else:
+            shapes = tuple(shapes)
+        return f"DatasetExtra<name={self.name}, length={len(self.headers)}, shape={shapes}>"
+
+    def __repr__(self) -> str:
+        return f"<{self} object at {hex(id(self))}>"
 
     @property
     def basepath(self) -> Path | None:
