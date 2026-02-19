@@ -17,7 +17,7 @@ properties:
   files:
     type: array
     items:
-      - tag: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
+      tag: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
 
 required: [name, headers, files]
 additionalProperties: false
