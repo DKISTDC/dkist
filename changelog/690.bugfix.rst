@@ -1,0 +1,1 @@
+Fix Inversion slicing so that it also slices Profiles when appropriate
