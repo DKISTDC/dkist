@@ -61,6 +61,7 @@ tests = [
   "hypothesis",
   "tox",
   "pydot",
+  "chardet<6",
 ]
 docs = [
   "sphinx<9",

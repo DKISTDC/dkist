@@ -265,6 +265,10 @@ class TiledDataset(Collection):
         """
         The shape of each individual tile in the TiledDataset.
         """
+        if len(self.shape) == 1:
+            # Need to not nest iteration if we've flattened the TieldDataset
+            return [tuple(tile.data.shape) for tile in self]
+        # Need to nest iteration in your standard 2D tile setup
         return [tuple(tile.data.shape for tile in row) for row in self]
 
     @staticmethod
