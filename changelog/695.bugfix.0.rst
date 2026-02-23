@@ -1,0 +1,1 @@
+Pin chardet version to <6 to work with latest requests.
