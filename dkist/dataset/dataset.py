@@ -200,6 +200,7 @@ class Dataset(NDCube):
         Writes the dataset to an asdf file
         """
         ## TODO better docstring
+        ## TODO Make masks happen
         if not basepath:
             basepath = self.files.basepath
         if not asdf_path:
@@ -210,6 +211,7 @@ class Dataset(NDCube):
 
         ## TODO validate?
         asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
+        ## TODO Create links to fits files if dir is different to original basepath?
 
     @classmethod
     @deprecated(since="1.0.0", alternative="load_dataset")
