@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
+import gwcs
+
 from ndcube import NDCollection
 
 __all__ = ["Inversion", "Profiles"]
@@ -140,6 +142,17 @@ class Inversion(NDCollection):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
 
+    @property
+    def wcs(self) -> gwcs.WCS | None:
+        """
+        The WCS for all the quantities in the inversion.
+
+        If the WCSes for any of the quantities diverge this will return None.
+        """
+        wcses: list[gwcs.WCS] = [cube.wcs for cube in self.values()]
+        if all(wcses[0] is w for w in wcses):
+            return wcses[0]
+
     def __str__(self):
         quants_repr = "\n".join(super().__str__().split("\n")[2:])
         profiles_repr = "\n".join(self.profiles.__str__().split("\n")[2:])
@@ -155,21 +168,33 @@ class Inversion(NDCollection):
 
         return textwrap.dedent(s).format(quants_repr, profiles_repr)
 
-    def __getitem__(self, aslice):
-        new_inv = super().__getitem__(aslice)
-        # If the keys are the same then it was a data slice so we should slice the profiles too
-        if hasattr(new_inv, "keys") and self.keys() == new_inv.keys():
-            # First we need to know which axes are common to the Inversion and the Profiles
-            i_ax = self.meta["axes"]
-            p_ax = self.profiles.meta["axes"]
+    def __getitem__(self, item):
+        new_inv = super().__getitem__(item)
+
+        if (
+            # If we have profiles, and we have a consistent WCS then we can propagate the slice to profiles
+            self.profiles is not None
+            and self.wcs is not None
+            # If the keys are the same then it was a data slice so we should slice the profiles too
+            and hasattr(new_inv, "keys")
+            and self.keys() == new_inv.keys()
+        ):
+            # Check to make sure all the profiles WCSes have the same pixel names or exit early
+            profiles_wcses = [p.wcs for p in self.profiles.values()]
+            pan = [w.pixel_axis_names for w in profiles_wcses]
+            if not all(p == pan[0] for p in pan):
+                return new_inv
+            # First we need to know which pixel axes are common to the Inversion and the Profiles
+            i_ax = self.wcs.pixel_axis_names[::-1]
+            p_ax = pan[0][::-1]
             shared_ax = []
             for ax in i_ax:
                 if ax in p_ax:
                     shared_ax.append(p_ax.index(ax))
             # Then we construct a new set of slices that reference the correct axes
             # We need a list if only one slice was given
-            aslice = [aslice] if isinstance(aslice, (slice, int)) else aslice
-            bslice = [aslice[shared_ax[a]] for a in range(min(len(aslice), len(shared_ax)))]
+            item = [item] if isinstance(item, (slice, int)) else item
+            bslice = [item[shared_ax[a]] for a in range(min(len(item), len(shared_ax)))]
             # Finally slice the Profiles along only the shared axes
             new_inv.profiles = self.profiles[*bslice]
         # If the keys are different then the data is untouched and we can copy the profiles
