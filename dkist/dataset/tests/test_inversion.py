@@ -109,3 +109,15 @@ def test_slice_sliced_inversion(inversion, slice_data_first):
     assert inv["temperature"][data_slice].shape == inv2["temperature"].shape
     assert inv.profiles["NaID_orig"][data_slice].shape == inv2.profiles["NaID_orig"].shape
     assert tuple(inv2.keys()) == quants_slice
+    assert inv.profiles.keys() == inv2.profiles.keys()
+
+
+def test_double_data_slice(inversion):
+    inv = inversion
+    inv1 = inv[100:]
+    inv2 = inv1[:, 100:]
+
+    assert inv["temperature"][100:, 100:].shape == inv2["temperature"].shape
+    assert inv.profiles["NaID_orig"][100:, 100:].shape == inv2.profiles["NaID_orig"].shape
+    assert inv.keys() == inv2.keys()
+    assert inv.profiles.keys() == inv2.profiles.keys()
