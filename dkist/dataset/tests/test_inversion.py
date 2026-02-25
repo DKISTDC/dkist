@@ -55,7 +55,7 @@ def test_slice_all(inversion, slice):
             [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(ishape, slice)]
             + list(ishape[len(slice) :])
         )
-        slice = slice[:2] # Only the first two axes are aligned. May break if we change data
+        slice = slice[:2]  # Only the first two axes are aligned. May break if we change data
         new_pshape = tuple(
             [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(pshape, slice)]
             + list(pshape[len(slice) :])
@@ -91,3 +91,21 @@ def test_inversion_plot_invalid_slice(inversion):
 def test_profiles_plot_invalid_slice(inversion):
     with pytest.raises(ValueError, match="must reduce profile data to 1D"):
         inversion.profiles.plot(np.s_[0])
+
+
+@pytest.mark.parametrize("slice_data_first", [True, False])
+def test_slice_sliced_inversion(inversion, slice_data_first):
+    quants_slice = ("optical_depth", "temperature")
+    data_slice = np.s_[100:, 100:]
+    inv = inversion
+    if slice_data_first:
+        inv1 = inv[data_slice]
+        inv2 = inv1[quants_slice]
+        assert not inv2.wcs
+    else:
+        inv1 = inv[quants_slice]
+        inv2 = inv1[data_slice]
+        assert inv.wcs == inv1.wcs
+    assert inv["temperature"][data_slice].shape == inv2["temperature"].shape
+    assert inv.profiles["NaID_orig"][data_slice].shape == inv2.profiles["NaID_orig"].shape
+    assert tuple(inv2.keys()) == quants_slice
