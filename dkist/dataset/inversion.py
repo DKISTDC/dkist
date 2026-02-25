@@ -136,7 +136,7 @@ class Inversion(NDCollection):
         General metadata for the overall collection.
     """
 
-    def __init__(self, *args, profiles=None, **kwargs):
+    def __init__(self, *args, profiles: Profiles | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
 
