@@ -1,1 +1,1 @@
-Fix `TiledDataset.tiles_shape` to work with flat (flattened or sliced) TiledDatasets.
+Fix `.TiledDataset.tiles_shape` to work with flat (flattened or sliced) TiledDatasets.
