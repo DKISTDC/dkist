@@ -27,6 +27,8 @@ def test_tileddataset_flat(simple_tiled_dataset):
     assert isinstance(simple_tiled_dataset.flat, TiledDataset)
     assert all(isinstance(t, Dataset) for t in simple_tiled_dataset.flat)
     assert not simple_tiled_dataset.flat.mask.all()
+    tiles_shape = simple_tiled_dataset.flat.tiles_shape
+    assert all(s == (simple_tiled_dataset.flat[0].shape) for s in tiles_shape)
 
 
 @pytest.mark.accept_cli_tiled_dataset
