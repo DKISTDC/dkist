@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
-import gwcs
-
 from ndcube import NDCollection
 
 __all__ = ["Inversion", "Profiles"]
@@ -142,17 +140,6 @@ class Inversion(NDCollection):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
 
-    @property
-    def wcs(self) -> gwcs.WCS | None:
-        """
-        The WCS for all the quantities in the inversion.
-
-        If the WCSes for any of the quantities diverge this will return None.
-        """
-        wcses: list[gwcs.WCS] = [cube.wcs for cube in self.values()]
-        if all(wcses[0] is w for w in wcses):
-            return wcses[0]
-
     def __str__(self):
         quants_repr = "\n".join(super().__str__().split("\n")[2:])
         profiles_repr = "\n".join(self.profiles.__str__().split("\n")[2:])
@@ -174,19 +161,26 @@ class Inversion(NDCollection):
         if (
             # If we have profiles, and we have a consistent WCS then we can propagate the slice to profiles
             self.profiles is not None
-            and self.wcs is not None
             # If the keys are the same then it was a data slice so we should slice the profiles too
             and hasattr(new_inv, "keys")
             and self.keys() == new_inv.keys()
         ):
             # Check to make sure all the profiles WCSes have the same pixel names or exit early
             profiles_wcses = [p.wcs for p in self.profiles.values()]
-            pan = [w.pixel_axis_names for w in profiles_wcses]
-            if not all(p == pan[0] for p in pan):
-                return new_inv
+            inversion_wcses = [i.wcs for i in self.values()]
+
+            def check_matching_pixel_names(wcses):
+                # Check to make sure all the profiles WCSes have the same pixel names or exit early
+                pan = [w.low_level_wcs.pixel_axis_names for w in wcses]
+                if all(p == pan[0] for p in pan):
+                    return pan[0]
+
             # First we need to know which pixel axes are common to the Inversion and the Profiles
-            i_ax = self.wcs.pixel_axis_names[::-1]
-            p_ax = pan[0][::-1]
+            if not(i_ax := check_matching_pixel_names(inversion_wcses)[::-1]):
+                return new_inv
+            if not(p_ax := check_matching_pixel_names(profiles_wcses)[::-1]):
+                return new_inv
+
             shared_ax = []
             for ax in i_ax:
                 if ax in p_ax:
