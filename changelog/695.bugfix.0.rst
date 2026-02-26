@@ -1,1 +1,0 @@
-Ignore requests warnings about chardet version to make <6 work.
