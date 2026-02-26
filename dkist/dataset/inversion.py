@@ -157,9 +157,10 @@ class Inversion(NDCollection):
 
     def __getitem__(self, item):
         new_inv = super().__getitem__(item)
+        new_inv.profiles = self.profiles
 
         if (
-            # If we have profiles, and we have a consistent WCS then we can propagate the slice to profiles
+            # If we have profiles then we can propagate the slice to profiles
             self.profiles is not None
             # If the keys are the same then it was a data slice so we should slice the profiles too
             and hasattr(new_inv, "keys")
@@ -191,9 +192,6 @@ class Inversion(NDCollection):
             bslice = [item[shared_ax[a]] for a in range(min(len(item), len(shared_ax)))]
             # Finally slice the Profiles along only the shared axes
             new_inv.profiles = self.profiles[*bslice]
-        # If the keys are different then the data is untouched and we can copy the profiles
-        else:
-            new_inv.profiles = self.profiles
         return new_inv
 
     def plot(
