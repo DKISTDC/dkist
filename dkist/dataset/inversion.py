@@ -177,15 +177,16 @@ class Inversion(NDCollection):
                     return pan[0]
 
             # First we need to know which pixel axes are common to the Inversion and the Profiles
-            if not(i_ax := check_matching_pixel_names(inversion_wcses)[::-1]):
+            # If any names are different
+            if not(i_ax := check_matching_pixel_names(inversion_wcses)):
                 return new_inv
-            if not(p_ax := check_matching_pixel_names(profiles_wcses)[::-1]):
+            if not(p_ax := check_matching_pixel_names(profiles_wcses)):
                 return new_inv
 
             shared_ax = []
-            for ax in i_ax:
+            for ax in i_ax[::-1]:
                 if ax in p_ax:
-                    shared_ax.append(p_ax.index(ax))
+                    shared_ax.append(p_ax[::-1].index(ax))
             # Then we construct a new set of slices that reference the correct axes
             # We need a list if only one slice was given
             item = [item] if isinstance(item, (slice, int)) else item
