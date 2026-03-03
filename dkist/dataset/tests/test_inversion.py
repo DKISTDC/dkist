@@ -122,8 +122,15 @@ def test_double_data_slice_inversion(inversion):
     assert inv.profiles.keys() == inv2.profiles.keys()
 
 
-def test_slice_inversion_with_mismatched_wcs(inversion_singleuse):
+def test_slice_inversion_with_mismatched_inversion_wcs(inversion_singleuse):
     inv = inversion_singleuse
     dict.__setitem__(inv, "temperature", inv["temperature"][:100])
+    with pytest.raises(DKISTUserWarning, match="datasets in this Inversion do not match the rest"):
+        inv1 = inv[100:]
+
+
+def test_slice_inversion_with_mismatched_profiles_wcs(inversion_singleuse):
+    inv = inversion_singleuse
+    dict.__setitem__(inv.profiles, "NaID_orif", inv["NaID_orig"][:100])
     with pytest.raises(DKISTUserWarning, match="datasets in this Inversion do not match the rest"):
         inv1 = inv[100:]
