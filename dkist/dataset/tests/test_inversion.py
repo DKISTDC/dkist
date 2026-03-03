@@ -8,6 +8,7 @@ import pytest
 from dkist import Dataset, Inversion
 from dkist.dataset.inversion import Profiles
 from dkist.tests.helpers import figure_test
+from dkist.utils.exceptions import DKISTUserWarning
 
 
 def test_inversion(inversion):
@@ -119,3 +120,10 @@ def test_double_data_slice_inversion(inversion):
     assert inv.profiles["NaID_orig"][100:, 100:].shape == inv2.profiles["NaID_orig"].shape
     assert inv.keys() == inv2.keys()
     assert inv.profiles.keys() == inv2.profiles.keys()
+
+
+def test_slice_inversion_with_mismatched_wcs(inversion_singleuse):
+    inv = inversion_singleuse
+    dict.__setitem__(inv, "temperature", inv["temperature"][:100])
+    with pytest.raises(DKISTUserWarning, match="datasets in this Inversion do not match the rest"):
+        inv1 = inv[100:]

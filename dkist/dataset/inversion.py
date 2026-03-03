@@ -9,7 +9,15 @@ from matplotlib.gridspec import GridSpec
 
 from ndcube import NDCollection
 
+from dkist.utils.exceptions import DKISTUserWarning
+
 __all__ = ["Inversion", "Profiles"]
+
+
+def raise_wcs_warning(obj):
+    raise DKISTUserWarning(f"One or more WCS objects of datasets in this {obj} do not match the rest."
+                           "Data may not be comparable between datasets."
+                           f"\n{axes}")
 
 
 class Profiles(NDCollection):
@@ -179,8 +187,10 @@ class Inversion(NDCollection):
             # First we need to know which pixel axes are common to the Inversion and the Profiles
             # If any names are different
             if not(i_ax := check_matching_pixel_names(inversion_wcses)):
+                raise_wcs_warning("Inversion")
                 return new_inv
             if not(p_ax := check_matching_pixel_names(profiles_wcses)):
+                raise_wcs_warning("Profiles")
                 return new_inv
 
             shared_ax = []
