@@ -1,0 +1,1 @@
+Update the devdeps figure hashes. How the WCSes are handled by something in the environment is very slightly different for TiledDataset, causing a very slight misalignment between the hashed baseline and resulting images.
