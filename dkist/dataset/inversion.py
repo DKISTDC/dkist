@@ -189,10 +189,10 @@ class Inversion(NDCollection):
             # If any names are different
             if not(i_ax := check_matching_pixel_names(inversion_wcses)):
                 raise_wcs_warning("Inversion")
-                return new_inv
+                return new_inv # pragma: no cover
             if not(p_ax := check_matching_pixel_names(profiles_wcses)):
                 raise_wcs_warning("Profiles")
-                return new_inv
+                return new_inv # pragma: no cover
 
             shared_ax = []
             for ax in i_ax[::-1]:
