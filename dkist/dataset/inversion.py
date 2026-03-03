@@ -16,8 +16,7 @@ __all__ = ["Inversion", "Profiles"]
 
 def raise_wcs_warning(obj):
     raise DKISTUserWarning(f"One or more WCS objects of datasets in this {obj} do not match the rest."
-                           "Data may not be comparable between datasets."
-                           f"\n{axes}")
+                           "Data may not be comparable between datasets.")
 
 
 class Profiles(NDCollection):
