@@ -131,6 +131,6 @@ def test_slice_inversion_with_mismatched_inversion_wcs(inversion_singleuse):
 
 def test_slice_inversion_with_mismatched_profiles_wcs(inversion_singleuse):
     inv = inversion_singleuse
-    dict.__setitem__(inv.profiles, "NaID_orif", inv["NaID_orig"][:100])
+    dict.__setitem__(inv.profiles, "NaID_orig", inv.profiles["NaID_orig"][:100])
     with pytest.raises(DKISTUserWarning, match="datasets in this Profiles do not match the rest"):
         inv1 = inv[100:]
