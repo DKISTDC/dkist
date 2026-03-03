@@ -16,7 +16,9 @@ __all__ = ["Inversion", "Profiles"]
 
 def raise_wcs_warning(obj):
     raise DKISTUserWarning(f"One or more WCS objects of datasets in this {obj} do not match the rest."
-                           "Data may not be comparable between datasets.")
+                           "Data may not be comparable between datasets."
+                           "(This should not be possible."
+                           "Please figure out what you did and report it to https://github.com/sunpy/ndcube/issues)")
 
 
 class Profiles(NDCollection):
