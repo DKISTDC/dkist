@@ -27,6 +27,6 @@ properties:
   profiles:
     $ref: "asdf://dkist.nso.edu/schemas/profiles-0.1.0"
 
-required: [meta, quantities, profiles]
+required: [meta, quantities]
 additionalProperties: true
 ...

@@ -464,3 +464,17 @@ def inversion(tmp_path_factory):
         with open(invdir / "test_L2_inversion.asdf", mode="wb") as afo:
             afo.write(gfo.read())
     return load_dataset(invdir / "test_L2_inversion.asdf")
+
+
+@pytest.fixture
+def inversion_singleuse(tmp_path_factory):
+    """
+    An inversion fixture to be used exactly once, so that changes don't affect other tests.
+    The session-scoped fixture above can stay so that we don't have to slow down the tests by
+    loading the inversion for every test that needs it.
+    """
+    invdir = tmp_path_factory.mktemp("data")
+    with gzip.open(Path(rootdir) / "test_L2_inversion.asdf.gz", mode="rb") as gfo:
+        with open(invdir / "test_L2_inversion.asdf", mode="wb") as afo:
+            afo.write(gfo.read())
+    return load_dataset(invdir / "test_L2_inversion.asdf")

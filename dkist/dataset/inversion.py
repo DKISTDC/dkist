@@ -9,7 +9,16 @@ from matplotlib.gridspec import GridSpec
 
 from ndcube import NDCollection
 
+from dkist.utils.exceptions import DKISTUserWarning
+
 __all__ = ["Inversion", "Profiles"]
+
+
+def raise_wcs_warning(obj):
+    raise DKISTUserWarning(f"One or more WCS objects of datasets in this {obj} do not match the rest."
+                           "Data may not be comparable between datasets."
+                           "(This should not be possible."
+                           "Please figure out what you did and report it to https://github.com/sunpy/ndcube/issues)")
 
 
 class Profiles(NDCollection):
@@ -136,7 +145,7 @@ class Inversion(NDCollection):
         General metadata for the overall collection.
     """
 
-    def __init__(self, *args, profiles=None, **kwargs):
+    def __init__(self, *args, profiles: Profiles | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
 
@@ -155,10 +164,46 @@ class Inversion(NDCollection):
 
         return textwrap.dedent(s).format(quants_repr, profiles_repr)
 
-    def __getitem__(self, aslice):
-        new_inv = super().__getitem__(aslice)
+    def __getitem__(self, item):
+        new_inv = super().__getitem__(item)
         new_inv.profiles = self.profiles
 
+        if (
+            # If we have profiles then we can propagate the slice to profiles
+            self.profiles is not None
+            # If the keys are the same then it was a data slice so we should slice the profiles too
+            and hasattr(new_inv, "keys")
+            and self.keys() == new_inv.keys()
+        ):
+            # Check to make sure all the profiles WCSes have the same pixel names or exit early
+            profiles_wcses = [p.wcs for p in self.profiles.values()]
+            inversion_wcses = [i.wcs for i in self.values()]
+
+            def check_matching_pixel_names(wcses):
+                # Check to make sure all the profiles WCSes have the same pixel names or exit early
+                pan = [w.low_level_wcs.pixel_axis_names for w in wcses]
+                if all(p == pan[0] for p in pan):
+                    return pan[0]
+
+            # First we need to know which pixel axes are common to the Inversion and the Profiles
+            # If any names are different
+            if not(i_ax := check_matching_pixel_names(inversion_wcses)):
+                raise_wcs_warning("Inversion")
+                return new_inv # pragma: no cover
+            if not(p_ax := check_matching_pixel_names(profiles_wcses)):
+                raise_wcs_warning("Profiles")
+                return new_inv # pragma: no cover
+
+            shared_ax = []
+            for ax in i_ax[::-1]:
+                if ax in p_ax:
+                    shared_ax.append(p_ax[::-1].index(ax))
+            # Then we construct a new set of slices that reference the correct axes
+            # We need a list if only one slice was given
+            item = [item] if isinstance(item, (slice, int)) else item
+            bslice = [item[shared_ax[a]] for a in range(min(len(item), len(shared_ax)))]
+            # Finally slice the Profiles along only the shared axes
+            new_inv.profiles = self.profiles[*bslice]
         return new_inv
 
     def plot(
@@ -194,7 +239,7 @@ class Inversion(NDCollection):
             if isinstance(inversions, str):
                 inversions = [inversions]
             sliced_inversions = Inversion(
-                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles
+                {name: self[name] for name in inversions}, aligned_axes="all", profiles=self.profiles, meta=self.meta
             )[slice_index]
         else:
             sliced_inversions = self[slice_index]

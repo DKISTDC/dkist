@@ -1,3 +1,4 @@
+import collections.abc
 from itertools import product, permutations
 
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import pytest
 from dkist import Dataset, Inversion
 from dkist.dataset.inversion import Profiles
 from dkist.tests.helpers import figure_test
+from dkist.utils.exceptions import DKISTUserWarning
 
 
 def test_inversion(inversion):
@@ -28,7 +30,7 @@ def test_str(inversion):
     item0_pmtns = list(permutations(item0keys))
     item1_pmtns = list(permutations(item1keys))
     allorders = [str([i0, i1, ("phys.absorption.opticalDepth",)]) for (i0, i1) in product(item0_pmtns, item1_pmtns)]
-    assert any([s in r for s in allorders])  #noqa:C419
+    assert any([s in r for s in allorders])  # noqa:C419
 
 
 def test_get_item(inversion):
@@ -38,9 +40,34 @@ def test_get_item(inversion):
     assert inversion.profiles == sliced_inv.profiles
 
 
+@pytest.mark.parametrize("slice", [np.s_[100:, 10:20], np.s_[10:], np.s_[0], np.s_[:, :10], np.s_[:, :, :10]])
+def test_slice_all(inversion, slice):
+    inv = inversion
+    sliced_inv = inv[slice]
+    ishape = inv["temperature"].data.shape
+    pshape = inv.profiles["NaID_orig"].data.shape
+    if isinstance(slice, int):
+        new_ishape = ishape[1:]
+        new_pshape = pshape[1:]
+    else:
+        if not isinstance(slice, collections.abc.Sequence):
+            slice = [slice]
+        new_ishape = tuple(
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(ishape, slice)]
+            + list(ishape[len(slice) :])
+        )
+        slice = slice[:2]  # Only the first two axes are aligned. May break if we change data
+        new_pshape = tuple(
+            [((s.stop or n) - (s.start or 0)) // (s.step or 1) for n, s in zip(pshape, slice)]
+            + list(pshape[len(slice) :])
+        )
+    assert sliced_inv["temperature"].data.shape == new_ishape
+    assert sliced_inv.profiles["NaID_orig"].data.shape == new_pshape
+
+
 @figure_test
 @pytest.mark.parametrize("inversions", ["all", ["temperature", "electron_pressure", "velocity"], "temperature"])
-@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0,0]])
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
 def test_inversion_plot(inversion, inversions, slice):
     fig = plt.figure(figsize=(12, 18))
     inversion.plot(slice, inversions=inversions)
@@ -65,3 +92,45 @@ def test_inversion_plot_invalid_slice(inversion):
 def test_profiles_plot_invalid_slice(inversion):
     with pytest.raises(ValueError, match="must reduce profile data to 1D"):
         inversion.profiles.plot(np.s_[0])
+
+
+@pytest.mark.parametrize("slice_data_first", [True, False])
+def test_slice_sliced_inversion(inversion, slice_data_first):
+    quants_slice = ("optical_depth", "temperature")
+    data_slice = np.s_[100:, 100:]
+    inv = inversion
+    if slice_data_first:
+        inv1 = inv[data_slice]
+        inv2 = inv1[quants_slice]
+    else:
+        inv1 = inv[quants_slice]
+        inv2 = inv1[data_slice]
+    assert inv["temperature"][data_slice].shape == inv2["temperature"].shape
+    assert inv.profiles["NaID_orig"][data_slice].shape == inv2.profiles["NaID_orig"].shape
+    assert tuple(inv2.keys()) == quants_slice
+    assert inv.profiles.keys() == inv2.profiles.keys()
+
+
+def test_double_data_slice_inversion(inversion):
+    inv = inversion
+    inv1 = inv[100:]
+    inv2 = inv1[:, 100:]
+
+    assert inv["temperature"][100:, 100:].shape == inv2["temperature"].shape
+    assert inv.profiles["NaID_orig"][100:, 100:].shape == inv2.profiles["NaID_orig"].shape
+    assert inv.keys() == inv2.keys()
+    assert inv.profiles.keys() == inv2.profiles.keys()
+
+
+def test_slice_inversion_with_mismatched_inversion_wcs(inversion_singleuse):
+    inv = inversion_singleuse
+    dict.__setitem__(inv, "temperature", inv["temperature"][:100])
+    with pytest.raises(DKISTUserWarning, match="datasets in this Inversion do not match the rest"):
+        inv1 = inv[100:]
+
+
+def test_slice_inversion_with_mismatched_profiles_wcs(inversion_singleuse):
+    inv = inversion_singleuse
+    dict.__setitem__(inv.profiles, "NaID_orig", inv.profiles["NaID_orig"][:100])
+    with pytest.raises(DKISTUserWarning, match="datasets in this Profiles do not match the rest"):
+        inv1 = inv[100:]
