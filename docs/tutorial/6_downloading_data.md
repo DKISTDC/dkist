@@ -67,7 +67,7 @@ from sunpy.net import Fido, attrs as a
 ---
 tags: [keep-inputs]
 ---
-res = Fido.search(a.dkist.Dataset("BKPLX"))
+res = Fido.search(a.dkist.Product("L1-KMUPT"))
 f = Fido.fetch(res, path="~/sunpy/data/{instrument}/{dataset_id}/")
 ds = dkist.load_dataset(f)
 ```
@@ -105,9 +105,7 @@ ds[0, 0].files.download()
 ds[0, 0].plot()
 ```
 
-+++
-
-The default download directory used by `download()` is in the same folder as the ASDF file we loaded, so in this case `~/sunpy/data/VISP/BKPLX`.
+The default download directory used by `download()` is in the same folder as the ASDF file we loaded, so in this case `~/sunpy/data/VISP/FERRWI`.
 Since the `download()` method set up the transfer through globus, you can check on the status of your download in the activity tab of the web app as we saw earlier.
 
 We can change the download location of the files using the `path` argument.
@@ -125,7 +123,7 @@ ds[0, 0].files.download(path="~/sunpy/data/{dataset_id}")
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-would save the file to `~/sunpy/data/BKPLX/VISP_2023_10_16T18_21_47_508_00630200_I_BKPLX_L1.fits`.
+would save the file to `~/sunpy/data/FERRWI/VISP_2023_10_16T18_21_47_508_00630200_I_FERRWI_L1.fits`.
 Downloading the files to a custom directory also sets the ``ds.files.basepath`` property so that the new files are loaded:
 
 ```{code-cell} ipython3
