@@ -19,6 +19,7 @@ kernelspec:
 ---
 import matplotlib.pyplot as plt
 from sunpy.net import Fido, attrs as a
+import astropy.units as u
 
 import dkist
 import dkist.net
@@ -32,15 +33,21 @@ First we'll search for all unembargoed VISP data.
 res = Fido.search(a.Instrument("VISP"), a.dkist.Embargoed(False))
 ```
 
-Next, since we want to use a high average $r_0$, we can have Fido sort the results and output just the useful columns.
-We'll ignore the datasets with anomalously high values and look at the next one with a value that is high but realistic.
+Next, since we want to use a high average $r_0$, we can have Fido search for only results in a useful range.
+We'll ignore datasets with anomalously high values and look at ones with a value that is high but realistic.
 
 ```{code-cell} python
-res["dkist"].sort("Average Fried Parameter", reverse=True)
-res["dkist"][res["dkist"]["Average Fried Parameter"] < 2].show("Product ID", "Average Fried Parameter")
+res = Fido.search(a.Instrument("VISP"), a.dkist.Embargoed(False), a.dkist.FriedParameter(1*u.cm, 2*u.cm))
 ```
 
-This gives us the product `L1-BAEPX`.
+Then we'll sort them and inspect just the columns we're interested in, the product ID and the average $r_0$.
+
+```{code-cell} ipython3
+res["dkist"].sort("Average Fried Parameter", reverse=True)
+res["dkist"].show("Product ID", "Average Fried Parameter")
+```
+
+Let's use the product `L1-DSLDE`.
 We can download the ASDF for that product's latest dataset with Fido to inspect it in more detail.
 Remember that this only downloads a single ASDF file with some more metadata about the dataset, not the actual science data.
 
@@ -48,7 +55,7 @@ Remember that this only downloads a single ASDF file with some more metadata abo
 ---
 :tags: [remove-stderr]
 ---
-asdf_file = Fido.fetch(res["dkist"][res["dkist"]["Product ID"] == "L1-BAEPX"], path="~/sunpy/data/{dataset_id}/")
+asdf_file = Fido.fetch(res["dkist"][res["dkist"]["Product ID"] == "L1-DSLDE"], path="~/sunpy/data/{dataset_id}/")
 ds = dkist.load_dataset(asdf_file)
 ```
 
@@ -77,8 +84,13 @@ bad_headers = ds.headers[ds.headers["ATMOS_R0"] > 1]
 # Make sure headers are sorted by date
 bad_headers.sort("DATE-AVG")
 
-# Slice up to the index of the first bad frame
-sds = ds[0, :bad_headers[0]["DINDEX3"]-1, :, :]
+# Look at the indices where r0 is bad so we can slice out a good section
+bad_headers['DINDEX3']-1
+```
+
+```{code-cell} ipython3
+# Slice out the largest section of good frames
+sds = ds[0, 12:36, :, :]
 ```
 
 We can now download only these files, remember you need globus-connect-personal running for this.
@@ -105,7 +117,7 @@ This is because we have deliberately only downloaded those frames with an accept
 You may also notice though, that the `Dataset` object continues to function normally without the rest of the data.
 When we try to access the data, if the file is missing then `Dataset` fills in the corresponding portions of the array with NaNs.
 
-Since the seeing is bad for a significant contiguous portion of the data, we may simply want to discount that part and look only at the useful data.
+Since the seeing is bad for significant contiguous portions of the data, we may simply want to discount that part and look only at the useful data.
 In this case we can use the sub-dataset we made earlier:
 
 ```{code-cell} python
