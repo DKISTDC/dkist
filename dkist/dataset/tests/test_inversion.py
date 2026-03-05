@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from dkist import Dataset, Inversion, load_dataset
+from dkist import Dataset, Inversion
 from dkist.dataset.inversion import Profiles
 from dkist.tests.helpers import figure_test
 from dkist.utils.exceptions import DKISTUserWarning
