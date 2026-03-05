@@ -1,7 +1,9 @@
+from pathlib import Path
 from textwrap import dedent
 
 import numpy as np
 
+import asdf
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
@@ -193,6 +195,24 @@ class Dataset(NDCube):
     Dataset loading and saving routines.
     """
 
+    def save(self, asdf_path=None, basepath=None, overwrite=False):
+        """
+        Writes the dataset to an asdf file
+        """
+        ## TODO better docstring
+        ## TODO Make masks happen
+        if not basepath:
+            basepath = self.files.basepath
+        if not asdf_path:
+            asdf_path = self.inventory["asdfObjectKey"].split("/")[-1]
+        asdf_path = Path(basepath) / asdf_path
+        if not overwrite and asdf_path.exists():
+            raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
+
+        ## TODO validate?
+        asdf.AsdfFile({"dataset": self}).write_to(asdf_path)
+        ## TODO Create links to fits files if dir is different to original basepath?
+
     @classmethod
     @deprecated(since="1.0.0", alternative="load_dataset")
     def from_directory(cls, directory):
@@ -201,6 +221,7 @@ class Dataset(NDCube):
         asdf file and a collection of FITS files.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(directory)
 
     @classmethod
@@ -210,6 +231,7 @@ class Dataset(NDCube):
         Construct a dataset object from a filepath of a suitable asdf file.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(filepath)
 
     """
