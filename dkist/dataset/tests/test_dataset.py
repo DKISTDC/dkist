@@ -223,7 +223,7 @@ def test_save_dataset_sliced(large_visp_dataset, slice):
     ds1 = ds[slice]
     ds1.save(fname, overwrite=True)
 
-    ds2 = load_dataset(ds1.files.basepath / fname)
+    ds2 = load_dataset(fname)
 
     assert ds1.data.shape == ds2.data.shape
     assert ds1.files.filenames == ds2.files.filenames
@@ -243,22 +243,10 @@ def test_save_dataset_to_existing_file(large_visp_dataset):
     ds1 = ds[0]
     ds1.save(fname, overwrite=True)
 
-    ds2 = load_dataset(ds1.files.basepath / fname)
+    ds2 = load_dataset(fname)
 
     # Just need to test enough to make sure it's the sliced ds and not the original in the file
     assert ds1.data.shape == ds2.data.shape
 
     # Tidying. I'm sure there's a better fixture-based way to do this
-    (ds.files.basepath / fname).unlink()
-
-
-def test_save_dataset_default_file(large_visp_dataset):
-    ds = large_visp_dataset
-
-    ds.save()
-    ds_path = Path(ds.inventory["asdfObjectKey"].split("/")[-1])
-
-    assert (ds.files.basepath / ds_path).exists()
-
-    # Again, this probably wants a fixture
-    (ds.files.basepath / ds_path).unlink()
+    Path(fname).unlink()
