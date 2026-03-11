@@ -11,6 +11,7 @@ import gwcs
 from asdf.testing.helpers import roundtrip_object
 
 import dkist
+from dkist import load_dataset
 from dkist.data.test import rootdir
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
@@ -174,3 +175,35 @@ def test_read_wcs_with_backwards_affine():
     #     pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
     #
     #     assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
+
+
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0], np.s_[0, 0, 0]])
+def test_save_dataset_sliced(large_visp_dataset, slice):
+    fname = "ds-save-test.asdf"
+    ds = large_visp_dataset
+
+    ds1 = ds[slice]
+    ds1.save(fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_dataset_equal(ds1, ds2, skip_history=True, compare_wcs=False)
+
+
+def test_save_dataset_to_existing_file(large_visp_dataset):
+    fname = "ds-overwrite-test.asdf"
+    ds = large_visp_dataset
+
+    ds.save(fname)
+    with pytest.raises(FileExistsError):
+        ds.save(fname)
+
+    ds1 = ds[0]
+    ds1.save(fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_dataset_equal(ds1, ds2, skip_history=True, compare_wcs=False)
+
+    # Tidying. I'm sure there's a better fixture-based way to do this
+    Path(fname).unlink()

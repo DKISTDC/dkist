@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from dkist import Dataset, Inversion, load_dataset
+from dkist import Dataset, Inversion
 from dkist.dataset.inversion import Profiles
 from dkist.tests.helpers import figure_test
 from dkist.utils.exceptions import DKISTUserWarning
@@ -134,40 +134,3 @@ def test_slice_inversion_with_mismatched_profiles_wcs(inversion_singleuse):
     dict.__setitem__(inv.profiles, "NaID_orig", inv.profiles["NaID_orig"][:100])
     with pytest.raises(DKISTUserWarning, match="datasets in this Profiles do not match the rest"):
         inv1 = inv[100:]
-
-
-@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
-def test_save_inversion_sliced(inversion, slice):
-    fname = "inv-save-test.asdf"
-    ds = inversion
-
-    ds1 = ds[slice]
-    ds1.save(fname, overwrite=True)
-
-    ds2 = load_dataset(fname)
-
-    assert (ds1.aligned_dimensions == ds2.aligned_dimensions).all()
-    assert ds1.aligned_axis_physical_types == ds2.aligned_axis_physical_types
-    assert ds1.keys() == ds2.keys()
-    assert (ds1.meta["headers"] == ds2.meta["headers"]).all()
-    assert ds1.meta["inventory"] == ds2.meta["inventory"]
-
-
-def test_save_inversion_to_existing_file(inversion):
-    fname = "inv-overwrite-test.asdf"
-    ds = inversion
-
-    ds.save(fname)
-    with pytest.raises(FileExistsError):
-        ds.save(fname)
-
-    ds1 = ds[0]
-    ds1.save(fname, overwrite=True)
-
-    ds2 = load_dataset(fname)
-
-    # Just need to test enough to make sure it's the sliced ds and not the original in the file
-    assert ds1.data.shape == ds2.data.shape
-
-    # Tidying. I'm sure there's a better fixture-based way to do this
-    Path(fname).unlink()
