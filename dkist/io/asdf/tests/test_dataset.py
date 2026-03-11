@@ -37,16 +37,21 @@ def test_roundtrip_file_manager(file_manager):
     assert newobj == file_manager._fm
 
 
-def assert_dataset_equal(new, old):
+def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
+    assert new.shape == old.shape
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
     assert old_headers.colnames == new_headers.colnames
     assert len(old_headers) == len(new_headers)
+    if skip_history:
+        old.meta.pop("history")
+        new.meta.pop("history")
     assert old.meta == new.meta
     old.meta["headers"] = old_headers
     new.meta["headers"] = new_headers
-    assert old.wcs.name == new.wcs.name
-    assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
+    if compare_wcs:
+        assert old.wcs.name == new.wcs.name
+        assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
     ac_new = new.files.fileuri_array
     ac_old = old.files.fileuri_array
     assert (ac_new == ac_old).all()
