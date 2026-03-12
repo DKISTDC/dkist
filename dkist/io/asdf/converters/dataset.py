@@ -33,7 +33,7 @@ class DatasetConverter(Converter):
             slice_ = []
             for s in subslice:
                 slice_.append(np.s_[s[0]:s[1]:s[2]] if isinstance(s, list) else s)
-            data = data[slice_].squeeze()
+            data = data[*slice_]
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")
