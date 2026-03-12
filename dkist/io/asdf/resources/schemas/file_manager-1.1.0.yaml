@@ -24,6 +24,14 @@ properties:
       anyOf:
       - type: integer
         minimum: 0
+  subslice:
+    anyOf:
+    - null: true
+    - type: array
+      items:
+        anyOf:
+        - type: integer
+          minimum: 0
   chunksize:
     type: array
 

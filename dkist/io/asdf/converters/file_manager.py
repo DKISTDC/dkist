@@ -24,6 +24,7 @@ class FileManagerConverter(Converter):
             # If we are on windows we need to strip the leading /
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
+        subslice = node["subslice"] if "subslice" in node.keys() else None
 
         return FileManager.from_parts(
             node["fileuris"],
@@ -33,6 +34,7 @@ class FileManagerConverter(Converter):
             chunksize=node.get("chunksize", None),
             loader=AstropyFITSLoader,
             basepath=base_path,
+            subslice=subslice,
         )
 
     def to_yaml_tree(self, obj, tag, ctx):
@@ -43,4 +45,9 @@ class FileManagerConverter(Converter):
         node["shape"] = obj._striped_external_array.shape
         if chunksize := obj._striped_external_array.chunksize is not None:
             node["chunksize"] = chunksize
+        if obj._subslice:
+            slice_ = []
+            for s in obj._subslice:
+                slice_.append([s.start, s.stop, s.step] if hasattr(s, "start") else s)
+            node["subslice"] = slice_
         return node

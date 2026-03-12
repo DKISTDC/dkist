@@ -182,7 +182,7 @@ def test_read_wcs_with_backwards_affine():
     #     assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
 
 
-@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0], np.s_[0, 0, 0]])
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 1], np.s_[0, 1, 2]])
 def test_save_dataset_sliced(large_visp_dataset, slice):
     fname = "ds-save-test.asdf"
     ds = large_visp_dataset
