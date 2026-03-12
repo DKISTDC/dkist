@@ -5,9 +5,11 @@ from asdf.extension import Converter
 
 class DatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/dataset-1.3.0",
         "asdf://dkist.nso.edu/tags/dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/dataset-1.0.0",
+        "tag:dkist.nso.edu:dkist/dataset-0.4.0",
         "tag:dkist.nso.edu:dkist/dataset-0.3.0",
         "tag:dkist.nso.edu:dkist/dataset-0.2.0",
         "tag:dkist.nso.edu:dkist/dataset-0.1.0",
@@ -22,10 +24,16 @@ class DatasetConverter(Converter):
         return tags[0]
 
     def from_yaml_tree(self, node, tag, ctx):
+        import numpy as np
         tag_version = tuple(map(int, tag.split("-")[1].split(".")))
         from dkist.dataset import Dataset
 
         data = node["data"]._striped_external_array._generate_array()
+        if subslice := node["data"]._subslice:
+            slice_ = []
+            for s in subslice:
+                slice_.append(np.s_[s[0]:s[1]:s[2]] if isinstance(s, list) else s)
+            data = data[slice_].squeeze()
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")

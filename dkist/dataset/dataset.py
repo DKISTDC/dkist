@@ -7,6 +7,7 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
+from dkist.io import save_asdf
 from dkist.io.dask.striped_array import FileManager
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
@@ -126,6 +127,8 @@ class Dataset(NDCube):
             sliced_dataset._file_manager = self._file_manager._fm._slice_by_cube(item)
             sliced_dataset.meta = sliced_dataset.meta.copy()
             sliced_dataset.meta["headers"] = self._slice_headers(item)
+            item = [item] if isinstance(item, int) else item
+            sliced_dataset._file_manager._fm._subslice = item[len(sliced_dataset._file_manager._fm._striped_external_array.parent_slice):]
         return sliced_dataset
 
     def _slice_headers(self, slice_):
@@ -193,6 +196,9 @@ class Dataset(NDCube):
     Dataset loading and saving routines.
     """
 
+    def save(self, asdf_path, overwrite=False):
+        save_asdf(self, asdf_path, overwrite)
+
     @classmethod
     @deprecated(since="1.0.0", alternative="load_dataset")
     def from_directory(cls, directory):
@@ -201,6 +207,7 @@ class Dataset(NDCube):
         asdf file and a collection of FITS files.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(directory)
 
     @classmethod
@@ -210,6 +217,7 @@ class Dataset(NDCube):
         Construct a dataset object from a filepath of a suitable asdf file.
         """
         from .loader import load_dataset  # noqa: PLC0415
+
         return load_dataset(filepath)
 
     """
