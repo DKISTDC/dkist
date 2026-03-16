@@ -28,6 +28,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   downstream:
     if: (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'Run downstream CI'))
@@ -43,6 +45,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
@@ -68,6 +71,8 @@ jobs:
     if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
     needs: [downstream]
     runs-on: ubuntu-latest
+    environment:
+      name: notify
     steps:
       - uses: Cadair/matrix-notify-action@31c7cc36051ee7dc4157a22c1f13dbc7d68e5120 # v2
         with:
