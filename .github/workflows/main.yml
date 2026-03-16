@@ -29,9 +29,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
@@ -45,7 +47,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
     with:
       default_python: '3.14'
       coverage: 'codecov'
@@ -59,7 +61,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   mypy:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
     with:
       pytest: false
       envs: |
@@ -68,8 +70,10 @@ jobs:
   sdist_verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.1
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.13'
       - run: python -m pip install -U --user build
@@ -78,7 +82,7 @@ jobs:
       - run: python -m twine check dist/*
 
   allowed-fail-tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
@@ -95,7 +99,7 @@ jobs:
         github.event_name == 'pull_request' &&
         contains(github.event.pull_request.labels.*.name, 'Run publish')
       )
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
     with:
       python-version: '3.13'
       test_extras: tests
@@ -131,7 +135,7 @@ jobs:
     needs: [tests, allowed-fail-tests, publish]
     runs-on: ubuntu-latest
     steps:
-      - uses: Cadair/matrix-notify-action@main
+      - uses: Cadair/matrix-notify-action@31c7cc36051ee7dc4157a22c1f13dbc7d68e5120 # v2
         with:
           matrix_token: ${{ secrets.matrix_access_token }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
