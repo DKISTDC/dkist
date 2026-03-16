@@ -143,5 +143,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           homeserver: ${{ secrets.matrix_homeserver }}
           roomid: '!RehafayCrAiXbzVpXI:openastronomy.org'
-          ignore_pattern: '.*Load.*'
+          ignore_pattern: '.*(Load|report overall).*'
           summarise_success: true
