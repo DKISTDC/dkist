@@ -14,9 +14,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   build_workshop:
     runs-on: ubuntu-latest
+    environment:
+      name: workshops
     steps:
       # Make sure the branch name logic handles workflow_dispatch
       - name: Branch name for releases
@@ -27,26 +31,28 @@ jobs:
         if: ${{ !startsWith(github.ref_name, 'v') }}
         run: echo 'BRANCHNAME=latest' >> "$GITHUB_ENV"
 
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.13"
 
       - name: Configure Git
         run: |
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
 
       - name: Install pipx
         run: pip install -U pipx
 
       - name: Clone workshop repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: true
           repository: 'DKISTDC/DKIST-Workshop'
           fetch-depth: 0
           path: 'workshop'
