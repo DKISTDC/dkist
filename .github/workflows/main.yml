@@ -88,7 +88,7 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  publish:
+  build_dists:
     needs: [tests]
     if: |
       github.event_name != 'pull_request' || (
@@ -101,9 +101,30 @@ jobs:
       test_extras: tests
       test_command: pytest --pyargs dkist -k "not test_fail" --remote-data=none --benchmark-skip
       # We have to work around a github runner bug here: https://github.com/actions/runner/issues/2788#issuecomment-2145922705
-      upload_to_pypi: ${{ startsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), 'refs/tags/v') && !endsWith(github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name), '.dev') }}
-    secrets:
-      pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+      save_artifacts: true
+      upload_to_pypi: false
+
+  publish:
+    needs: [build_dists]
+    if: startsWith(github.ref, 'refs/tags/v')
+    name: Upload to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          merge-multiple: true
+          pattern: dist-*
+          path: dist
+
+      - run: ls -lha dist/
+
+      - name: Run upload
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
 
   notify:
     if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
