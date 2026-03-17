@@ -1,4 +1,9 @@
 repos:
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+    - id: zizmor
+      exclude: ".github/workflows/sub_package_update.yml"
     # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.14.10"
