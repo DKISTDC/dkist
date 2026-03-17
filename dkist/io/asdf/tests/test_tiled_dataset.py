@@ -46,9 +46,7 @@ def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice):
     ds2 = load_dataset(fname)
 
     assert ds1.shape == ds2.shape
-    # Axes within fits files won't be affected by save and load
-    assert [s[0] for s in ds1.flat.tiles_shape] == [s[0] for s in ds2.flat.tiles_shape]
-    assert (np.array([s[-2:] for s in ds2.flat.tiles_shape], dtype=object) == ds.files._fm.shape[-2:]).all()
+    assert ds1.flat.tiles_shape == ds2.flat.tiles_shape
     assert ds1.files.filenames == ds2.files.filenames
     assert ds1.files.shape == ds2.files.shape
     assert (ds1.meta["headers"] == ds2.meta["headers"]).all()
