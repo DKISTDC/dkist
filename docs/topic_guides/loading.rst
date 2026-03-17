@@ -1,6 +1,6 @@
 .. _dkist:topic-guides:loadinglevel1data:
 
-Loading and Working with Level One Data
+Loading and Working with Level 1 Data
 =======================================
 
 As we saw in the :ref:`dkist:topic-guides:downloading-fits` section, once we have an ASDF file representing a DKIST dataset it can be loaded with `dkist.Dataset`.
