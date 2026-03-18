@@ -99,7 +99,7 @@ Helpfully, `Dataset` provides some additional metadata which includes a link to 
 ds.meta['inventory']['headerDocumentationUrl']
 ```
 
-If you follow this link and then click on "Level One FITS Specification" you will find a list of all the FITS keywords used for level 1 data with a description of each.
+If you follow this link and then click on "Level 1 FITS Specification" you will find a list of all the FITS keywords used for level 1 data with a description of each.
 Using this we can find that the Fried parameter is stored with the keyword `"ATMOS_R0"`.
 Then it's trivial to plot this information:
 

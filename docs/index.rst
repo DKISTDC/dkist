@@ -30,7 +30,7 @@ The `dkist` package is a `SunPy Affiliated Package <https://sunpy.org/affiliated
 
         :material-outlined:`accessibility_new;8em;sd-text-secondary`
 
-        This tutorial walks you through how to search for, download and load DKIST Level one data.
+        This tutorial walks you through how to search for, download and load DKIST Level 1 data.
 
     .. grid-item-card:: Examples
         :link: dkist:examples:index
