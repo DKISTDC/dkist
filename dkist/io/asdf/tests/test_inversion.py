@@ -9,8 +9,8 @@ from dkist import load_dataset
 
 
 def assert_inversion_equal(new, old):
-    old_headers = old.meta.pop("headers")
-    new_headers = new.meta.pop("headers")
+    old_headers = old.meta["headers"]
+    new_headers = new.meta["headers"]
     assert old_headers.colnames == new_headers.colnames
     assert len(old_headers) == len(new_headers)
     # This won't work because of how we handle the meta attributes
