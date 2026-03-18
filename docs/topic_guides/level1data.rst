@@ -1,7 +1,7 @@
 .. _dkist:topic-guides:level1data:
 
 Level 1 DKIST Data
-====================
+==================
 
 The Level 1 data provided by the DKIST data center has been calibrated to remove any effects introduced by the telescope or instruments.
 The result of these calibration recipes is a Level 1 "dataset" which are the smallest units of DKIST data which are searchable from the data center.

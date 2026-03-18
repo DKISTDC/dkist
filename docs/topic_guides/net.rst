@@ -1,7 +1,7 @@
 .. _dkist:topic-guides:searchdownload:
 
 Searching and Downloading Level 1 Data
-========================================
+======================================
 
 The DKIST Data Center provides a search interface for searching for Level 1 datasets.
 This means you can search for whole collections of FITS files, each with an associated ASDF metadata file and other ancillary files (such as preview movies).
