@@ -302,11 +302,10 @@ class FileManager:
 
     def _slice_by_cube(self, item_):
         item = self._array_slice_to_loader_slice(item_)
-        item_ = (item,) if isinstance(item_, int) else item_
+        item_ = np.index_exp[item_]
         loader_view = StripedExternalArrayView(self._striped_external_array, item)
-        new_fm = type(self)(loader_view, loader_view.parent_slice)
-        new_fm._subslice = item_[len((item,) if isinstance(item, int) else item):]
-        return new_fm
+        subslice = item_[len((item,) if isinstance(item, int) else item):]
+        return type(self)(loader_view, subslice)
 
     def _generate_array(self):
         return self._striped_external_array._generate_array()
