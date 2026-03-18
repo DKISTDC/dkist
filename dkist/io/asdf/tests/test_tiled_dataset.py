@@ -35,7 +35,7 @@ def test_save_tiled_dataset_sliced(large_tiled_dataset, slice):
     assert ds1.meta["inventory"] == ds2.meta["inventory"]
 
 
-@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, :100, 100:]])
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, :100, 100:], np.s_[:, :, 0]])
 def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice):
     fname = "tds-save-test.asdf"
     ds = large_tiled_dataset
