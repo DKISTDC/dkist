@@ -285,7 +285,7 @@ class FileManager:
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)
-        return type(self)(StripedExternalArrayView(self._striped_external_array, item))
+        return type(self)(StripedExternalArrayView(self._striped_external_array, item), None)
 
     def _array_slice_to_loader_slice(self, aslice):
         """
