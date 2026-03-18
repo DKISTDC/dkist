@@ -1,9 +1,9 @@
 .. _dkist:topic-guides:searchdownload:
 
-Searching and Downloading Level One Data
-========================================
+Searching and Downloading Level 1 Data
+======================================
 
-The DKIST Data Center provides a search interface for searching for level one datasets.
+The DKIST Data Center provides a search interface for searching for Level 1 datasets.
 This means you can search for whole collections of FITS files, each with an associated ASDF metadata file and other ancillary files (such as preview movies).
 The ASDF and other ancillary files are made available to download over HTTP, to transfer the FITS files we use `Globus <https://www.globus.org/data-transfer>`__.
 
@@ -71,7 +71,7 @@ This will return a list-like object which contains one or more filepaths to the 
 Downloading FITS files with Globus
 ----------------------------------
 
-As mentioned at the top of the page the DKIST level one data are only available to download using the `Globus <https://www.globus.org/data-transfer>`__ file transfer system.
+As mentioned at the top of the page the DKIST Level 1 data are only available to download using the `Globus <https://www.globus.org/data-transfer>`__ file transfer system.
 The `dkist` package provides helpers to orchestrate the transfer of files with Globus.
 The objective of these helpers is to provide the tools needed to quickly access some or all of a dataset, and to script the transfer of any data.
 

@@ -5,7 +5,7 @@ Welcome to the DKIST tutorial.
 In this tutorial we shall guide you through getting started with DKIST data.
 By the end of this tutorial you should be familiar with how to:
 
-* Search for level one datasets using `Fido`.
+* Search for Level 1 datasets using `Fido`.
 * Loading these datasets with `dkist.load_dataset`.
 * Inspecting the `dkist.Dataset` object and how to work with it.
 * How to transfer FITS files to your local computer using Globus.
