@@ -300,10 +300,13 @@ class FileManager:
         aslice = aslice[:-1*len(fits_array_shape)]
         return tuple(aslice)
 
-    def _slice_by_cube(self, item):
-        item = self._array_slice_to_loader_slice(item)
+    def _slice_by_cube(self, item_):
+        item = self._array_slice_to_loader_slice(item_)
+        item_ = (item,) if isinstance(item_, int) else item_
         loader_view = StripedExternalArrayView(self._striped_external_array, item)
-        return type(self)(loader_view, loader_view.parent_slice)
+        new_fm = type(self)(loader_view, loader_view.parent_slice)
+        new_fm._subslice = item_[len((item,) if isinstance(item, int) else item):]
+        return new_fm
 
     def _generate_array(self):
         return self._striped_external_array._generate_array()

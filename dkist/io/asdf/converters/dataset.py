@@ -33,6 +33,9 @@ class DatasetConverter(Converter):
             slice_ = []
             for s in subslice:
                 slice_.append(np.s_[s[0]:s[1]:s[2]] if isinstance(s, list) else s)
+            fm_arr_shape = node["data"].fileuri_array.shape
+            idx = 0 if fm_arr_shape == (1,) else len(fm_arr_shape)
+            slice_ = [np.s_[:]] * idx + slice_
             data = data[*slice_]
         wcs = node["wcs"]
         meta = node.get("meta", {})

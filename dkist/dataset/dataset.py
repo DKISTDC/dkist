@@ -127,8 +127,6 @@ class Dataset(NDCube):
             sliced_dataset._file_manager = self._file_manager._fm._slice_by_cube(item)
             sliced_dataset.meta = sliced_dataset.meta.copy()
             sliced_dataset.meta["headers"] = self._slice_headers(item)
-            item = [item] if isinstance(item, int) else item
-            sliced_dataset._file_manager._fm._subslice = item[len(sliced_dataset._file_manager._fm._striped_external_array.parent_slice):]
         return sliced_dataset
 
     def _slice_headers(self, slice_):
