@@ -24,10 +24,10 @@ def load_dataset(target, *, ignore_version_mismatch=False):
     """
     Load a DKIST dataset from a variety of inputs.
 
-    This function loads one or more DKIST ASDF files into `dkist.Dataset` or
-    `dkist.TiledDataset` classes. It can take a variety of inputs (listed below)
-    and will either return a single object or a list of objects if multiple
-    datasets are loaded.
+    This function loads one or more DKIST ASDF files into `dkist.Dataset`,
+    `dkist.TiledDataset` or `dkist.Inversion` classes. It can take a variety of
+    inputs (listed below) and will either return a single object or a list of
+    objects if multiple datasets are loaded.
 
     Parameters
     ----------
