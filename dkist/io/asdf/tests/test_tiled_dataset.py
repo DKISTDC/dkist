@@ -6,7 +6,7 @@ import pytest
 
 import asdf
 
-from dkist import load_dataset
+from dkist import load_dataset, save_dataset
 
 
 def test_verify_tiled_dataset_schema(tiled_dataset_asdf_path):
@@ -24,7 +24,7 @@ def test_save_tiled_dataset_sliced(large_tiled_dataset, slice):
     ds = large_tiled_dataset
 
     ds1 = ds[slice]
-    ds1.save(fname, overwrite=True)
+    save_dataset(ds1, fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 
@@ -41,7 +41,7 @@ def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice):
     ds = large_tiled_dataset
 
     ds1 = ds.slice_tiles[slice]
-    ds1.save(fname, overwrite=True)
+    save_dataset(ds1, fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 
@@ -57,12 +57,12 @@ def test_save_tiled_dataset_to_existing_file(large_tiled_dataset):
     fname = "tds-overwrite-test.asdf"
     ds = large_tiled_dataset
 
-    ds.save(fname)
+    save_dataset(ds, fname)
     with pytest.raises(FileExistsError):
-        ds.save(fname)
+        save_dataset(ds, fname)
 
     ds1 = ds.slice_tiles[0]
-    ds1.save(fname, overwrite=True)
+    save_dataset(ds1, fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 

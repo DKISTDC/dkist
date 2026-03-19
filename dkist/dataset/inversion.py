@@ -9,7 +9,6 @@ from matplotlib.gridspec import GridSpec
 
 from ndcube import NDCollection
 
-from dkist.io import save_asdf
 from dkist.utils.exceptions import DKISTUserWarning
 
 __all__ = ["Inversion", "Profiles"]
@@ -267,6 +266,3 @@ class Inversion(NDCollection):
             ax.set_title(name)
 
         return figure
-
-    def save(self, asdf_path, overwrite=False):
-        save_asdf(self, asdf_path, overwrite)

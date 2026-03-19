@@ -7,7 +7,6 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
-from dkist.io import save_asdf
 from dkist.io.dask.striped_array import FileManager
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
@@ -193,9 +192,6 @@ class Dataset(NDCube):
     """
     Dataset loading and saving routines.
     """
-
-    def save(self, asdf_path, overwrite=False):
-        save_asdf(self, asdf_path, overwrite)
 
     @classmethod
     @deprecated(since="1.0.0", alternative="load_dataset")

@@ -23,7 +23,6 @@ from numpy.typing import NDArray
 import astropy
 from astropy.table import Table, vstack
 
-from dkist.io import save_asdf
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
@@ -460,6 +459,3 @@ class TiledDataset(Collection):
         A `~.DKISTFileManager` helper for interacting with the files backing the data in this `.TiledDataset`.
         """
         return self._files
-
-    def save(self, asdf_path=None, basepath=None, overwrite=False):
-        save_asdf(self, asdf_path, overwrite)

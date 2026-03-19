@@ -5,7 +5,7 @@ import pytest
 
 from asdf.testing.helpers import roundtrip_object
 
-from dkist import load_dataset
+from dkist import load_dataset, save_dataset
 
 
 def assert_inversion_equal(new, old):
@@ -29,7 +29,7 @@ def test_save_inversion_sliced(inversion, slice):
     ds = inversion
 
     ds1 = ds[slice]
-    ds1.save(fname, overwrite=True)
+    save_dataset(ds1, fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 
@@ -40,12 +40,12 @@ def test_save_inversion_to_existing_file(inversion):
     fname = "inv-overwrite-test.asdf"
     ds = inversion
 
-    ds.save(fname)
+    save_dataset(ds, fname)
     with pytest.raises(FileExistsError):
-        ds.save(fname)
+        save_dataset(ds, fname)
 
     ds1 = ds[0]
-    ds1.save(fname, overwrite=True)
+    save_dataset(ds1, fname, overwrite=True)
 
     ds2 = load_dataset(fname)
 

@@ -3,7 +3,7 @@ from textwrap import dedent
 
 import asdf
 
-__all__ = ["filemanager_info_str"]
+__all__ = ["filemanager_info_str", "save_dataset"]
 
 
 def filemanager_info_str(filemanager):
@@ -14,7 +14,7 @@ def filemanager_info_str(filemanager):
     """)
 
 
-def save_asdf(dataset, asdf_path, overwrite=False):
+def save_dataset(dataset, asdf_path, overwrite=False):
         """
         Writes a dataset to an asdf file
         """
