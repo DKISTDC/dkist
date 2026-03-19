@@ -254,20 +254,21 @@ class FileManager:
     ----------
     striped_external_array
     """
-    __slots__ = ["_striped_external_array"]
+    __slots__ = ["_striped_external_array", "_subslice"]
 
     @classmethod
-    def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None):
+    def from_parts(cls, fileuris, target, dtype, shape, *, loader, basepath=None, chunksize=None, subslice=None):
         """
         An initialization helper for constructing the `StripedExternalArray` and the `FileManager` together.
         """
         striped_array = StripedExternalArray(
             fileuris, target, dtype, shape, loader=loader, basepath=basepath, chunksize=None,
         )
-        return cls(striped_array)
+        return cls(striped_array, subslice)
 
-    def __init__(self, striped_external_array: StripedExternalArray):
+    def __init__(self, striped_external_array: StripedExternalArray, subslice):
         self._striped_external_array = striped_external_array
+        self._subslice = subslice
 
     def __eq__(self, other):
         return self._striped_external_array == other._striped_external_array
@@ -284,7 +285,7 @@ class FileManager:
 
     def __getitem__(self, item):
         item = sanitize_slices(item, self._striped_external_array.ndim)
-        return type(self)(StripedExternalArrayView(self._striped_external_array, item))
+        return type(self)(StripedExternalArrayView(self._striped_external_array, item), None)
 
     def _array_slice_to_loader_slice(self, aslice):
         """
@@ -299,10 +300,12 @@ class FileManager:
         aslice = aslice[:-1*len(fits_array_shape)]
         return tuple(aslice)
 
-    def _slice_by_cube(self, item):
-        item = self._array_slice_to_loader_slice(item)
+    def _slice_by_cube(self, item_):
+        item = self._array_slice_to_loader_slice(item_)
+        item_ = np.index_exp[item_]
         loader_view = StripedExternalArrayView(self._striped_external_array, item)
-        return type(self)(loader_view)
+        subslice = item_[len((item,) if isinstance(item, int) else item):]
+        return type(self)(loader_view, subslice)
 
     def _generate_array(self):
         return self._striped_external_array._generate_array()
