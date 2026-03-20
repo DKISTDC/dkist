@@ -189,6 +189,20 @@ class Dataset(NDCube):
         """
         return self.meta["inventory"]
 
+    @property
+    def _data_is_modified(self):
+        """
+        Private property to determine if the data dask graph has been modified.
+        """
+        layers = list(self.data.dask.layers.keys())
+        tasks = []
+        # We want to ignore operations which won't change the actual data
+        ignorable = ["load_file", "reshape", "getitem"]
+        tasks = {l[:l.find("-")] for l in layers if l[:l.find("-")] not in ignorable}
+        if len(tasks) > 0:
+            return True
+        return False
+
     """
     Dataset loading and saving routines.
     """
