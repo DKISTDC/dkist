@@ -27,6 +27,7 @@ properties:
   subslice:
     anyOf:
     - null: true
+    - type: integer
     - type: array
       items:
         anyOf:
