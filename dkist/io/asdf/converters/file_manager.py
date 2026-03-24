@@ -1,6 +1,8 @@
 from pathlib import Path, PureWindowsPath
 from urllib.parse import urlparse
 
+import numpy as np
+
 from asdf.extension import Converter
 
 
@@ -24,7 +26,12 @@ class FileManagerConverter(Converter):
             # If we are on windows we need to strip the leading /
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
-        subslice = node["subslice"] if "subslice" in node.keys() else None
+        if subslice := node.get("subslice"):
+            slice_ = []
+            for s in subslice:
+                slice_.append(slice(*s) if isinstance(s, list) else s)
+            idx = len(np.shape(node["fileuris"]))
+            subslice = [np.s_[:]] * idx + slice_
 
         return FileManager.from_parts(
             node["fileuris"],

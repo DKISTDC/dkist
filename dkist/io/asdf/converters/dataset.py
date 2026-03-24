@@ -30,13 +30,7 @@ class DatasetConverter(Converter):
 
         data = node["data"]._striped_external_array._generate_array()
         if subslice := node["data"]._subslice:
-            slice_ = []
-            for s in subslice:
-                slice_.append(slice(*s) if isinstance(s, list) else s)
-            fm_arr_shape = node["data"].fileuri_array.shape
-            idx = 0 if fm_arr_shape == (1,) else len(fm_arr_shape)
-            slice_ = [np.s_[:]] * idx + slice_
-            data = data[*slice_]
+            data = data[*subslice]
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")
