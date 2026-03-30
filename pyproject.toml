@@ -23,9 +23,8 @@ dependencies = [
   # Some of these schema dependencies are minimums because we generated asdf
   # files with them unpinned so they are now required to read generated asdf
   # files.
-  "asdf>=4.0.0",  # Required by gwcs 0.24
-  "asdf-astropy>=0.11.0", # Required for dataset.save()
-  "asdf-coordinates-schemas>=0.4.0",  # required by asdf-astropy 0.10
+  "asdf-astropy>=0.11.0", # Required for save_dataset()
+  "asdf-coordinates-schemas>=0.4.0",  # required by asdf-astropy 0.11
   "asdf-standard>=1.1.0",
   "asdf-transform-schemas>=0.6.0",
   "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
