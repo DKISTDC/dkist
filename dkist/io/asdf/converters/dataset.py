@@ -24,7 +24,6 @@ class DatasetConverter(Converter):
         return tags[0]
 
     def from_yaml_tree(self, node, tag, ctx):
-        import numpy as np
         tag_version = tuple(map(int, tag.split("-")[1].split(".")))
         from dkist.dataset import Dataset
 
