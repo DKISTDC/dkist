@@ -41,6 +41,4 @@ def save_dataset(dataset, asdf_path, overwrite=False):
         if not overwrite and asdf_path.exists():
             raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
 
-        ## TODO validate?
         asdf.AsdfFile({"inversion" if isinstance(dataset, Inversion) else "dataset": dataset}).write_to(asdf_path)
-        ## TODO Create links to fits files if dir is different to original basepath?
