@@ -266,7 +266,7 @@ class FileManager:
         )
         return cls(striped_array, subslice)
 
-    def __init__(self, striped_external_array: StripedExternalArray, subslice):
+    def __init__(self, striped_external_array: StripedExternalArray, subslice=None):
         self._striped_external_array = striped_external_array
         self._subslice = subslice
 
