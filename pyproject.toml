@@ -24,7 +24,7 @@ dependencies = [
   # files with them unpinned so they are now required to read generated asdf
   # files.
   "asdf>=4.0.0",  # Required by gwcs 0.24
-  "asdf-astropy@git+https://github.com/Cadair/asdf-astropy@highlevelwcswrapper", # Required for dataset.save()
+  "asdf-astropy>=0.11.0 # Required for dataset.save()
   "asdf-coordinates-schemas>=0.4.0",  # required by asdf-astropy 0.10
   "asdf-standard>=1.1.0",
   "asdf-transform-schemas>=0.6.0",
