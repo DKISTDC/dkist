@@ -1,8 +1,6 @@
 from pathlib import Path, PureWindowsPath
 from urllib.parse import urlparse
 
-import numpy as np
-
 from asdf.extension import Converter
 
 
@@ -15,6 +13,8 @@ class FileManagerConverter(Converter):
     types = ["dkist.io.dask.striped_array.FileManager"]
 
     def from_yaml_tree(self, node, tag, ctx):
+        import numpy as np
+
         from dkist.io.dask.loaders import AstropyFITSLoader
         from dkist.io.dask.striped_array import FileManager
 
