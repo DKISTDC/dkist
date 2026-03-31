@@ -49,3 +49,4 @@ conf = Conf()
 # Do internal imports last (so logger etc is initialised)
 from dkist.dataset import Dataset, TiledDataset, Inversion, load_dataset
 from dkist.utils.sysinfo import system_info
+from dkist.io.utils import save_dataset
