@@ -1,1 +1,1 @@
-Bump required versions of asdf-astropy and asdf-coordinates-schemas as needed for dataset-saving functionality
+Bump required versions of asdf, asdf-astropy and asdf-coordinates-schemas as needed for dataset-saving functionality
