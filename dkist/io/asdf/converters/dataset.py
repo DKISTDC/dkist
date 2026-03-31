@@ -5,9 +5,11 @@ from asdf.extension import Converter
 
 class DatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/dataset-1.3.0",
         "asdf://dkist.nso.edu/tags/dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/dataset-1.0.0",
+        "tag:dkist.nso.edu:dkist/dataset-0.4.0",
         "tag:dkist.nso.edu:dkist/dataset-0.3.0",
         "tag:dkist.nso.edu:dkist/dataset-0.2.0",
         "tag:dkist.nso.edu:dkist/dataset-0.1.0",
@@ -26,6 +28,8 @@ class DatasetConverter(Converter):
         from dkist.dataset import Dataset
 
         data = node["data"]._striped_external_array._generate_array()
+        if subslice := node["data"]._subslice:
+            data = data[*subslice]
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")

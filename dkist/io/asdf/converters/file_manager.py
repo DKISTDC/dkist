@@ -7,11 +7,14 @@ from asdf.extension import Converter
 class FileManagerConverter(Converter):
     tags = [
         "tag:dkist.nso.edu:dkist/array_container-0.2.0",
+        "asdf://dkist.nso.edu/tags/file_manager-1.1.0",
         "asdf://dkist.nso.edu/tags/file_manager-1.0.0",
     ]
     types = ["dkist.io.dask.striped_array.FileManager"]
 
     def from_yaml_tree(self, node, tag, ctx):
+        import numpy as np
+
         from dkist.io.dask.loaders import AstropyFITSLoader
         from dkist.io.dask.striped_array import FileManager
 
@@ -23,6 +26,12 @@ class FileManagerConverter(Converter):
             # If we are on windows we need to strip the leading /
             filepath = Path(url.path.strip("/"))
         base_path = filepath.parent
+        if subslice := node.get("subslice"):
+            slice_ = []
+            for s in subslice:
+                slice_.append(slice(*s) if isinstance(s, list) else s)
+            idx = len(np.shape(node["fileuris"]))
+            subslice = [np.s_[:]] * idx + slice_
 
         return FileManager.from_parts(
             node["fileuris"],
@@ -32,6 +41,7 @@ class FileManagerConverter(Converter):
             chunksize=node.get("chunksize", None),
             loader=AstropyFITSLoader,
             basepath=base_path,
+            subslice=subslice,
         )
 
     def to_yaml_tree(self, obj, tag, ctx):
@@ -42,4 +52,9 @@ class FileManagerConverter(Converter):
         node["shape"] = obj._striped_external_array.shape
         if chunksize := obj._striped_external_array.chunksize is not None:
             node["chunksize"] = chunksize
+        if obj._subslice:
+            slice_ = []
+            for s in obj._subslice:
+                slice_.append([s.start, s.stop, s.step] if hasattr(s, "start") else s)
+            node["subslice"] = slice_
         return node

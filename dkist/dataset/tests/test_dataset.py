@@ -50,6 +50,7 @@ def test_repr(dataset, dataset_3d):
     r = repr(dataset_3d)
     assert str(dataset_3d.data) in r
 
+
 def test_repr_numpy(dataset):
     # Do it the old way to support old ndcube
     dataset._data = dataset.data.compute()

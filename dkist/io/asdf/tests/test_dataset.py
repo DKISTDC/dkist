@@ -11,6 +11,7 @@ import gwcs
 from asdf.testing.helpers import roundtrip_object
 
 import dkist
+from dkist import load_dataset, save_dataset
 from dkist.data.test import rootdir
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
@@ -36,16 +37,21 @@ def test_roundtrip_file_manager(file_manager):
     assert newobj == file_manager._fm
 
 
-def assert_dataset_equal(new, old):
+def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
+    assert new.shape == old.shape
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
     assert old_headers.colnames == new_headers.colnames
     assert len(old_headers) == len(new_headers)
+    if skip_history:
+        old.meta.pop("history")
+        new.meta.pop("history")
     assert old.meta == new.meta
     old.meta["headers"] = old_headers
     new.meta["headers"] = new_headers
-    assert old.wcs.name == new.wcs.name
-    assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
+    if compare_wcs:
+        assert old.wcs.name == new.wcs.name
+        assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
     ac_new = new.files.fileuri_array
     ac_old = old.files.fileuri_array
     assert (ac_new == ac_old).all()
@@ -87,8 +93,8 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.2.0"
-        assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.3.0"
+        assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.1.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
         assert "asdf://dkist.nso.edu/dkist/extensions/dkist-0.9.0" not in extension_uris
@@ -174,3 +180,36 @@ def test_read_wcs_with_backwards_affine():
     #     pixel_outputs = wcs.world_to_pixel_values(*world_outputs)
     #
     #     assert np.allclose(pixel_inputs, pixel_outputs, atol=1e-6)
+
+
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[:2], np.s_[0, 1], np.s_[0, 1, 2],
+                                   np.s_[:, 1], np.s_[:, :, 2], np.s_[:2, 1:10, 2:20]])
+def test_save_dataset_sliced(large_visp_dataset, slice):
+    fname = "ds-save-test.asdf"
+    ds = large_visp_dataset
+
+    ds1 = ds[slice]
+    save_dataset(ds1, fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_dataset_equal(ds2, ds1, skip_history=True, compare_wcs=False)
+
+
+def test_save_dataset_to_existing_file(large_visp_dataset):
+    fname = "ds-overwrite-test.asdf"
+    ds = large_visp_dataset
+
+    save_dataset(ds, fname)
+    with pytest.raises(FileExistsError):
+        save_dataset(ds, fname)
+
+    ds1 = ds[0]
+    save_dataset(ds1, fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_dataset_equal(ds2, ds1, skip_history=True, compare_wcs=False)
+
+    # Tidying. I'm sure there's a better fixture-based way to do this
+    Path(fname).unlink()

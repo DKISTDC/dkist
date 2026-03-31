@@ -6,7 +6,7 @@ from numpy.random import default_rng
 import astropy.units as u
 from astropy.modeling.models import Tabular1D
 
-from dkist import load_dataset
+from dkist import load_dataset, save_dataset
 from dkist.wcs.models import (Ravel, generate_celestial_transform,
                               update_celestial_transform_parameters)
 
@@ -61,6 +61,7 @@ def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
     performance of the compute step.
     """
     from dkist.data.sample import VISP_L1_KMUPT  # noqa: PLC0415
+
     ds = load_dataset(VISP_L1_KMUPT)[0, :15]
     # If we don't want to load files, set basepath to something where the files are not
     if not load_files:
@@ -78,6 +79,7 @@ def test_dataset_compute_data_full_files(benchmark, load_files, tmp_path):
 @pytest.mark.remote_data
 def test_dataset_compute_data_partial_files(benchmark):
     from dkist.data.sample import VISP_L1_KMUPT  # noqa: PLC0415
+
     ds = load_dataset(VISP_L1_KMUPT)[0, :15, :100, :100]
     benchmark(ds.data.compute)
 
@@ -145,7 +147,7 @@ def test_raveled_tab1d_model(benchmark):
 @pytest.mark.benchmark
 def test_slice_dataset(benchmark, large_visp_dataset):
     @benchmark
-    def slice_dataset(dataset=large_visp_dataset, idx = np.s_[:2, 10:15, 0]):
+    def slice_dataset(dataset=large_visp_dataset, idx=np.s_[:2, 10:15, 0]):
         sliced = dataset[idx]
 
 
@@ -157,3 +159,11 @@ def test_dataset_repr(benchmark, large_visp_dataset):
 @pytest.mark.benchmark
 def test_tileddataset_repr(benchmark, simple_tiled_dataset):
     benchmark(repr, simple_tiled_dataset)
+
+
+@pytest.mark.benchmark
+@pytest.mark.parametrize("dataset", ["large_visp_dataset", "inversion"])
+def test_dataset_save(benchmark, dataset, request):
+    @benchmark
+    def write_dataset(dataset=request.getfixturevalue(dataset)):
+        save_dataset(dataset, asdf_path="save-benchmark.asdf", overwrite=True)
