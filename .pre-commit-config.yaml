@@ -6,12 +6,12 @@ repos:
       exclude: ".github/workflows/sub_package_update.yml"
     # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.14.10"
+    rev: "v0.15.9"
     hooks:
       - id: ruff
         args: ["--fix"]
   - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|dkist/extern)$"
@@ -31,7 +31,7 @@ repos:
       - id: mixed-line-ending
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.asdf|.json|.hdr)$"
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         args: [ "--write-changes", "-D", "-", "-D", ".codespell-dict.txt"]
