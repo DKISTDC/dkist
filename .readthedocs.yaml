@@ -13,6 +13,9 @@ build:
       # Note $DKIST_SAMPLE_DIR is set by RTD to ~/dkist_data
       - python -c "from dkist.data.sample import download_all_sample_data; download_all_sample_data()"
       - python -c "from dkist.data.sample import VISP_L1_KMUPT; print(VISP_L1_KMUPT)"
+    build:
+      html:
+        - python -m sphinx -T -j 1 -b html -d docs/_build/doctrees -D language=en docs/ $READTHEDOCS_OUTPUT/html
 
 conda:
   environment: .rtd-environment.yml
@@ -21,9 +24,6 @@ sphinx:
   builder: html
   configuration: docs/conf.py
   fail_on_warning: false
-
-formats:
-  - htmlzip
 
 python:
   install:
