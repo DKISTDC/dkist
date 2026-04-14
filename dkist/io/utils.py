@@ -37,6 +37,9 @@ def save_dataset(dataset, asdf_path, overwrite=False):
 
     if isinstance(asdf_path, str):
         asdf_path = Path(asdf_path)
+    if asdf_path.suffix() == "asdf":
+        newdata = zarr.storage.MemoryStore()
+        dataset.data.to_zarr(newdata)
 
     if not overwrite and asdf_path.exists():
         raise FileExistsError(f"ASDF file {asdf_path} already exists. Use overwrite=True to replace it.")
