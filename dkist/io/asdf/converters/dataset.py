@@ -5,10 +5,12 @@ from asdf.extension import Converter
 
 class DatasetConverter(Converter):
     tags = [
+        "asdf://dkist.nso.edu/tags/dataset-1.4.0",
         "asdf://dkist.nso.edu/tags/dataset-1.3.0",
         "asdf://dkist.nso.edu/tags/dataset-1.2.0",
         "asdf://dkist.nso.edu/tags/dataset-1.1.0",
         "asdf://dkist.nso.edu/tags/dataset-1.0.0",
+        "tag:dkist.nso.edu:dkist/dataset-0.5.0",
         "tag:dkist.nso.edu:dkist/dataset-0.4.0",
         "tag:dkist.nso.edu:dkist/dataset-0.3.0",
         "tag:dkist.nso.edu:dkist/dataset-0.2.0",
