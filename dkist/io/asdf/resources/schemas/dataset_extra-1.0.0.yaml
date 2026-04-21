@@ -1,0 +1,24 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/dataset_extra-1.0.0"
+
+title: Dataset Extra
+description: A representation of the headers and arrays for a single dataset extra.
+
+type: object
+properties:
+  name:
+    type: string
+    description: Dataset extra name
+  headers:
+    tag: "tag:astropy.org:astropy/table/table-1.*"
+    description: Table of all headers for the extra
+  files:
+    type: array
+    items:
+      tag: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
+
+required: [name, headers, files]
+additionalProperties: false
+...

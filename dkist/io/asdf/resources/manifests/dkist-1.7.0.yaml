@@ -16,3 +16,5 @@ tags:
     tag_uri: "asdf://dkist.nso.edu/tags/inversion-0.1.0"
   - schema_uri: "asdf://dkist.nso.edu/schemas/profiles-0.1.0"
     tag_uri: "asdf://dkist.nso.edu/tags/profiles-0.1.0"
+  - schema_uri: "asdf://dkist.nso.edu/schemas/dataset_extra-1.0.0"
+    tag_uri: "asdf://dkist.nso.edu/tags/dataset_extra-1.0.0"
