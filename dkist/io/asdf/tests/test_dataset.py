@@ -37,7 +37,7 @@ def test_roundtrip_file_manager(file_manager):
     assert newobj == file_manager._fm
 
 
-def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
+def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True, compare_files=True):
     assert new.shape == old.shape
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
@@ -52,9 +52,10 @@ def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
     if compare_wcs:
         assert old.wcs.name == new.wcs.name
         assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
-    ac_new = new.files.fileuri_array
-    ac_old = old.files.fileuri_array
-    assert (ac_new == ac_old).all()
+    if compare_files:
+        ac_new = new.files.fileuri_array
+        ac_old = old.files.fileuri_array
+        assert (ac_new == ac_old).all()
     assert old.unit == new.unit
     assert old.mask == new.mask
 
@@ -93,7 +94,7 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.3.0"
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.4.0"
         assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.1.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
@@ -213,3 +214,14 @@ def test_save_dataset_to_existing_file(large_visp_dataset):
 
     # Tidying. I'm sure there's a better fixture-based way to do this
     Path(fname).unlink()
+
+
+def test_save_dataset_to_single_file(large_visp_dataset):
+    fname = "ds-save-test.asdf"
+    ds = large_visp_dataset[0]
+
+    save_dataset(ds, fname, overwrite=True, data_format="internal")
+
+    ds1 = load_dataset(fname)
+
+    assert_dataset_equal(ds1, ds, skip_history=True, compare_wcs=False, compare_files=False)
