@@ -11,7 +11,9 @@ description:
 type: object
 properties:
   data:
-    tag: "asdf://dkist.nso.edu/tags/file_manager-1.*"
+    anyOf:
+      - tag: "asdf://dkist.nso.edu/tags/file_manager-1.*"
+      - tag: "asdf://asdf-format.org/zarr/tags/zarr-1.*"
 
   wcs:
     description: The coordinate system for the complete dataset.

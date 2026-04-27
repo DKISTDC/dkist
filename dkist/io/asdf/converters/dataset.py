@@ -1,5 +1,7 @@
 import copy
 
+import zarr
+
 from asdf.extension import Converter
 
 
@@ -27,11 +29,16 @@ class DatasetConverter(Converter):
 
     def from_yaml_tree(self, node, tag, ctx):
         tag_version = tuple(map(int, tag.split("-")[1].split(".")))
+        from zarr.core.array import Array as zArray
+
         from dkist.dataset import Dataset
 
-        data = node["data"]._striped_external_array._generate_array()
-        if subslice := node["data"]._subslice:
-            data = data[*subslice]
+        if isinstance(node["data"], zArray):
+            data = node["data"]
+        else:
+            data = node["data"]._striped_external_array._generate_array()
+            if subslice := node["data"]._subslice:
+                data = data[*subslice]
         wcs = node["wcs"]
         meta = node.get("meta", {})
         unit = node.get("unit")
@@ -62,7 +69,8 @@ class DatasetConverter(Converter):
 
         dataset = Dataset(data, wcs=wcs, meta=meta,
                           unit=unit, mask=mask)
-        dataset._file_manager = node["data"]
+        if not isinstance(node["data"], zArray):
+            dataset._file_manager = node["data"]
         return dataset
 
     def to_yaml_tree(self, dataset, tag, ctx):
@@ -75,7 +83,10 @@ class DatasetConverter(Converter):
         # If the history key has been injected into the meta, do not save it
         node["meta"].pop("history", None)
         node["wcs"] = dataset.wcs
-        node["data"] = dataset.files._fm
+        if isinstance(dataset.data, zarr.core.array.Array):
+            node["data"] = dataset.data
+        else:
+            node["data"] = dataset.files._fm
         if dataset.unit:
             node["unit"] = dataset.unit
         if dataset.mask:
