@@ -29,6 +29,7 @@ dependencies = [
   "asdf-standard>=1.1.0",
   "asdf-transform-schemas>=0.6.0",
   "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
+  "asdf-zarr@git+https://github.com/SolarDrew/asdf-astropy@zarr3-updates", # Required for dataset.save(data_format="internal")
   "astropy>=6.1",  # required by ndcube 2.4
   "dask[array]>=2024.4.1",  # required by dask-image via reproject
   "globus-sdk>=4.0",
@@ -41,6 +42,7 @@ dependencies = [
   "packaging>=25.0",
   "sunpy[net,asdf]>=6",
   "tqdm>=4.65",
+  "zarr",
 ]
 dynamic = ["version"]
 
