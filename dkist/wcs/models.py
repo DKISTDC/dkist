@@ -31,8 +31,8 @@ __all__ = [
     "VaryingCelestialTransform",
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
-    "generate_grating_spectral_transform",
     "generate_celestial_transform",
+    "generate_grating_spectral_transform",
     "varying_celestial_transform_from_tables",
 ]
 
