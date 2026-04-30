@@ -9,9 +9,11 @@ import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
+from astropy.wcs import WCS
 
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
+                              generate_grating_spectral_transform,
                               generate_celestial_transform, update_celestial_transform_parameters,
                               varying_celestial_transform_from_tables)
 
@@ -50,6 +52,36 @@ def test_generate_celestial_unitless():
     )
     shift1 = tfrm.left.left.left.left.right
     assert u.allclose(shift1.offset, 0)
+
+
+def test_generate_grating_spectral_transform():
+    header = {
+        "CTYPE1": "AWAV-GRA",
+        "CUNIT1": "nm",
+        "CRPIX1": 218,
+        "CRVAL1": 854.1738582455826,
+        "CDELT1": 0.0022975580183395555,
+        "PV1_0": 23000.0,
+        "PV1_1": 90,
+        "PV1_2": 65.696,
+    }
+    transform = generate_grating_spectral_transform(
+        reference_pixel=header["CRPIX1"] - 1,
+        reference_wavelength=header["CRVAL1"] * u.nm,
+        dispersion=header["CDELT1"] * u.nm / u.pix,
+        grating_density=header["PV1_0"] / u.m,
+        spectral_order=header["PV1_1"] * u.one,
+        incident_angle=header["PV1_2"] * u.deg,
+    )
+
+    pixels = np.array([0, 100, 217, 300, 511], dtype=float)
+    expected = WCS(header).all_pix2world(pixels, 0)[0] * u.m
+    result = transform(pixels)
+
+    assert isinstance(transform, CompoundModel)
+    np.testing.assert_allclose(
+        result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
+    )
 
 
 def test_update_celestial():
