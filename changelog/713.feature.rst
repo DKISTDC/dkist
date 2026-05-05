@@ -1,0 +1,1 @@
+Added dkist.wcs.models.generate_grating_spectral_transform() for building FITS -GRA/-GRI spectral transforms from header-derived grating parameters.
