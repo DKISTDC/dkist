@@ -123,8 +123,9 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
 
     # add ManifestExtension to entry_points.py
     entrypoints = asdf_dir / "entry_points.py"
-    add_increment_line(entrypoints, f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",\n',
-                       old_mani_ver, new_mani_ver, " converters=dkist_converters),")
+    converters = "wcs_converters" if manifest == "dkist-wcs" else "dkist_converters"
+    add_increment_line(entrypoints, f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",',
+                       old_mani_ver, new_mani_ver, f" converters={converters}),")
 
     replace_line(new_mani_file,
                  [f"id: asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}\n",
@@ -200,17 +201,17 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=__doc__)
-    argp.add_argument("schema_name", help="Name of the schema to add or update.")
+    argp.add_argument("schema_name", help="Name of the schema to add or update. Use the name only, without any additional file extension (ie: 'file_manager', not 'file_manager.py'")
     argp.add_argument("--manifest", help="Name of the manifest to add the new schema to."
                       "Creating a new manifest is not currently supported."
                       "(Default 'dkist')",
                       default="dkist")
-    argp.add_argument("--schema_increment", help="Increment to apply to the schema version."
+    argp.add_argument("--schema_increment", help="Increment to apply to the schema version, using semantic versioning."
                       "Ignored when creating a new schema."
                       "Must be 'major', 'minor' or 'bugfix'."
                       "(Default 'minor')",
                       default="minor")
-    argp.add_argument("--manifest_increment", help="Increment to apply to the manifest version."
+    argp.add_argument("--manifest_increment", help="Increment to apply to the manifest version, using semantic versioning."
                       "Must be 'major', 'minor' or 'bugfix'."
                       "(Default 'minor')",
                       default="minor")
