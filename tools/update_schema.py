@@ -124,7 +124,7 @@ def main(schema_name, manifest="dkist", schema_increment="minor", manifest_incre
     # add ManifestExtension to entry_points.py
     entrypoints = asdf_dir / "entry_points.py"
     converters = "wcs_converters" if manifest == "dkist-wcs" else "dkist_converters"
-    add_increment_line(entrypoints, f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}",',
+    add_increment_line(entrypoints, f'        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/{manifest}-{old_mani_ver}", converters={converters}),\n',
                        old_mani_ver, new_mani_ver, f" converters={converters}),")
 
     replace_line(new_mani_file,
