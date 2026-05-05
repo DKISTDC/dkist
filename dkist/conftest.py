@@ -482,6 +482,7 @@ def inversion_singleuse(tmp_path_factory):
     return load_dataset(invdir / "test_L2_inversion.asdf")
 
 
+@pytest.fixture
 def dataset_extra_obj():
     headers = Table({"col1": [1, 2], "col2": ["a", "b"]})
     ears = [
