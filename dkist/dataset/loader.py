@@ -11,6 +11,7 @@ import asdf
 
 import dkist
 from dkist.io.asdf.entry_points import get_extensions as get_dkist_extensions
+from dkist.io.dask.striped_array import FileManager, StripedExternalArray
 from dkist.utils.exceptions import DKISTOutOfDateError, DKISTUserWarning
 
 ASDF_FILENAME_PATTERN = re.compile(
@@ -253,6 +254,8 @@ def _load_l1_from_asdf(asdf_file, filepath):
     base_path = filepath.parent
     ds = asdf_file.tree["dataset"]
     ds.meta["history"] = asdf_file.tree["history"]
+    if not ds.files:
+        ds._file_manager = FileManager(StripedExternalArray([], 0, ds.data.dtype, ds.data.shape, loader=dkist.io.dask.loaders.BaseFITSLoader))
     if isinstance(ds, TiledDataset):
         for sub in ds.flat:
             sub.files.basepath = base_path
