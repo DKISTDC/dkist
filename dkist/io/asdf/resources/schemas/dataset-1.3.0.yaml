@@ -1,12 +1,11 @@
 %YAML 1.1
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "asdf://dkist.nso.edu/schemas/dataset-1.2.0"
+id: "asdf://dkist.nso.edu/schemas/dataset-1.3.0"
 
 title: |
   A DKIST Level 1 Dataset object.
 description: The container for a distributed dataset object.
-
 type: object
 properties:
   data:
