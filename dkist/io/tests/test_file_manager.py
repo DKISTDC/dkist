@@ -196,6 +196,39 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
     )
 
 
+def test_download_quality_json(mocker, small_visp_dataset):
+    downloader = mocker.patch("dkist.io.file_manager.Downloader")
+    dataset_id = small_visp_dataset.meta["inventory"]["datasetId"]
+
+    small_visp_dataset.files.quality_report(format="json")
+
+    downloader.return_value.enqueue_file.assert_called_once_with(
+        f"{conf.download_endpoint}/quality?datasetId={dataset_id}",
+        path=small_visp_dataset.files.basepath,
+        overwrite=None,
+        headers={"Accept": "application/json"},
+    )
+    downloader.return_value.download.assert_called_once_with()
+
+
+def test_download_quality_pdf_format(mocker, small_visp_dataset):
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    dataset_id = small_visp_dataset.meta["inventory"]["datasetId"]
+
+    small_visp_dataset.files.quality_report(format="pdf")
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/quality?datasetId={dataset_id}"],
+        path=small_visp_dataset.files.basepath,
+        overwrite=None,
+    )
+
+
+def test_download_quality_invalid_format(small_visp_dataset):
+    with pytest.raises(ValueError, match="Unsupported quality report format"):
+        small_visp_dataset.files.quality_report(format="xml")
+
+
 @pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
