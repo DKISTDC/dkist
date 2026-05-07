@@ -85,6 +85,12 @@ def num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schem
     return len(latest_sche_yamls.values())+1 == len(schemas)
 
 
+def man_extensions_use_correct_converters():
+    with open(repodir / "io" / "asdf" / "entry_points.py") as f:
+        lines = [line for line in f.readlines() if "ManifestExtension." in line]
+        return all(("wcs_" in l and "dkist-wcs" in l) | ("dkist_" in l and "dkist" in l) for l in lines)
+
+
 def test_schema_infrastructure():
     latest_man_yamls, latest_extensions, latest_sche_yamls, converters, latest_schemas_in_manifest = get_infra_info()
 
@@ -92,6 +98,7 @@ def test_schema_infrastructure():
 
     schemas = [tagname(tag.tag_uri) for ext in latest_extensions.values() for tag in ext.tags]
     assert num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas)
+    assert man_extensions_use_correct_converters()
     for schema, yaml in latest_sche_yamls.items():
         yaml_version, converter = get_schema_info(schema, yaml)
         assert schema_converter_imported(converter)
