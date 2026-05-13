@@ -180,7 +180,8 @@ def test_length_one_first_array_axis(small_visp_dataset):
     {"path": "~/", "overwrite": True}
 ])
 def test_download_quality(mocker, small_visp_dataset, kwargs):
-    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    downloader = mocker.patch("dkist.io.file_manager.Downloader")
+    dataset_id = small_visp_dataset.meta["inventory"]["datasetId"]
 
     small_visp_dataset.files.quality_report(**kwargs)
 
@@ -190,10 +191,11 @@ def test_download_quality(mocker, small_visp_dataset, kwargs):
     if "overwrite" not in kwargs:
         kwargs["overwrite"] = None
 
-    simple_download.assert_called_once_with(
-        [f"{conf.download_endpoint}/quality?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+    downloader.return_value.enqueue_file.assert_called_once_with(
+        f"{conf.download_endpoint}/quality?datasetId={dataset_id}",
         **kwargs
     )
+    downloader.return_value.download.assert_called_once_with()
 
 
 def test_download_quality_json(mocker, small_visp_dataset):
@@ -212,16 +214,17 @@ def test_download_quality_json(mocker, small_visp_dataset):
 
 
 def test_download_quality_pdf_format(mocker, small_visp_dataset):
-    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+    downloader = mocker.patch("dkist.io.file_manager.Downloader")
     dataset_id = small_visp_dataset.meta["inventory"]["datasetId"]
 
     small_visp_dataset.files.quality_report(format="pdf")
 
-    simple_download.assert_called_once_with(
-        [f"{conf.download_endpoint}/quality?datasetId={dataset_id}"],
+    downloader.return_value.enqueue_file.assert_called_once_with(
+        f"{conf.download_endpoint}/quality?datasetId={dataset_id}",
         path=small_visp_dataset.files.basepath,
         overwrite=None,
     )
+    downloader.return_value.download.assert_called_once_with()
 
 
 def test_download_quality_invalid_format(small_visp_dataset):

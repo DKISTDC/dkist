@@ -178,13 +178,12 @@ class DKISTFileManager:
         url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
+        kwargs = {}
         if normalized_format == "json":
-            dl = Downloader()
-            dl.enqueue_file(
-                url, path=path, overwrite=overwrite, headers={"Accept": "application/json"}
-            )
-            return dl.download()
-        return Downloader.simple_download([url], path=path, overwrite=overwrite)
+            kwargs["headers"] = {"Accept": "application/json"}
+        dl = Downloader()
+        dl.enqueue_file(url, path=path, overwrite=overwrite, **kwargs)
+        return dl.download()
 
     def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool | None = None) -> Results:
         """
