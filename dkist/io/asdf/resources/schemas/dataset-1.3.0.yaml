@@ -5,15 +5,19 @@ id: "asdf://dkist.nso.edu/schemas/dataset-1.3.0"
 
 title: |
   A DKIST Level 1 Dataset object.
-description: The container for a distributed dataset object.
+description:
+  The container for a distributed dataset object.
+
 type: object
 properties:
   data:
-    tag: "asdf://dkist.nso.edu/tags/file_manager-1.0.0"
+    tag: "asdf://dkist.nso.edu/tags/file_manager-1.*"
 
   wcs:
     description: The coordinate system for the complete dataset.
-    tag: "tag:stsci.edu:gwcs/wcs-1.*"
+    anyOf:
+      - tag: "tag:stsci.edu:gwcs/wcs-1.*"
+      - tag: "tag:astropy.org:astropy/wcs/highlevelwcswrapper-1.*"
 
   mask:
     tag: "tag:stsci.edu:asdf/core/ndarray-1.*"
