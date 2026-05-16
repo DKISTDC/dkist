@@ -50,6 +50,13 @@ properties:
         description: A copy of the inventory record for this dataset.
         type: object
 
+      extras:
+        description: A set of "extras" for the dataset, such as intermediate calibration products.
+        type: object
+        patternProperties:
+          ".*":
+            tag: "asdf://dkist.nso.edu/tags/dataset_extra-1.0.0"
+
     required: [headers, inventory]
     additionalProperties: true
 
