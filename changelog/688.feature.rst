@@ -1,0 +1,2 @@
+Adds limited file-saving capability to `Dataset`, `TiledDataset` and `Inversion` classes.
+This can be used to save datasets which have been modified by slicing or masking, but in which the data values have not been changed.
