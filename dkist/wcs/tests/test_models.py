@@ -64,6 +64,10 @@ def test_generate_grating_spectral_transform():
         "PV1_0": 23000.0,
         "PV1_1": 90,
         "PV1_2": 65.696,
+        "PV1_3": 1.25,
+        "PV1_4": 1000.0,
+        "PV1_5": 1.5,
+        "PV1_6": 0.8,
     }
     transform = generate_grating_spectral_transform(
         reference_pixel=header["CRPIX1"] - 1,
@@ -72,10 +76,14 @@ def test_generate_grating_spectral_transform():
         grating_density=header["PV1_0"] / u.m,
         spectral_order=header["PV1_1"] * u.one,
         incident_angle=header["PV1_2"] * u.deg,
+        refractive_index=header["PV1_3"] * u.one,
+        refractive_index_derivative=header["PV1_4"] / u.m,
+        out_of_plane_angle=header["PV1_5"] * u.deg,
+        camera_angle=header["PV1_6"] * u.deg,
     )
 
     pixels = np.array([0, 100, 217, 300, 511], dtype=float)
-    expected = WCS(header).all_pix2world(pixels, 0)[0] * u.m
+    expected = WCS(header).spectral.pixel_to_world(pixels)
     result = transform(pixels)
 
     assert isinstance(transform, CompoundModel)
