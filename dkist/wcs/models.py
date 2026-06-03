@@ -14,7 +14,6 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, custom_model, separable
 from astropy.utils.decorators import deprecated_renamed_argument
-from gwcs.spectroscopy import WavelengthFromGratingEquation
 
 from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTDeprecationWarning
@@ -32,17 +31,21 @@ __all__ = [
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
     "generate_celestial_transform",
-    "generate_grating_spectral_transform",
     "varying_celestial_transform_from_tables",
 ]
+
+
 class _refracted_angle_sine_model:
     """
-    Factory for the custom model used to compute the sine of the refracted angle.
+    Namespace for constructing the refracted-angle sine custom model.
+
+    The returned Astropy model must continue to originate from
+    ``dkist.wcs.models`` so that serialized ASDF trees can resolve the import
+    path at read time.
     """
 
-    @classmethod
+    @staticmethod
     def refracted_angle_sine(
-            cls,
             reference_pixel: float,
             reference_wavelength: u.Quantity,
             dispersion: u.Quantity,
@@ -75,7 +78,16 @@ class _refracted_angle_sine_model:
         return refracted_angle_sine()
 
 
-def generate_grating_spectral_transform(
+class SpectralTransformBase(ABC):
+    """
+    Base class for grating/grism spectral transform builders.
+
+    ``dkist`` keeps the public builder entry point here and delegates the
+    concrete implementation to ``dkist-inventory``.
+    """
+
+    @staticmethod
+    def generate_grating_spectral_transform(
         reference_pixel: float,
         reference_wavelength: u.Quantity,
         dispersion: u.Quantity,
@@ -87,49 +99,13 @@ def generate_grating_spectral_transform(
         out_of_plane_angle: u.Quantity = 0 * u.deg,
         camera_angle: u.Quantity = 0 * u.deg,
 ) -> CompoundModel:
-    """
-    Generate a one-dimensional FITS ``-GRA``/``-GRI`` spectral transform.
+        """
+        Build a one-dimensional FITS ``-GRA``/``-GRI`` spectral transform.
 
-    This function computes the FITS grating/grism input and output angles using
-    the formalism described by Greisen et al. and delegates the final
-    wavelength calculation to
-    ``gwcs.spectroscopy.WavelengthFromGratingEquation``.
-
-    References
-    ----------
-    Greisen, E. W., Calabretta, M. R., Valdes, F. G., & Allen, S. L. (2006),
-    "Representations of spectral coordinates in FITS",
-    https://scixplorer.org/abs/2006A%26A...446..747G/abstract
-    """
-    adjusted_incident_angle_sine = (
-        refractive_index - refractive_index_derivative * reference_wavelength
-    ) * np.sin(incident_angle)
-    groove_density = (
-        (grating_density * spectral_order) / np.cos(out_of_plane_angle)
-        - refractive_index_derivative * np.sin(incident_angle)
-    ) / spectral_order
-
-    refracted_angle = _refracted_angle_sine_model.refracted_angle_sine(
-        reference_pixel=reference_pixel,
-        reference_wavelength=reference_wavelength,
-        dispersion=dispersion,
-        grating_density=grating_density,
-        spectral_order=spectral_order,
-        incident_angle=incident_angle,
-        refractive_index=refractive_index,
-        refractive_index_derivative=refractive_index_derivative,
-        out_of_plane_angle=out_of_plane_angle,
-        camera_angle=camera_angle,
-    )
-    incident_angle = m.Const1D(amplitude=adjusted_incident_angle_sine)
-    wavelength_from_grating = WavelengthFromGratingEquation(
-        groove_density=groove_density,
-        spectral_order=spectral_order,
-        name="Spectral",
-    )
-
-    return m.Mapping((0, 0)) | (incident_angle & refracted_angle) | wavelength_from_grating
-
+        This wrapper preserves the historical public API in ``dkist`` while
+        delegating the implementation to ``dkist-inventory`` when it is
+        available.
+        """
 
 def generate_celestial_transform(
         crpix: Iterable[float] | u.Quantity,
