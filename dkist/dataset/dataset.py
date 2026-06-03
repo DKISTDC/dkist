@@ -1,3 +1,4 @@
+import warnings
 from textwrap import dedent
 
 import numpy as np
@@ -182,7 +183,7 @@ class Dataset(NDCube):
         A `~.DKISTFileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
         if not self._file_manager:
-            raise DKISTUserWarning("This dataset does not have a FileManager - all functionality related to fits files will be unavailable.")
+            warnings.warn(DKISTUserWarning("This dataset does not have a FileManager - all functionality related to fits files will be unavailable."))
         return self._file_manager
 
     @property
