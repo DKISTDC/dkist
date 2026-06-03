@@ -10,6 +10,7 @@ from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 from dkist.io.dask.striped_array import FileManager
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
+from dkist.utils.exceptions import DKISTUserWarning
 
 from .utils import dataset_info_str
 
@@ -180,6 +181,8 @@ class Dataset(NDCube):
         """
         A `~.DKISTFileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
+        if not self._file_manager:
+            raise DKISTUserWarning("This dataset does not have a FileManager - all functionality related to fits files will be unavailable.")
         return self._file_manager
 
     @property
