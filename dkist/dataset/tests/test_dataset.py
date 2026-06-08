@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, TiledDataset, load_dataset
-from dkist.io import DKISTFileManager
+from dkist.io import DKISTFileManager, NullDKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
@@ -152,7 +152,7 @@ def test_file_manager():
 
 
 def test_no_file_manager(dataset_3d):
-    assert dataset_3d.files is None
+    assert isinstance(dataset_3d.files, NullDKISTFileManager)
 
 
 def test_inventory_propery():

@@ -9,7 +9,7 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.dask.striped_array import FileManager
-from dkist.io.file_manager import DKISTFileManager
+from dkist.io.file_manager import DKISTFileManager, NullDKISTFileManager
 from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTUserWarning
 
@@ -184,6 +184,7 @@ class Dataset(NDCube):
         """
         if not self._file_manager:
             warnings.warn(DKISTUserWarning("This dataset does not have a FileManager - all functionality related to fits files will be unavailable."))
+            return NullDKISTFileManager()
         return self._file_manager
 
     @property
