@@ -15,7 +15,7 @@ from dkist import load_dataset, save_dataset
 from dkist.data.test import rootdir
 from dkist.io import DKISTFileManager
 from dkist.io.dask.loaders import AstropyFITSLoader
-from dkist.utils.exceptions import DKISTDeprecationWarning
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 
 @pytest.fixture
@@ -222,6 +222,7 @@ def test_save_dataset_to_single_file(large_visp_dataset):
 
     save_dataset(ds, fname, overwrite=True, data_format="internal")
 
-    ds1 = load_dataset(fname)
+    with pytest.warns(DKISTUserWarning, match="This dataset has no files"):
+        ds1 = load_dataset(fname)
 
     assert_dataset_equal(ds1, ds, skip_history=True, compare_wcs=False, compare_files=False)
