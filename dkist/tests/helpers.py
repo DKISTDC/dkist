@@ -16,11 +16,10 @@ def get_hash_library_name():
     import mpl_animators  # noqa: PLC0415
 
     animators_version = "dev" if (("dev" in mpl_animators.__version__) or ("rc" in mpl_animators.__version__)) else mpl_animators.__version__.replace(".", "")
-    ft2_version = f"{mpl.ft2font.__freetype_version__.replace('.', '')}"
     mpl_version = "dev" if (("dev" in mpl.__version__) or ("rc" in mpl.__version__)) else mpl.__version__.replace(".", "")
     astropy_version = "dev" if (("dev" in astropy.__version__) or ("rc" in astropy.__version__)) else astropy.__version__.replace(".", "")
     ndcube_version = "dev" if (("dev" in ndcube.__version__) or ("rc" in ndcube.__version__)) else ndcube.__version__.replace(".", "")
-    return f"figure_hashes_mpl_{mpl_version}_ft_{ft2_version}_astropy_{astropy_version}_animators_{animators_version}_ndcube_{ndcube_version}.json"
+    return f"figure_hashes_mpl_{mpl_version}_astropy_{astropy_version}_animators_{animators_version}_ndcube_{ndcube_version}.json"
 
 
 def figure_test(test_function):

@@ -56,6 +56,6 @@ jobs:
       - name: Run benchmarks
         uses: CodspeedHQ/action@281164b0f014a4e7badd2c02cecad9b595b70537 # v4.11.1
         with:
-          input: "walltime"
+          mode: "walltime"
           token: ${{ secrets.CODSPEED_TOKEN }}  # zizmor: ignore[secrets-outside-env] We want this to run everywhere so it always needs the token
           run: "pytest -vvv -r fEs --pyargs dkist --codspeed --remote-data=any -m walltime"
