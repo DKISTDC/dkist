@@ -2,13 +2,26 @@ import json
 import pathlib
 
 import globus_sdk
+import globus_sdk.services.transfer
 import pytest
+from requests import Response
 
 import dkist.net
 from dkist.data.test import rootdir
 from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directory_listing,
-                                        get_endpoint_id, get_local_endpoint_id,
-                                        get_transfer_client)
+                                        get_endpoint_id, get_local_endpoint_id)
+
+
+def _generate_response(data):
+    """
+    Generate a fake requests.Response object.
+    """
+    resp = Response()
+    resp._content = json.dumps(data).encode("UTF-8")
+    resp._content_consumed = True
+    resp.status_code = 200
+    resp.reason = "OK"
+    return resp
 
 
 @pytest.fixture
@@ -18,8 +31,7 @@ def endpoint_search(mocker, transfer_client):
 
     responses = []
     for d in data:
-        response = mocker.MagicMock()
-        response.json = lambda: d
+        response = _generate_response(d)
         responses.append(globus_sdk.response.GlobusHTTPResponse(response, transfer_client))
     return {"DATA": responses}
 
@@ -64,8 +76,6 @@ def test_get_local_endpoint_id(mocker, endpoint_id):
 
 def test_get_endpoint_id_search(mocker, mock_search, endpoint_search, transfer_client):
     mock_search.return_value = endpoint_search
-
-    transfer_client = get_transfer_client()
 
     # Test exact display name match
     endpoint_id = get_endpoint_id("NCAR Data Sharing Service", tfr_client=transfer_client)
