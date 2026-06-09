@@ -140,9 +140,14 @@ class DKISTFileManager:
 
         return self._ndcube.meta["inventory"]
 
-    def quality_report(self, path: str | os.PathLike | None = None, overwrite: bool = None) -> Results:
+    def quality_report(
+        self,
+        path: str | os.PathLike | None = None,
+        overwrite: bool | None = None,
+        format: str = "pdf",
+    ) -> Results:
         """
-        Download the quality report PDF.
+        Download the quality report as a PDF or JSON file.
 
         Parameters
         ----------
@@ -154,6 +159,9 @@ class DKISTFileManager:
         overwrite
             Set to `True` to overwrite file if it already exists. See
             `parfive.Downloader.simple_download` for details.
+        format
+            The format of the quality report to download. The default is
+            ``"pdf"``. Accepted values are ``"pdf"`` and ``"json"``.
 
         Returns
         -------
@@ -162,10 +170,20 @@ class DKISTFileManager:
             downloaded file if the download was successful, and any errors if it
             was not.
         """
+        normalized_format = format.lower() if isinstance(format, str) else None
+        if normalized_format not in ("pdf", "json"):
+            msg = f"Unsupported quality report format: {format!r}. Expected 'pdf' or 'json'."
+            raise ValueError(msg)
+
         url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
         if path is None and self.basepath:
             path = self.basepath
-        return Downloader.simple_download([url], path=path, overwrite=overwrite)
+        kwargs = {}
+        if normalized_format == "json":
+            kwargs["headers"] = {"Accept": "application/json"}
+        dl = Downloader()
+        dl.enqueue_file(url, path=path, overwrite=overwrite, **kwargs)
+        return dl.download()
 
     def preview_movie(self, path: str | os.PathLike | None = None, overwrite: bool | None = None) -> Results:
         """

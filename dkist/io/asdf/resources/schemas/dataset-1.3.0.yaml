@@ -50,6 +50,22 @@ properties:
         description: A copy of the inventory record for this dataset.
         type: object
 
+      parameters:
+        description: A copy of the parameters used to generate this dataset.
+        type: object
+
+      observation_input_frames:
+        description: A copy of the observation input frames used to generate this dataset.
+        type: object
+
+      calibration_input_frames:
+        description: A copy of the calibration input frames used to generate this dataset.
+        type: object
+
+      recipe_run_config:
+        description: A copy of the recipe configurations used to generate this dataset.
+        type: object
+
     required: [headers, inventory]
     additionalProperties: true
 
