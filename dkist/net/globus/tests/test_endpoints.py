@@ -120,7 +120,7 @@ def test_get_endpoint_id_invalid_uuid(mocker, mock_search, transfer_client, endp
     # Test EndpointNotFound error
     mocker.patch.object(err, "code", "EndpointNotFound")
     endpoint_id = get_endpoint_id("wibble", tfr_client=transfer_client)
-    assert endpoint_id == "dd1ee92a-6d04-11e5-ba46-22000b92c6ec"
+    assert endpoint_id == "616aeee4-8bec-11e6-b047-22000b92c261"
 
 
 def test_directory_listing(mocker, transfer_client, ls_response):
