@@ -12,8 +12,9 @@ except ImportError:
 
 import astropy.modeling.models as m
 import astropy.units as u
-from astropy.modeling import CompoundModel, Model, Parameter, custom_model, separable
+from astropy.modeling import CompoundModel, Model, Parameter, separable
 from astropy.utils.decorators import deprecated_renamed_argument
+from gwcs.spectroscopy import WavelengthFromGratingEquation
 
 from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTDeprecationWarning
@@ -31,59 +32,17 @@ __all__ = [
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
     "generate_celestial_transform",
+    "generate_grating_spectral_transform",
     "varying_celestial_transform_from_tables",
 ]
-
-
-class _refracted_angle_sine_model:
-    """
-    Namespace for constructing the refracted-angle sine custom model.
-
-    The returned Astropy model must continue to originate from
-    ``dkist.wcs.models`` so that serialized ASDF trees can resolve the import
-    path at read time.
-    """
-
-    @staticmethod
-    def refracted_angle_sine(
-            reference_pixel: float,
-            reference_wavelength: u.Quantity,
-            dispersion: u.Quantity,
-            grating_density: u.Quantity,
-            spectral_order: u.Quantity,
-            incident_angle: u.Quantity,
-            refractive_index: u.Quantity,
-            refractive_index_derivative: u.Quantity,
-            out_of_plane_angle: u.Quantity,
-            camera_angle: u.Quantity,
-    ) -> Model:
-        grism_constant = (grating_density * spectral_order) / np.cos(out_of_plane_angle)
-        reference_refracted_angle = np.arcsin(
-            (grism_constant * reference_wavelength) - refractive_index * np.sin(incident_angle)
-        )
-        grism_parameter_per_wavelength = (grism_constant - refractive_index_derivative * np.sin(incident_angle)) / (
-            np.cos(reference_refracted_angle) * np.cos(camera_angle) ** 2
-        )
-
-        @custom_model
-        def refracted_angle_sine(pixel):
-            wavelength_offset = ((pixel - reference_pixel) * u.pix) * dispersion
-            output_angle = (
-                np.arctan(-np.tan(camera_angle) + wavelength_offset * grism_parameter_per_wavelength)
-                + reference_refracted_angle
-                + camera_angle
-            )
-            return np.sin(output_angle)
-
-        return refracted_angle_sine()
 
 
 class SpectralTransformBase(ABC):
     """
     Base class for grating/grism spectral transform builders.
 
-    ``dkist`` keeps the public builder entry point here and delegates the
-    concrete implementation to ``dkist-inventory``.
+    ``dkist`` keeps the public builder entry point here and delegates the core
+    spectral model assembly to ``gwcs``.
     """
 
     @staticmethod
@@ -98,14 +57,55 @@ class SpectralTransformBase(ABC):
         refractive_index_derivative: u.Quantity = 0 / u.m,
         out_of_plane_angle: u.Quantity = 0 * u.deg,
         camera_angle: u.Quantity = 0 * u.deg,
-) -> CompoundModel:
+    ) -> CompoundModel:
         """
         Build a one-dimensional FITS ``-GRA``/``-GRI`` spectral transform.
 
-        This wrapper preserves the historical public API in ``dkist`` while
-        delegating the implementation to ``dkist-inventory`` when it is
-        available.
+        This is a compatibility entry point that delegates to
+        `~gwcs.spectroscopy.WavelengthFromGratingEquation.generate_grating_spectral_transform`.
         """
+        return WavelengthFromGratingEquation.generate_grating_spectral_transform(
+            reference_pixel=reference_pixel,
+            reference_wavelength=reference_wavelength,
+            dispersion=dispersion,
+            grating_density=grating_density,
+            spectral_order=spectral_order,
+            incident_angle=incident_angle,
+            refractive_index=refractive_index,
+            refractive_index_derivative=refractive_index_derivative,
+            out_of_plane_angle=out_of_plane_angle,
+            camera_angle=camera_angle,
+        )
+
+
+def generate_grating_spectral_transform(
+        reference_pixel: float,
+        reference_wavelength: u.Quantity,
+        dispersion: u.Quantity,
+        grating_density: u.Quantity,
+        spectral_order: u.Quantity,
+        incident_angle: u.Quantity,
+        refractive_index: u.Quantity = 1 * u.one,
+        refractive_index_derivative: u.Quantity = 0 / u.m,
+        out_of_plane_angle: u.Quantity = 0 * u.deg,
+        camera_angle: u.Quantity = 0 * u.deg,
+) -> CompoundModel:
+    """
+    Compatibility wrapper around
+    ``SpectralTransformBase.generate_grating_spectral_transform``.
+    """
+    return SpectralTransformBase.generate_grating_spectral_transform(
+        reference_pixel=reference_pixel,
+        reference_wavelength=reference_wavelength,
+        dispersion=dispersion,
+        grating_density=grating_density,
+        spectral_order=spectral_order,
+        incident_angle=incident_angle,
+        refractive_index=refractive_index,
+        refractive_index_derivative=refractive_index_derivative,
+        out_of_plane_angle=out_of_plane_angle,
+        camera_angle=camera_angle,
+    )
 
 def generate_celestial_transform(
         crpix: Iterable[float] | u.Quantity,
