@@ -7,6 +7,8 @@ omit =
   dkist/__init__*
   dkist/utils/_model_to_graphviz.py
   dkist/tests/test_benchmarks.py
+  dkist/_dev/*
+  */dkist/_dev/*
   */dkist/conftest.py
   */dkist/*setup_package*
   */dkist/extern/*

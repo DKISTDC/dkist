@@ -1,0 +1,1 @@
+Update update_schema.py to automatically determine which list of converters to use when adding a ManifestExtension to entry_points.py
