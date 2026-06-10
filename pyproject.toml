@@ -42,7 +42,7 @@ dependencies = [
   "packaging>=25.0",
   "sunpy[net,asdf]>=6",
   "tqdm>=4.65",
-  "zarr>=3",
+  "zarr>=3.1.5", # Required for asdf-zarr > 0.0.4
 ]
 dynamic = ["version"]
 
