@@ -1,3 +1,4 @@
+import warnings
 from textwrap import dedent
 
 import numpy as np
@@ -8,8 +9,9 @@ from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 from dkist.io.dask.striped_array import FileManager
-from dkist.io.file_manager import DKISTFileManager
+from dkist.io.file_manager import DKISTFileManager, NullDKISTFileManager
 from dkist.utils.decorators import deprecated
+from dkist.utils.exceptions import DKISTUserWarning
 
 from .utils import dataset_info_str
 
@@ -180,6 +182,9 @@ class Dataset(NDCube):
         """
         A `~.DKISTFileManager` helper for interacting with the files backing the data in this ``Dataset``.
         """
+        if not self._file_manager:
+            warnings.warn(DKISTUserWarning("This dataset does not have a FileManager - all functionality related to fits files will be unavailable."))
+            return NullDKISTFileManager()
         return self._file_manager
 
     @property
@@ -188,6 +193,20 @@ class Dataset(NDCube):
         Convenience attribute to access the inventory metadata.
         """
         return self.meta["inventory"]
+
+    @property
+    def _data_is_modified(self):
+        """
+        Private property to determine if the data dask graph has been modified.
+        """
+        layers = list(self.data.dask.layers.keys())
+        tasks = []
+        # We want to ignore operations which won't change the actual data
+        ignorable = ["load_file", "reshape", "getitem"]
+        tasks = {l[:l.find("-")] for l in layers if l[:l.find("-")] not in ignorable}
+        if len(tasks) > 0:
+            return True
+        return False
 
     """
     Dataset loading and saving routines.

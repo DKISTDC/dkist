@@ -12,8 +12,8 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from dkist.data.test import rootdir
 from dkist.dataset import Dataset, TiledDataset, load_dataset
-from dkist.io import DKISTFileManager
-from dkist.utils.exceptions import DKISTDeprecationWarning
+from dkist.io import DKISTFileManager, NullDKISTFileManager
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 
 @pytest.fixture
@@ -47,8 +47,10 @@ def test_init_missing_meta_keys(identity_gwcs):
 def test_repr(dataset, dataset_3d):
     r = repr(dataset)
     assert str(dataset.data) in r
-    r = repr(dataset_3d)
+    with pytest.warns(DKISTUserWarning, match="This dataset does not have a FileManager"):
+        r = repr(dataset_3d)
     assert str(dataset_3d.data) in r
+    assert "Dataset has no external files associated with it" in r
 
 
 def test_repr_numpy(dataset):
@@ -152,7 +154,8 @@ def test_file_manager():
 
 
 def test_no_file_manager(dataset_3d):
-    assert dataset_3d.files is None
+    with pytest.warns(DKISTUserWarning, match="This dataset does not have a FileManager"):
+        assert isinstance(dataset_3d.files, NullDKISTFileManager)
 
 
 def test_inventory_propery():
