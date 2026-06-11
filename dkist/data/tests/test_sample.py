@@ -1,9 +1,11 @@
 import os
 import platform
 from unittest.mock import call
+from urllib.request import urlopen
 
 import pytest
 
+from dkist.data._sample import _BASE_URL
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 
@@ -50,5 +52,14 @@ def test_fail(tmp_sample_dir):
     """
     No remote data means this test should fail.
     """
+    # Sometimes this test runs and it can still access the internet
+    # even though internet_off should prevent this.  We skip the test
+    # if we can access the internet.
+    try:
+        urlopen(_BASE_URL)
+        pytest.skip("Internet not disabled")
+    except Exception:  # noqa BLE001
+        pass
+
     with pytest.raises(RuntimeError, match="1 sample data files failed"):
         from dkist.data.sample import VISP_L1_KMUPT  # noqa: F401 PLC0415
