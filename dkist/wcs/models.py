@@ -12,7 +12,7 @@ except ImportError:
 
 import astropy.modeling.models as m
 import astropy.units as u
-from astropy.modeling import CompoundModel, Model, Parameter, separable
+from astropy.modeling import CompoundModel, Model, Parameter, custom_model, separable
 from astropy.utils.decorators import deprecated_renamed_argument
 from gwcs.spectroscopy import WavelengthFromGratingEquation
 
@@ -50,7 +50,7 @@ class SpectralTransformBase(ABC):
         reference_pixel: float,
         reference_wavelength: u.Quantity,
         dispersion: u.Quantity,
-        grating_density: u.Quantity,
+        groove_density: u.Quantity,
         spectral_order: u.Quantity,
         incident_angle: u.Quantity,
         refractive_index: u.Quantity = 1 * u.one,
@@ -62,27 +62,49 @@ class SpectralTransformBase(ABC):
         Build a one-dimensional FITS ``-GRA``/``-GRI`` spectral transform.
 
         This is a compatibility entry point that delegates to
-        `~gwcs.spectroscopy.WavelengthFromGratingEquation.generate_grating_spectral_transform`.
+        `~gwcs.spectroscopy.WavelengthFromGratingEquation` after constructing
+        the FITS grating spectral-coordinate inputs from the header-derived
+        grating parameters.
         """
-        return WavelengthFromGratingEquation.generate_grating_spectral_transform(
-            reference_pixel=reference_pixel,
-            reference_wavelength=reference_wavelength,
-            dispersion=dispersion,
-            grating_density=grating_density,
+        model = WavelengthFromGratingEquation(
+            groove_density=groove_density,
             spectral_order=spectral_order,
             incident_angle=incident_angle,
-            refractive_index=refractive_index,
             refractive_index_derivative=refractive_index_derivative,
             out_of_plane_angle=out_of_plane_angle,
-            camera_angle=camera_angle,
         )
+
+        alpha_in = m.Const1D(
+            amplitude=(refractive_index - refractive_index_derivative * reference_wavelength)
+            * np.sin(incident_angle)
+        )
+
+        grism_constant = (groove_density * spectral_order) / np.cos(out_of_plane_angle)
+        reference_refracted_angle = np.arcsin(
+            (grism_constant * reference_wavelength) - refractive_index * np.sin(incident_angle)
+        )
+        grism_parameter_per_wavelength = (
+            grism_constant - refractive_index_derivative * np.sin(incident_angle)
+        ) / (np.cos(reference_refracted_angle) * np.cos(camera_angle) ** 2)
+
+        @custom_model
+        def alpha_out(pixel):
+            wavelength_offset = ((pixel - reference_pixel) * u.pix) * dispersion
+            output_angle = (
+                np.arctan(-np.tan(camera_angle) + wavelength_offset * grism_parameter_per_wavelength)
+                + reference_refracted_angle
+                + camera_angle
+            )
+            return np.sin(output_angle)
+
+        return m.Mapping((0, 0)) | (alpha_in & alpha_out()) | model
 
 
 def generate_grating_spectral_transform(
         reference_pixel: float,
         reference_wavelength: u.Quantity,
         dispersion: u.Quantity,
-        grating_density: u.Quantity,
+        groove_density: u.Quantity,
         spectral_order: u.Quantity,
         incident_angle: u.Quantity,
         refractive_index: u.Quantity = 1 * u.one,
@@ -98,7 +120,7 @@ def generate_grating_spectral_transform(
         reference_pixel=reference_pixel,
         reference_wavelength=reference_wavelength,
         dispersion=dispersion,
-        grating_density=grating_density,
+        groove_density=groove_density,
         spectral_order=spectral_order,
         incident_angle=incident_angle,
         refractive_index=refractive_index,
