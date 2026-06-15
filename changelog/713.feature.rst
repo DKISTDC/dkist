@@ -1,1 +1,1 @@
-Added dkist.wcs.models.generate_grating_spectral_transform() as a compatibility wrapper for building FITS ``-GRA``/``-GRI`` spectral transforms from header-derived grating parameters.
+Updated `dkist.wcs.models.generate_grating_spectral_transform()` to build FITS ``-GRA``/``-GRI`` spectral transforms by passing a constant incident-angle term and spectral pixel input into `gwcs.spectroscopy.WavelengthFromGratingEquation`.

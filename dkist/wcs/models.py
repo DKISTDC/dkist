@@ -129,6 +129,9 @@ def build_grating_spectral_transform(
     model = WavelengthFromGratingEquation(
         groove_density=groove_density,
         spectral_order=spectral_order,
+        reference_pixel=reference_pixel,
+        reference_wavelength=reference_wavelength,
+        dispersion=dispersion,
         incident_angle=incident_angle,
         refractive_index=refractive_index,
         refractive_index_derivative=refractive_index_derivative,
@@ -141,23 +144,7 @@ def build_grating_spectral_transform(
         * np.sin(incident_angle)
     )
 
-    grism_constant = (groove_density * spectral_order) / np.cos(out_of_plane_angle)
-    reference_refracted_angle = np.arcsin(
-        (grism_constant * reference_wavelength) - refractive_index * np.sin(incident_angle)
-    )
-    grism_parameter_per_wavelength = (
-        grism_constant - refractive_index_derivative * np.sin(incident_angle)
-    ) / (np.cos(reference_refracted_angle) * np.cos(camera_angle) ** 2)
-
-    alpha_out = refracted_angle_sine_model(
-        reference_pixel=reference_pixel,
-        reference_refracted_angle=reference_refracted_angle,
-        dispersion=dispersion,
-        grism_parameter_per_wavelength=grism_parameter_per_wavelength,
-        camera_angle=camera_angle,
-    )
-
-    return m.Mapping((0, 0)) | (alpha_in & alpha_out) | model
+    return m.Mapping((0, 0)) | (alpha_in & m.Identity(1)) | model
 
 
 def generate_grating_spectral_transform(
