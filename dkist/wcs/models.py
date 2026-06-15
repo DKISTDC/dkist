@@ -130,8 +130,10 @@ def build_grating_spectral_transform(
         groove_density=groove_density,
         spectral_order=spectral_order,
         incident_angle=incident_angle,
+        refractive_index=refractive_index,
         refractive_index_derivative=refractive_index_derivative,
         out_of_plane_angle=out_of_plane_angle,
+        camera_angle=camera_angle,
     )
 
     alpha_in = m.Const1D(
