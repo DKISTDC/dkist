@@ -39,48 +39,6 @@ __all__ = [
 ]
 
 
-class SpectralTransformBase(ABC):
-    """
-    Base class for grating/grism spectral transform builders.
-
-    ``dkist`` keeps the public builder entry point here and delegates the core
-    spectral model assembly to ``gwcs``.
-    """
-
-    @staticmethod
-    def generate_grating_spectral_transform(
-        reference_pixel: float,
-        reference_wavelength: u.Quantity,
-        dispersion: u.Quantity,
-        groove_density: u.Quantity,
-        spectral_order: u.Quantity,
-        incident_angle: u.Quantity,
-        refractive_index: u.Quantity = 1 * u.one,
-        refractive_index_derivative: u.Quantity = 0 / u.m,
-        out_of_plane_angle: u.Quantity = 0 * u.deg,
-        camera_angle: u.Quantity = 0 * u.deg,
-    ) -> CompoundModel:
-        """
-        Build a one-dimensional FITS ``-GRA``/``-GRI`` spectral transform.
-
-        ``dkist`` keeps this compatibility builder so existing import paths
-        remain available. The ASDF-stable pixel-dependent refracted-angle model
-        also lives in this module.
-        """
-        return build_grating_spectral_transform(
-            reference_pixel=reference_pixel,
-            reference_wavelength=reference_wavelength,
-            dispersion=dispersion,
-            groove_density=groove_density,
-            spectral_order=spectral_order,
-            incident_angle=incident_angle,
-            refractive_index=refractive_index,
-            refractive_index_derivative=refractive_index_derivative,
-            out_of_plane_angle=out_of_plane_angle,
-            camera_angle=camera_angle,
-        )
-
-
 @custom_model
 def refracted_angle_sine_model(
     pixel,
@@ -121,30 +79,41 @@ def build_grating_spectral_transform(
     Build a FITS grating spectral transform from header-derived parameters.
 
     This is the low-level implementation used by the compatibility entry
-    points in `dkist.wcs.models`. The input and output angle terms are
-    computed following the FITS grating/grism spectral-coordinate formalism
-    described by Greisen et al. (2006):
+    points in `dkist.wcs.models`. It composes a constant incident-angle sine
+    term, a pixel-dependent refracted-angle sine model, and
+    `~gwcs.spectroscopy.WavelengthFromGratingEquation`, following the FITS
+    grating/grism spectral-coordinate formalism described by Greisen et al.
+    (2006):
     https://scixplorer.org/abs/2006A%26A...446..747G/abstract
     """
     model = WavelengthFromGratingEquation(
         groove_density=groove_density,
         spectral_order=spectral_order,
-        reference_pixel=reference_pixel,
         reference_wavelength=reference_wavelength,
-        dispersion=dispersion,
-        incident_angle=incident_angle,
         refractive_index=refractive_index,
         refractive_index_derivative=refractive_index_derivative,
         out_of_plane_angle=out_of_plane_angle,
+    )
+
+    alpha_in = m.Const1D(amplitude=np.sin(incident_angle))
+
+    grism_constant = (groove_density * spectral_order) / np.cos(out_of_plane_angle)
+    reference_refracted_angle = np.arcsin(
+        (grism_constant * reference_wavelength) - refractive_index * np.sin(incident_angle)
+    )
+    grism_parameter_per_wavelength = (
+        grism_constant - refractive_index_derivative * np.sin(incident_angle)
+    ) / (np.cos(reference_refracted_angle) * np.cos(camera_angle) ** 2)
+
+    alpha_out = refracted_angle_sine_model(
+        reference_pixel=reference_pixel,
+        reference_refracted_angle=reference_refracted_angle,
+        dispersion=dispersion,
+        grism_parameter_per_wavelength=grism_parameter_per_wavelength,
         camera_angle=camera_angle,
     )
 
-    alpha_in = m.Const1D(
-        amplitude=(refractive_index - refractive_index_derivative * reference_wavelength)
-        * np.sin(incident_angle)
-    )
-
-    return m.Mapping((0, 0)) | (alpha_in & m.Identity(1)) | model
+    return m.Mapping((0, 0)) | (alpha_in & alpha_out) | model
 
 
 def generate_grating_spectral_transform(
@@ -160,10 +129,15 @@ def generate_grating_spectral_transform(
         camera_angle: u.Quantity = 0 * u.deg,
 ) -> CompoundModel:
     """
-    Compatibility wrapper around
-    ``SpectralTransformBase.generate_grating_spectral_transform``.
+    Build a FITS ``-GRA``/``-GRI`` spectral transform from header-derived parameters.
+
+    Composes a constant incident-angle sine term (`~astropy.modeling.models.Const1D`),
+    a pixel-dependent refracted-angle sine model (`~dkist.wcs.models.refracted_angle_sine_model`),
+    and `~gwcs.spectroscopy.WavelengthFromGratingEquation` following the FITS
+    grating/grism spectral-coordinate formalism described by Greisen et al. (2006):
+    https://scixplorer.org/abs/2006A%26A...446..747G/abstract
     """
-    return SpectralTransformBase.generate_grating_spectral_transform(
+    return build_grating_spectral_transform(
         reference_pixel=reference_pixel,
         reference_wavelength=reference_wavelength,
         dispersion=dispersion,
@@ -175,6 +149,7 @@ def generate_grating_spectral_transform(
         out_of_plane_angle=out_of_plane_angle,
         camera_angle=camera_angle,
     )
+
 
 def generate_celestial_transform(
         crpix: Iterable[float] | u.Quantity,

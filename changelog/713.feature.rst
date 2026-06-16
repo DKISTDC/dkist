@@ -1,1 +1,1 @@
-Updated `dkist.wcs.models.generate_grating_spectral_transform()` to build FITS ``-GRA``/``-GRI`` spectral transforms by passing a constant incident-angle term and spectral pixel input into `gwcs.spectroscopy.WavelengthFromGratingEquation`.
+Updated `dkist.wcs.models.generate_grating_spectral_transform()` to build FITS ``-GRA``/``-GRI`` spectral transforms by composing a constant incident-angle term and pixel-dependent refracted-angle model with `gwcs.spectroscopy.WavelengthFromGratingEquation`.

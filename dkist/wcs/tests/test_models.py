@@ -14,7 +14,7 @@ from astropy.wcs import WCS
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
                               generate_celestial_transform, generate_grating_spectral_transform,
-                              update_celestial_transform_parameters,
+                              refracted_angle_sine_model, update_celestial_transform_parameters,
                               varying_celestial_transform_from_tables)
 
 
@@ -54,7 +54,7 @@ def test_generate_celestial_unitless():
     assert u.allclose(shift1.offset, 0)
 
 
-def test_generate_grating_spectral_transform():
+def test_generate_grating_spectral_transform() -> None:
     header = {
         "CTYPE1": "AWAV-GRA",
         "CUNIT1": "nm",
@@ -87,6 +87,10 @@ def test_generate_grating_spectral_transform():
     result = transform(pixels)
 
     assert isinstance(transform, CompoundModel)
+    assert any(
+        isinstance(submodel, refracted_angle_sine_model)
+        for submodel in transform.traverse_postorder()
+    )
     np.testing.assert_allclose(
         result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
     )
