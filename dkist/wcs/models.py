@@ -54,7 +54,7 @@ def refracted_angle_sine_model(
     This model is defined in ``dkist`` so its import path remains stable for
     ASDF serialization and deserialization.
     """
-    wavelength_offset = ((pixel - reference_pixel) * u.pix) * dispersion
+    wavelength_offset = (u.Quantity(pixel, u.pix) - u.Quantity(reference_pixel, u.pix)) * dispersion
     output_angle = (
         np.arctan(-np.tan(camera_angle) + wavelength_offset * grism_parameter_per_wavelength)
         + reference_refracted_angle
