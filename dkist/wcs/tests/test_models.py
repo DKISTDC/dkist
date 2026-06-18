@@ -10,6 +10,7 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 from astropy.wcs import WCS
+from gwcs.spectroscopy import RefractedAngleSineModel
 
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
@@ -87,10 +88,14 @@ def test_generate_grating_spectral_transform() -> None:
     result = transform(pixels)
 
     assert isinstance(transform, CompoundModel)
-    assert any(
-        isinstance(submodel, refracted_angle_sine_model)
-        for submodel in transform.traverse_postorder()
-    )
+    # The transform should contain a refracted_angle_sine_model (dkist subclass),
+    # which is itself a subclass of gwcs.spectroscopy.RefractedAngleSineModel.
+    refracted_submodels = [
+        sm for sm in transform.traverse_postorder()
+        if isinstance(sm, refracted_angle_sine_model)
+    ]
+    assert len(refracted_submodels) == 1
+    assert isinstance(refracted_submodels[0], RefractedAngleSineModel)
     np.testing.assert_allclose(
         result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
     )
