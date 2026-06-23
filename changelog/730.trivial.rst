@@ -1,0 +1,1 @@
+Tweak allowed types of new meta entries
