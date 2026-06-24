@@ -1,1 +1,0 @@
-Adds format support to DKISTFileManager.quality_report() so callers can download either the existing PDF report or the new JSON report.
