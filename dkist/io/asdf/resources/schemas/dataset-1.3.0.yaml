@@ -52,15 +52,21 @@ properties:
 
       parameters:
         description: A copy of the parameters used to generate this dataset.
-        type: object
+        anyOf:
+        - type: object
+        - type: array
 
       observation_input_frames:
         description: A copy of the observation input frames used to generate this dataset.
-        type: object
+        anyOf:
+        - type: object
+        - type: array
 
       calibration_input_frames:
         description: A copy of the calibration input frames used to generate this dataset.
-        type: object
+        anyOf:
+        - type: object
+        - type: array
 
       recipe_run_config:
         description: A copy of the recipe configurations used to generate this dataset.

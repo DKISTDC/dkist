@@ -1,3 +1,45 @@
+1.18 (2026-06-09)
+=================
+
+Backwards Incompatible Changes
+------------------------------
+
+- Bump required versions of asdf, asdf-astropy and asdf-coordinates-schemas as needed for dataset-saving functionality (`#688 <https://github.com/DKISTDC/dkist/pull/688>`__)
+
+
+Features
+--------
+
+- Adds limited file-saving capability to `Dataset`, `TiledDataset` and `Inversion` classes.
+  This can be used to save datasets which have been modified by slicing or masking, but in which the data values have not been changed. (`#688 <https://github.com/DKISTDC/dkist/pull/688>`__)
+- Add observation frames, calibration frames, and recipe run configuration information to generated ASDF files. (`#707 <https://github.com/DKISTDC/dkist/pull/707>`__)
+- Adds format support to DKISTFileManager.quality_report() so callers can download either the existing PDF report or the new JSON report. (`#721 <https://github.com/DKISTDC/dkist/pull/721>`__)
+
+
+Bug Fixes
+---------
+
+- Fix Inversion slicing so that it also slices Profiles when appropriate (`#690 <https://github.com/DKISTDC/dkist/pull/690>`__)
+- Fix `.TiledDataset.tiles_shape` to work with flat (flattened or sliced) TiledDatasets. (`#695 <https://github.com/DKISTDC/dkist/pull/695>`__)
+- Use a different dataset for the downloading data example, and tweak the search and the text.
+  The previous dataset no longer came up in the original search and the r0 had changed.
+  Also update the downloading tutorial to use Product ID because it's been reprocessed and the Dataset ID has changed. (`#697 <https://github.com/DKISTDC/dkist/pull/697>`__)
+
+
+Improved Documentation
+----------------------
+
+- Remove downloading example notebook until it can be reworked, because the data have changed. (`#704 <https://github.com/DKISTDC/dkist/pull/704>`__)
+- Use "Level 1" as the style convention in the documentation. (`#705 <https://github.com/DKISTDC/dkist/pull/705>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Update the devdeps figure hashes. How the WCSes are handled by something in the environment is very slightly different for TiledDataset, causing a very slight misalignment between the hashed baseline and resulting images. (`#697 <https://github.com/DKISTDC/dkist/pull/697>`__)
+- Update update_schema.py to automatically determine which list of converters to use when adding a ManifestExtension to entry_points.py (`#719 <https://github.com/DKISTDC/dkist/pull/719>`__)
+
+
 1.17.0 (2026-02-05)
 ===================
 
