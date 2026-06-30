@@ -71,7 +71,8 @@ def build_grating_spectral_transform(
     `~gwcs.spectroscopy.RefractedAngleSineModel`), and
     `~gwcs.spectroscopy.WavelengthFromGratingEquation`, following the FITS
     grating/grism spectral-coordinate formalism described by Greisen et al.
-    (2006):
+    (2006). The input and output angles are computed from the Greisen
+    relations within the component models:
     https://scixplorer.org/abs/2006A%26A...446..747G/abstract
     """
     model = WavelengthFromGratingEquation(
@@ -85,19 +86,16 @@ def build_grating_spectral_transform(
 
     alpha_in = m.Const1D(amplitude=np.sin(incident_angle))
 
-    grism_constant = (groove_density * spectral_order) / np.cos(out_of_plane_angle)
-    reference_refracted_angle = np.arcsin(
-        (grism_constant * reference_wavelength) - refractive_index * np.sin(incident_angle)
-    )
-    grism_parameter_per_wavelength = (
-        grism_constant - refractive_index_derivative * np.sin(incident_angle)
-    ) / (np.cos(reference_refracted_angle) * np.cos(camera_angle) ** 2)
-
     alpha_out = refracted_angle_sine_model(
         reference_pixel=reference_pixel,
-        reference_refracted_angle=reference_refracted_angle,
+        reference_wavelength=reference_wavelength,
         dispersion=dispersion,
-        grism_parameter_per_wavelength=grism_parameter_per_wavelength,
+        groove_density=groove_density,
+        spectral_order=spectral_order,
+        incident_angle=incident_angle,
+        refractive_index=refractive_index,
+        refractive_index_derivative=refractive_index_derivative,
+        out_of_plane_angle=out_of_plane_angle,
         camera_angle=camera_angle,
     )
 
