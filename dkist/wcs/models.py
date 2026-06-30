@@ -36,6 +36,7 @@ __all__ = [
     "varying_celestial_transform_from_tables",
 ]
 
+
 def build_grating_spectral_transform(
     reference_pixel: float,
     reference_wavelength: u.Quantity,
