@@ -60,11 +60,6 @@ def build_grating_spectral_transform(
     (2006). The input and output angles are computed from the Greisen
     relations within the component models:
     https://scixplorer.org/abs/2006A%26A...446..747G/abstract
-
-    The first six parameters are the FITS-facing values needed to define the
-    transform directly from the header. The remaining parameters default to
-    the legacy grating-equation behavior and correspond to the additional
-    grism correction terms.
     """
     model = WavelengthFromGratingEquation(
         groove_density=groove_density,
