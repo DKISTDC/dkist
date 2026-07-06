@@ -41,6 +41,7 @@ dependencies = [
   "packaging>=25.0",
   "sunpy[net,asdf]>=6",
   "tqdm>=4.65",
+  "universal_pathlib>=0.2.6",
 ]
 dynamic = ["version"]
 

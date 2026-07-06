@@ -1,0 +1,1 @@
+`dkist.load_dataset` now accepts remote URLs (e.g. ``s3://``) for both ASDF files and dataset directories, and ``Dataset.files.basepath`` can be set to a remote location, with the ASDF and FITS files read through `fsspec`. Reading from S3 additionally requires the ``s3fs`` package to be installed.

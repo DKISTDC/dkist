@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from packaging.version import Version
 from parfive import Results
+from upath import UPath
 
 import asdf
 
@@ -118,13 +119,19 @@ def _load_from_iterable(iterable: tuple | list, *, ignore_version_mismatch=False
 @load_dataset.register
 def _load_from_string(path: str, *, ignore_version_mismatch=False):
     """
-    A string representing a directory or an ASDF file.
+    A string representing a directory, an ASDF file, or a remote URL (e.g. ``s3://``).
     """
     if "://" in path:
-        from upath import UPath  # noqa: PLC0415
-
         return _load_from_path(UPath(path), ignore_version_mismatch=ignore_version_mismatch)
     return _load_from_path(Path(path), ignore_version_mismatch=ignore_version_mismatch)
+
+
+@load_dataset.register
+def _load_from_upath(path: UPath, *, ignore_version_mismatch=False):
+    """
+    A `~upath.UPath` object representing a local or remote directory or ASDF file.
+    """
+    return _load_from_path(path, ignore_version_mismatch=ignore_version_mismatch)
 
 
 @load_dataset.register

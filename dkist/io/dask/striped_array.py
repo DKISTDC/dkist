@@ -22,6 +22,7 @@ from collections.abc import Iterable
 import dask.array
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
+from upath import UPath
 
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
@@ -162,18 +163,11 @@ class StripedExternalArray(BaseStripedExternalArray):
         if value is None:
             return None
         if isinstance(value, str) and "://" in value:
-            from upath import UPath  # noqa: PLC0415
-
             return UPath(value)
-        try:
-            from upath import UPath  # noqa: PLC0415
-        except ImportError:
-            pass
-        else:
+        if isinstance(value, UPath):
             # Keep fsspec-backed paths as they are; converting them to a plain
             # Path would mangle the URL
-            if isinstance(value, UPath):
-                return value
+            return value
         return Path(value).expanduser()
 
     @property
