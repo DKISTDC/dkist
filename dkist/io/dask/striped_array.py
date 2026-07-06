@@ -159,7 +159,22 @@ class StripedExternalArray(BaseStripedExternalArray):
 
     @staticmethod
     def _sanitize_basepath(value):
-        return Path(value).expanduser() if value is not None else None
+        if value is None:
+            return None
+        if isinstance(value, str) and "://" in value:
+            from upath import UPath  # noqa: PLC0415
+
+            return UPath(value)
+        try:
+            from upath import UPath  # noqa: PLC0415
+        except ImportError:
+            pass
+        else:
+            # Keep fsspec-backed paths as they are; converting them to a plain
+            # Path would mangle the URL
+            if isinstance(value, UPath):
+                return value
+        return Path(value).expanduser()
 
     @property
     def basepath(self) -> os.PathLike:

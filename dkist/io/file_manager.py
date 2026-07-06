@@ -71,7 +71,7 @@ class DKISTFileManager:
 
     @basepath.setter
     def basepath(self, basepath: str | os.PathLike):
-        self._fm.basepath = Path(basepath)
+        self._fm.basepath = basepath
 
     def __getattr__(self, attr):
         # We want to proxy a fixed list of public API:
