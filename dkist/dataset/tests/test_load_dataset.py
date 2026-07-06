@@ -288,3 +288,21 @@ def test_version_error(asdf_extensions):
 
     ds = load_dataset(test_file, ignore_version_mismatch=True)
     assert isinstance(ds, Dataset)
+
+
+@pytest.mark.filterwarnings("ignore::asdf.exceptions.AsdfPackageVersionWarning")
+def test_version_error_string_and_iterable(asdf_extensions):
+    # ignore_version_mismatch used to be dropped (and so silently ignored) for
+    # string and iterable inputs, as only the Path input forwarded it.
+    test_file, match = asdf_extensions
+    if match is None:
+        pytest.skip("only relevant for files that raise the version error")
+
+    with pytest.raises(DKISTOutOfDateError):
+        load_dataset(str(test_file))
+
+    ds = load_dataset(str(test_file), ignore_version_mismatch=True)
+    assert isinstance(ds, Dataset)
+
+    ds = load_dataset([test_file], ignore_version_mismatch=True)
+    assert isinstance(ds, Dataset)
