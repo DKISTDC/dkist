@@ -99,7 +99,7 @@ def _load_from_results(results: Results, *, ignore_version_mismatch=False):
     """
     The results from a call to ``Fido.fetch``, all results must be valid DKIST ASDF files.
     """
-    return _load_from_iterable(results)
+    return _load_from_iterable(results, ignore_version_mismatch=ignore_version_mismatch)
 
 
 @load_dataset.register
@@ -107,7 +107,9 @@ def _load_from_iterable(iterable: tuple | list, *, ignore_version_mismatch=False
     """
     A list or tuple of valid inputs to ``load_dataset``.
     """
-    datasets = [load_dataset(item) for item in iterable]
+    datasets = [
+        load_dataset(item, ignore_version_mismatch=ignore_version_mismatch) for item in iterable
+    ]
     if len(datasets) == 1:
         return datasets[0]
     return datasets
@@ -119,7 +121,7 @@ def _load_from_string(path: str, *, ignore_version_mismatch=False):
     A string representing a directory or an ASDF file.
     """
     # TODO Adjust this to accept URLs as well
-    return _load_from_path(Path(path))
+    return _load_from_path(Path(path), ignore_version_mismatch=ignore_version_mismatch)
 
 
 @load_dataset.register
