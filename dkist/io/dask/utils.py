@@ -1,3 +1,4 @@
+import uuid
 import warnings
 
 import dask
@@ -29,19 +30,25 @@ def stack_loader_array(loader_array, output_shape, chunksize=None):
     """
     file_shape = loader_array.flat[0].shape
 
+    # Dask identifies arrays by their name, so the name has to be unique to
+    # this array: if two arrays share a name, combining them into a single
+    # graph (for example stacking two tiles of a mosaic) silently uses one
+    # array's tasks for both.
+    name = f"load_files-{uuid.uuid4().hex}"
+
     tasks = {}
     for i, loader in enumerate(loader_array.flat):
         # The key identifies this chunk's position in the (partially-flattened) final data cube
-        key = ("load_files", i)
+        key = (name, i)
         key += (0,) * len(file_shape)
         # Each task will be to call _call_loader, with the loader as an argument
         tasks[key] = (_call_loader, loader)
 
-    dsk = dask.highlevelgraph.HighLevelGraph.from_collections("load_files", tasks, dependencies=())
+    dsk = dask.highlevelgraph.HighLevelGraph.from_collections(name, tasks, dependencies=())
     # Specifies that each chunk occupies a space of 1 pixel in the first dimension, and all the pixels in the others
     chunks = (*((1,) * loader_array.size,), *((s,) for s in file_shape))
     array = dask.array.Array(dsk,
-                             name="load_files",
+                             name=name,
                              chunks=chunks,
                              dtype=loader_array.flat[0].dtype)
     # Now impose the higher dimensions on the data cube
