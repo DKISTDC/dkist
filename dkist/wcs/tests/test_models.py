@@ -252,7 +252,8 @@ def test_varying_transform_crval():
 
     pixel = (0*u.pix, 0*u.pix, 2*u.pix)
     world = vct(*pixel)
-    assert u.allclose(world, (3.59999722e+02, 2.78325906e-13)*u.deg)
+    # Tolerance introduced here to allow for the difference between astropy 8.0 and 8.1
+    assert u.allclose(world, (3.59999722e+02, 2.69329694e-13)*u.deg, atol=1e-14*u.deg)
 
     assert u.allclose(vct.inverse(*world, 2*u.pix), pixel[:2], atol=0.01*u.pix)
 
