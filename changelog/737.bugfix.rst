@@ -1,0 +1,1 @@
+``ignore_version_mismatch`` is now honored when `dkist.load_dataset` is given a string path, a list of inputs or `~parfive.Results`; previously it was silently ignored for these input types and only worked for `~pathlib.Path` input.
