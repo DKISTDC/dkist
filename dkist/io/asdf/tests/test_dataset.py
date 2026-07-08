@@ -220,7 +220,7 @@ def test_save_dataset_to_single_file(large_visp_dataset):
     fname = "ds-save-test.asdf"
     ds = large_visp_dataset[0]
 
-    save_dataset(ds, fname, overwrite=True, data_format="internal")
+    save_dataset(ds, fname, overwrite=True, data_format="asdf")
 
     with pytest.warns(DKISTUserWarning):
         ds1 = load_dataset(fname)
