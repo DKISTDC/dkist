@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from packaging.version import Version
 from parfive import Results
+from upath import UPath
 
 import asdf
 
@@ -118,10 +119,19 @@ def _load_from_iterable(iterable: tuple | list, *, ignore_version_mismatch=False
 @load_dataset.register
 def _load_from_string(path: str, *, ignore_version_mismatch=False):
     """
-    A string representing a directory or an ASDF file.
+    A string representing a directory, an ASDF file, or a remote URL (e.g. ``s3://``).
     """
-    # TODO Adjust this to accept URLs as well
+    if "://" in path:
+        return _load_from_path(UPath(path), ignore_version_mismatch=ignore_version_mismatch)
     return _load_from_path(Path(path), ignore_version_mismatch=ignore_version_mismatch)
+
+
+@load_dataset.register
+def _load_from_upath(path: UPath, *, ignore_version_mismatch=False):
+    """
+    A `~upath.UPath` object representing a local or remote directory or ASDF file.
+    """
+    return _load_from_path(path, ignore_version_mismatch=ignore_version_mismatch)
 
 
 @load_dataset.register
@@ -165,7 +175,7 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
     - Ignore any ASDF files with an old suffix if a new suffix is present
     - Throw a warning to the user if any ASDF files with older suffixes are found
     """
-    base_path = Path(directory).expanduser()
+    base_path = Path(directory).expanduser() if isinstance(directory, str) else directory
     asdf_files = tuple(base_path.glob("*.asdf"))
 
     if not asdf_files:
@@ -229,7 +239,9 @@ def _load_from_asdf(filepath, *, ignore_version_mismatch=False):
     from dkist.dataset import Dataset, Inversion, TiledDataset  # noqa: PLC0415
 
     # Load the file without a custom schema so that we can validate it against multiple schemas
-    with asdf.open(filepath, lazy_load=False, memmap=False) as ff:
+    with filepath.open(mode="rb") as fileobj, asdf.open(
+        fileobj, lazy_load=False, memmap=False
+    ) as ff:
         if not ignore_version_mismatch:
             _check_dkist_version(filepath, ff)
 
