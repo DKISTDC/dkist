@@ -310,6 +310,7 @@ def test_version_error_string_and_iterable(asdf_extensions):
     ds = load_dataset([test_file], ignore_version_mismatch=True)
     assert isinstance(ds, Dataset)
 
+
 @pytest.fixture
 def small_visp_memory_url():
     # Copy the small VISP dataset (ASDF plus FITS files) into an in-memory

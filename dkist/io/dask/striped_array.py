@@ -39,10 +39,10 @@ class FileManagerProtocol(Protocol):
     """
 
     @property
-    def basepath(self) -> os.PathLike: ...
+    def basepath(self) -> Path | UPath | None: ...
 
     @basepath.setter
-    def basepath(self, path: str | os.PathLike) -> None: ...
+    def basepath(self, path: str | os.PathLike | UPath) -> None: ...
 
     @property
     def filenames(self) -> list[str]: ...
@@ -166,19 +166,20 @@ class StripedExternalArray(BaseStripedExternalArray):
             return UPath(value)
         if isinstance(value, UPath):
             # Keep fsspec-backed paths as they are; converting them to a plain
-            # Path would mangle the URL
-            return value
+            # Path would mangle the URL. expanduser only has an effect on
+            # local filesystem paths.
+            return value.expanduser()
         return Path(value).expanduser()
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Path | UPath | None:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
         return self._basepath
 
     @basepath.setter
-    def basepath(self, value: os.PathLike | str | None):
+    def basepath(self, value: os.PathLike | UPath | str | None):
         self._basepath = self._sanitize_basepath(value)
         for loader in self._loader_array.flat:
             loader.basepath = self._basepath
@@ -223,7 +224,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Path | UPath | None:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
