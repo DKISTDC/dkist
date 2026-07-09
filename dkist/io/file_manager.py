@@ -5,7 +5,7 @@ This file contains the DKIST specific FileManager code.
 import os
 import json
 import urllib
-from typing import Any
+from typing import Any, cast
 from pathlib import Path
 from textwrap import dedent
 
@@ -25,6 +25,18 @@ def _is_remote(path):
     Return `True` if ``path`` is an fsspec-backed path to a remote filesystem.
     """
     return isinstance(path, UPath) and path.protocol not in ("", "file", "local")
+
+
+def _local_basepath(basepath: Path | UPath | None) -> str | os.PathLike | None:
+    """
+    Return ``basepath`` for use as a local download destination, or `None` if
+    it is a remote location.
+    """
+    if _is_remote(basepath):
+        return None
+    # A non-remote basepath is either a Path or a UPath on the local
+    # filesystem, both of which implement the os.PathLike interface
+    return cast("str | os.PathLike | None", basepath)
 
 
 class DKISTFileManager:
@@ -184,8 +196,8 @@ class DKISTFileManager:
             raise ValueError(msg)
 
         url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
-        if path is None and self.basepath and not _is_remote(self.basepath):
-            path = self.basepath
+        if path is None:
+            path = _local_basepath(self.basepath)
         kwargs = {}
         if normalized_format == "json":
             kwargs["headers"] = {"Accept": "application/json"}
@@ -216,8 +228,8 @@ class DKISTFileManager:
             was not.
         """
         url = f"{self._metadata_streamer_url}/movie?datasetId={self._dataset_id}"
-        if path is None and self.basepath and not _is_remote(self.basepath):
-            path = self.basepath
+        if path is None:
+            path = _local_basepath(self.basepath)
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
     def download(
@@ -277,8 +289,7 @@ class DKISTFileManager:
         path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
-        local_basepath = None if _is_remote(self.basepath) else self.basepath
-        destination_path = path or local_basepath or "/~/"
+        destination_path = path or _local_basepath(self.basepath) or "/~/"
         destination_path = Path(destination_path).as_posix()
         destination_path = Path(destination_path.format(**path_inv))
 
