@@ -16,6 +16,7 @@ kernelspec:
 # Showing the Field of View of VBI on AIA
 
 ```{code-cell} ipython3
+:tags: [keep-inputs]
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
