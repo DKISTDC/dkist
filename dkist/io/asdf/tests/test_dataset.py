@@ -216,9 +216,12 @@ def test_save_dataset_to_existing_file(large_visp_dataset):
     Path(fname).unlink()
 
 
-def test_save_dataset_to_single_file(large_visp_dataset):
+@pytest.mark.parametrize("slice", [np.s_[0, 1], np.s_[0, 1, 2],
+                                   np.s_[:, 1], np.s_[:, :, 2], np.s_[:2, 1:10, 2:20]])
+@pytest.mark.accept_cli_dataset
+def test_save_dataset_to_single_file(large_visp_dataset, slice):
     fname = "ds-save-test.asdf"
-    ds = large_visp_dataset[0]
+    ds = large_visp_dataset[slice]
 
     save_dataset(ds, fname, overwrite=True, data_format="asdf")
 
