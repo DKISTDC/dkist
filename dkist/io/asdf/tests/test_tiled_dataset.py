@@ -7,6 +7,7 @@ import pytest
 import asdf
 
 from dkist import load_dataset, save_dataset
+from dkist.utils.exceptions import DKISTUserWarning
 
 
 def assert_tiled_dataset_equal(new, old, skip_history=False, compare_wcs=True, compare_files=True):
@@ -86,3 +87,16 @@ def test_save_tiled_dataset_to_existing_file(large_tiled_dataset):
 
     # Tidying. I'm sure there's a better fixture-based way to do this
     Path(fname).unlink()
+
+
+@pytest.mark.parametrize("slice", [np.s_[:2, :2], np.s_[:, 1]])
+def test_save_tiled_dataset_to_single_file(large_tiled_dataset, slice):
+    fname = "tds-single_file-test.asdf"
+    ds = large_tiled_dataset[slice]
+
+    save_dataset(ds, fname, overwrite=True, data_format="asdf")
+
+    with pytest.warns(DKISTUserWarning):
+        ds1 = load_dataset(fname)
+
+    assert_tiled_dataset_equal(ds1, ds, skip_history=True, compare_files=False)
