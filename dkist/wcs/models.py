@@ -14,7 +14,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, separable
 from astropy.utils.decorators import deprecated_renamed_argument
-from gwcs.spectroscopy import RefractedAngleSineModel, WavelengthFromGratingEquation
+from gwcs.spectroscopy import RefractedAngleSineModel, WavelengthFromGrismEquation
 
 from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTDeprecationWarning
@@ -55,13 +55,13 @@ def build_grating_spectral_transform(
     Composes a constant incident-angle sine term (`~astropy.modeling.models.Const1D`),
     a pixel-dependent refracted-angle sine model
     (`~gwcs.spectroscopy.RefractedAngleSineModel`), and
-    `~gwcs.spectroscopy.WavelengthFromGratingEquation`, following the FITS
+    `~gwcs.spectroscopy.WavelengthFromGrismEquation`, following the FITS
     grating/grism spectral-coordinate formalism described by Greisen et al.
     (2006). The input and output angles are computed from the Greisen
     relations within the component models:
     https://scixplorer.org/abs/2006A%26A...446..747G/abstract
     """
-    model = WavelengthFromGratingEquation(
+    model = WavelengthFromGrismEquation(
         groove_density=groove_density,
         spectral_order=spectral_order,
         reference_wavelength=reference_wavelength,
