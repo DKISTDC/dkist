@@ -6,4 +6,4 @@
 # gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
 # shasum -a 256 -c codecov.SHA256SUM
 chmod +x codecov
-codecov "$@"
+./codecov "$@"
