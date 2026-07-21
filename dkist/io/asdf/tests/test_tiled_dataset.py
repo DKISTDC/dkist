@@ -13,6 +13,8 @@ from dkist.utils.exceptions import DKISTUserWarning
 def assert_tiled_dataset_equal(new, old, skip_history=False, compare_wcs=True, compare_files=True):
     assert new.shape == old.shape
     assert new.flat.tiles_shape == old.flat.tiles_shape
+    assert old.combined_headers.colnames == new.combined_headers.colnames
+    assert len(old.combined_headers), len(new.combined_headers)
     old_headers = old.meta.pop("headers")
     new_headers = new.meta.pop("headers")
     assert old_headers.colnames == new_headers.colnames
