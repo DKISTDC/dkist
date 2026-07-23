@@ -41,7 +41,7 @@ def save_dataset(dataset, asdf_path, overwrite=False, data_format="fits"):
         files distributed by the DKIST Data Center.
         If "asdf", data will be saved as binary blocks within the asdf file itself.
     """
-    from dkist import TiledDataset  # noqa: PLC0415
+    from dkist import Dataset, TiledDataset  # noqa: PLC0415
     from dkist.dataset import Inversion  # noqa: PLC0415
 
     if isinstance(asdf_path, str):
@@ -52,10 +52,12 @@ def save_dataset(dataset, asdf_path, overwrite=False, data_format="fits"):
                 store = zarr.storage.MemoryStore({})
                 newdata = zarr.create_array(store=store, data=tile.data)
                 tile.data = newdata
-        else:
+        elif isinstance(dataset, Dataset):
             store = zarr.storage.MemoryStore({})
             newdata = zarr.create_array(store=store, data=dataset.data)
             dataset.data = newdata
+        else:
+            raise ValueError(f"Saving to asdf files is not yet supported for {type(dataset)} objects.")
     elif data_format != "fits":
         raise ValueError("data_format must be either 'fits' or 'asdf'")
 
