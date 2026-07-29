@@ -1,5 +1,5 @@
 import types
-import textwrap
+from textwrap import dedent
 from collections.abc import Iterable
 
 import matplotlib.figure
@@ -10,6 +10,8 @@ from matplotlib.gridspec import GridSpec
 from ndcube import NDCollection
 
 from dkist.utils.exceptions import DKISTUserWarning
+
+from .utils import inversion_info_str
 
 __all__ = ["Inversion", "Profiles"]
 
@@ -149,20 +151,25 @@ class Inversion(NDCollection):
         super().__init__(*args, **kwargs)
         self.profiles = profiles
 
+    def __repr__(self):
+        prefix = object.__repr__(self)
+        return dedent(f"{prefix}\n{self.__str__()}")
+
     def __str__(self):
-        quants_repr = "\n".join(super().__str__().split("\n")[2:])
-        profiles_repr = "\n".join(self.profiles.__str__().split("\n")[2:])
-        s = """\
-        Inversion
-        ~~~~~~~~~
-        {}
+        return inversion_info_str(self)
+        # quants_repr = "\n".join(super().__str__().split("\n")[2:])
+        # profiles_repr = "\n".join(self.profiles.__str__().split("\n")[2:])
+        # s = """\
+        # Inversion
+        # ~~~~~~~~~
+        # {}
 
-        Profiles
-        ~~~~~~~~
-        {}
-        """
+        # Profiles
+        # ~~~~~~~~
+        # {}
+        # """
 
-        return textwrap.dedent(s).format(quants_repr, profiles_repr)
+        # return textwrap.dedent(s).format(quants_repr, profiles_repr)
 
     def __getitem__(self, item):
         new_inv = super().__getitem__(item)
