@@ -114,6 +114,12 @@ def inversion_info_str(inv_in):
     # corresponding world axes
     aligned_axes = list(inv_in.aligned_axes.values())
     indices = list(set(aligned_axes[0]).intersection(*aligned_axes))
+    acm = list(inv_in.values())[0].wcs.axis_correlation_matrix[:, indices]
+    world_indices = np.where(np.any(acm, axis=1))[0]
+
+    s += f"These Datasets share {len(indices)} pixel and {len(world_indices)} world dimensions."
+    s += f"The shared pixel axes have shape {[inv_in.aligned_dimensions[i] for i in indices]}.\n\n"
+
     # Low level Just in case the dataset has been sliced and returned the wrong kind of wcs
     wcs = inv_in[list(inv_in.keys())[0]].wcs.low_level_wcs
     s += array_dimensions_info(wcs, indices)
