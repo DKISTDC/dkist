@@ -112,8 +112,6 @@ def inversion_info_str(inv_in):
 
     # This section shows only info about the pixel axes shared across all inversions and the
     # corresponding world axes
-    s += "The following information relates to only the pixel axes shared by all inversions, and the\n"
-    s += "corresponding world axes. Invdividual inversions may include other coordinate information.\n"
     aligned_axes = list(inv_in.aligned_axes.values())
     indices = list(set(aligned_axes[0]).intersection(*aligned_axes))
     # Low level Just in case the dataset has been sliced and returned the wrong kind of wcs
@@ -126,6 +124,9 @@ def inversion_info_str(inv_in):
     s += "Correlation between pixel and world axes:\n\n"
     s += _get_pp_matrix(ds.wcs, indices)
 
+    s += "\n\n"
+    s += "The above WCS information relates to only the pixel axes shared by all inversions, and the\n"
+    s += "corresponding world axes. Invdividual inversions may include other coordinate information.\n"
 
     # Make sure we get rid of the extra whitespace at the end of some lines
     return "\n".join([line.rstrip() for line in s.splitlines()])
