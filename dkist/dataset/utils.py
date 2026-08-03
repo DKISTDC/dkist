@@ -79,11 +79,13 @@ def dataset_info_str(ds_in):
     return "\n".join([line.rstrip() for line in s.splitlines()])
 
 
-def inversion_info_str(inv_in):
-    s = f"This Level 2 product is a dictionary of {len(inv_in.items())} Datasets with {len(inv_in.aligned_dimensions)} aligned dimensions "
-    s += f"and consists of {sum([len(ds.files._fm.filenames) for ds in inv_in.values()])} total frames.\n"
+def level2_info_str(l2_in):
+    from dkist.dataset.inversion import Profiles  # noqa: PLC0415
+
+    s = f"This Level 2 product is a dictionary of {len(l2_in.items())} Datasets with {len(l2_in.aligned_dimensions)} aligned dimensions "
+    s += f"and consists of {sum([len(ds.files._fm.filenames) for ds in l2_in.values()])} total frames.\n"
     basepaths = []
-    for ds in inv_in.values():
+    for ds in l2_in.values():
         basepaths.append(ds.files.basepath)
     basepaths = set(basepaths)
     if len(basepaths) == 1:
@@ -92,36 +94,43 @@ def inversion_info_str(inv_in):
         s += "Files are stored in the following locations:\n"
         for path in basepaths:
             s += f"- {path}\n"
-
-    s += "\nThis Inversion has ID ...\n\n"
-
-    s += f"The Datasets in this Inversion represent the following {len(inv_in.items())} physical parameters:\n"
-    for param in inv_in.keys():
-        s += f"- {param}\n"
-
-    lines = []
-    for p in inv_in.profiles.keys():
-        line = p[:p.index("_")] if "_" in p else p
-        if line not in lines:
-            lines.append(line)
-    s += f"\nThese parameters were calculated using the following {len(lines)} line profiles "
-    s += "(see the .profiles attribute for more information) :\n"
-    for line in lines:
-        s += f"- {line}\n"
     s += "\n"
+
+    if not isinstance(l2_in, Profiles):
+        s += "This Inversion has ID ...\n\n"
+
+        s += f"The Datasets in this Inversion represent the following {len(l2_in.items())} physical parameters:\n"
+        for param in l2_in.keys():
+            s += f"- {param}\n"
+
+        lines = []
+        for p in l2_in.profiles.keys():
+            line = p[:p.index("_")] if "_" in p else p
+            if line not in lines:
+                lines.append(line)
+        s += f"\nThese parameters were calculated using the following {len(lines)} line profiles "
+        s += "(see the .profiles attribute for more information) :\n"
+        for line in lines:
+            s += f"- {line}\n"
+        s += "\n"
+    else:
+        s += f"The Datasets in this Profiles object represent the following {len(l2_in.items())} line profiles:\n"
+        for param in l2_in.keys():
+            s += f"- {param}\n"
+        s += "\n"
 
     # This section shows only info about the pixel axes shared across all inversions and the
     # corresponding world axes
-    aligned_axes = list(inv_in.aligned_axes.values())
+    aligned_axes = list(l2_in.aligned_axes.values())
     indices = list(set(aligned_axes[0]).intersection(*aligned_axes))
-    acm = list(inv_in.values())[0].wcs.axis_correlation_matrix[:, indices]
+    acm = list(l2_in.values())[0].wcs.axis_correlation_matrix[:, indices]
     world_indices = np.where(np.any(acm, axis=1))[0]
 
     s += f"These Datasets share {len(indices)} pixel and {len(world_indices)} world dimensions."
-    s += f"The shared pixel axes have shape {[inv_in.aligned_dimensions[i] for i in indices]}.\n\n"
+    s += f"The shared pixel axes have shape {[list(l2_in.values())[0].shape[i] for i in indices]}.\n\n"
 
     # Low level Just in case the dataset has been sliced and returned the wrong kind of wcs
-    wcs = inv_in[list(inv_in.keys())[0]].wcs.low_level_wcs
+    wcs = l2_in[list(l2_in.keys())[0]].wcs.low_level_wcs
     s += array_dimensions_info(wcs, indices)
     s += world_dimensions_info(wcs, indices)
 
