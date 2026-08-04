@@ -27,6 +27,14 @@ def test_repr(inversion):
     assert profiles in r
     assert "These Datasets share 3 pixel and 5 world dimensions.The shared pixel axes have shape [424, 508, 81]." in r
 
+    # Test that all basepaths are represented if component datasets are saved in different locations
+    orig_basepath = inversion["velocity"].files.basepath
+    temp_basepath = orig_basepath / "temperature"
+    inversion["temperature"].files.basepath = temp_basepath
+    r = repr(inversion)
+    assert f"- {orig_basepath}" in r
+    assert f"- {temp_basepath}" in r
+
 
 def test_profiles_repr(inversion):
     r = repr(inversion.profiles)
