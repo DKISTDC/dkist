@@ -33,7 +33,7 @@ permissions: {}
 
 jobs:
   tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@e5af21e4ae37af089a73bb032e10b78b0e746174 # v3.0.1
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
@@ -47,7 +47,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@e5af21e4ae37af089a73bb032e10b78b0e746174 # v3.0.1
     with:
       default_python: '3.14'
       coverage: 'codecov'
@@ -61,7 +61,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   mypy:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@e5af21e4ae37af089a73bb032e10b78b0e746174 # v3.0.1
     with:
       pytest: false
       envs: |
@@ -82,7 +82,7 @@ jobs:
       - run: python -m twine check dist/*
 
   allowed-fail-tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@a138926f6e4f9667d1306c24f24f5bdcaa01fbab # v2.5.0
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@e5af21e4ae37af089a73bb032e10b78b0e746174 # v3.0.1
     with:
       coverage: 'codecov'
       posargs: '--color=yes'
@@ -128,7 +128,7 @@ jobs:
       - run: ls -lha dist/
 
       - name: Run upload
-        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
 
   notify:
     if: always() && github.event_name != 'pull_request' && github.ref_name == 'main'
