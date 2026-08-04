@@ -30,7 +30,7 @@ jobs:
           python-version: '3.14'
       - run: python -m pip install .[tests] pytest-codspeed
       - name: Run benchmarks
-        uses: CodspeedHQ/action@a4a36bb07c0638b0b4ca52bf1f3dad1b4289e52f # v4.18.1
+        uses: CodspeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286 # v4.18.5
         with:
           mode: "simulation"
           token: ${{ secrets.CODSPEED_TOKEN }}  # zizmor: ignore[secrets-outside-env] We want this to run everywhere so it always needs the token
