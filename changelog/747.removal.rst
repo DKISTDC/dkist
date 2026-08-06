@@ -1,0 +1,2 @@
+Rename the ``figure=`` keyword argument of `.TiledDataset.plot` to ``fig=``, for consistency with `ndcube.NDCube.plot`.
+Passing ``figure=`` still works but is deprecated and will be removed in a future release.
