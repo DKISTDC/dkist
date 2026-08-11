@@ -1,0 +1,1 @@
+Update representation of Inversion and Profiles classes for consistency with Dataset and TiledDataset.
