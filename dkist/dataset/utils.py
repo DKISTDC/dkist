@@ -126,7 +126,7 @@ def level2_info_str(l2_in):
     acm = list(l2_in.values())[0].wcs.axis_correlation_matrix[:, indices]
     world_indices = np.where(np.any(acm, axis=1))[0]
 
-    s += f"These Datasets share {len(indices)} pixel and {len(world_indices)} world dimensions."
+    s += f"These Datasets share {len(indices)} pixel and {len(world_indices)} world dimensions. "
     s += f"The shared pixel axes have shape {[list(l2_in.values())[0].shape[i] for i in indices]}.\n\n"
 
     # Low level Just in case the dataset has been sliced and returned the wrong kind of wcs
