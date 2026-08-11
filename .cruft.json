@@ -24,7 +24,7 @@
       "include_cruft_update_github_workflow": "y",
       "use_pat_in_cruft_update_workflow": "y",
       "use_extended_ruff_linting": "y",
-      "matrix_room_id": "",
+      "matrix_room_id": "!RehafayCrAiXbzVpXI:openastronomy.org",
       "extra_ci_jobs": "mypy,allowed-fail-tests",
       "_sphinx_theme": "sunpy",
       "_parent_project": "",

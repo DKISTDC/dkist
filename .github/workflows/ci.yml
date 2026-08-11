@@ -7,6 +7,7 @@ on:
       - 'main'
       - '*.*'
       - '!*backport*'
+      - '!prepare-v*'
     tags:
       - 'v*'
       - '!*dev*'
@@ -21,7 +22,7 @@ on:
     #        │ │ ┌───────── day of the month (1 - 31)
     #        │ │ │ ┌───────── month (1 - 12 or JAN-DEC)
     #        │ │ │ │ ┌───────── day of the week (0 - 6 or SUN-SAT)
-    - cron: '0 7 * * 3'  # Every Wed at 07:00 UTC
+    - cron: '0 7 * * 1'  # Every Mon at 09:00 UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -120,7 +121,7 @@ jobs:
     with:
       python-version: '3.13'
       test_extras: 'tests'
-      test_command: 'pytest -p no:warnings --doctest-rst --pyargs sunkit_dem'
+      test_command: 'pytest -p no:warnings --doctest-rst --pyargs dkist -k "not test_fail" --remote-data=none --benchmark-skip'
       submodules: false
       save_artifacts: true
       upload_to_pypi: false
@@ -145,4 +146,21 @@ jobs:
       - run: ls -lha dist/
 
       - name: Run upload
-        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # v1.14.2
+
+  notify:
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+    needs: [build_dists]
+    runs-on: ubuntu-latest
+    environment:
+      name: matrix
+    steps:
+      - uses: Cadair/matrix-notify-action@31c7cc36051ee7dc4157a22c1f13dbc7d68e5120  # v2
+        with:
+          workflow_description: 'CI Workflow'
+          matrix_token: ${{ secrets.MATRIX_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          homeserver: ${{ secrets.MATRIX_HOMESERVER }}
+          roomid: '!RehafayCrAiXbzVpXI:openastronomy.org'
+          ignore_pattern: '.*(Load|report overall).*'
+          summarise_success: true
