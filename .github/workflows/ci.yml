@@ -91,12 +91,9 @@ jobs:
   mypy:
     needs: [core]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@8c8bb6c6c962542921f993d47d26df38dccd50b1  # v3.0.2
-    permissions:
-      id-token: write
     with:
       submodules: false
       toxdeps: tox-pypi-filter
-      coverage: codecov-oidc
       envs: |
         - linux: mypy
 
