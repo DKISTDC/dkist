@@ -642,7 +642,7 @@ def varying_celestial_transform_from_tables(
         lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
-        slit: None | Literal[0, 1] = None,
+        slit: Literal[0, 1] | None = None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
