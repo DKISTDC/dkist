@@ -752,6 +752,12 @@ class Ravel(Model):
             result = np.array([result])
         # find places where either input coordinate is out of bounds and replace with nan
         oob = ((rounded_inputs < 0) + (rounded_inputs > array_bounds[:, np.newaxis])).sum(axis=0).astype(bool)
+        if not (np.array(result.shape) == 1).all():
+            for axis in result.shape:
+                if axis == 1:
+                    oob = oob[np.newaxis]
+                else:
+                    break
         result[oob] = np.nan
         return result
 
