@@ -23,7 +23,7 @@ jobs:
     outputs:
       new_commit_count: ${{ steps.commit.outputs.new_commit_count }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -44,7 +44,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: codspeed-macro
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -54,7 +54,7 @@ jobs:
       - name: Install requirements
         run: python -m pip install .[tests] pytest-codspeed
       - name: Run benchmarks
-        uses: CodspeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286 # v4.18.5
+        uses: CodspeedHQ/action@0ca9cbbf4623b599a6c3ed4fc8a922942705d9f1 # v5.0.2
         with:
           mode: "walltime"
           token: ${{ secrets.CODSPEED_TOKEN }}  # zizmor: ignore[secrets-outside-env] We want this to run everywhere so it always needs the token
