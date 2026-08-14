@@ -25,7 +25,7 @@ def test_repr(inversion):
     assert keys in r
     profiles = "\n- ".join(["NaID", "FeI630", "CaII854"]) # noqa: FLY002
     assert profiles in r
-    assert "These Datasets share 3 pixel and 5 world dimensions.The shared pixel axes have shape [424, 508, 81]." in r
+    assert "These Datasets share 3 pixel and 5 world dimensions. The shared pixel axes have shape [424, 508, 81]." in r
 
     # Test that all basepaths are represented if component datasets are saved in different locations
     orig_basepath = inversion["velocity"].files.basepath
