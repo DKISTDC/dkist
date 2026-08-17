@@ -41,7 +41,7 @@ def test_profiles_repr(inversion):
     assert "This Level 2 product is a dictionary of 6 Datasets with 3 aligned dimensions and consists of 2544 total frames." in r
     profiles = "\n- ".join(["NaID_orig", "NaID_fit", "FeI630_orig", "FeI630_fit", "CaII854_orig", "CaII854_fit"]) # noqa: FLY002
     assert profiles in r
-    assert "These Datasets share 3 pixel and 5 world dimensions.The shared pixel axes have shape [424, 508, 4]." in r
+    assert "These Datasets share 3 pixel and 5 world dimensions. The shared pixel axes have shape [424, 508, 4]." in r
 
 
 def test_get_item(inversion):
