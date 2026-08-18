@@ -55,5 +55,5 @@ jobs:
 
       - name: Run tests in different directory
         run: |
-          cd ..
+          cd /tmp
           python -m pytest --pyargs dkist --benchmark-skip
