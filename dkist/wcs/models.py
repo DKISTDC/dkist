@@ -751,7 +751,7 @@ class Ravel(Model):
         if has_units:
             result = result * u.pix
         else:
-            result = np.array([result])
+            result = np.array(result)
         return result
 
     @property
