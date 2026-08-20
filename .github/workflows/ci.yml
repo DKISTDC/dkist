@@ -72,7 +72,6 @@ jobs:
         - macos: py313
         - linux: py311
         - linux: py311-oldestdeps
-        - linux: py314-devdeps
 
   docs:
     needs: [core]
@@ -108,7 +107,7 @@ jobs:
       coverage: codecov-oidc
       envs: |
         - linux: py312-online
-        - linux: py313-devdeps
+        - linux: py314-devdeps
 
   build_dists:
     # Build wheels on PRs only when labelled. Releases will only be published if tagged ^v.*
