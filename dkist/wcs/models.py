@@ -745,20 +745,13 @@ class Ravel(Model):
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
         fraction = input_values[index] - rounded_inputs[index]
         result += fraction
+        oob = np.logical_or((rounded_inputs < 0), (rounded_inputs > array_bounds[:, np.newaxis])).any(axis=0)
+        result[oob] = np.nan
         # Put the units back if they were there...
         if has_units:
             result = result * u.pix
         else:
             result = np.array([result])
-        # find places where either input coordinate is out of bounds and replace with nan
-        oob = ((rounded_inputs < 0) + (rounded_inputs > array_bounds[:, np.newaxis])).sum(axis=0).astype(bool)
-        if not (np.array(result.shape) == 1).all():
-            for axis in result.shape:
-                if axis == 1:
-                    oob = oob[np.newaxis]
-                else:
-                    break
-        result[oob] = np.nan
         return result
 
     @property
