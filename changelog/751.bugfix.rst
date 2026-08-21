@@ -1,0 +1,1 @@
+Fix coordinate clipping behaviour of Ravel model.
