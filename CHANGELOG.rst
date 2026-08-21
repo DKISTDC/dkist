@@ -1,3 +1,12 @@
+1.18.1 (2026-08-26)
+===================
+
+Bug Fixes
+---------
+
+- Fix coordinate clipping behaviour of Ravel model.
+
+
 1.18 (2026-06-09)
 =================
 
