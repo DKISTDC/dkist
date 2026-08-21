@@ -7,18 +7,23 @@ from dkist.utils.inventory import (_path_format_table, dehumanize_inventory,
 def test_humanize_loop():
     inv = {
         "hasSpectralAxis": True,
+        "qualityDataObjectKey": "pid_1_123/BDNEK/BDNEK_quality_data.json",
         "notAKey": "wibble"
     }
 
     new_inv = humanize_inventory(inv)
     assert "Has Spectral Axis" in new_inv
     assert "hasSpectralAxis" not in new_inv
+    assert "Quality Data Filename" in new_inv
+    assert "qualityDataObjectKey" not in new_inv
     assert "notAKey" in new_inv
 
     old_inv = dehumanize_inventory(new_inv)
 
     assert "Has Spectral Axis" not in old_inv
     assert "hasSpectralAxis" in old_inv
+    assert "Quality Data Filename" not in old_inv
+    assert "qualityDataObjectKey" in old_inv
     assert "notAKey" in old_inv
 
 
