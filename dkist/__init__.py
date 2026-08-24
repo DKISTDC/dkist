@@ -17,7 +17,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-__all__ = ["Dataset", "Inversion", "TiledDataset", "conf", "load_dataset", "system_info", "write_default_config"]
+__all__ = ["Dataset", "Inversion", "TiledDataset", "conf", "load_dataset", "save_dataset", "system_info", "write_default_config"]
 
 
 def write_default_config(overwrite=False):

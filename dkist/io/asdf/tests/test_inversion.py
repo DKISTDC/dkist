@@ -53,3 +53,8 @@ def test_save_inversion_to_existing_file(inversion):
 
     # Tidying. I'm sure there's a better fixture-based way to do this
     Path(fname).unlink()
+
+
+def test_save_inversion_to_single_file(inversion):
+    with pytest.raises(ValueError, match="not yet supported"):
+        save_dataset(inversion, "any-file.asdf", data_format="asdf")

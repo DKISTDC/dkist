@@ -5,6 +5,7 @@ This file contains the DKIST specific FileManager code.
 import os
 import json
 import urllib
+import warnings
 from typing import Any
 from pathlib import Path
 from textwrap import dedent
@@ -14,9 +15,29 @@ from parfive import Downloader, Results
 from dkist import log
 from dkist.io.dask.striped_array import FileManager, FileManagerProtocol
 from dkist.io.utils import filemanager_info_str
+from dkist.utils.exceptions import DKISTUserWarning
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
-__all__ = ["DKISTFileManager"]
+__all__ = ["DKISTFileManager", "NullDKISTFileManager"]
+
+
+class NullDKISTFileManager:
+    """
+    Placeholder to be used when a dataset has no files.
+
+    This exists mostly so that other internal infrastructure doesn't break when setting
+    attributes on a dataset's FileManager.
+    """
+    __slots__ = ["_fm", "_inventory_cache", "_ndcube"]
+
+    def __getattr__(self, attr):
+        warnings.warn(DKISTUserWarning(f"This dataset has no files therefore no FileManager. {attr} is not defined"))
+
+    def __setattr__(self, name, val):
+        warnings.warn(DKISTUserWarning(f"This dataset has no files therefore no FileManager. {name} cannot be set"))
+
+    def __len__(self):
+        return 0
 
 
 class DKISTFileManager:

@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
-      - run: python -m pip install .[tests] pytest-codspeed
+      - run: python -m pip install -e .[tests] pytest-codspeed
       - name: Run benchmarks
         uses: CodspeedHQ/action@0ca9cbbf4623b599a6c3ed4fc8a922942705d9f1 # v5.0.2
         with:

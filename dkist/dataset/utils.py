@@ -55,6 +55,8 @@ def dataset_info_str(ds_in):
         nframes = len(ds.files) if not is_tiled else sum([len(tile.files) for tile in ds_in._data.compressed()])
         s += f"consists of {nframes} frames.\n"
         s += f"Files are stored in {ds.files.basepath}\n"
+    else:
+        s += "has no external files associated with it."
 
     s += f"\nThis calibration has Dataset ID {dsID}."
     s += f"\nThe unique identifier for the input observe frames (Product ID) is {pID}.\n"

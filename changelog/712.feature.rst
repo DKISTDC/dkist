@@ -1,0 +1,2 @@
+Extends dataset-saving capability to allow a dataset to be saved to a single file with the `data_format="asdf"` kwarg.
+This stores the data array in the same asdf as the metadata, removing the need for external fits files.
