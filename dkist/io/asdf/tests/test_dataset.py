@@ -229,3 +229,8 @@ def test_save_dataset_to_single_file(large_visp_dataset, slice):
         ds1 = load_dataset(fname)
 
     assert_dataset_equal(ds1, ds, skip_history=True, compare_wcs=False, compare_files=False)
+
+
+def test_save_dataset_with_invalid_format(dataset):
+    with pytest.raises(ValueError, match="data_format must be either 'fits' or 'asdf'"):
+        save_dataset(dataset, "any-file.asd", data_format="some invalid format")
