@@ -9,10 +9,13 @@ import astropy.units as u
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
+from astropy.wcs import WCS
+from gwcs.spectroscopy import RefractedAngleSineModel
 
 from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
                               VaryingCelestialTransform2D, VaryingCelestialTransform3D,
-                              generate_celestial_transform, update_celestial_transform_parameters,
+                              build_grating_spectral_transform, generate_celestial_transform,
+                              update_celestial_transform_parameters,
                               varying_celestial_transform_from_tables)
 
 
@@ -50,6 +53,49 @@ def test_generate_celestial_unitless():
     )
     shift1 = tfrm.left.left.left.left.right
     assert u.allclose(shift1.offset, 0)
+
+
+def test_build_grating_spectral_transform() -> None:
+    header = {
+        "CTYPE1": "AWAV-GRA",
+        "CUNIT1": "nm",
+        "CRPIX1": 218,
+        "CRVAL1": 854.1738582455826,
+        "CDELT1": 0.0022975580183395555,
+        "PV1_0": 23000.0,
+        "PV1_1": 90,
+        "PV1_2": 65.696,
+        "PV1_3": 1.25,
+        "PV1_4": 1000.0,
+        "PV1_5": 1.5,
+        "PV1_6": 0.8,
+    }
+    transform = build_grating_spectral_transform(
+        reference_pixel=header["CRPIX1"] - 1,
+        reference_wavelength=header["CRVAL1"] * u.nm,
+        dispersion=header["CDELT1"] * u.nm / u.pix,
+        groove_density=header["PV1_0"] / u.m,
+        spectral_order=header["PV1_1"] * u.one,
+        incident_angle=header["PV1_2"] * u.deg,
+        refractive_index=header["PV1_3"] * u.one,
+        refractive_index_derivative=header["PV1_4"] / u.m,
+        out_of_plane_angle=header["PV1_5"] * u.deg,
+        camera_angle=header["PV1_6"] * u.deg,
+    )
+
+    pixels = np.array([0, 100, 217, 300, 511], dtype=float)
+    expected = WCS(header).spectral.pixel_to_world(pixels)
+    result = transform(pixels)
+
+    assert isinstance(transform, CompoundModel)
+    # The transform should contain the gwcs refracted-angle model.
+    assert any(
+        isinstance(sm, RefractedAngleSineModel)
+        for sm in transform.traverse_postorder()
+    )
+    np.testing.assert_allclose(
+        result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
+    )
 
 
 def test_update_celestial():
