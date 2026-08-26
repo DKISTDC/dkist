@@ -695,7 +695,7 @@ def varying_celestial_transform_from_tables(
         lon_pole: float | u.Quantity = None,
         projection: Model = m.Pix2Sky_TAN(),
         inverse: bool = False,
-        slit: None | Literal[0, 1] = None,
+        slit: Literal[0, 1] | None = None,
 ) -> BaseVaryingCelestialTransform:
     """
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
@@ -792,17 +792,19 @@ class Ravel(Model):
         # round the index values, but clip them if they exceed the array bounds
         # the bounds are one less than the shape dimension value
         array_bounds = np.array(self.array_shape) - 1
-        rounded_inputs = np.clip(np.rint(input_values).astype(int), None, array_bounds[:, np.newaxis])
-        result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order).astype(float)
+        rounded_inputs = np.rint(input_values).astype(int)
+        result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order, mode="clip").astype(float)
         index = 0 if self.order == "F" else -1
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
         fraction = input_values[index] - rounded_inputs[index]
         result += fraction
+        oob = np.logical_or((rounded_inputs < 0), (rounded_inputs > array_bounds[:, np.newaxis])).any(axis=0)
+        result[oob] = np.nan
         # Put the units back if they were there...
         if has_units:
             result = result * u.pix
         else:
-            result = np.array([result])
+            result = np.array(result)
         return result
 
     @property
