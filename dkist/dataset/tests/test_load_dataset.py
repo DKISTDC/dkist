@@ -3,8 +3,11 @@ import shutil
 import numbers
 import contextlib
 
+import fsspec
+import numpy as np
 import pytest
 from parfive import Results
+from upath import UPath
 
 import asdf
 from asdf.tags.core import ExtensionMetadata, Software
@@ -306,3 +309,44 @@ def test_version_error_string_and_iterable(asdf_extensions):
 
     ds = load_dataset([test_file], ignore_version_mismatch=True)
     assert isinstance(ds, Dataset)
+
+
+@pytest.fixture
+def small_visp_memory_url():
+    # Copy the small VISP dataset (ASDF plus FITS files) into an in-memory
+    # fsspec filesystem, which behaves like any remote filesystem (e.g. S3)
+    # without needing network access.
+    fs = fsspec.filesystem("memory")
+    src = rootdir / "small_visp"
+    for file in src.iterdir():
+        fs.pipe_file(f"/small_visp/{file.name}", file.read_bytes())
+    yield "memory://small_visp"
+    fs.rm("/small_visp", recursive=True)
+
+
+@pytest.mark.parametrize("asdf_suffix", ["", "/test_visp.asdf"])
+def test_load_dataset_remote_url(small_visp_memory_url, asdf_suffix):
+    # Both the directory and direct ASDF file forms of a remote URL should
+    # load, keep a remote basepath, and read the FITS data through fsspec.
+    ds = load_dataset(small_visp_memory_url + asdf_suffix)
+    assert isinstance(ds, Dataset)
+    assert isinstance(ds.files.basepath, UPath)
+
+    reference = load_dataset(rootdir / "small_visp")
+    np.testing.assert_array_equal(np.asarray(ds.data), np.asarray(reference.data))
+
+
+def test_load_dataset_upath(small_visp_memory_url):
+    ds = load_dataset(UPath(small_visp_memory_url))
+    assert isinstance(ds, Dataset)
+    assert isinstance(ds.files.basepath, UPath)
+
+
+def test_basepath_remote_url(small_visp_memory_url):
+    # Setting basepath to a remote URL string should be preserved rather than
+    # mangled into a local path, and data reads should go through fsspec.
+    ds = load_dataset(rootdir / "small_visp")
+    reference = np.asarray(ds.data)
+    ds.files.basepath = small_visp_memory_url
+    assert isinstance(ds.files.basepath, UPath)
+    np.testing.assert_array_equal(np.asarray(ds.data), reference)

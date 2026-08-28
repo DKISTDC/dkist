@@ -5,11 +5,12 @@ This file contains the DKIST specific FileManager code.
 import os
 import json
 import urllib
-from typing import Any
+from typing import Any, cast
 from pathlib import Path
 from textwrap import dedent
 
 from parfive import Downloader, Results
+from upath import UPath
 
 from dkist import log
 from dkist.io.dask.striped_array import FileManager, FileManagerProtocol
@@ -17,6 +18,25 @@ from dkist.io.utils import filemanager_info_str
 from dkist.utils.inventory import humanize_inventory, path_format_inventory
 
 __all__ = ["DKISTFileManager"]
+
+
+def _is_remote(path):
+    """
+    Return `True` if ``path`` is an fsspec-backed path to a remote filesystem.
+    """
+    return isinstance(path, UPath) and path.protocol not in ("", "file", "local")
+
+
+def _local_basepath(basepath: Path | UPath | None) -> str | os.PathLike | None:
+    """
+    Return ``basepath`` for use as a local download destination, or `None` if
+    it is a remote location.
+    """
+    if _is_remote(basepath):
+        return None
+    # A non-remote basepath is either a Path or a UPath on the local
+    # filesystem, both of which implement the os.PathLike interface
+    return cast("str | os.PathLike | None", basepath)
 
 
 class DKISTFileManager:
@@ -63,15 +83,15 @@ class DKISTFileManager:
         return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Path | UPath | None:
         """
         The path all arrays read data from.
         """
         return self._fm.basepath
 
     @basepath.setter
-    def basepath(self, basepath: str | os.PathLike):
-        self._fm.basepath = Path(basepath)
+    def basepath(self, basepath: str | os.PathLike | UPath):
+        self._fm.basepath = basepath
 
     def __getattr__(self, attr):
         # We want to proxy a fixed list of public API:
@@ -154,8 +174,8 @@ class DKISTFileManager:
         path
             The destination path to save the file to. See
             `parfive.Downloader.simple_download` for details.
-            The default path is ``.basepath``, if ``.basepath`` is None it will
-            default to `~/`.
+            The default path is ``.basepath``, if ``.basepath`` is `None` or a
+            remote location it will default to `~/`.
         overwrite
             Set to `True` to overwrite file if it already exists. See
             `parfive.Downloader.simple_download` for details.
@@ -176,8 +196,8 @@ class DKISTFileManager:
             raise ValueError(msg)
 
         url = f"{self._metadata_streamer_url}/quality?datasetId={self._dataset_id}"
-        if path is None and self.basepath:
-            path = self.basepath
+        if path is None:
+            path = _local_basepath(self.basepath)
         kwargs = {}
         if normalized_format == "json":
             kwargs["headers"] = {"Accept": "application/json"}
@@ -194,8 +214,8 @@ class DKISTFileManager:
         path
             The destination path to save the file to. See
             `parfive.Downloader.simple_download` for details.
-            The default path is ``.basepath``, if ``.basepath`` is None it will
-            default to `~/`.
+            The default path is ``.basepath``, if ``.basepath`` is `None` or a
+            remote location it will default to `~/`.
         overwrite
             Set to `True` to overwrite file if it already exists. See
             `parfive.Downloader.simple_download` for details.
@@ -208,8 +228,8 @@ class DKISTFileManager:
             was not.
         """
         url = f"{self._metadata_streamer_url}/movie?datasetId={self._dataset_id}"
-        if path is None and self.basepath:
-            path = self.basepath
+        if path is None:
+            path = _local_basepath(self.basepath)
         return Downloader.simple_download([url], path=path, overwrite=overwrite)
 
     def download(
@@ -228,8 +248,8 @@ class DKISTFileManager:
         path
             The path to save the data in, must be accessible by the Globus
             endpoint.
-            The default value is ``.basepath``, if ``.basepath`` is None it will
-            default to ``/~/``.
+            The default value is ``.basepath``, if ``.basepath`` is `None` or a
+            remote location it will default to ``/~/``.
             It is possible to put placeholder strings in the path with any key
             from the dataset inventory dictionary which can be accessed as
             ``ds.meta['inventory']``. An example of this would be
@@ -269,7 +289,7 @@ class DKISTFileManager:
         path_inv = path_format_inventory(humanize_inventory(inv))
 
         base_path = Path(net_conf.dataset_path.format(**inv))
-        destination_path = path or self.basepath or "/~/"
+        destination_path = path or _local_basepath(self.basepath) or "/~/"
         destination_path = Path(destination_path).as_posix()
         destination_path = Path(destination_path.format(**path_inv))
 

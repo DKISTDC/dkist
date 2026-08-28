@@ -22,6 +22,7 @@ from collections.abc import Iterable
 import dask.array
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
+from upath import UPath
 
 from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
 
@@ -38,10 +39,10 @@ class FileManagerProtocol(Protocol):
     """
 
     @property
-    def basepath(self) -> os.PathLike: ...
+    def basepath(self) -> Path | UPath | None: ...
 
     @basepath.setter
-    def basepath(self, path: str | os.PathLike) -> None: ...
+    def basepath(self, path: str | os.PathLike | UPath) -> None: ...
 
     @property
     def filenames(self) -> list[str]: ...
@@ -159,17 +160,26 @@ class StripedExternalArray(BaseStripedExternalArray):
 
     @staticmethod
     def _sanitize_basepath(value):
-        return Path(value).expanduser() if value is not None else None
+        if value is None:
+            return None
+        if isinstance(value, str) and "://" in value:
+            return UPath(value)
+        if isinstance(value, UPath):
+            # Keep fsspec-backed paths as they are; converting them to a plain
+            # Path would mangle the URL. expanduser only has an effect on
+            # local filesystem paths.
+            return value.expanduser()
+        return Path(value).expanduser()
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Path | UPath | None:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
         return self._basepath
 
     @basepath.setter
-    def basepath(self, value: os.PathLike | str | None):
+    def basepath(self, value: os.PathLike | UPath | str | None):
         self._basepath = self._sanitize_basepath(value)
         for loader in self._loader_array.flat:
             loader.basepath = self._basepath
@@ -214,7 +224,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         return dedent(f"{prefix}\n{self.__str__()}")
 
     @property
-    def basepath(self) -> os.PathLike:
+    def basepath(self) -> Path | UPath | None:
         """
         The path all arrays generated from this ``FileManager`` use to read data from.
         """
