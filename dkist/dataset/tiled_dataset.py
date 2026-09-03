@@ -22,6 +22,7 @@ from numpy.typing import NDArray
 
 import astropy
 from astropy.table import Table, vstack
+from astropy.utils.decorators import deprecated_renamed_argument
 
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
@@ -284,11 +285,12 @@ class TiledDataset(Collection):
                 ylabel = coord.get_axislabel() or coord._get_default_axislabel()
         return (xlabel, ylabel)
 
+    @deprecated_renamed_argument("figure", "fig", "1.19", warning_type=DKISTDeprecationWarning)
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
         share_zscale: bool = False,
-        figure: matplotlib.figure.Figure | None = None,
+        fig: matplotlib.figure.Figure | None = None,
         swap_tile_limits: Literal["x", "y", "xy"] | None = None,
         *,
         hide_internal_tick_labels: bool = False,
@@ -307,7 +309,7 @@ class TiledDataset(Collection):
             Determines whether the color scale of the plots should be calculated
             independently (``False``) or shared across all plots (``True``).
             Defaults to False
-        figure
+        fig
             A figure to use for the plot. If not specified the current pyplot
             figure will be used, or a new one created.
         swap_tile_limits
@@ -331,8 +333,8 @@ class TiledDataset(Collection):
 
         vmin, vmax = np.inf, 0
 
-        if figure is None:
-            figure = plt.gcf()
+        if fig is None:
+            fig = plt.gcf()
 
         sliced_dataset = self.slice_tiles[slice_index]
         # This can change to just .shape once we support ndcube >= 2.3
@@ -342,7 +344,7 @@ class TiledDataset(Collection):
                 "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile."
             )
         dataset_ncols, dataset_nrows = sliced_dataset.shape
-        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=figure)
+        gridspec = GridSpec(nrows=dataset_nrows, ncols=dataset_ncols, figure=fig)
         for col in range(dataset_ncols):
             for row in range(dataset_nrows):
                 tile = sliced_dataset[col, row]
@@ -351,7 +353,7 @@ class TiledDataset(Collection):
 
                 # Fill up grid from the bottom row
                 ax_gridspec = gridspec[dataset_nrows - row - 1, col]
-                ax = figure.add_subplot(ax_gridspec, projection=tile.wcs)
+                ax = fig.add_subplot(ax_gridspec, projection=tile.wcs)
 
                 tile.plot(axes=ax, **kwargs)
 
@@ -371,15 +373,15 @@ class TiledDataset(Collection):
                     if row != 0:
                         ax.coords[0].set_ticklabel_position("")
                 if col == row == 0:
-                    figure.supxlabel(xlabel, y=0.05)
-                    figure.supylabel(ylabel, x=0.05)
+                    fig.supxlabel(xlabel, y=0.05)
+                    fig.supylabel(ylabel, x=0.05)
 
                 axmin, axmax = ax.get_images()[0].get_clim()
                 vmin = axmin if axmin < vmin else vmin
                 vmax = axmax if axmax > vmax else vmax
 
         if share_zscale:
-            for ax in figure.get_axes():
+            for ax in fig.get_axes():
                 ax.get_images()[0].set_clim(vmin, vmax)
 
         title = f"{self.inventory['instrumentName']} Dataset ({self.inventory['datasetId']}) at "
@@ -392,8 +394,8 @@ class TiledDataset(Collection):
         title += f"(slice={(slice_index if len(slice_index) > 1 else slice_index[0])})".replace(
             "slice(None, None, None)", ":"
         )
-        figure.suptitle(title, y=0.95)
-        return figure
+        fig.suptitle(title, y=0.95)
+        return fig
 
     @property
     def slice_tiles(self):
