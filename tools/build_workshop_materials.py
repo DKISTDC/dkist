@@ -18,13 +18,13 @@ The learner notebooks will have all the code stripped from the code cells unless
 they have "keep-inputs" in their tags.
 """
 
-import sys
 import argparse
 import subprocess
+import sys
+from collections import defaultdict
+from functools import cache
 from pathlib import Path
 from textwrap import dedent
-from functools import cache
-from collections import defaultdict
 from urllib.parse import urljoin
 
 import mdformat.plugins

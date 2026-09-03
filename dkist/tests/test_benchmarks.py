@@ -7,8 +7,7 @@ import astropy.units as u
 from astropy.modeling.models import Tabular1D
 
 from dkist import load_dataset, save_dataset
-from dkist.wcs.models import (Ravel, generate_celestial_transform,
-                              update_celestial_transform_parameters)
+from dkist.wcs.models import Ravel, generate_celestial_transform, update_celestial_transform_parameters
 
 
 @pytest.mark.benchmark

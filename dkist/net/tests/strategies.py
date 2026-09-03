@@ -1,9 +1,9 @@
 """
 Hypothesis strategies for testing the DKIST client.
 """
-import typing
-import inspect
 import datetime
+import inspect
+import typing
 from functools import cache
 
 import hypothesis.strategies as st

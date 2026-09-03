@@ -9,7 +9,6 @@ from dkist.data.test import rootdir
 
 if __name__ == "__main__":
     from dkist_data_simulator.spec214.vbi import MosaicedVBIBlueDataset
-
     from dkist_inventory.asdf_generator import dataset_from_fits
 
     class DemoMosaicedVBIBlueDataset(MosaicedVBIBlueDataset):
