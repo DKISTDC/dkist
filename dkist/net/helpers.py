@@ -2,10 +2,10 @@
 Functions and classes for searching and downloading from the data center.
 """
 import datetime
-from os import PathLike
-from typing import Literal
-from pathlib import Path
 from collections.abc import Iterable
+from os import PathLike
+from pathlib import Path
+from typing import Literal
 
 from astropy import table
 

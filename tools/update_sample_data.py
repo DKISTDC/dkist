@@ -10,9 +10,9 @@
 """
 This script recreates the sample data files and uploads the recreated versions to Asgard.
 """
+import argparse
 import sys
 import tarfile
-import argparse
 from pathlib import Path
 
 import numpy as np

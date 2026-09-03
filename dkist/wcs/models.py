@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import Literal
-from itertools import product
 from collections.abc import Iterable
+from itertools import product
+from typing import Literal
 
 import numpy as np
 

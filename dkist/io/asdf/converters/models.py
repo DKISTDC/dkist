@@ -1,5 +1,6 @@
-import astropy.units as u
 from asdf_astropy.converters.transform.core import TransformConverterBase, parameter_to_value
+
+import astropy.units as u
 
 
 class VaryingCelestialConverter(TransformConverterBase):
