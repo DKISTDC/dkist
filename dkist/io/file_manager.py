@@ -2,12 +2,12 @@
 This file contains the DKIST specific FileManager code.
 """
 
-import os
 import json
+import os
 import urllib
-from typing import Any
 from pathlib import Path
 from textwrap import dedent
+from typing import Any
 
 from parfive import Downloader, Results
 

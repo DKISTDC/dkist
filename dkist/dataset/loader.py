@@ -1,8 +1,8 @@
 import re
 import warnings
-from pathlib import Path
-from functools import cache, singledispatch
 from collections import defaultdict
+from functools import cache, singledispatch
+from pathlib import Path
 
 from packaging.version import Version
 from parfive import Results

@@ -1,11 +1,11 @@
 """
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
-import re
-import json
-import time
-import pathlib
 import datetime
+import json
+import pathlib
+import re
+import time
 from os import PathLike
 from typing import Literal
 
@@ -13,8 +13,7 @@ import globus_sdk
 from tqdm.auto import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
-from .endpoints import (get_data_center_endpoint_id, get_endpoint_id,
-                        get_local_endpoint_id, get_transfer_client)
+from .endpoints import get_data_center_endpoint_id, get_endpoint_id, get_local_endpoint_id, get_transfer_client
 
 __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 

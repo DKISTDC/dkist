@@ -42,7 +42,7 @@ Run the following command in a directory where you want to store the notebooks, 
 
 .. code-block:: bash
 
-	git clone https://github.com/DKISTDC/DKIST-Workshop.git
+    git clone https://github.com/DKISTDC/DKIST-Workshop.git
 
 If this doesn't work you can also download a zip file of the notebooks `here <https://github.com/DKISTDC/DKIST-Workshop/archive/refs/heads/stable.zip>`__.
 
@@ -50,8 +50,8 @@ Then change into this directory and run jupyter:
 
 .. code-block:: bash
 
-	cd DKIST-Workshop
-	jupyter notebook
+    cd DKIST-Workshop
+    jupyter notebook
 
 
 The notebooks in the ``instructor`` folder have the code cells pre-filled, the others are blank to allow you to fill in the content from the :ref:`dkist:tutorial:index`.

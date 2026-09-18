@@ -8,8 +8,12 @@ from requests import Response
 
 import dkist.net
 from dkist.data.test import rootdir
-from dkist.net.globus.endpoints import (get_data_center_endpoint_id, get_directory_listing,
-                                        get_endpoint_id, get_local_endpoint_id)
+from dkist.net.globus.endpoints import (
+    get_data_center_endpoint_id,
+    get_directory_listing,
+    get_endpoint_id,
+    get_local_endpoint_id,
+)
 
 
 def _generate_response(data):

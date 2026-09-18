@@ -1,16 +1,14 @@
 from textwrap import dedent
 
 import numpy as np
+from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
 
 import gwcs
 from astropy.wcs.wcsapi.wrappers import SlicedLowLevelWCS
 
-from ndcube.ndcube import NDCube, NDCubeLinkedDescriptor
-
 from dkist.io.dask.striped_array import FileManager
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.decorators import deprecated
-
 from .utils import dataset_info_str
 
 __all__ = ["Dataset"]

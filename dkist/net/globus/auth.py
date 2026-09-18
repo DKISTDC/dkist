@@ -4,14 +4,14 @@ Globus Auth Helpers.
 # A lot of this code is copied from the Globus Auth Example repo:
 # https://github.com/globus/native-app-examples
 
-import json
-import stat
-import queue
 import functools
+import json
+import queue
+import stat
 import threading
 import webbrowser
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
 import globus_sdk

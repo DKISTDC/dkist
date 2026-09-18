@@ -12,11 +12,17 @@ from astropy.modeling.models import Tabular1D
 from astropy.wcs import WCS
 from gwcs.spectroscopy import RefractedAngleSineModel
 
-from dkist.wcs.models import (AsymmetricMapping, Ravel, Unravel, VaryingCelestialTransform,
-                              VaryingCelestialTransform2D, VaryingCelestialTransform3D,
-                              build_grating_spectral_transform, generate_celestial_transform,
-                              update_celestial_transform_parameters,
-                              varying_celestial_transform_from_tables)
+from dkist.wcs.models import (
+    AsymmetricMapping,
+    Ravel,
+    Unravel,
+    VaryingCelestialTransform,
+    VaryingCelestialTransform2D,
+    VaryingCelestialTransform3D,
+    generate_celestial_transform,
+    update_celestial_transform_parameters,
+    varying_celestial_transform_from_tables,
+)
 
 
 def test_generate_celestial():

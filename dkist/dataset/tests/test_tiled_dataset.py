@@ -1,5 +1,5 @@
-import re
 import copy
+import re
 from importlib import resources
 
 import matplotlib.pyplot as plt
