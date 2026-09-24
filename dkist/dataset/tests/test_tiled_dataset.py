@@ -11,7 +11,7 @@ from astropy.table import Table
 
 from dkist import Dataset, TiledDataset, load_dataset
 from dkist.tests.helpers import figure_test
-from dkist.utils.exceptions import DKISTUserWarning
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 
 def test_tiled_dataset(simple_tiled_dataset, dataset):
@@ -128,7 +128,7 @@ def test_tileddataset_plot(share_zscale, hide_labels):
                       match="The metadata ASDF file that produced this dataset is out of date and will result in "
                             "incorrect plots. Please re-download the metadata ASDF file."):
         #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
-        ds.plot(0, share_zscale=share_zscale, hide_internal_tick_labels=hide_labels, figure=fig)
+        ds.plot(0, share_zscale=share_zscale, hide_internal_tick_labels=hide_labels, fig=fig)
 
     return plt.gcf()
 
@@ -142,7 +142,7 @@ def test_masked_tileddataset_plot():
     ds._data.mask[0, 1] = True
 
     fig = plt.figure(figsize=(12, 15))
-    ds.plot(0, figure=fig)
+    ds.plot(0, fig=fig)
     return fig
 
 
@@ -176,7 +176,7 @@ def test_tileddataset_plot_limit_swapping(swap_tile_limits):
                       match="The metadata ASDF file that produced this dataset is out of date and will result in "
                             "incorrect plots. Please re-download the metadata ASDF file."):
         #TODO: Once sample data have been updated maybe we should test both paths here (old data and new data)
-        non_square_ds.plot(0, share_zscale=False, swap_tile_limits=swap_tile_limits, figure=fig)
+        non_square_ds.plot(0, share_zscale=False, swap_tile_limits=swap_tile_limits, fig=fig)
 
     assert fig.axes[0].get_gridspec().get_geometry() == non_square_ds.shape[::-1]
     for ax in fig.axes:
@@ -216,7 +216,20 @@ def test_tileddataset_plot_non2d_sliceindex():
                             "incorrect plots. Please re-download the metadata ASDF file."):
         with pytest.raises(ValueError, match=re.escape("Applying slice '(0,)' to this dataset resulted in a 1 "
                 "dimensional dataset, you should pass a slice which results in a 2D dataset for each tile.")):
-            already_sliced_ds.plot(0, figure=fig)
+            already_sliced_ds.plot(0, fig=fig)
+
+
+def test_tileddataset_plot_fig_kwarg(large_tiled_dataset):
+    fig = plt.figure()
+    with pytest.warns(DKISTUserWarning, match="The metadata ASDF file that produced this dataset is out of date"):
+        assert large_tiled_dataset.plot(0, fig=fig) is fig
+
+
+def test_tileddataset_plot_figure_kwarg_deprecated(large_tiled_dataset):
+    fig = plt.figure()
+    with pytest.warns(DKISTUserWarning, match="The metadata ASDF file that produced this dataset is out of date"):
+        with pytest.warns(DKISTDeprecationWarning, match='"figure" was deprecated in version 1.19'):
+            assert large_tiled_dataset.plot(0, figure=fig) is fig
 
 
 @pytest.mark.accept_cli_tiled_dataset

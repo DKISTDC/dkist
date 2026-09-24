@@ -152,7 +152,7 @@ In the case of VBI, this argument will be a single number which specifies the in
 
 ```{code-cell} ipython3
 fig = plt.figure()
-fig = tds.plot(0, figure=fig)
+fig = tds.plot(0, fig=fig)
 ```
 
 +++
@@ -163,5 +163,5 @@ You may notice in the plots above that the colour scale is independent for each 
 
 ```{code-cell} ipython3
 fig = plt.figure()
-fig = tds.plot(0, share_zscale=True, figure=fig)
+fig = tds.plot(0, share_zscale=True, fig=fig)
 ```
