@@ -1,0 +1,1 @@
+`~dkist.wcs.models.VaryingCelestialTransform` no longer returns NaN at the far pixel edge (``n - 0.5``) of an even-length lookup table: the pixel edges at ``-0.5`` and ``n - 0.5`` now belong to the first and last rows whatever the parity of ``n``, so pixel corners are finite. Only coordinates further outside the table give NaN.

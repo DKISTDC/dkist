@@ -1,6 +1,5 @@
 from abc import ABC
 from collections.abc import Iterable
-from itertools import product
 from typing import Literal
 
 import numpy as np
@@ -146,6 +145,27 @@ def update_celestial_transform_parameters(
         setattr(transform, name, val)
 
     return transform
+
+
+def _rotate_sphere(lon, lat, lon_reference, lat_pole, lon_output):
+    """
+    Rotate spherical coordinates between the native and celestial systems.
+
+    This is the spherical rotation of FITS paper II (equations 2 and 5), with every
+    angle in degrees. ``lon_reference`` is the longitude, in the input system, of the
+    output system's pole, ``lon_output`` is the longitude, in the output system, of the
+    input system's pole, and ``lat_pole`` is the latitude of either pole in the other
+    system, which is the same both ways. The longitude returned is in
+    ``(lon_output - 180, lon_output + 180]``.
+    """
+    dlon = np.deg2rad(lon - lon_reference)
+    lat, lat_pole = np.deg2rad(lat), np.deg2rad(lat_pole)
+    cos_lat, sin_lat = np.cos(lat), np.sin(lat)
+    cos_pole, sin_pole = np.cos(lat_pole), np.sin(lat_pole)
+    x = sin_lat * cos_pole - cos_lat * sin_pole * np.cos(dlon)
+    y = -cos_lat * np.sin(dlon)
+    z = sin_lat * sin_pole + cos_lat * cos_pole * np.cos(dlon)
+    return lon_output + np.rad2deg(np.arctan2(y, x)), np.rad2deg(np.arctan2(z, np.hypot(x, y)))
 
 
 class BaseVaryingCelestialTransform(Model, ABC):
@@ -308,52 +328,79 @@ class BaseVaryingCelestialTransform(Model, ABC):
             lon_pole=lon_pole,
         )
 
+    @staticmethod
+    def _to_value(value, unit):
+        """
+        ``value`` as a float array, converted to ``unit`` if it has units.
+        """
+        if isinstance(value, u.Quantity):
+            return value.to_value(unit)
+        return np.asarray(value, dtype=float)
+
+    def _lookup_rows(self, *lookups):
+        """
+        The lookup table row of every point, and whether the point is within the table.
+
+        A point uses its nearest row. The pixel edges at -0.5 and n - 0.5 belong to the
+        first and last rows, whatever the parity of n; anything further out is outside
+        the table.
+        """
+        valid = np.ones(np.shape(lookups[0]), dtype=bool)
+        rows = []
+        for lookup, size in zip(lookups, self.table_shape, strict=True):
+            valid &= (lookup >= -0.5) & (lookup <= size - 0.5)
+            rows.append(np.clip(self.sanitize_index(np.where(valid, lookup, 0)), 0, size - 1))
+        return tuple(rows), valid
+
+    def _pixel_to_sky(self, x, y, pc, crpix, crval, cdelt, lon_pole):
+        # shift | rot | scale, with the tables gathered per point
+        offset = np.stack([x - crpix[..., 0], y - crpix[..., 1]], axis=-1)
+        intermediate = np.einsum("...ij,...j->...i", pc, offset) * cdelt
+        phi, theta = self.projection(intermediate[..., 0], intermediate[..., 1])
+        lon, lat = _rotate_sphere(phi, theta, lon_pole, crval[..., 1], crval[..., 0])
+        # Wrap the longitude into [-180, 180), where a FITS WCS puts it too.
+        return lon - 360 * np.floor((lon + 180) / 360), lat
+
+    def _sky_to_pixel(self, lon, lat, pc, crpix, crval, cdelt, lon_pole):
+        phi, theta = _rotate_sphere(lon, lat, crval[..., 0], crval[..., 1], lon_pole)
+        intermediate = np.stack(self.projection.inverse(phi, theta), axis=-1) / cdelt
+        offset = np.einsum("...ij,...j->...i", np.linalg.inv(pc), intermediate)
+        return offset[..., 0] + crpix[..., 0], offset[..., 1] + crpix[..., 1]
+
     def _map_transform(self, *arrays, cdelt, lon_pole, inverse=False):
-        # We need to broadcast the arrays together so they are all the same shape
+        """
+        Evaluate the transform of every point in one pass.
+
+        Each point uses the lookup table rows of its (rounded) lookup coordinates, so
+        the tables are gathered per point and the whole transform is evaluated with
+        array arithmetic, instead of once per distinct row.
+        """
         barrays = np.broadcast_arrays(*arrays, subok=True)
-        # # Convert the z, q, and m coordinates where present into indices to the lookup tables
-        inds = []
-        for barray in barrays[2:]:
-            inds.append(self.sanitize_index(barray))
+        has_units = isinstance(barrays[0], u.Quantity)
+        # Because we have set input_units_strict to True we can assume that
+        # all inputs have the correct units for the transform
+        xy_unit = u.deg if inverse else u.pix
+        x, y = (self._to_value(array, xy_unit) for array in barrays[:2])
+        rows, valid = self._lookup_rows(*(self._to_value(array, u.pix) for array in barrays[2:]))
 
-        if isinstance(barrays[0], u.Quantity):
-            # Because we have set input_units_strict to True we can assume that
-            # all inputs have the correct units for the transform
-            arrays = [arr.value for arr in barrays]
+        pc = self._to_value(self.pc_table, u.pix)[rows]
+        crpix = self._to_value(self.crpix_table, u.pix)[rows]
+        crval = self._to_value(self.crval_table, u.deg)[rows]
+        # Scalar parameters are reshaped to be length one arrays by modeling
+        cdelt = self._to_value(cdelt, u.deg / u.pix).reshape(-1, 2)[0]
+        lon_pole = self._to_value(lon_pole, u.deg).reshape(-1)[0]
 
-        x_out = np.empty_like(arrays[0])
-        y_out = np.empty_like(arrays[1])
-
-        # We now loop over every unique value of z and compute the transform.
-        # This means we make the minimum number of calls possible to the transform.
-        ranges = [np.unique(ind) for ind in inds]
-        for ind in product(*ranges):
-            # Scalar parameters are reshaped to be length one arrays by modeling
-            sct = self.transform_at_index(ind, cdelt=cdelt[0], lon_pole=lon_pole[0])
-
-            # Call this transform for all values of x, y where z == zind
-            masks = [inds[i] == ind[i] for i in range(len(ind))]
-            if len(masks) > 1:
-                mask = np.logical_and(*masks)
-            else:
-                mask = masks[0]
-            if inverse:
-                xx, yy = sct.inverse(arrays[0][mask], arrays[1][mask])
-            else:
-                xx, yy = sct(arrays[0][mask], arrays[1][mask])
-
-            x_out[mask], y_out[mask] = xx, yy
+        transform = self._sky_to_pixel if inverse else self._pixel_to_sky
+        x, y = transform(x, y, pc, crpix, crval, cdelt, lon_pole)
+        x = np.where(valid, x, np.nan)
+        y = np.where(valid, y, np.nan)
 
         # Put the units back if we started with some
-        if isinstance(barrays[0], u.Quantity):
-            if self._is_inverse:
-                x_out = x_out << u.pix
-                y_out = y_out << u.pix
-            else:
-                x_out = x_out << u.deg
-                y_out = y_out << u.deg
+        if has_units:
+            unit = u.pix if self._is_inverse else u.deg
+            x, y = x << unit, y << unit
 
-        return x_out, y_out
+        return x, y
 
     def evaluate(self, *inputs):
         # This method has to be able to take an arbitrary number of arrays but also accept not being given kwargs

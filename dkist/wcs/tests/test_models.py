@@ -134,7 +134,8 @@ def test_varying_transform_pc():
     pixel = (0*u.pix, 0*u.pix, 5*u.pix)
     world = vct(*pixel)
     assert np.array(world[0]).shape == ()
-    assert u.allclose(world, (359.99804329*u.deg, 0.00017119*u.deg))
+    # The longitude is wrapped into [-180, 180) like a FITS WCS.
+    assert u.allclose(world, (-0.00195671*u.deg, 0.00017119*u.deg))
     assert u.allclose(vct.inverse(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
 
 
@@ -187,7 +188,7 @@ def test_varying_transform_pc_unitless():
 
     pixel = (0, 0, 5)
     world = vct(*pixel)
-    assert np.allclose(world, (359.99804329, 0.00017119))
+    assert np.allclose(world, (-0.00195671, 0.00017119))
 
     assert np.allclose(vct.inverse(*world, 5), pixel[:2], atol=0.01)
 
@@ -213,8 +214,8 @@ def test_varying_transform_crval():
 
     pixel = (0*u.pix, 0*u.pix, 2*u.pix)
     world = vct(*pixel)
-    # Tolerance introduced here to allow for the difference between astropy 8.0 and 8.1
-    assert u.allclose(world, (3.59999722e+02, 2.69329694e-13)*u.deg, atol=1e-14*u.deg)
+    # The latitude is only rounding error, so it needs an absolute tolerance.
+    assert u.allclose(world, (-2.77777777e-04, 0.0)*u.deg, atol=1e-12*u.deg)
 
     assert u.allclose(vct.inverse(*world, 2*u.pix), pixel[:2], atol=0.01*u.pix)
 
@@ -725,3 +726,95 @@ def test_varying_transform_crval_crpix():
     world_1 = trans1(0,0)
 
     assert world_0 == world_1
+
+
+def _random_varying_tables(rng, table_shape, has_units):
+    n_rows = int(np.prod(table_shape))
+    pc_table = np.array([rotation_matrix(a)[:2, :2] for a in rng.uniform(0, 360, n_rows)])
+    tables = {
+        "pc_table": pc_table.reshape((*table_shape, 2, 2)),
+        # Fiducial points on either side of the origin, so wrapping matters.
+        "crval_table": rng.uniform(-0.1, 0.1, (*table_shape, 2)),
+        "crpix_table": rng.uniform(0, 10, (*table_shape, 2)),
+        "cdelt": np.array([0.5, 2.0]) / 3600,
+        "lon_pole": 170.0,
+    }
+    if has_units:
+        units = {"pc_table": u.pix, "crval_table": u.deg, "crpix_table": u.pix, "cdelt": u.deg / u.pix, "lon_pole": u.deg}
+        tables = {key: value * units[key] for key, value in tables.items()}
+    return tables
+
+
+@pytest.mark.parametrize("table_shape", [pytest.param((7,), id="1D"), pytest.param((3, 4), id="2D"), pytest.param((2, 3, 4), id="3D")])
+@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
+def test_vct_matches_transform_at_index(has_units, table_shape):
+    """
+    The vectorised evaluation must agree with the per-row transform, with the longitude
+    wrapped into [-180, 180), and invert back to the pixel coordinates.
+    """
+    rng = default_rng(1234)
+    vct = varying_celestial_transform_from_tables(**_random_varying_tables(rng, table_shape, has_units))
+    unit = u.pix if has_units else 1
+    x, y = rng.uniform(-3, 12, 60), rng.uniform(-3, 12, 60)
+    # Anywhere within the table, including the half pixel beyond its first and last rows.
+    lookups = [rng.uniform(-0.5, size - 0.5, 60) for size in table_shape]
+    rows = [np.clip(np.round(lookup), 0, size - 1).astype(int) for lookup, size in zip(lookups, table_shape)]
+
+    world = vct(x * unit, y * unit, *(lookup * unit for lookup in lookups))
+
+    expected = np.array([vct.transform_at_index(tuple(row))(xi, yi) for xi, yi, *row in zip(x, y, *rows)])
+    expected[:, 0] -= 360 * np.floor((expected[:, 0] + 180) / 360)
+    world_unit = u.deg if has_units else 1
+    assert u.allclose(world[0], expected[:, 0] * world_unit, atol=1e-9 * world_unit)
+    assert u.allclose(world[1], expected[:, 1] * world_unit, atol=1e-9 * world_unit)
+    assert np.all(np.abs(np.asarray(world[0])) < 180)
+
+    pixel = vct.inverse(*world, *(lookup * unit for lookup in lookups))
+    assert u.allclose(pixel[0], x * unit, atol=1e-6 * unit)
+    assert u.allclose(pixel[1], y * unit, atol=1e-6 * unit)
+
+
+@pytest.mark.parametrize("n_rows", [pytest.param(4, id="even"), pytest.param(5, id="odd")])
+def test_vct_pixel_edges_belong_to_the_first_and_last_rows(n_rows):
+    """
+    The pixel edges at -0.5 and n - 0.5 are in the table, whatever the parity of n, so
+    pixel corners are finite; further out is NaN. See DKISTDC/dkist#761.
+    """
+    pc_table = np.broadcast_to(np.identity(2), (3, n_rows, 2, 2))
+    vct = VaryingCelestialTransform2D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=(0, 0), pc_table=pc_table)
+    edges = np.array([-0.5, n_rows - 0.5, -0.51, n_rows - 0.49])
+    zeros = np.zeros(4)
+
+    for transform in (vct, vct.inverse):
+        along_q = np.array(transform(zeros, zeros, zeros, edges))
+        along_z = np.array(transform(zeros, zeros, [-0.5, 2.5, -0.51, 2.51], zeros))
+        for out in (along_q, along_z):
+            assert np.isfinite(out[:, :2]).all()
+            assert np.isnan(out[:, 2:]).all()
+
+    assert np.isfinite(vct(0, 0, 0, n_rows - 0.5)).all()
+    assert np.isnan(vct(0, 0, 0, n_rows)).all()
+
+
+@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
+def test_vct_longitude_is_wrapped(has_units):
+    """
+    Longitudes come out in [-180, 180), like a FITS WCS, whichever way the table gives them.
+    """
+    crval_table = np.array([[-10.0, 5.0], [350.0, 5.0]])
+    tables = {"crpix_table": (0, 0), "cdelt": (1, 1), "crval_table": crval_table, "pc_table": np.identity(2)}
+    unit = u.pix if has_units else 1
+    if has_units:
+        tables = {
+            "crpix_table": (0, 0) * u.pix,
+            "cdelt": (1, 1) * u.deg / u.pix,
+            "crval_table": crval_table * u.deg,
+            "pc_table": np.identity(2) * u.pix,
+        }
+    vct = VaryingCelestialTransform(**tables)
+
+    lon, lat = vct([0, 0] * unit, [0, 0] * unit, [0, 1] * unit)
+
+    assert u.allclose(lon, [-10, -10] * (u.deg if has_units else 1))
+    assert u.allclose(lat, [5, 5] * (u.deg if has_units else 1))
+    assert u.allclose(vct.inverse(lon, lat, [0, 1] * unit), [0, 0] * unit, atol=1e-9 * unit)

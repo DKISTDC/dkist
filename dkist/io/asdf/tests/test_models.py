@@ -40,7 +40,8 @@ def test_roundtrip_vct():
 
     pixel = (0*u.pix, 0*u.pix, 5*u.pix)
     world = new_vct(*pixel)
-    assert u.allclose(world, (359.99804329*u.deg, 0.00017119*u.deg))
+    # The longitude is wrapped into [-180, 180) like a FITS WCS.
+    assert u.allclose(world, (-0.00195671*u.deg, 0.00017119*u.deg))
 
     assert u.allclose(new_ivct(*world, 5*u.pix), pixel[:2], atol=0.01*u.pix)
 
@@ -67,7 +68,7 @@ def test_roundtrip_vct_2d():
 
     pixel = (0*u.pix, 0*u.pix, 4*u.pix, 2*u.pix)
     world = new_vct(*pixel)
-    assert u.allclose(world, (359.99861111, 0.00138889)*u.deg)
+    assert u.allclose(world, (-0.00138889, 0.00138889)*u.deg)
 
     assert u.allclose(new_ivct(*world, 4*u.pix, 2*u.pix), pixel[:2], atol=0.01*u.pix)
 

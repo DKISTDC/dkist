@@ -1,0 +1,1 @@
+`~dkist.wcs.models.VaryingCelestialTransform` and its inverse now evaluate every point in one vectorised pass, gathering the lookup tables per point, instead of rebuilding and evaluating a transform for each distinct table row. Plotting and coordinate lookups on observations with many raster steps are tens of times faster.

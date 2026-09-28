@@ -1,0 +1,1 @@
+The forward `~dkist.wcs.models.VaryingCelestialTransform` now returns longitudes in [-180, 180) degrees, as a FITS WCS does, instead of [0, 360). Coordinates east of disk centre were 360 degrees too high in the low-level (``*_values``) API; the ``SkyCoord`` output is unchanged.
