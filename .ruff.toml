@@ -38,12 +38,8 @@ select = [
   # "PERF",
   "RUF",
 ]
-<<<<<<<
 
-extend-ignore = [
-=======
 ignore = [
->>>>>>>
   # pycodestyle (E, W)
   "E501", # ignore line length will use a formatter instead
   "E702",
