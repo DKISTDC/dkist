@@ -182,7 +182,7 @@ version_file = "dkist/_version.py"
     directory = "performance"
     name = "Performance Improvements"
     showcontent = true
-    
+
 [tool.repo-review.ignore]
 PY003 = "The LICENSE file is in licenses/"
 PY005 = "The template packages tests inside dkist/"
