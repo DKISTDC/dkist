@@ -497,6 +497,22 @@ def test_vct(has_units, slit, num_varying_axes):
     assert np.any(np.isnan(list(world2)))
 
 
+def test_vct3d_uses_all_three_lookup_indices():
+    """
+    Select each 3D table entry using all three lookup indices.
+    """
+    lookups = np.indices((2, 2, 2)).reshape(3, -1)
+    crval_table = np.zeros((2, 2, 2, 2))
+    crval_table[..., 0] = 10 + np.arange(8).reshape(2, 2, 2)
+    vct = VaryingCelestialTransform3D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=crval_table, pc_table=np.identity(2))
+    zeros = np.zeros(8)
+
+    lon, lat = vct(zeros, zeros, *lookups)
+
+    assert np.allclose(lon, crval_table[tuple(lookups)][:, 0])
+    assert np.allclose(vct.inverse(lon, lat, *lookups), 0, atol=1e-9)
+
+
 def _evaluate_ravel(array_shape, inputs, order="C"):
     """Evaluate the ravel computation using brute force for comparison with numpy result."""
     # NB: This method does not work with units...
