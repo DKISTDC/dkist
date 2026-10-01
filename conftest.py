@@ -35,7 +35,7 @@ def pytest_runtest_makereport(item, call):
             tds = item.config.getoption("--tiled-ds")
         except ValueError:
             # If CLI arguments can't be found, need to return gracefully
-            warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets were not used.")
+            warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets were not used.", stacklevel=2)
             return report
         if ds and item.get_closest_marker("accept_cli_dataset"):
             report.nodeid += f"[{ds}]"

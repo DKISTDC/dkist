@@ -69,17 +69,22 @@ def _unit_range(attr_type):
         unit = u.s
 
     @st.composite
-    def aunit(draw, number=st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=1e10)):
+    def aunit(draw, number=None):
+        if not number:
+            number = st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=1e10)
         return draw(number) * unit
 
     return st.builds(attr_type, aunit(), aunit())
 
 
 @st.composite
-def _embargo_end(draw, time=Times(
-                 max_value=datetime.datetime(datetime.datetime.now(datetime.UTC).year, 1, 1, 0, 0),
-                 min_value=datetime.datetime(1981, 1, 1, 0, 0)),
-                 delta=TimeDelta()):
+def _embargo_end(draw, time=None, delta=None):
+    if not time:
+        time = Times(
+            max_value = datetime.datetime(datetime.datetime.now(datetime.UTC).year, 1, 1, 0, 0),
+            min_value=datetime.datetime(1981, 1, 1, 0, 0))
+    if not delta:
+        delta=TimeDelta()
     t1 = draw(time)
     t2 = t1 + draw(delta)
 
@@ -104,11 +109,12 @@ st.register_type_strategy(a.dkist.EmbargoEndTime, _embargo_end())
 
 @settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
-def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
-                                     min_size=1, unique=True)):
+def query_and(draw, stattrs=None):
     """
     Generate a AttrAnd query.
     """
+    if not stattrs:
+        stattrs=st.lists(st.sampled_from(_supported_attr_types()), min_size=1, unique=True)
     attr_types = draw(stattrs)
     query_attrs = list(map(draw, map(st.from_type, attr_types)))
     assume(not(len(query_attrs) == 1 and isinstance(query_attrs[0], a.Time)))
@@ -117,11 +123,13 @@ def query_and(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
 
 @settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
-def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
-                                    min_size=1, unique=True)):
+def query_or(draw, stattrs=None):
     """
     Just OR a lot of attrs together.
     """
+    if not stattrs:
+        stattrs = st.lists(st.sampled_from(_supported_attr_types()),
+                           min_size=1, unique=True)
     attr_types = draw(stattrs)
     query_attrs = list(map(draw, map(st.from_type, attr_types)))
     assume(not(any(isinstance(q, a.Time) for q in query_attrs)))
@@ -130,8 +138,10 @@ def query_or(draw, stattrs=st.lists(st.sampled_from(_supported_attr_types()),
 
 @settings(suppress_health_check=[HealthCheck.too_slow])
 @st.composite
-def query_or_composite(draw, qands=st.lists(query_and(), min_size=2, max_size=5)):
+def query_or_composite(draw, qands=None):
     """
     Make a more realistic OR of ANDs.
     """
+    if not qands:
+        qands = st.lists(query_and(), min_size=2, max_size=5)
     return attr.or_(*draw(qands))
