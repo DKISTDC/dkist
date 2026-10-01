@@ -10,7 +10,7 @@ from ndcube import NDCollection
 
 from astropy.utils.decorators import deprecated_renamed_argument
 
-from dkist.utils.exceptions import DKISTUserWarning
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 
 __all__ = ["Inversion", "Profiles"]
 
