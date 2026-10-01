@@ -43,10 +43,11 @@ class Profiles(NDCollection):
         General metadata for the overall collection.
     """
 
+    @deprecated_renamed_argument("figure", "fig", "1.19", warning_type=DKISTDeprecationWarning)
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
-        figure: matplotlib.figure.Figure | None = None,
+        fig: matplotlib.figure.Figure | None = None,
         profiles: str | Iterable[str] = "all",
         **kwargs,
     ):
@@ -206,10 +207,11 @@ class Inversion(NDCollection):
             new_inv.profiles = self.profiles[*bslice]
         return new_inv
 
+    @deprecated_renamed_argument("figure", "fig", "1.19", warning_type=DKISTDeprecationWarning)
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
-        figure: matplotlib.figure.Figure | None = None,
+        fig: matplotlib.figure.Figure | None = None,
         inversions: str | Iterable[str] = "all",
         **kwargs,
     ):
