@@ -423,6 +423,19 @@ def test_vct_slit_bounds(slit):
             slit=slit,
         )
 
+
+def test_vct_inverse_outside_the_table():
+    """
+    The inverse returns NaN for lookup indices outside the table.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    x, y = vct.inverse([10, 10], [0, 0], [0, 5])
+
+    assert np.allclose([x[0], y[0]], [0, 0])
+    assert np.isnan([x[1], y[1]]).all()
+
+
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id="1D"), pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])

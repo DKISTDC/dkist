@@ -321,13 +321,16 @@ class BaseVaryingCelestialTransform(Model, ABC):
             # all inputs have the correct units for the transform
             arrays = [arr.value for arr in barrays]
 
-        x_out = np.empty_like(arrays[0])
-        y_out = np.empty_like(arrays[1])
+        x_out = np.full_like(arrays[0], np.nan)
+        y_out = np.full_like(arrays[1], np.nan)
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
         ranges = [np.unique(ind) for ind in inds]
         for ind in product(*ranges):
+            # Leave points outside the lookup table as NaN.
+            if any(i < 0 or i >= size for i, size in zip(ind, self.table_shape)):
+                continue
             # Scalar parameters are reshaped to be length one arrays by modeling
             sct = self.transform_at_index(ind, cdelt=cdelt[0], lon_pole=lon_pole[0])
 
