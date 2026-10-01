@@ -6,13 +6,13 @@ but not representable in a single NDCube derived object as the array data are
 not contiguous in the spatial dimensions (due to overlaps and offsets).
 """
 
-import os
 import copy
+import os
 import types
 import warnings
-from typing import Any, Self, Literal
+from collections.abc import Collection, Iterable
 from textwrap import dedent
-from collections.abc import Iterable, Collection
+from typing import Any, Literal, Self
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -26,7 +26,6 @@ from astropy.utils.decorators import deprecated_renamed_argument
 
 from dkist.io.file_manager import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
-
 from .dataset import Dataset
 from .utils import dataset_info_str
 

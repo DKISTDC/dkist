@@ -11,9 +11,9 @@ This module sets up the following things:
   - Overrides warnings.showwarnings so that subclasses of given warning classes are displayed using the logger.
 * Sets up a ``log`` instance which uses the Astropy StreamHandler class to log to stdout and colourise the output.
 """
+import logging
 import os
 import sys
-import logging
 import warnings
 
 from astropy.logger import StreamHandler as AstropyStreamHandler

@@ -114,7 +114,7 @@ jobs:
             **To run the CI on this pull request you will need to close it and reopen it.**
 
   report-fail:
-    if: failure()
+    if: ${{ failure() && github.event_name == 'schedule' }}
     needs: [update]
     runs-on: ubuntu-latest
     permissions:

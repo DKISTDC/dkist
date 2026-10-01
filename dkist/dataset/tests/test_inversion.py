@@ -1,5 +1,5 @@
 import collections.abc
-from itertools import product, permutations
+from itertools import permutations, product
 
 import matplotlib.pyplot as plt
 import numpy as np
