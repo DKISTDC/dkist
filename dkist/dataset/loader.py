@@ -217,6 +217,7 @@ def _load_from_directory(directory, *, ignore_version_mismatch=False):
             f"ASDF files with old names ({', '.join([a.name for a in ignored_files])}) "
             "were found in this directory and ignored. You may want to delete these files.",
             DKISTUserWarning,
+            stacklevel=2,
         )
 
     if len(asdfs_to_load) == 1:

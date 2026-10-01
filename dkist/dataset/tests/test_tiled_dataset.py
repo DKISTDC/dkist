@@ -62,7 +62,7 @@ def test_tiled_dataset_mask(simple_tiled_dataset):
 @pytest.mark.parametrize("aslice", [np.s_[0, :100, 100:200]])
 def test_tiled_dataset_slice_tiles(large_tiled_dataset, aslice):
     sliced = large_tiled_dataset.slice_tiles[aslice]
-    for i, tile in enumerate(sliced.flat):
+    for _i, tile in enumerate(sliced.flat):
         # This will throw an AttributeError if you do tile.shape and I don't know why
         assert tile.data.shape == (100, 100)
 
@@ -245,7 +245,7 @@ def test_file_manager(large_tiled_dataset):
 
     ds[1, 1].files.basepath = "/not/a/dir/"
     with pytest.raises(ValueError, match="Not all tiles share the same basepath"):
-        ds.files.basepath
+        bp = ds.files.basepath
 
 
 @pytest.mark.accept_cli_dataset

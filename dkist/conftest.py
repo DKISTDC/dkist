@@ -434,7 +434,7 @@ def pytest_runtest_call(item):
     except ValueError:
         # If CLI arguments can't be found, need to return gracefully
         # TODO raise a warning here
-        warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets will not be used.")
+        warnings.warn("--ds and --tiled-ds were not found. Any supplied datasets will not be used.", stacklevel=2)
         yield item
 
 

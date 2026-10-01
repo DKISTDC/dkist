@@ -156,6 +156,7 @@ class TiledDataset(Collection):
             warnings.warn(
                 "The inventory= kwarg is deprecated, inventory should be passed as part of the meta argument",
                 DKISTDeprecationWarning,
+                stacklevel=2,
             )
         self._data = np.ma.masked_array(dataset_array, dtype=object, mask=mask)
         meta = meta or {}
@@ -324,6 +325,7 @@ class TiledDataset(Collection):
                 "The metadata ASDF file that produced this dataset is out of date and "
                 "will result in incorrect plots. Please re-download the metadata ASDF file.",
                 DKISTUserWarning,
+                stacklevel=2,
             )
 
         if isinstance(slice_index, (int, slice, types.EllipsisType)):

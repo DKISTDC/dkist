@@ -43,7 +43,7 @@ def test_warning_capture(caplog_dkist, capsys):
 
     with warnings.catch_warnings():
         warnings.simplefilter("always")
-        warnings.warn("Test warning", DKISTWarning)
+        warnings.warn("Test warning", DKISTWarning, stacklevel=2)
         assert caplog_dkist.record_tuples == [("dkist", logging.WARNING, "DKISTWarning: Test warning")]
 
     captured = capsys.readouterr()
@@ -56,7 +56,7 @@ def test_subclass_warning_capture(caplog_dkist, capsys):
 
     with warnings.catch_warnings():
         warnings.simplefilter("always")
-        warnings.warn("Test warning", DKISTUserWarning)
+        warnings.warn("Test warning", DKISTUserWarning, stacklevel=2)
         assert caplog_dkist.record_tuples == [("dkist", logging.WARNING, "DKISTUserWarning: Test warning")]
 
     captured = capsys.readouterr()
@@ -73,7 +73,7 @@ def test_no_warning_capture(caplog_dkist, capsys):
             log.enable_warnings_capture()
             log.disable_warnings_capture()
             warnings.simplefilter("always")
-            warnings.warn("Test warning", DKISTWarning)
+            warnings.warn("Test warning", DKISTWarning, stacklevel=2)
             assert caplog_dkist.record_tuples == []
 
     captured = capsys.readouterr()
@@ -88,7 +88,7 @@ def test_not_class_warning_capture(caplog_dkist, capsys):
             # We must re-enable capture in the context manager
             log.enable_warnings_capture()
             warnings.simplefilter("always")
-            warnings.warn("Test warning", Warning)
+            warnings.warn("Test warning", Warning, stacklevel=2)
             assert caplog_dkist.record_tuples == []
 
     captured = capsys.readouterr()
