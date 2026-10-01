@@ -199,7 +199,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
     def sanitize_index(ind):
         if isinstance(ind, u.Quantity):
             ind = ind.value
-        return np.array(np.round(ind), dtype=int)
+        # A lookup halfway between two rows uses the later row.
+        return np.array(np.floor(np.add(ind, 0.5)), dtype=int)
 
     @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
     def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
@@ -313,8 +314,11 @@ class BaseVaryingCelestialTransform(Model, ABC):
         barrays = np.broadcast_arrays(*arrays, subok=True)
         # # Convert the z, q, and m coordinates where present into indices to the lookup tables
         inds = []
-        for barray in barrays[2:]:
-            inds.append(self.sanitize_index(barray))
+        for barray, size in zip(barrays[2:], self.table_shape):
+            ind = self.sanitize_index(barray)
+            # Keep the outer pixel edge, size - 0.5, on the last row.
+            value = barray.value if isinstance(barray, u.Quantity) else barray
+            inds.append(np.where(value <= size - 0.5, np.minimum(ind, size - 1), ind))
 
         if isinstance(barrays[0], u.Quantity):
             # Because we have set input_units_strict to True we can assume that
@@ -739,13 +743,17 @@ class Ravel(Model):
         # round the index values, but clip them if they exceed the array bounds
         # the bounds are one less than the shape dimension value
         array_bounds = np.array(self.array_shape) - 1
-        rounded_inputs = np.rint(input_values).astype(int)
+        # Halfway coordinates use the later pixel. Clip the outer edge to the
+        # last pixel before calculating the fractional offset.
+        rounded_inputs = np.clip(np.floor(np.add(input_values, 0.5)).astype(int), 0, array_bounds[:, np.newaxis])
         result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order, mode="clip").astype(float)
         index = 0 if self.order == "F" else -1
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
         fraction = input_values[index] - rounded_inputs[index]
         result += fraction
-        oob = np.logical_or((rounded_inputs < 0), (rounded_inputs > array_bounds[:, np.newaxis])).any(axis=0)
+        # Coordinates at either outer pixel edge are still inside the array.
+        values = np.asarray(input_values)
+        oob = ~((values >= -0.5) & (values <= array_bounds[:, np.newaxis] + 0.5)).all(axis=0)
         result[oob] = np.nan
         # Put the units back if they were there...
         if has_units:
