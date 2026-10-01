@@ -725,3 +725,34 @@ def test_varying_transform_crval_crpix():
     world_1 = trans1(0,0)
 
     assert world_0 == world_1
+
+
+@pytest.mark.parametrize("n_rows", [pytest.param(4, id="even"), pytest.param(5, id="odd")])
+def test_vct_pixel_edges_belong_to_the_first_and_last_rows(n_rows):
+    """
+    Pixel corners at both outer edges have finite coordinates.
+    Coordinates beyond the lookup table return NaN. See DKISTDC/dkist#761.
+    """
+    pc_table = np.broadcast_to(np.identity(2), (n_rows, n_rows, 2, 2))
+    vct = VaryingCelestialTransform2D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=(0, 0), pc_table=pc_table)
+    edges, beyond, zeros = np.array([-0.5, n_rows - 0.5]), np.array([-0.51, n_rows - 0.49]), np.zeros(2)
+
+    for lookups in ((edges, zeros), (zeros, edges)):
+        world = vct(zeros, zeros, *lookups)
+        assert np.isfinite(world).all()
+        assert np.isfinite(vct.inverse(*world, *lookups)).all()
+    for lookups in ((beyond, zeros), (zeros, beyond)):
+        assert np.isnan(vct(zeros, zeros, *lookups)).all()
+
+
+def test_vct_half_pixels_take_the_later_row():
+    """
+    A lookup halfway between two rows uses the later row. See DKISTDC/dkist#761.
+    """
+    crval_table = np.stack([10 + np.arange(4), np.zeros(4)], axis=-1)
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=crval_table, pc_table=np.identity(2))
+    zeros = np.zeros(3)
+
+    lon, _ = vct(zeros, zeros, [0.5, 1.5, 2.5])
+
+    assert np.allclose(lon, [11, 12, 13])
