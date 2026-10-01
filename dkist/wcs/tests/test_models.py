@@ -192,6 +192,18 @@ def test_varying_transform_pc_unitless():
     assert np.allclose(vct.inverse(*world, 5), pixel[:2], atol=0.01)
 
 
+def test_varying_transform_unitless_scalar_pixel():
+    """
+    Scalar x and y without units work with an array of lookup indices.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    lon, lat = vct(0, 0, [0, 1])
+
+    assert np.allclose(lon, [10, 20])
+    assert np.allclose(lat, [0, 0])
+
+
 def test_varying_transform_crval():
     crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
     vct = VaryingCelestialTransform(

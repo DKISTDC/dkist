@@ -320,6 +320,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
             # Because we have set input_units_strict to True we can assume that
             # all inputs have the correct units for the transform
             arrays = [arr.value for arr in barrays]
+        else:
+            arrays = barrays
 
         x_out = np.full_like(arrays[0], np.nan)
         y_out = np.full_like(arrays[1], np.nan)
