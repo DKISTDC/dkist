@@ -640,6 +640,40 @@ def test_ravel_ordering(ndim, order):
         assert int(ravel_value) == values[tuple(inputs)]
 
 
+@pytest.mark.parametrize("n", [pytest.param(4, id="even"), pytest.param(5, id="odd")])
+def test_ravel_pixel_edges(n):
+    """
+    Ravel returns finite values at both outer pixel edges.
+    Coordinates beyond the array return NaN.
+    See DKISTDC/dkist#761.
+    """
+    ravel = Ravel((n, n))
+    edges, beyond, zeros = np.array([-0.5, n - 0.5]), np.array([-0.51, n - 0.49]), np.zeros(2)
+
+    # The last axis keeps its fraction, the others are rounded.
+    assert np.allclose(ravel(zeros, edges), [-0.5, n - 0.5])
+    assert np.allclose(ravel(edges, zeros), [0, (n - 1) * n])
+    assert np.isnan(ravel(zeros, beyond)).all()
+    assert np.isnan(ravel(beyond, zeros)).all()
+
+
+@pytest.mark.parametrize("order", ["C", "F"])
+@pytest.mark.parametrize("has_units", [True, False])
+def test_ravel_half_pixels_take_the_later_pixel(order, has_units):
+    """
+    A halfway coordinate on a rounded axis uses the later pixel.
+    """
+    ravel = Ravel((4, 4), order=order)
+    half_pixels = np.array([0.5, 1.5, 2.5])
+    zeros = np.zeros(3)
+    inputs = (half_pixels, zeros) if order == "C" else (zeros, half_pixels)
+    unit = u.pix if has_units else 1
+
+    result = ravel(*(axis * unit for axis in inputs))
+
+    assert np.allclose(result, np.array([4, 8, 12]) * unit)
+
+
 @pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_repr(ndim, order):
