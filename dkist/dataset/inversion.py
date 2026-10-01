@@ -1,6 +1,6 @@
-from textwrap import dedent
 import types
 from collections.abc import Iterable
+from textwrap import dedent
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -9,7 +9,6 @@ from matplotlib.gridspec import GridSpec
 from ndcube import NDCollection
 
 from dkist.utils.exceptions import DKISTUserWarning
-
 from .utils import level2_info_str
 
 __all__ = ["Inversion", "Profiles"]
