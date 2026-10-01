@@ -199,7 +199,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
     def sanitize_index(ind):
         if isinstance(ind, u.Quantity):
             ind = ind.value
-        return np.array(np.round(ind), dtype=int)
+        # A lookup halfway between two rows uses the later row.
+        return np.array(np.floor(np.add(ind, 0.5)), dtype=int)
 
     @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
     def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
@@ -313,8 +314,11 @@ class BaseVaryingCelestialTransform(Model, ABC):
         barrays = np.broadcast_arrays(*arrays, subok=True)
         # # Convert the z, q, and m coordinates where present into indices to the lookup tables
         inds = []
-        for barray in barrays[2:]:
-            inds.append(self.sanitize_index(barray))
+        for barray, size in zip(barrays[2:], self.table_shape):
+            ind = self.sanitize_index(barray)
+            # Keep the outer pixel edge, size - 0.5, on the last row.
+            value = barray.value if isinstance(barray, u.Quantity) else barray
+            inds.append(np.where(value <= size - 0.5, np.minimum(ind, size - 1), ind))
 
         if isinstance(barrays[0], u.Quantity):
             # Because we have set input_units_strict to True we can assume that
