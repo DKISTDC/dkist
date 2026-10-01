@@ -333,10 +333,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
 
             # Call this transform for all values of x, y where z == zind
             masks = [inds[i] == ind[i] for i in range(len(ind))]
-            if len(masks) > 1:
-                mask = np.logical_and(*masks)
-            else:
-                mask = masks[0]
+            mask = np.logical_and.reduce(masks)
             if inverse:
                 xx, yy = sct.inverse(arrays[0][mask], arrays[1][mask])
             else:
