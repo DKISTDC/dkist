@@ -164,5 +164,7 @@ def test_tileddataset_repr(benchmark, simple_tiled_dataset):
 @pytest.mark.parametrize("dataset", ["large_visp_dataset", "inversion"])
 def test_dataset_save(benchmark, dataset, request):
     @benchmark
-    def write_dataset(dataset=request.getfixturevalue(dataset)):
+    def write_dataset(dataset=None):
+        if not dataset:
+            dataset = request.getfixturevalue(dataset)
         save_dataset(dataset, asdf_path="save-benchmark.asdf", overwrite=True)

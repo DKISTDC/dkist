@@ -41,7 +41,7 @@ def generate_celestial_transform(
         pc: ArrayLike | u.Quantity,
         crval: Iterable[float] | u.Quantity,
         lon_pole: float | u.Quantity = None,
-        projection: Model = m.Pix2Sky_TAN(),
+        projection: Model | None = None,
 ) -> CompoundModel:
     """
     Create a simple celestial transform from FITS like parameters.
@@ -72,6 +72,8 @@ def generate_celestial_transform(
     This function has not been tested with more complex projections. Ensure
     that your lon_pole is correct for your projection.
     """
+    if not projection:
+        projection = m.Pix2Sky_TAN()
     spatial_unit = None
     if hasattr(crval[0], "unit"):
         spatial_unit = crval[0].unit
@@ -202,7 +204,9 @@ class BaseVaryingCelestialTransform(Model, ABC):
         return np.array(np.round(ind), dtype=int)
 
     @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
-    def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
+    def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=None, **kwargs):
+        if not projection:
+            projection = m.Pix2Sky_TAN()
         super().__init__(*args, **kwargs)
         (
             self.table_shape,
@@ -640,7 +644,7 @@ def varying_celestial_transform_from_tables(
         pc_table: ArrayLike | u.Quantity,
         crval_table: Iterable[float] | u.Quantity,
         lon_pole: float | u.Quantity = None,
-        projection: Model = m.Pix2Sky_TAN(),
+        projection: Model | None = None,
         inverse: bool = False,
         slit: Literal[0, 1] | None = None,
 ) -> BaseVaryingCelestialTransform:
@@ -648,6 +652,8 @@ def varying_celestial_transform_from_tables(
     Generate a `.BaseVaryingCelestialTransform` based on the dimensionality of the tables.
     """
 
+    if not projection:
+        projection = m.Pix2Sky_TAN()
     table_shape, pc_table, crval_table, crpix_table = BaseVaryingCelestialTransform._validate_table_shapes(
         np.asanyarray(pc_table),
         np.asanyarray(crval_table),
