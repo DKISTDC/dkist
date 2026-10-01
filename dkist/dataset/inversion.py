@@ -1,12 +1,11 @@
-import types
 from textwrap import dedent
+import types
 from collections.abc import Iterable
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
-
 from ndcube import NDCollection
 
 from dkist.utils.exceptions import DKISTUserWarning

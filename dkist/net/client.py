@@ -1,12 +1,12 @@
-import os
 import json
+import os
 import urllib.parse
 import urllib.request
-from typing import Any
-from textwrap import dedent
-from functools import partial
 from collections import defaultdict
-from collections.abc import Mapping, Iterable
+from collections.abc import Iterable, Mapping
+from functools import partial
+from textwrap import dedent
+from typing import Any
 
 import aiohttp
 import numpy as np
@@ -18,14 +18,12 @@ from astropy.time import Time
 
 from sunpy.net import attr
 from sunpy.net import attrs as sattrs  # noqa: ICN001
-from sunpy.net.base_client import (BaseClient, QueryResponseRow,
-                                   QueryResponseTable, convert_row_to_table)
+from sunpy.net.base_client import BaseClient, QueryResponseRow, QueryResponseTable, convert_row_to_table
 from sunpy.util.net import parse_header
 
 from dkist import log
 from dkist.net.attrs_values import get_search_attrs_values
 from dkist.utils.inventory import INVENTORY_KEY_MAP
-
 from . import attrs as dattrs
 from .attr_walker import walker
 

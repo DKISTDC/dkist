@@ -9,10 +9,10 @@
 This script adds and updates the appropriate files to update the version of an ASDF schema.
 """
 
-import sys
-import shutil
-import pathlib
 import argparse
+import pathlib
+import shutil
+import sys
 
 from git import Repo
 

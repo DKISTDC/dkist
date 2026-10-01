@@ -1,6 +1,6 @@
+import inspect
 import re
 import typing
-import inspect
 
 import pytest
 

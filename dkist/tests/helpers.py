@@ -1,12 +1,11 @@
-from pathlib import Path
 from functools import wraps
+from pathlib import Path
 
 import matplotlib as mpl
+import ndcube
 import pytest
 
 import astropy
-
-import ndcube
 
 
 def get_hash_library_name():
