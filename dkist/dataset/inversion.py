@@ -8,6 +8,8 @@ import numpy as np
 from matplotlib.gridspec import GridSpec
 from ndcube import NDCollection
 
+from astropy.utils.decorators import deprecated_renamed_argument
+
 from dkist.utils.exceptions import DKISTUserWarning
 
 __all__ = ["Inversion", "Profiles"]
