@@ -8,7 +8,9 @@ import numpy as np
 from matplotlib.gridspec import GridSpec
 from ndcube import NDCollection
 
-from dkist.utils.exceptions import DKISTUserWarning
+from astropy.utils.decorators import deprecated_renamed_argument
+
+from dkist.utils.exceptions import DKISTDeprecationWarning, DKISTUserWarning
 from .utils import level2_info_str
 
 __all__ = ["Inversion", "Profiles"]
@@ -50,10 +52,11 @@ class Profiles(NDCollection):
     def __str__(self):
         return level2_info_str(self)
 
+    @deprecated_renamed_argument("figure", "fig", "1.19", warning_type=DKISTDeprecationWarning)
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
-        figure: matplotlib.figure.Figure | None = None,
+        fig: matplotlib.figure.Figure | None = None,
         profiles: str | Iterable[str] = "all",
         **kwargs,
     ):
@@ -76,8 +79,8 @@ class Profiles(NDCollection):
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
 
-        if figure is None:
-            figure = plt.gcf()
+        if fig is None:
+            fig = plt.gcf()
 
         if profiles != "all":
             if isinstance(profiles, str):
@@ -103,7 +106,7 @@ class Profiles(NDCollection):
             if line not in lines:
                 lines.append(line)
         ncols, nrows = len(lines), 4
-        gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
+        gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=fig)
         for l, line in enumerate(lines):
             for s, stokes in enumerate(["I", "Q", "U", "V"]):
                 profile = sliced_profiles[line + "_orig"][..., s]
@@ -112,7 +115,7 @@ class Profiles(NDCollection):
                     raise ValueError("Slice must reduce profile data to 1D")
 
                 ax_gridspec = gridspec[s, l]
-                ax = figure.add_subplot(ax_gridspec, projection=profile)
+                ax = fig.add_subplot(ax_gridspec, projection=profile)
 
                 profile.plot(axes=ax, marker="o", linestyle="", **kwargs)
                 fit.plot(axes=ax, **kwargs)
@@ -127,7 +130,7 @@ class Profiles(NDCollection):
                 if s == 3:
                     ax.set_xlabel(xlabel)
 
-        return figure
+        return fig
 
 
 class Inversion(NDCollection):
@@ -205,10 +208,11 @@ class Inversion(NDCollection):
             new_inv.profiles = self.profiles[*bslice]
         return new_inv
 
+    @deprecated_renamed_argument("figure", "fig", "1.19", warning_type=DKISTDeprecationWarning)
     def plot(
         self,
         slice_index: int | slice | Iterable[int | slice],
-        figure: matplotlib.figure.Figure | None = None,
+        fig: matplotlib.figure.Figure | None = None,
         inversions: str | Iterable[str] = "all",
         **kwargs,
     ):
@@ -231,8 +235,8 @@ class Inversion(NDCollection):
         if isinstance(slice_index, (int, slice, types.EllipsisType)):
             slice_index = (slice_index,)
 
-        if figure is None:
-            figure = plt.gcf()
+        if fig is None:
+            fig = plt.gcf()
 
         if inversions != "all":
             if isinstance(inversions, str):
@@ -244,7 +248,7 @@ class Inversion(NDCollection):
             sliced_inversions = self[slice_index]
         ncols = len(inversions) if inversions != "all" else 4
         nrows = int(np.ceil(len(sliced_inversions) / ncols))
-        gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=figure)
+        gridspec = GridSpec(nrows=nrows, ncols=ncols, figure=fig)
         row = -1
         for i, (name, inv) in enumerate(sliced_inversions.items()):
             if len(inv.shape) not in (1, 2):
@@ -253,7 +257,7 @@ class Inversion(NDCollection):
             if col == 0:
                 row += 1
             ax_gridspec = gridspec[row, col]
-            ax = figure.add_subplot(ax_gridspec, projection=inv)
+            ax = fig.add_subplot(ax_gridspec, projection=inv)
 
             inv.plot(axes=ax, **kwargs)
 
@@ -264,4 +268,4 @@ class Inversion(NDCollection):
 
             ax.set_title(name)
 
-        return figure
+        return fig
