@@ -232,6 +232,12 @@ def test_tileddataset_plot_figure_kwarg_deprecated(large_tiled_dataset):
             assert large_tiled_dataset.plot(0, figure=fig) is fig
 
 
+def test_tileddataset_plot_default_fig(large_tiled_dataset):
+    fig = plt.figure()
+    with pytest.warns(DKISTUserWarning, match="The metadata ASDF file that produced this dataset is out of date"):
+        assert large_tiled_dataset.plot(0) is fig
+
+
 @pytest.mark.accept_cli_tiled_dataset
 def test_repr(simple_tiled_dataset):
     r = repr(simple_tiled_dataset)
