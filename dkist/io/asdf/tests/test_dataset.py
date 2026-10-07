@@ -184,8 +184,8 @@ def test_read_wcs_with_backwards_affine():
 
 @pytest.mark.parametrize("slice", [np.s_[0], np.s_[:2], np.s_[0, 1], np.s_[0, 1, 2],
                                    np.s_[:, 1], np.s_[:, :, 2], np.s_[:2, 1:10, 2:20]])
-def test_save_dataset_sliced(large_visp_dataset, slice):
-    fname = "ds-save-test.asdf"
+def test_save_dataset_sliced(large_visp_dataset, slice, tmp_path):
+    fname = tmp_path / "ds-save-test.asdf"
     ds = large_visp_dataset
 
     ds1 = ds[slice]
@@ -196,8 +196,8 @@ def test_save_dataset_sliced(large_visp_dataset, slice):
     assert_dataset_equal(ds2, ds1, skip_history=True, compare_wcs=False)
 
 
-def test_save_dataset_to_existing_file(large_visp_dataset):
-    fname = "ds-overwrite-test.asdf"
+def test_save_dataset_to_existing_file(large_visp_dataset, tmp_path):
+    fname = tmp_path / "ds-overwrite-test.asdf"
     ds = large_visp_dataset
 
     save_dataset(ds, fname)
@@ -210,6 +210,3 @@ def test_save_dataset_to_existing_file(large_visp_dataset):
     ds2 = load_dataset(fname)
 
     assert_dataset_equal(ds2, ds1, skip_history=True, compare_wcs=False)
-
-    # Tidying. I'm sure there's a better fixture-based way to do this
-    Path(fname).unlink()
