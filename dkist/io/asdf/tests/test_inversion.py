@@ -1,4 +1,3 @@
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -24,8 +23,8 @@ def test_roundtrip_inversion(inversion):
 
 
 @pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
-def test_save_inversion_sliced(inversion, slice):
-    fname = "inv-save-test.asdf"
+def test_save_inversion_sliced(inversion, slice, tmp_path):
+    fname = tmp_path / "inv-save-test.asdf"
     ds = inversion
 
     ds1 = ds[slice]
@@ -36,8 +35,8 @@ def test_save_inversion_sliced(inversion, slice):
     assert_inversion_equal(ds1, ds2)
 
 
-def test_save_inversion_to_existing_file(inversion):
-    fname = "inv-overwrite-test.asdf"
+def test_save_inversion_to_existing_file(inversion, tmp_path):
+    fname = tmp_path / "inv-overwrite-test.asdf"
     ds = inversion
 
     save_dataset(ds, fname)
@@ -50,6 +49,3 @@ def test_save_inversion_to_existing_file(inversion):
     ds2 = load_dataset(fname)
 
     assert_inversion_equal(ds1, ds2)
-
-    # Tidying. I'm sure there's a better fixture-based way to do this
-    Path(fname).unlink()
