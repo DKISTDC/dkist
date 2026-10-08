@@ -192,6 +192,18 @@ def test_varying_transform_pc_unitless():
     assert np.allclose(vct.inverse(*world, 5), pixel[:2], atol=0.01)
 
 
+def test_varying_transform_unitless_scalar_pixel():
+    """
+    Scalar x and y without units work with an array of lookup indices.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    lon, lat = vct(0, 0, [0, 1])
+
+    assert np.allclose(lon, [10, 20])
+    assert np.allclose(lat, [0, 0])
+
+
 def test_varying_transform_crval():
     crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
     vct = VaryingCelestialTransform(
@@ -423,6 +435,19 @@ def test_vct_slit_bounds(slit):
             slit=slit,
         )
 
+
+def test_vct_inverse_outside_the_table():
+    """
+    The inverse returns NaN for lookup indices outside the table.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    x, y = vct.inverse([10, 10], [0, 0], [0, 5])
+
+    assert np.allclose([x[0], y[0]], [0, 0])
+    assert np.isnan([x[1], y[1]]).all()
+
+
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id="1D"), pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
@@ -495,6 +520,22 @@ def test_vct(has_units, slit, num_varying_axes):
     # grid2 has coordinates outside the lut boundaries and should have nans
     world2 = vct(*grid2)
     assert np.any(np.isnan(list(world2)))
+
+
+def test_vct3d_uses_all_three_lookup_indices():
+    """
+    Select each 3D table entry using all three lookup indices.
+    """
+    lookups = np.indices((2, 2, 2)).reshape(3, -1)
+    crval_table = np.zeros((2, 2, 2, 2))
+    crval_table[..., 0] = 10 + np.arange(8).reshape(2, 2, 2)
+    vct = VaryingCelestialTransform3D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=crval_table, pc_table=np.identity(2))
+    zeros = np.zeros(8)
+
+    lon, lat = vct(zeros, zeros, *lookups)
+
+    assert np.allclose(lon, crval_table[tuple(lookups)][:, 0])
+    assert np.allclose(vct.inverse(lon, lat, *lookups), 0, atol=1e-9)
 
 
 def _evaluate_ravel(array_shape, inputs, order="C"):
