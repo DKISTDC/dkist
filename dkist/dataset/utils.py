@@ -185,8 +185,8 @@ def world_dimensions_info(wcs, indices=None):
     acm = wcs.axis_correlation_matrix
     if indices:
         acm = acm[:, indices]
-    n_dim = len(indices) if indices else wcs.pixel_n_dim
-    indices = indices if indices else range(wcs.pixel_n_dim)
+    n_dim = len(indices) if indices else wcs.world_n_dim
+    indices = indices if indices else range(wcs.world_n_dim)
     # Find largest between header size and value length
     world_dim_width = max(9, len(str(n_dim)))
     world_nam_width = max(9, max(len(x) if x is not None else 0 for x in [wcs.world_axis_names[i] for i in indices]))
