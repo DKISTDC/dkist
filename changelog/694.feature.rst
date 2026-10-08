@@ -1,0 +1,1 @@
+Add support for dataset extras in `.Dataset.meta`, including reading headers from the ASDF file and lazy-loading the arrays from the FITS files.
