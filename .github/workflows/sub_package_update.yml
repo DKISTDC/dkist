@@ -23,6 +23,7 @@ permissions: {}
 
 jobs:
   update:
+    if: ${{ !github.event.repository.fork }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

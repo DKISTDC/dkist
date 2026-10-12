@@ -1,8 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=62.1",
-  "setuptools_scm[toml]>=8.0.0",
-  "wheel",
+  "setuptools_scm[toml]>=8.0.1",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -117,6 +116,25 @@ version_file = "dkist/_version.py"
 
     changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/DKISTDC/dkist/blob/main/changelog/README.rst)."
 
+<<<<<<<
+=======
+[tool.repo-review.ignore]
+PY003 = "The LICENSE file is in licenses/"
+PY005 = "The template packages tests inside dkist/"
+PP006 = "We are not currently using dependency-groups"
+PP301 = "pytest config is in pytest.ini"
+PC110 = "ruff format not currently an option"
+PC140 = "No SunPy projects make heavy use of types"
+PC170 = "Not using pygrep"
+PC180 = "No markdown formatter required"
+PC901 = "Opt-out"
+PC902 = "Opt-out"
+MY = "No SunPy projects make heavy use of types"
+
+# TODO: This should be in towncrier.toml but Giles currently only works looks in
+# pyproject.toml we should move this back when it's fixed.
+[tool.towncrier]
+>>>>>>>
     type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/DKISTDC/dkist/blob/main/changelog/README.rst)"
 
     number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
