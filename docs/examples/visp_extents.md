@@ -32,6 +32,7 @@ from dkist.data.sample import VISP_BKPLX
 
 ```{note}
 This example requires `sunpy>=6.1` for the {obj}`sunpy.visualization.extent` function.
+Also if you installed dkist with pip you may need to run ``pip install sunpy[all]``, to install the dependancies for sunpy's map.
 ```
 
 +++
