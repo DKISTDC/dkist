@@ -41,6 +41,23 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inve
     )
 
 
+def test_download_extras_default_keywords(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
+    base_path = Path(net.conf.dataset_path.format(**dataset.meta["inventory"]))
+    file_list = [base_path / "extra"]
+
+    dataset.files.download_dataset_extras()
+
+    orchestrate_transfer_mock.assert_called_once_with(
+        file_list,
+        recursive=True,
+        destination_path=Path("/~"),
+        destination_endpoint=None,
+        progress=True,
+        wait=True,
+        label=None,
+    )
+
+
 @pytest.fixture
 def httpserver_dataset_endpoint(httpserver):
     old = conf.dataset_endpoint
