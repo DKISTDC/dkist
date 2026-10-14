@@ -359,7 +359,7 @@ class DKISTFileManager:
 
     def _download_with_globus(
         self,
-        file_list: list[str],
+        file_list: list[Path],
         path: str | os.PathLike | None = None,
         destination_endpoint: str = None,
         progress: bool = True,
