@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.1
+    jupytext_version: 1.19.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -19,19 +19,25 @@ You will need sunpy's Map submodule to run this example, if you installed `dkist
 If you installed with conda you will already have it installed.
 ```
 
-In this how-to we will demonstrate how to draw the spataial bounding box of a VISP dataset on an AIA image.
+In this how-to we will demonstrate how to draw the spatial bounding box of a VISP dataset on an AIA image.
 
 The first step is to download an ASDF file for the VISP dataset and a cotemporal AIA image.
 We know the time range of interest, and only want one passband of AIA.
 
 ```{code-cell} ipython3
+import matplotlib.pyplot as plt
+
 import astropy.units as u
 
+import sunpy.map
 from sunpy.net import Fido, attrs as a
+from sunpy.visualization.drawing import extent as draw_extent
 
 import dkist
 import dkist.net
+```
 
+```{code-cell} ipython3
 results = Fido.search(a.Time("2023/10/16 18:45", "2023/10/16 18:48"), (a.Instrument.visp | (a.Instrument.aia & a.Wavelength(17.1*u.nm))))
 results
 ```
@@ -51,8 +57,6 @@ ds
 ```
 
 ```{code-cell} ipython3
-import sunpy.map
-
 aia = sunpy.map.Map(files[1])
 aia
 ```
@@ -65,29 +69,10 @@ visp_spatial = ds[0, :, 0, :]
 visp_spatial
 ```
 
-Extract the bottom left and top right corners of the VISP data by finding the world coordinates of the bottom left pixel and top right pixel.
-```{note}
-Note that we subtract 0.5 from the data shape, this is because we want to find the coordinate of the center of the pixel not the edge.
-```
+Finally, plot the AIA image as a [sunpy Map](https://docs.sunpy.org/en/stable/tutorial/maps.html) and then draw the extent of the spatial component of the VISP data.
 
 ```{code-cell} ipython3
-corners = visp_spatial.wcs.array_index_to_world([0, visp_spatial.data.shape[0] - 0.5],
-                                                [0, visp_spatial.data.shape[1] - 0.5])
-corners
-```
-
-This call also returns the extent of the times for the raster scan, however, we only want the spatial coordinates so we extract the `SkyCoord` object.
-
-```{code-cell} ipython3
-corners = corners[0]
-```
-
-Finally, plot the AIA image as a [sunpy Map](https://docs.sunpy.org/en/stable/tutorial/maps.html) and then draw a rectangle with our corners.
-
-```{code-cell} ipython3
-import matplotlib.pyplot as plt
-
 ax = plt.subplot(projection=aia)
 aia.plot(axes=ax)
-aia.draw_quadrangle(corners)
+draw_extent(ax, visp_spatial.wcs)
 ```
