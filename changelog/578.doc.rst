@@ -1,0 +1,1 @@
+Add an example of plotting the extent of VISP data on an AIA image.
