@@ -1,0 +1,1 @@
+Add `dkist.net.globus.use_transfer_client` to allow applications to supply an already-authorized Globus Transfer client for directory listings and dataset downloads.
