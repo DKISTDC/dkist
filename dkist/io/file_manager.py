@@ -75,7 +75,7 @@ class DKISTFileManager:
         self._fm.basepath = basepath
         if self._ndcube:
             if extras := self._ndcube.meta.get("extras"):
-                for e in extras.items():
+                for e in extras.values():
                     e.basepath = basepath
 
     def __getattr__(self, attr):
