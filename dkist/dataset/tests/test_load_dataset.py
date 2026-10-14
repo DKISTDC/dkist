@@ -1,7 +1,7 @@
+import contextlib
+import numbers
 import re
 import shutil
-import numbers
-import contextlib
 
 import fsspec
 import numpy as np

@@ -7,8 +7,7 @@ import astropy.units as u
 from astropy.modeling.models import Tabular1D
 
 from dkist import load_dataset, save_dataset
-from dkist.wcs.models import (Ravel, generate_celestial_transform,
-                              update_celestial_transform_parameters)
+from dkist.wcs.models import Ravel, generate_celestial_transform, update_celestial_transform_parameters
 
 
 @pytest.mark.benchmark
@@ -163,7 +162,7 @@ def test_tileddataset_repr(benchmark, simple_tiled_dataset):
 
 @pytest.mark.benchmark
 @pytest.mark.parametrize("dataset", ["large_visp_dataset", "inversion"])
-def test_dataset_save(benchmark, dataset, request):
+def test_dataset_save(benchmark, dataset, request, tmp_path):
     @benchmark
     def write_dataset(dataset=request.getfixturevalue(dataset)):
-        save_dataset(dataset, asdf_path="save-benchmark.asdf", overwrite=True)
+        save_dataset(dataset, asdf_path=tmp_path / "save-benchmark.asdf", overwrite=True)

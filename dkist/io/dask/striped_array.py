@@ -12,12 +12,12 @@ The slicing functionality on the ``FileManager`` object works by constructing a
 view into the original ``StripedExternalArray`` object through the
 ``StripedExternalArrayView`` class.
 """
-import os
 import abc
-from typing import Any, Protocol
+import os
+from collections.abc import Iterable
 from pathlib import Path
 from textwrap import dedent
-from collections.abc import Iterable
+from typing import Any, Protocol
 
 import dask.array
 import numpy as np

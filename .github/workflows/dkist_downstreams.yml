@@ -43,12 +43,12 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.13'
 
@@ -75,7 +75,7 @@ jobs:
     environment:
       name: notify
     steps:
-      - uses: Cadair/matrix-notify-action@31c7cc36051ee7dc4157a22c1f13dbc7d68e5120 # v2
+      - uses: Cadair/matrix-notify-action@9f46790e6ae0a5a83bd63ae0a3bb1948f2bc784c # v3
         with:
           matrix_token: ${{ secrets.matrix_access_token }}
           github_token: ${{ secrets.GITHUB_TOKEN }}

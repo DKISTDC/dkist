@@ -2,12 +2,12 @@
 This file contains the DKIST specific FileManager code.
 """
 
-import os
 import json
+import os
 import urllib
-from typing import Any, cast
 from pathlib import Path
 from textwrap import dedent
+from typing import Any
 
 from parfive import Downloader, Results
 from upath import UPath
@@ -36,7 +36,10 @@ def _local_basepath(basepath: Path | UPath | None) -> str | os.PathLike | None:
         return None
     # A non-remote basepath is either a Path or a UPath on the local
     # filesystem, both of which implement the os.PathLike interface
-    return cast("str | os.PathLike | None", basepath)
+    return  
+  
+  
+  ("str | os.PathLike | None", basepath)
 
 
 class DKISTFileManager:

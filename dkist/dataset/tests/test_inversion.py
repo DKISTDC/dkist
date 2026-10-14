@@ -1,5 +1,4 @@
 import collections.abc
-from itertools import product, permutations
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,18 +18,30 @@ def test_inversion(inversion):
     assert len(inversion.profiles.items()) == 6
 
 
-def test_str(inversion):
+def test_repr(inversion):
     r = repr(inversion)
-    keys = "('optical_depth', 'temperature', 'electron_pressure', 'microturbulence', 'mag_strength', 'velocity', 'mag_inclination', 'mag_azimuth', 'geo_height', 'gas_pressure', 'density')"
+    assert "This Level 2 product is a dictionary of 11 Datasets with 3 aligned dimensions and consists of 4664 total frames." in r
+    keys = "\n- ".join(["optical_depth", "temperature", "electron_pressure", "microturbulence", "mag_strength", "velocity", "mag_inclination", "mag_azimuth", "geo_height", "gas_pressure", "density"]) # noqa: FLY002
     assert keys in r
-    # Ordering of axes appears to be random causing high chance of test failure
-    # Therefore we need to check every possible combination of axis keys
-    item0keys = ("time", "custom:pos.helioprojective.lat", "custom:pos.helioprojective.lon")
-    item1keys = ("custom:pos.helioprojective.lat", "phys.polarization.stokes", "custom:pos.helioprojective.lon")
-    item0_pmtns = list(permutations(item0keys))
-    item1_pmtns = list(permutations(item1keys))
-    allorders = [str([i0, i1, ("phys.absorption.opticalDepth",)]) for (i0, i1) in product(item0_pmtns, item1_pmtns)]
-    assert any([s in r for s in allorders])  # noqa:C419
+    profiles = "\n- ".join(["NaID", "FeI630", "CaII854"]) # noqa: FLY002
+    assert profiles in r
+    assert "These Datasets share 3 pixel and 5 world dimensions. The shared pixel axes have shape [424, 508, 81]." in r
+
+    # Test that all basepaths are represented if component datasets are saved in different locations
+    orig_basepath = inversion["velocity"].files.basepath
+    temp_basepath = orig_basepath / "temperature"
+    inversion["temperature"].files.basepath = temp_basepath
+    r = repr(inversion)
+    assert f"- {orig_basepath}" in r
+    assert f"- {temp_basepath}" in r
+
+
+def test_profiles_repr(inversion):
+    r = repr(inversion.profiles)
+    assert "This Level 2 product is a dictionary of 6 Datasets with 3 aligned dimensions and consists of 2544 total frames." in r
+    profiles = "\n- ".join(["NaID_orig", "NaID_fit", "FeI630_orig", "FeI630_fit", "CaII854_orig", "CaII854_fit"]) # noqa: FLY002
+    assert profiles in r
+    assert "These Datasets share 3 pixel and 5 world dimensions. The shared pixel axes have shape [424, 508, 4]." in r
 
 
 def test_get_item(inversion):

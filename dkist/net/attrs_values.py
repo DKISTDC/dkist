@@ -1,8 +1,8 @@
 "Functions for working with the net submodule"
-import json
-import urllib
 import datetime as dt
 import importlib.resources
+import json
+import urllib
 from pathlib import Path
 
 import platformdirs

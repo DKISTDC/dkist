@@ -14,6 +14,7 @@ from dkist.data.test import rootdir
 from dkist.dataset import Dataset, TiledDataset, load_dataset
 from dkist.io import DKISTFileManager
 from dkist.utils.exceptions import DKISTDeprecationWarning
+from dkist.wcs.models import Ravel
 
 
 @pytest.fixture
@@ -213,3 +214,28 @@ def test_file_slicing_without_dummy_axis(dataset_5d):
     assert len(ds[0, 0].files) == np.prod(shape[2])
     assert len(ds[0, 0, 0].files) == 1
     assert len(ds[0, 0, 0, 0].files) == 1
+
+
+@pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
+@pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
+@pytest.mark.parametrize("input_type", [pytest.param("array", id="Array Inputs"), pytest.param("scalar", id="Scalar Inputs")])
+def test_ravel_oob_nan(ndim, has_units, input_type):
+    array_shape = tuple(5 for _ in range(ndim))
+    ravel = Ravel(array_shape, order="C")
+    units = u.pix
+    if input_type == "array":
+        # One in-bounds, two out-of-bounds (below and above)
+        coords = [np.array([2, -1, 10])] + [np.array([2, 2, 2])] * (ndim - 1)
+    else:
+        coords = [(-1)] + [2] * (ndim - 1)
+    if has_units:
+        coords = coords * units
+    result = ravel(*coords)
+    # First element (in-bounds) must be finite, OOB elements must be NaN
+    if input_type == "array":
+        out = result.value if has_units else result
+        assert np.isfinite(out[0])
+        assert np.isnan(out[1])
+        assert np.isnan(out[2])
+    else:
+        assert np.isnan(result)

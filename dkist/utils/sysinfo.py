@@ -1,5 +1,5 @@
 import platform
-from importlib.metadata import version, distribution
+from importlib.metadata import distribution, version
 
 import sunpy.extern.distro as distro
 from sunpy.util.sysinfo import find_dependencies, get_keys_list, get_requirements
