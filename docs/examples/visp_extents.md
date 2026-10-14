@@ -39,13 +39,13 @@ Also if you installed dkist with pip you may need to run ``pip install sunpy[all
 
 ## Obtaining some data
 
-In this example we will use the VISP sample dataset [BKPLX](https://dkist.data.nso.edu/datasetview/BKPLX).
+In this example we will use the VISP sample dataset [L1_KMUPT](https://dkist.data.nso.edu/datasetview/L1_KMUPT).
 If you want to replace this dataset with your own dataset, see {ref}`dkist:howto-guide:sample-data`.
 
 Let's load the data with {obj}`dkist.load_dataset`:
 
 ```{code-cell} ipython3
-ds = dkist.load_dataset(VISP_BKPLX)
+ds = dkist.load_dataset(VISP_L1_KMUPT)
 ds
 ```
 
