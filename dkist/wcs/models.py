@@ -35,6 +35,11 @@ __all__ = [
 ]
 
 
+def _round_half_up(values):
+    """Round to the nearest integer, with halves going to the later pixel."""
+    return np.array(np.floor(np.add(values, 0.5)), dtype=int)
+
+
 def generate_celestial_transform(
         crpix: Iterable[float] | u.Quantity,
         cdelt: Iterable[float] | u.Quantity,
@@ -200,7 +205,7 @@ class BaseVaryingCelestialTransform(Model, ABC):
         if isinstance(ind, u.Quantity):
             ind = ind.value
         # A lookup halfway between two rows uses the later row.
-        return np.array(np.floor(np.add(ind, 0.5)), dtype=int)
+        return np.array(_round_half_up(ind), dtype=int)
 
     @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
     def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
@@ -745,7 +750,7 @@ class Ravel(Model):
         array_bounds = np.array(self.array_shape) - 1
         # Halfway coordinates use the later pixel. Clip the outer edge to the
         # last pixel before calculating the fractional offset.
-        rounded_inputs = np.clip(np.floor(np.add(input_values, 0.5)).astype(int), 0, array_bounds[:, np.newaxis])
+        rounded_inputs = np.clip(_round_half_up(input_values), 0, array_bounds[:, np.newaxis])
         result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order, mode="clip").astype(float)
         index = 0 if self.order == "F" else -1
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
