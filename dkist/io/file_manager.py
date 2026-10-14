@@ -268,15 +268,9 @@ class DKISTFileManager:
         """
         # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
         from dkist.net import conf as net_conf  # noqa: PLC0415
-        from dkist.net.helpers import _orchestrate_transfer_task  # noqa: PLC0415
 
         inv = self._inventory
-        path_inv = path_format_inventory(humanize_inventory(inv))
-
         base_path = Path(net_conf.dataset_path.format(**inv))
-        destination_path = path or self.basepath or "/~/"
-        destination_path = Path(destination_path).as_posix()
-        destination_path = Path(destination_path.format(**path_inv))
 
         # TODO: If we are transferring the whole dataset then we should use the
         # directory not the list of all the files in it.
@@ -287,12 +281,148 @@ class DKISTFileManager:
         if inv["qualityReportObjectKey"]:
             file_list.append(Path("/") / inv["bucket"] / inv["qualityReportObjectKey"])
 
+        return self._download_with_globus(
+            file_list,
+            path=path,
+            destination_endpoint=destination_endpoint,
+            progress=progress,
+            wait=wait,
+            label=label,
+        )
+
+    def download_dataset_extras(
+        self,
+        path: str | os.PathLike | None = None,
+        destination_endpoint: str = None,
+        progress: bool = True,
+        wait: bool = True,
+        label: str = None,
+    ):
+        """
+        Start a Globus file transfer for the dataset extras.
+
+        Parameters
+        ----------
+        path
+            The path to save the data in, must be accessible by the Globus
+            endpoint.
+            The default value is ``.basepath``, if ``.basepath`` is None it will
+            default to ``/~/``.
+            It is possible to put placeholder strings in the path with any key
+            from the dataset inventory dictionary which can be accessed as
+            ``ds.meta['inventory']``. An example of this would be
+            ``path="~/dkist/{datasetId}"`` to save the files in a folder named
+            with the dataset ID being downloaded.
+            If ``path`` is specified, and ``destination_endpoint`` is `None`
+            (i.e. you are downloading to a local Globus personal endpoint) this
+            method will set ``.basepath`` to the value of the ``path=``
+            argument, so that the array can be read from your transferred
+            files.
+
+        destination_endpoint
+            A unique specifier for a Globus endpoint. If `None` a local
+            endpoint will be used if it can be found, otherwise an error will
+            be raised. See `~dkist.net.globus.get_endpoint_id` for valid
+            endpoint specifiers.
+
+        progress
+           If `True` status information and a progress bar will be displayed
+           while waiting for the transfer to complete.
+           If ``progress="verbose"`` then all globus events generated during
+           the transfer will be shown (by default only error messages are
+           shown.)
+
+        wait
+            If `False` then the function will return while the Globus transfer task
+            is still running. Setting ``wait=False`` implies ``progress=False``.
+
+        label
+            Label for the Globus transfer. If `None` then a default will be used.
+        """
+        # Import here to prevent triggering an import of `.net` with `dkist.dataset`.
+        from dkist.net import conf as net_conf  # noqa: PLC0415
+
+        inv = self._inventory
+        base_path = Path(net_conf.dataset_path.format(**inv))
+
+        file_list = [base_path / "extra"]
+
+        return self._download_with_globus(
+            file_list,
+            path=path,
+            destination_endpoint=destination_endpoint,
+            progress=progress,
+            wait=wait,
+            label=label,
+            recursive=True
+        )
+
+    def _download_with_globus(
+        self,
+        file_list: list[str],
+        path: str | os.PathLike | None = None,
+        destination_endpoint: str = None,
+        progress: bool = True,
+        wait: bool = True,
+        label: str = None,
+        recursive: bool = False,
+    ):
+        """
+        Start a Globus file transfer for all files in this Dataset.
+
+        Parameters
+        ----------
+        path
+            The path to save the data in, must be accessible by the Globus
+            endpoint.
+            The default value is ``.basepath``, if ``.basepath`` is None it will
+            default to ``/~/``.
+            It is possible to put placeholder strings in the path with any key
+            from the dataset inventory dictionary which can be accessed as
+            ``ds.meta['inventory']``. An example of this would be
+            ``path="~/dkist/{datasetId}"`` to save the files in a folder named
+            with the dataset ID being downloaded.
+            If ``path`` is specified, and ``destination_endpoint`` is `None`
+            (i.e. you are downloading to a local Globus personal endpoint) this
+            method will set ``.basepath`` to the value of the ``path=``
+            argument, so that the array can be read from your transferred
+            files.
+
+        destination_endpoint
+            A unique specifier for a Globus endpoint. If `None` a local
+            endpoint will be used if it can be found, otherwise an error will
+            be raised. See `~dkist.net.globus.get_endpoint_id` for valid
+            endpoint specifiers.
+
+        progress
+           If `True` status information and a progress bar will be displayed
+           while waiting for the transfer to complete.
+           If ``progress="verbose"`` then all globus events generated during
+           the transfer will be shown (by default only error messages are
+           shown.)
+
+        wait
+            If `False` then the function will return while the Globus transfer task
+            is still running. Setting ``wait=False`` implies ``progress=False``.
+
+        label
+            Label for the Globus transfer. If `None` then a default will be used.
+        """
+        from dkist.net.helpers import _orchestrate_transfer_task  # noqa: PLC0415
+
+        inv = self._inventory
+        path_inv = path_format_inventory(humanize_inventory(inv))
+
+        destination_path = path or self.basepath or "/~/"
+        destination_path = Path(destination_path).as_posix()
+        destination_path = Path(destination_path.format(**path_inv))
+
         # TODO: Ascertain if the destination path is local better than this
         is_local = not destination_endpoint
 
         _orchestrate_transfer_task(
             file_list,
-            recursive=False,
+            recursive=recursive,
             destination_path=destination_path,
             destination_endpoint=destination_endpoint,
             progress=progress,
