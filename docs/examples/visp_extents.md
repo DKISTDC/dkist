@@ -27,7 +27,7 @@ from sunpy.visualization import drawing
 
 import dkist
 import dkist.net
-from dkist.data.sample import VISP_BKPLX
+from dkist.data.sample import VISP_L1_KMUPT
 ```
 
 ```{note}
