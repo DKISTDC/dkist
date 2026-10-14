@@ -3,10 +3,9 @@ Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
 import datetime
 import json
-import pathlib
 import re
 import time
-from os import PathLike
+from pathlib import Path
 from typing import Literal
 
 import globus_sdk
@@ -21,7 +20,7 @@ __all__ = ["start_transfer_from_file_list", "watch_transfer_progress"]
 def _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_path, recursive):
     src_file_list = file_list
     if not isinstance(dst_base_path, (list, tuple)):
-        dst_base_path = pathlib.Path(dst_base_path)
+        dst_base_path = Path(dst_base_path)
         dst_file_list = []
         for src_file in src_file_list:
             # If a common prefix is not specified just copy the filename or last directory
@@ -45,9 +44,9 @@ def _populate_manifest(transfer_manifest, file_list, dst_base_path, src_base_pat
 def start_transfer_from_file_list(
     src_endpoint: str,
     dst_endpoint: str,
-    dst_base_path: PathLike,
-    file_list: list[PathLike],
-    src_base_path: PathLike = None,
+    dst_base_path: Path,
+    file_list: list[Path],
+    src_base_path: Path = None,
     recursive: bool | list[bool] = False,
     label: str = None
 ) -> str:
@@ -281,9 +280,9 @@ def watch_transfer_progress(task_id, tfr_client, poll_interval=5,
         progress.close()
 
 
-def _orchestrate_transfer_task(file_list: list[PathLike],
+def _orchestrate_transfer_task(file_list: list[Path],
                                recursive: bool | list[bool],
-                               destination_path: PathLike | list[PathLike] = "/~/",
+                               destination_path: Path | list[Path] = "/~/",
                                destination_endpoint: str = None,
                                *,
                                progress: bool | Literal["verbose"] = True,
