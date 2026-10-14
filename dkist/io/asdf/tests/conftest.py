@@ -50,6 +50,12 @@ def break_manifest():
 def orphan_schema():
     # Create a schema file that isn't listed anywhere else
     orphan_schema = rootdir.parent.parent / "io" / "asdf" / "resources" / "schemas" / "null-0.1.0.yaml"
-    orphan_schema.touch()
+    with open(orphan_schema, "w") as f:
+        f.writelines([
+            "%YAML 1.1\n",
+            "---\n",
+            '$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"\n',
+            'id: "asdf://dkist.nso.edu/schemas/null-0.99.0"\n',
+        ])
     yield
     orphan_schema.unlink()

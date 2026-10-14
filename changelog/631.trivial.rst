@@ -1,1 +1,0 @@
-Adds a dev script to automate incrementing a schema version number.

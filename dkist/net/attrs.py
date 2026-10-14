@@ -15,6 +15,8 @@ from sunpy.net.attr import Range as _Range
 from sunpy.net.attr import SimpleAttr as _SimpleAttr
 from sunpy.net.attr import or_
 
+from dkist.utils.decorators import deprecated
+
 __all__ = [
     "BoundingBox",
     "BrowseMovie",
@@ -29,7 +31,6 @@ __all__ = [
     "ObservingProgramExecutionID",
     "Page",
     "PageSize",
-    "PolarimetricAccuracy",
     "Product",
     "Proposal",
     "Recipe",
@@ -208,8 +209,16 @@ class FriedParameter(_Range):
 
 
 # qualityAveragePolarimetricAccuracyMin, qualityAverageFriedParameterMax
+@deprecated(since="1.17.0")
 class PolarimetricAccuracy(_Range):
     """
+    .. warning::
+
+        The API for downloading data from the DKIST Data Center no longer accepts the
+        PolarimetricAccuracy parameter. There are currently no plans to support a
+        replacement. This class is therefore deprecated and will not influence the results
+        returned when searching for data.
+
     The average polarimetric accuracy of a dataset.
     """
     def collides(self, other):

@@ -40,7 +40,6 @@ def api_param_names():
         da.Recipe: ("recipeId",),
         da.Embargoed: ("isEmbargoed",),
         da.FriedParameter: ("qualityAverageFriedParameterMin", "qualityAverageFriedParameterMax"),
-        da.PolarimetricAccuracy: ("qualityAveragePolarimetricAccuracyMin", "qualityAveragePolarimetricAccuracyMax"),
         da.ExposureTime: ("exposureTimeMin", "exposureTimeMax"),
         da.EmbargoEndTime: ("embargoEndDateMin", "embargoEndDateMax"),
         da.SpectralSampling: ("averageDatasetSpectralSamplingMin", "averageDatasetSpectralSamplingMax"),

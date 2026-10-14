@@ -6,9 +6,17 @@ import importlib.resources as importlib_resources
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
-from dkist.io.asdf.converters import (AsymmetricMappingConverter, CoupledCompoundConverter,
-                                      DatasetConverter, FileManagerConverter, RavelConverter,
-                                      TiledDatasetConverter, VaryingCelestialConverter)
+from dkist.io.asdf.converters import (
+    AsymmetricMappingConverter,
+    CoupledCompoundConverter,
+    DatasetConverter,
+    FileManagerConverter,
+    InversionConverter,
+    ProfilesConverter,
+    RavelConverter,
+    TiledDatasetConverter,
+    VaryingCelestialConverter,
+)
 
 
 def get_resource_mappings():
@@ -36,36 +44,25 @@ def get_extensions():
     """
     Get the list of extensions.
     """
-    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter()]
+    dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter(), InversionConverter(), ProfilesConverter()]
     wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter(), AsymmetricMappingConverter()]
     return [
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.5.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.4.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.3.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.2.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0",
-                                   converters=dkist_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.5.0",
-                                   converters=wcs_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.4.0",
-                                   converters=wcs_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.3.0",
-                                   converters=wcs_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.2.0",
-                                   converters=wcs_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.1.0",
-                                   converters=wcs_converters),
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0",
-                                   converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.7.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.6.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.5.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.4.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.3.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.2.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.5.0", converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.4.0", converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.3.0", converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.2.0", converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.1.0", converters=wcs_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.0.0", converters=wcs_converters),
         # This manifest handles all pre-refactor tags
-        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0",
-                                   converters=dkist_converters,
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-0.9.0", converters=dkist_converters,
                                    # Register that this is a replacement for the old extension
                                    legacy_class_names=["dkist.io.asdf.extension.DKISTExtension"])
     ]

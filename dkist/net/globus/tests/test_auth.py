@@ -1,14 +1,19 @@
 import json
-import stat
 import pathlib
 import platform
+import stat
 
 import globus_sdk
 import requests
 
-from dkist.net.globus.auth import (ensure_globus_authorized, get_cache_contents,
-                                   get_cache_file_path, get_refresh_token_authorizer,
-                                   save_auth_cache, start_local_server)
+from dkist.net.globus.auth import (
+    ensure_globus_authorized,
+    get_cache_contents,
+    get_cache_file_path,
+    get_refresh_token_authorizer,
+    save_auth_cache,
+    start_local_server,
+)
 
 
 def test_http_server():

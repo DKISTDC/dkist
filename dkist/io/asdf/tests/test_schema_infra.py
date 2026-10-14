@@ -1,5 +1,5 @@
-import pathlib
 import itertools
+import pathlib
 
 import pytest
 
@@ -67,15 +67,28 @@ def schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest):
 
 
 def schema_ver_matches_filename(yaml, yaml_version):
-        # Check that schema version in schema matches filename
-        with open(yaml, encoding="utf-8") as f:
-            schema_version_in_yaml = f.readlines()[3][-7:-2]
-        return schema_version_in_yaml == yaml_version
+    # Check that schema version in schema matches filename
+    with open(yaml, encoding="utf-8") as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith("id:"):
+                schema_line = line
+                break
+        else:
+            raise ValueError(f"No id found in schema file {yaml}")
+    schema_version_in_yaml = schema_line[-7:-2]
+    return schema_version_in_yaml == yaml_version
 
 
 def num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas):
     # varying_celestial_transform schema is reused for inverse_, so the list from entry_points will be one shorter
     return len(latest_sche_yamls.values())+1 == len(schemas)
+
+
+def man_extensions_use_correct_converters():
+    with open(repodir / "io" / "asdf" / "entry_points.py") as f:
+        lines = [line for line in f.readlines() if "ManifestExtension." in line]
+        return all(("wcs_" in l and "dkist-wcs" in l) | ("dkist_" in l and "dkist" in l) for l in lines)
 
 
 def test_schema_infrastructure():
@@ -85,6 +98,7 @@ def test_schema_infrastructure():
 
     schemas = [tagname(tag.tag_uri) for ext in latest_extensions.values() for tag in ext.tags]
     assert num_schema_yamls_matches_num_schema_in_entry_points(latest_sche_yamls, schemas)
+    assert man_extensions_use_correct_converters()
     for schema, yaml in latest_sche_yamls.items():
         yaml_version, converter = get_schema_info(schema, yaml)
         assert schema_converter_imported(converter)
@@ -104,5 +118,4 @@ def test_incorrect_schema_infrastructure(break_manifest, orphan_schema):
         assert schema_in_converters_list(converter, converters)
     with pytest.raises(KeyError):
         assert schema_yaml_matches_manifest(yaml_version, latest_schemas_in_manifest["null"])
-    with pytest.raises(IndexError):
-        assert schema_ver_matches_filename(latest_sche_yamls["null"], yaml_version)
+    assert not schema_ver_matches_filename(latest_sche_yamls["null"], yaml_version)

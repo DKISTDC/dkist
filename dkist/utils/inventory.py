@@ -61,6 +61,7 @@ INVENTORY_KEY_MAP: dict[str, str] = DefaultMap(None, {
         "averageDatasetSpatialSampling": "Average Spatial Sampling",
         "averageDatasetTemporalSampling": "Average Temporal Sampling",
         "qualityReportObjectKey": "Quality Report Filename",
+        "qualityDataObjectKey": "Quality Data Filename",
         "inputDatasetParametersPartId": "Input Dataset Parameters Part ID",
         "inputDatasetObserveFramesPartId": "Input Dataset Observe Frames Part ID",
         "inputDatasetCalibrationFramesPartId": "Input Dataset Calibration Frames Part ID",

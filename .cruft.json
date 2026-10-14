@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/sunpy/package-template",
-  "commit": "164646d882aa2e972d305c54778aaaf35f707464",
+  "commit": "edba737e77f01d0c18afed540efd4028e4f54118",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -22,17 +22,21 @@
       "enable_dynamic_dev_versions": "y",
       "include_example_code": "n",
       "include_cruft_update_github_workflow": "y",
+      "use_pat_in_cruft_update_workflow": "y",
       "use_extended_ruff_linting": "y",
+      "matrix_room_id": "!RehafayCrAiXbzVpXI:openastronomy.org",
+      "extra_ci_jobs": "mypy,allowed-fail-tests",
+      "use_sunpy_pr_template": "n",
       "_sphinx_theme": "sunpy",
       "_parent_project": "",
       "_install_requires": "",
       "_copy_without_render": [
         "docs/_templates",
         "docs/_static",
-        ".github/workflows/sub_package_update.yml"
+        ".github/workflows/zizmor.yml"
       ],
       "_template": "https://github.com/sunpy/package-template",
-      "_commit": "164646d882aa2e972d305c54778aaaf35f707464"
+      "_commit": "edba737e77f01d0c18afed540efd4028e4f54118"
     }
   },
   "directory": null

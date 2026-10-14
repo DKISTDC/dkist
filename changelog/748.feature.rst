@@ -1,0 +1,1 @@
+Add a human readable name for the ``qualityDataObjectKey`` inventory key, which is displayed as "Quality Data Filename" and can be used as the ``{quality_data_filename}`` path interpolation key.

@@ -144,6 +144,19 @@ def test_file_manager_direct_slice(eit_dataset):
     assert sub_file.basepath == ds.files.basepath
 
 
+def test_generated_arrays_have_unique_names(file_manager):
+    # Dask identifies arrays by their name, so arrays wrapping different files
+    # must not share a name: if they do, combining them into a single graph
+    # (e.g. stacking two tiles of a mosaic) silently uses one array's file
+    # loading tasks for both.
+    array1 = file_manager[0]._generate_array()
+    array2 = file_manager[1]._generate_array()
+    assert array1.name != array2.name
+
+    stacked = da.stack([array1, array2]).compute()
+    assert not np.allclose(stacked[0], stacked[1])
+
+
 def test_reprs(file_manager):
     assert str(len(file_manager)) in repr(file_manager)
     assert str(file_manager.shape) in repr(file_manager)

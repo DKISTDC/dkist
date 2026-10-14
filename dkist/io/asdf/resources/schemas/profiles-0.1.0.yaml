@@ -1,0 +1,8 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/profiles-0.1.0"
+title: Represents a DKIST Level 2 inversion's source profiles
+
+$ref: "asdf://sunpy.org/ndcube/schemas/ndcollection-1.0.0"
+...

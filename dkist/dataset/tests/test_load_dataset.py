@@ -1,7 +1,7 @@
+import contextlib
+import numbers
 import re
 import shutil
-import numbers
-import contextlib
 
 import pytest
 from parfive import Results
@@ -118,7 +118,7 @@ def test_not_dkist_asdf(tmp_path):
     af = asdf.AsdfFile({"hello": "world"})
     af.write_to(tmp_path / "test.asdf")
 
-    with pytest.raises(TypeError, match="not a valid DKIST"):
+    with pytest.raises(TypeError, match="not a valid level 1 or level 2 DKIST"):
         load_dataset(tmp_path / "test.asdf")
 
 
@@ -287,4 +287,22 @@ def test_version_error(asdf_extensions):
         assert exc_info.match("From time to time")
 
     ds = load_dataset(test_file, ignore_version_mismatch=True)
+    assert isinstance(ds, Dataset)
+
+
+@pytest.mark.filterwarnings("ignore::asdf.exceptions.AsdfPackageVersionWarning")
+def test_version_error_string_and_iterable(asdf_extensions):
+    # ignore_version_mismatch used to be dropped (and so silently ignored) for
+    # string and iterable inputs, as only the Path input forwarded it.
+    test_file, match = asdf_extensions
+    if match is None:
+        pytest.skip("only relevant for files that raise the version error")
+
+    with pytest.raises(DKISTOutOfDateError):
+        load_dataset(str(test_file))
+
+    ds = load_dataset(str(test_file), ignore_version_mismatch=True)
+    assert isinstance(ds, Dataset)
+
+    ds = load_dataset([test_file], ignore_version_mismatch=True)
     assert isinstance(ds, Dataset)

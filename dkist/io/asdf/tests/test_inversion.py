@@ -1,0 +1,51 @@
+
+import numpy as np
+import pytest
+
+from asdf.testing.helpers import roundtrip_object
+
+from dkist import load_dataset, save_dataset
+
+
+def assert_inversion_equal(new, old):
+    old_headers = old.meta["headers"]
+    new_headers = new.meta["headers"]
+    assert old_headers.colnames == new_headers.colnames
+    assert len(old_headers) == len(new_headers)
+    # This won't work because of how we handle the meta attributes
+    # We should make it work, I'm just not sure how yet
+    # assert old.meta == new.meta
+
+
+def test_roundtrip_inversion(inversion):
+    newobj = roundtrip_object(inversion)
+    assert_inversion_equal(newobj, inversion)
+
+
+@pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, 0]])
+def test_save_inversion_sliced(inversion, slice, tmp_path):
+    fname = tmp_path / "inv-save-test.asdf"
+    ds = inversion
+
+    ds1 = ds[slice]
+    save_dataset(ds1, fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_inversion_equal(ds1, ds2)
+
+
+def test_save_inversion_to_existing_file(inversion, tmp_path):
+    fname = tmp_path / "inv-overwrite-test.asdf"
+    ds = inversion
+
+    save_dataset(ds, fname)
+    with pytest.raises(FileExistsError):
+        save_dataset(ds, fname)
+
+    ds1 = ds[0]
+    save_dataset(ds1, fname, overwrite=True)
+
+    ds2 = load_dataset(fname)
+
+    assert_inversion_equal(ds1, ds2)

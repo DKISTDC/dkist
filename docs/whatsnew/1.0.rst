@@ -54,7 +54,7 @@ Reading Datasets
 ----------------
 
 The ``dkist`` package implements two classes for representing a "Dataset", `dkist.Dataset`, and for observations with multiple spatial tiles, `dkist.TiledDataset` which is a collection of ``Dataset`` objects.
-Any DKIST level one ASDF file can be loaded with the `dkist.load_dataset` function.
+Any DKIST Level 1 ASDF file can be loaded with the `dkist.load_dataset` function.
 
 .. code-block:: python
 

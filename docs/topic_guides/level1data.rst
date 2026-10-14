@@ -1,15 +1,15 @@
 .. _dkist:topic-guides:level1data:
 
-Level One DKIST Data
-====================
+Level 1 DKIST Data
+==================
 
-The level one data provided by the DKIST data center has been calibrated to remove any effects introduced by the telescope or instruments.
-The result of these calibration recipes is a level one "dataset" which are the smallest units of DKIST data which are searchable from the data center.
+The Level 1 data provided by the DKIST data center has been calibrated to remove any effects introduced by the telescope or instruments.
+The result of these calibration recipes is a Level 1 "dataset" which are the smallest units of DKIST data which are searchable from the data center.
 
 Many FITS, one ASDF
 -------------------
 
-Due to the potential size of each of these datasets, and to eliminate on demand processing at the data center a single level one dataset is distributed across many FITS files. Each individual FITS file represents what can be considered to be a "single calibrated exposure".
+Due to the potential size of each of these datasets, and to eliminate on demand processing at the data center a single Level 1 dataset is distributed across many FITS files. Each individual FITS file represents what can be considered to be a "single calibrated exposure".
 This means that when all the processing steps have been taken into account there can be many actual exposures of the instrument involved, but these have all been reduced to a single array.
 The exact contents of each FITS file vary depending on the type of instrument and the mode it was operating in, but some examples would be:
 
@@ -17,7 +17,7 @@ The exact contents of each FITS file vary depending on the type of instrument an
 * A single slit position, at one Stokes profile, with a single timestamp (ViSP / CryoNIRSP).
 * A single narrow band image, at one Stokes profile, with a single timestamp (VTF).
 
-The FITS files provided at level one by the data center, will conform to the FITS 4 specification and contain all the information about their individual array as well as DKIST specific keys in the header which specify its position in the larger dataset.
+The FITS files provided at Level 1 by the data center, will conform to the FITS 4 specification and contain all the information about their individual array as well as DKIST specific keys in the header which specify its position in the larger dataset.
 To increase the usability of these data, in addition to all the FITS files (which could number many thousands) a single metadata only ASDF file is generated per dataset.
 
 The ASDF file provides the following information about the dataset:
