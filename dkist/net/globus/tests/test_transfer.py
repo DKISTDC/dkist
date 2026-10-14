@@ -3,9 +3,10 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from globus_sdk import GlobusHTTPResponse
+from globus_sdk import GlobusHTTPResponse, TransferClient
 from globus_sdk.services.transfer.response.iterable import IterableTransferResponse
 
+from dkist.net.globus.endpoints import use_transfer_client
 from dkist.net.globus.transfer import (
     _get_speed,
     _orchestrate_transfer_task,
@@ -91,6 +92,18 @@ def test_start_transfer(mocker, transfer_client, mock_endpoints):
     for filepath, tfr in zip(file_list, transfer_manifest):
         assert filepath.as_posix() == tfr["source_path"]
         assert f"/{filepath.name}" == tfr["destination_path"]
+
+
+def test_start_transfer_uses_supplied_transfer_client(mocker, mock_endpoints):
+    transfer_client = mocker.Mock(spec=TransferClient)
+    transfer_client.submit_transfer.return_value = {"task_id": "task_id"}
+    file_list = [Path("/a/name.fits")]
+
+    with use_transfer_client(transfer_client):
+        task_id = start_transfer_from_file_list("a", "b", "/", file_list)
+
+    assert task_id == "task_id"
+    transfer_client.submit_transfer.assert_called_once()
 
 
 def test_start_transfer_src_base(mocker, transfer_client, mock_endpoints):

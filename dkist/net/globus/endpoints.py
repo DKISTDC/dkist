@@ -5,6 +5,9 @@ import json
 import pathlib
 import urllib
 import webbrowser
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import cache
 
 import globus_sdk
@@ -12,7 +15,58 @@ from packaging.version import Version
 
 from .auth import ensure_globus_authorized, get_refresh_token_authorizer
 
-__all__ = ["get_data_center_endpoint_id", "get_directory_listing", "get_endpoint_id"]
+__all__ = [
+    "get_data_center_endpoint_id",
+    "get_directory_listing",
+    "get_endpoint_id",
+    "use_transfer_client",
+]
+
+
+_transfer_client_override: ContextVar[globus_sdk.TransferClient | None] = ContextVar(
+    "transfer_client_override",
+    default=None,
+)
+
+
+@contextmanager
+def use_transfer_client(
+    transfer_client: globus_sdk.TransferClient,
+) -> Iterator[globus_sdk.TransferClient]:
+    """
+    Temporarily use a specific Globus Transfer client.
+
+    This provides a scoped way for non-interactive applications to supply an
+    already-authorized client without changing the user-facing download APIs.
+    Outside the context, transfer clients continue to be created using the
+    native-app authentication flow.
+
+    Parameters
+    ----------
+    transfer_client
+        An authorized Globus Transfer client.
+
+    Yields
+    ------
+    `globus_sdk.TransferClient`
+        The supplied transfer client.
+
+    Examples
+    --------
+    Use an already-authorized client to download a dataset:
+
+    .. code-block:: python
+
+        from dkist.net.globus import use_transfer_client
+
+        with use_transfer_client(authorized_client):
+            dataset.files.download(destination_endpoint=endpoint_id)
+    """
+    token = _transfer_client_override.set(transfer_client)
+    try:
+        yield transfer_client
+    finally:
+        _transfer_client_override.reset(token)
 
 
 def get_transfer_client(force_reauth=False):
@@ -28,6 +82,9 @@ def get_transfer_client(force_reauth=False):
     -------
     `globus_sdk.TransferClient`
     """
+    if (transfer_client := _transfer_client_override.get()) is not None:
+        return transfer_client
+
     auth = get_refresh_token_authorizer(force_reauth)["transfer.api.globus.org"]
     return globus_sdk.TransferClient(authorizer=auth)
 
