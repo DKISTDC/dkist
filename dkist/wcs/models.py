@@ -14,6 +14,7 @@ import astropy.modeling.models as m
 import astropy.units as u
 from astropy.modeling import CompoundModel, Model, Parameter, separable
 from astropy.utils.decorators import deprecated_renamed_argument
+from gwcs.spectroscopy import RefractedAngleSineModel, WavelengthFromGrismEquation
 
 from dkist.utils.decorators import deprecated
 from dkist.utils.exceptions import DKISTDeprecationWarning
@@ -30,9 +31,61 @@ __all__ = [
     "VaryingCelestialTransform",
     "VaryingCelestialTransform2D",
     "VaryingCelestialTransform3D",
+    "build_grating_spectral_transform",
     "generate_celestial_transform",
     "varying_celestial_transform_from_tables",
 ]
+
+
+def build_grating_spectral_transform(
+    reference_pixel: float,
+    reference_wavelength: u.Quantity,
+    dispersion: u.Quantity,
+    groove_density: u.Quantity,
+    spectral_order: u.Quantity,
+    incident_angle: u.Quantity,
+    refractive_index: u.Quantity = 1 * u.one,
+    refractive_index_derivative: u.Quantity = 0 / u.m,
+    out_of_plane_angle: u.Quantity = 0 * u.deg,
+    camera_angle: u.Quantity = 0 * u.deg,
+) -> CompoundModel:
+    """
+    Build a FITS grating spectral transform from header-derived parameters.
+
+    Composes a constant incident-angle sine term (`~astropy.modeling.models.Const1D`),
+    a pixel-dependent refracted-angle sine model
+    (`~gwcs.spectroscopy.RefractedAngleSineModel`), and
+    `~gwcs.spectroscopy.WavelengthFromGrismEquation`, following the FITS
+    grating/grism spectral-coordinate formalism described by Greisen et al.
+    (2006). The input and output angles are computed from the Greisen
+    relations within the component models:
+    https://scixplorer.org/abs/2006A%26A...446..747G/abstract
+    """
+    model = WavelengthFromGrismEquation(
+        groove_density=groove_density,
+        spectral_order=spectral_order,
+        reference_wavelength=reference_wavelength,
+        refractive_index=refractive_index,
+        refractive_index_derivative=refractive_index_derivative,
+        out_of_plane_angle=out_of_plane_angle,
+    )
+
+    alpha_in = m.Const1D(amplitude=np.sin(incident_angle))
+
+    alpha_out = RefractedAngleSineModel(
+        reference_pixel=reference_pixel,
+        reference_wavelength=reference_wavelength,
+        dispersion=dispersion,
+        groove_density=groove_density,
+        spectral_order=spectral_order,
+        incident_angle=incident_angle,
+        refractive_index=refractive_index,
+        refractive_index_derivative=refractive_index_derivative,
+        out_of_plane_angle=out_of_plane_angle,
+        camera_angle=camera_angle,
+    )
+
+    return m.Mapping((0, 0)) | (alpha_in & alpha_out) | model
 
 
 def generate_celestial_transform(
