@@ -1,10 +1,5 @@
-import pytest
-
 import asdf
 from asdf.testing.helpers import roundtrip_object
-from astropy.table import Table
-
-from dkist.dataset import DatasetExtra
 
 
 def assert_dataset_extra_equal(new, old):
@@ -25,26 +20,6 @@ def assert_dataset_extra_equal(new, old):
 def test_roundtrip_dataset_extra(dataset_extra_obj):
     newobj = roundtrip_object(dataset_extra_obj)
     assert_dataset_extra_equal(newobj, dataset_extra_obj)
-
-
-@pytest.fixture
-def dataset_extras():
-    headers = Table({"col1": [1, 2, 3, 4], "col2": ["a", "b", "c", "d"]})
-    ears1 = [asdf.ExternalArrayReference("file1.fits", 0, "float64", (10, 10))]
-    ears2 = [asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10))]
-    extra1 = DatasetExtra(
-        name="extra1",
-        full_header_table=headers,
-        header_rows=[0, 1],
-        ears=ears1,
-    )
-    extra2 = DatasetExtra(
-        name="extra2",
-        full_header_table=headers,
-        header_rows=[2, 3],
-        ears=ears2,
-    )
-    return extra1, extra2
 
 
 def test_roundtrip_dataset_extra_with_header_rows(dataset_extras):
