@@ -41,6 +41,16 @@ def test_download_default_keywords(dataset, orchestrate_transfer_mock, mock_inve
     )
 
 
+def test_download_remote_basepath(dataset, orchestrate_transfer_mock, mock_inventory_refresh):
+    # A remote basepath can not be used as the Globus destination, so the
+    # default destination should be the same as when basepath is not set.
+    dataset.files.basepath = "memory://some/remote/location"
+
+    dataset.files.download()
+
+    assert orchestrate_transfer_mock.call_args.kwargs["destination_path"] == Path("/~")
+
+
 @pytest.fixture
 def httpserver_dataset_endpoint(httpserver):
     old = conf.dataset_endpoint
@@ -232,6 +242,21 @@ def test_download_quality_invalid_format(small_visp_dataset):
         small_visp_dataset.files.quality_report(format="xml")
 
 
+def test_download_quality_remote_basepath(mocker, small_visp_dataset):
+    # A remote basepath should not be used as the default download path
+    downloader = mocker.patch("dkist.io.file_manager.Downloader")
+    dataset_id = small_visp_dataset.meta["inventory"]["datasetId"]
+
+    small_visp_dataset.files.basepath = "memory://some/remote/location"
+    small_visp_dataset.files.quality_report()
+
+    downloader.return_value.enqueue_file.assert_called_once_with(
+        f"{conf.download_endpoint}/quality?datasetId={dataset_id}",
+        path=None,
+        overwrite=None,
+    )
+
+
 @pytest.mark.parametrize("kwargs", [
     {},
     {"path": "~/", "overwrite": True}
@@ -250,6 +275,20 @@ def test_download_quality_movie(mocker, small_visp_dataset, kwargs):
     simple_download.assert_called_once_with(
         [f"{conf.download_endpoint}/movie?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
         **kwargs
+    )
+
+
+def test_download_quality_movie_remote_basepath(mocker, small_visp_dataset):
+    # A remote basepath should not be used as the default download path
+    simple_download = mocker.patch("dkist.io.file_manager.Downloader.simple_download")
+
+    small_visp_dataset.files.basepath = "memory://some/remote/location"
+    small_visp_dataset.files.preview_movie()
+
+    simple_download.assert_called_once_with(
+        [f"{conf.download_endpoint}/movie?datasetId={small_visp_dataset.meta['inventory']['datasetId']}"],
+        path=None,
+        overwrite=None,
     )
 
 

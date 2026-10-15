@@ -92,10 +92,11 @@ class AstropyFITSLoader(BaseFITSLoader):
             # which only uses memory for one value.
             return np.broadcast_to((np.nan,), self.shape) * np.nan
 
-        with fits.open(self.absolute_uri,
-                       memmap=False,  # memmap is redundant with dask and delayed loading
-                       do_not_scale_image_data=True,  # don't scale as we shouldn't need to
-                       mode="denywrite") as hdul:
+        with self.absolute_uri.open(mode="rb") as fileobj, fits.open(
+            fileobj,
+            memmap=False,  # memmap is redundant with dask and delayed loading
+            do_not_scale_image_data=True,  # don't scale as we shouldn't need to
+        ) as hdul:
             log.debug("Accessing slice %s from file %s", slc, self.absolute_uri)
 
             hdu = hdul[self.target]
