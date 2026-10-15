@@ -15,7 +15,7 @@ import gwcs
 import gwcs.coordinate_frames as cf
 from astropy.io import fits
 from astropy.modeling import Model, Parameter
-from astropy.table import Table, vstack
+from astropy.table import MaskedColumn, Table, vstack
 from astropy.time import Time
 
 from sunpy.coordinates.frames import Helioprojective
@@ -498,6 +498,38 @@ def dataset_extra_obj():
         asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10)),
     ]
     return DatasetExtra(name="test_extra", full_header_table=headers, ears=ears, basepath=".")
+
+
+@pytest.fixture
+def dataset_extras():
+    """
+    Two extras sharing the same full_header_table with extra-specific
+    (masked) columns, so that each column's data only appears in one
+    extra after header_rows selection.
+    """
+    headers = Table()
+    headers["common"] = [1, 2, 3, 4]
+    headers["extra1_only"] = MaskedColumn(
+        data=["a", "b", "", ""], mask=[False, False, True, True]
+    )
+    headers["extra2_only"] = MaskedColumn(
+        data=["", "", "c", "d"], mask=[True, True, False, False]
+    )
+    ears1 = [asdf.ExternalArrayReference("file1.fits", 0, "float64", (10, 10))]
+    ears2 = [asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10))]
+    extra1 = DatasetExtra(
+        name="extra1",
+        full_header_table=headers,
+        header_rows=[0, 1],
+        ears=ears1,
+    )
+    extra2 = DatasetExtra(
+        name="extra2",
+        full_header_table=headers,
+        header_rows=[2, 3],
+        ears=ears2,
+    )
+    return extra1, extra2
 
 
 @pytest.fixture

@@ -36,6 +36,18 @@ def test_headers_with_header_rows():
     assert list(result["col2"]) == ["a", "c"]
 
 
+def test_headers_filters_extra_specific_columns(dataset_extras):
+    extra1, extra2 = dataset_extras
+
+    assert list(extra1.headers["common"]) == [1, 2]
+    assert list(extra1.headers["extra1_only"]) == ["a", "b"]
+    assert "extra2_only" not in extra1.headers.colnames
+
+    assert list(extra2.headers["common"]) == [3, 4]
+    assert "extra1_only" not in extra2.headers.colnames
+    assert list(extra2.headers["extra2_only"]) == ["c", "d"]
+
+
 def test_data(dataset_extra_obj, dataset_extra_dir):
     data = dataset_extra_obj.data
     assert isinstance(data, list)

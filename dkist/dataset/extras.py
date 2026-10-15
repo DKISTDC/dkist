@@ -75,10 +75,25 @@ class DatasetExtra:
     def name(self) -> str:
         return self._name
 
+    @staticmethod
+    def _drop_fully_masked_columns(table: Table) -> Table:
+        """Remove columns where every row is masked."""
+        cols_to_remove = []
+        for colname in table.colnames:
+            col = table[colname]
+            # Check if column has a mask and all values are masked
+            if hasattr(col, "mask") and col.mask is not None and col.mask.all():
+                cols_to_remove.append(colname)
+
+        if cols_to_remove:
+            table.remove_columns(cols_to_remove)
+
+        return table
+
     @property
     def headers(self) -> Table:
         if self._header_rows is not None:
-            return self._full_header_table[self._header_rows]
+            return self._drop_fully_masked_columns(self._full_header_table[self._header_rows])
         return self._full_header_table
 
     @property
