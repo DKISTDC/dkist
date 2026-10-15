@@ -13,6 +13,8 @@ from dkist.net.globus.endpoints import (
     get_directory_listing,
     get_endpoint_id,
     get_local_endpoint_id,
+    get_transfer_client,
+    use_transfer_client,
 )
 
 
@@ -62,6 +64,66 @@ def mock_search(mocker):
 
 def test_get_transfer_client(mocker, transfer_client):
     assert isinstance(transfer_client, globus_sdk.TransferClient)
+
+
+def test_use_transfer_client_is_scoped(mocker):
+    default_client = mocker.sentinel.default_client
+    supplied_client = mocker.sentinel.supplied_client
+    transfer_client_constructor = mocker.patch(
+        "dkist.net.globus.endpoints.globus_sdk.TransferClient",
+        return_value=default_client,
+    )
+    mocker.patch(
+        "dkist.net.globus.endpoints.get_refresh_token_authorizer",
+        return_value={"transfer.api.globus.org": mocker.sentinel.authorizer},
+    )
+
+    with use_transfer_client(supplied_client) as active_client:
+        assert active_client is supplied_client
+        assert get_transfer_client() is supplied_client
+        transfer_client_constructor.assert_not_called()
+
+    assert get_transfer_client() is default_client
+    transfer_client_constructor.assert_called_once_with(
+        authorizer=mocker.sentinel.authorizer,
+    )
+
+
+def test_use_transfer_client_restores_outer_client():
+    """
+    Given an outer context with its own transfer client,
+    when a nested context temporarily supplies a different client,
+    then exiting the nested context restores the outer client.
+    """
+    outer_client = globus_sdk.TransferClient()
+    inner_client = globus_sdk.TransferClient()
+
+    with use_transfer_client(outer_client):
+        assert get_transfer_client() is outer_client
+
+        with use_transfer_client(inner_client):
+            assert get_transfer_client() is inner_client
+
+        assert get_transfer_client() is outer_client
+
+
+def test_use_transfer_client_restores_after_error(mocker):
+    default_client = mocker.sentinel.default_client
+    supplied_client = mocker.sentinel.supplied_client
+    mocker.patch(
+        "dkist.net.globus.endpoints.globus_sdk.TransferClient",
+        return_value=default_client,
+    )
+    mocker.patch(
+        "dkist.net.globus.endpoints.get_refresh_token_authorizer",
+        return_value={"transfer.api.globus.org": mocker.sentinel.authorizer},
+    )
+
+    with pytest.raises(RuntimeError, match="test error"):
+        with use_transfer_client(supplied_client):
+            raise RuntimeError("test error")
+
+    assert get_transfer_client() is default_client
 
 
 @pytest.mark.parametrize("endpoint_id", ["12345", None])
