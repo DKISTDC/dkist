@@ -12,11 +12,40 @@ from dkist.io.dask.loaders import AstropyFITSLoader
 class DatasetExtra:
     """
     This class represents information about all the files for a specific dataset extra.
+
+    Parameters
+    ----------
+
+    name
+        The name of the extra.
+    full_header_table
+        The header table of either headers for this extra or all
+        extras associated with the dataset.
+    header_rows
+        The rows in ``full_header_table`` which correspond to this
+        extra (in the order of ``ears``). If `None` then all rows from
+        ``full_header_table`` are used.
+    ears
+        The `asdf.ExternalArrayReference` objects for the extra data
+        in the FITS files, must be the same length as
+        ``full_header_table[header_rows]``.
+    basepath
+        The path where the FITS files described by the URIs in
+        ``ears`` can be found. If `None`, the URIs are assumed to be absolute.
     """
 
-    def __init__(self, name: str, headers: Table, ears: list[asdf.ExternalArrayReference], basepath: os.PathLike | None = None):
+    def __init__(
+        self,
+        name: str,
+        *,
+        full_header_table: Table,
+        header_rows: list[int] | None = None,
+        ears: list[asdf.ExternalArrayReference],
+        basepath: os.PathLike | None = None,
+    ):
         self._name = name
-        self._headers = headers
+        self._full_header_table = full_header_table
+        self._header_rows = header_rows
         self._ears = ears
         self.basepath = basepath
 
@@ -48,7 +77,9 @@ class DatasetExtra:
 
     @property
     def headers(self) -> Table:
-        return self._headers
+        if self._header_rows is not None:
+            return self._full_header_table[self._header_rows]
+        return self._full_header_table
 
     @property
     def data(self) -> list[dask.array.Array]:

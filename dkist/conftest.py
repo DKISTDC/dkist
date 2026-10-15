@@ -497,7 +497,7 @@ def dataset_extra_obj():
         asdf.ExternalArrayReference("file1.fits", 0, "float64", (10, 10)),
         asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10)),
     ]
-    return DatasetExtra(name="test_extra", headers=headers, ears=ears, basepath=".")
+    return DatasetExtra(name="test_extra", full_header_table=headers, ears=ears, basepath=".")
 
 
 @pytest.fixture
