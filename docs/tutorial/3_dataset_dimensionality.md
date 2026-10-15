@@ -131,7 +131,7 @@ ds.wcs.pixel_axis_names
 note how these are reversed from one another, we can print them together with:
 
 ```{code-cell} ipython3
-for name, length in zip(ds.wcs.pixel_axis_names[::-1], ds.shape):
+for name, length in zip(ds.wcs.pixel_axis_names, ds.wcs.pixel_shape):
     print(f"{name}: {length}")
 ```
 

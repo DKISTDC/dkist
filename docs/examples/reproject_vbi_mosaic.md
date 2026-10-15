@@ -38,7 +38,7 @@ from dkist.data.sample import VBI_L1_NZJTB
 
 ## Obtaining some data
 
-In this example we will use the VBI sample dataset [AJQWW](https://dkist.data.nso.edu/datasetview/AJQWW).
+In this example we will use the VBI sample dataset [L1_NZJTB](https://dkist.data.nso.edu/product/L1-NZJTB).
 If you want to replace this dataset with your own dataset, see {ref}`dkist:howto-guide:sample-data`.
 
 Let's load the data with {obj}`dkist.load_dataset`:
