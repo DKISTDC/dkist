@@ -1,8 +1,11 @@
 import dask.array as da
 import numpy as np
 
+import asdf
 from astropy.io import fits
 from astropy.table import Table
+
+from dkist.dataset import DatasetExtra
 
 
 def test_name(dataset_extra_obj):
@@ -13,6 +16,24 @@ def test_headers(dataset_extra_obj):
     assert isinstance(dataset_extra_obj.headers, Table)
     assert len(dataset_extra_obj.headers) == 2
     assert dataset_extra_obj.headers.colnames == ["col1", "col2"]
+
+
+def test_headers_with_header_rows():
+    headers = Table({"col1": [1, 2, 3, 4], "col2": ["a", "b", "c", "d"]})
+    ears = [
+        asdf.ExternalArrayReference("file1.fits", 0, "float64", (10, 10)),
+        asdf.ExternalArrayReference("file2.fits", 1, "float64", (10, 10)),
+    ]
+    extra = DatasetExtra(
+        name="test_extra",
+        full_header_table=headers,
+        header_rows=[0, 2],
+        ears=ears,
+    )
+    result = extra.headers
+    assert len(result) == 2
+    assert list(result["col1"]) == [1, 3]
+    assert list(result["col2"]) == ["a", "c"]
 
 
 def test_data(dataset_extra_obj, dataset_extra_dir):

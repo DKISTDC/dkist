@@ -11,14 +11,19 @@ properties:
   name:
     type: string
     description: Dataset extra name
-  headers:
+  full_header_table:
     tag: "tag:astropy.org:astropy/table/table-1.*"
-    description: Table of all headers for the extra
+    description: Table of all headers for the extra, or all extras in a dataset.
+  header_rows:
+    description: Rows in full_header_table which correspond to this extra, if missing, all rows are used.
+    type: array
+    items:
+      type: integer
   files:
     type: array
     items:
       tag: "tag:stsci.edu:asdf/core/externalarray-1.0.0"
 
-required: [name, headers, files]
+required: [name, full_header_table, files]
 additionalProperties: false
 ...
