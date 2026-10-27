@@ -88,6 +88,11 @@ def build_grating_spectral_transform(
     return m.Mapping((0, 0)) | (alpha_in & alpha_out) | model
 
 
+def _round_half_up(values):
+    """Round to the nearest integer, with halves going to the later pixel."""
+    return np.array(np.floor(np.add(values, 0.5)), dtype=int)
+
+
 def generate_celestial_transform(
         crpix: Iterable[float] | u.Quantity,
         cdelt: Iterable[float] | u.Quantity,
@@ -252,7 +257,8 @@ class BaseVaryingCelestialTransform(Model, ABC):
     def sanitize_index(ind):
         if isinstance(ind, u.Quantity):
             ind = ind.value
-        return np.array(np.round(ind), dtype=int)
+        # A lookup halfway between two rows uses the later row.
+        return np.array(_round_half_up(ind), dtype=int)
 
     @deprecated_renamed_argument("crpix", "crpix_table", "1.12", warning_type=DKISTDeprecationWarning)
     def __init__(self, *args, crval_table=None, pc_table=None, crpix_table=None, projection=m.Pix2Sky_TAN(), **kwargs):
@@ -366,30 +372,35 @@ class BaseVaryingCelestialTransform(Model, ABC):
         barrays = np.broadcast_arrays(*arrays, subok=True)
         # # Convert the z, q, and m coordinates where present into indices to the lookup tables
         inds = []
-        for barray in barrays[2:]:
-            inds.append(self.sanitize_index(barray))
+        for barray, size in zip(barrays[2:], self.table_shape):
+            ind = self.sanitize_index(barray)
+            # Keep the outer pixel edge, size - 0.5, on the last row.
+            value = barray.value if isinstance(barray, u.Quantity) else barray
+            inds.append(np.where(value <= size - 0.5, np.minimum(ind, size - 1), ind))
 
         if isinstance(barrays[0], u.Quantity):
             # Because we have set input_units_strict to True we can assume that
             # all inputs have the correct units for the transform
             arrays = [arr.value for arr in barrays]
+        else:
+            arrays = barrays
 
-        x_out = np.empty_like(arrays[0])
-        y_out = np.empty_like(arrays[1])
+        x_out = np.full_like(arrays[0], np.nan)
+        y_out = np.full_like(arrays[1], np.nan)
 
         # We now loop over every unique value of z and compute the transform.
         # This means we make the minimum number of calls possible to the transform.
         ranges = [np.unique(ind) for ind in inds]
         for ind in product(*ranges):
+            # Leave points outside the lookup table as NaN.
+            if any(i < 0 or i >= size for i, size in zip(ind, self.table_shape)):
+                continue
             # Scalar parameters are reshaped to be length one arrays by modeling
             sct = self.transform_at_index(ind, cdelt=cdelt[0], lon_pole=lon_pole[0])
 
             # Call this transform for all values of x, y where z == zind
             masks = [inds[i] == ind[i] for i in range(len(ind))]
-            if len(masks) > 1:
-                mask = np.logical_and(*masks)
-            else:
-                mask = masks[0]
+            mask = np.logical_and.reduce(masks)
             if inverse:
                 xx, yy = sct.inverse(arrays[0][mask], arrays[1][mask])
             else:
@@ -792,13 +803,17 @@ class Ravel(Model):
         # round the index values, but clip them if they exceed the array bounds
         # the bounds are one less than the shape dimension value
         array_bounds = np.array(self.array_shape) - 1
-        rounded_inputs = np.rint(input_values).astype(int)
+        # Halfway coordinates use the later pixel. Clip the outer edge to the
+        # last pixel before calculating the fractional offset.
+        rounded_inputs = np.clip(_round_half_up(input_values), 0, array_bounds[:, np.newaxis])
         result = np.ravel_multi_index(rounded_inputs, self.array_shape, order=self.order, mode="clip").astype(float)
         index = 0 if self.order == "F" else -1
         # Adjust the result to allow a fractional part for interpolation in Tabular1D
         fraction = input_values[index] - rounded_inputs[index]
         result += fraction
-        oob = np.logical_or((rounded_inputs < 0), (rounded_inputs > array_bounds[:, np.newaxis])).any(axis=0)
+        # Coordinates at either outer pixel edge are still inside the array.
+        values = np.asarray(input_values)
+        oob = ~((values >= -0.5) & (values <= array_bounds[:, np.newaxis] + 0.5)).all(axis=0)
         result[oob] = np.nan
         # Put the units back if they were there...
         if has_units:

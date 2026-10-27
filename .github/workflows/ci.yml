@@ -32,7 +32,8 @@ permissions: {}
 
 jobs:
   core:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    if: ${{ !github.event.repository.fork || github.event_name != 'schedule' }}
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     permissions:
       id-token: write
     with:
@@ -58,7 +59,7 @@ jobs:
 
   test:
     needs: [core, sdist_verify]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     permissions:
       id-token: write
     with:
@@ -75,7 +76,7 @@ jobs:
 
   docs:
     needs: [core]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     with:
       default_python: '3.13'
       submodules: false
@@ -89,7 +90,7 @@ jobs:
 
   mypy:
     needs: [core]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     with:
       submodules: false
       toxdeps: tox-pypi-filter
@@ -98,7 +99,7 @@ jobs:
 
   allowed-fail-tests:
     needs: [core]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     permissions:
       id-token: write
     with:
@@ -119,7 +120,7 @@ jobs:
         contains(github.event.pull_request.labels.*.name, 'Run publish')
       )
     needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@22ddf09dfabb443adddfb9f861b7d41a787d6b1a  # v3.0.3
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@3a3dcf3ba6828dac29eba10334948ef38364ed14  # v3.1.0
     with:
       python-version: '3.13'
       test_extras: 'tests'
@@ -157,7 +158,7 @@ jobs:
     environment:
       name: notify
     steps:
-      - uses: Cadair/matrix-notify-action@31c7cc36051ee7dc4157a22c1f13dbc7d68e5120  # v2
+      - uses: Cadair/matrix-notify-action@9f46790e6ae0a5a83bd63ae0a3bb1948f2bc784c  # v3
         with:
           workflow_description: 'CI Workflow'
           matrix_token: ${{ secrets.MATRIX_ACCESS_TOKEN }}

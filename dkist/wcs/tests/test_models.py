@@ -237,6 +237,18 @@ def test_varying_transform_pc_unitless():
     assert np.allclose(vct.inverse(*world, 5), pixel[:2], atol=0.01)
 
 
+def test_varying_transform_unitless_scalar_pixel():
+    """
+    Scalar x and y without units work with an array of lookup indices.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    lon, lat = vct(0, 0, [0, 1])
+
+    assert np.allclose(lon, [10, 20])
+    assert np.allclose(lat, [0, 0])
+
+
 def test_varying_transform_crval():
     crval_table = ((0, 1), (2, 3), (4, 5)) * u.arcsec
     vct = VaryingCelestialTransform(
@@ -468,6 +480,19 @@ def test_vct_slit_bounds(slit):
             slit=slit,
         )
 
+
+def test_vct_inverse_outside_the_table():
+    """
+    The inverse returns NaN for lookup indices outside the table.
+    """
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=((10, 0), (20, 0)), pc_table=np.identity(2))
+
+    x, y = vct.inverse([10, 10], [0, 0], [0, 5])
+
+    assert np.allclose([x[0], y[0]], [0, 0])
+    assert np.isnan([x[1], y[1]]).all()
+
+
 @pytest.mark.parametrize("num_varying_axes", [pytest.param(1, id="1D"), pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("slit", [pytest.param(1, id="spectrograph"), pytest.param(None, id="imager")])
 @pytest.mark.parametrize("has_units", [pytest.param(True, id="With Units"), pytest.param(False, id="Without Units")])
@@ -540,6 +565,22 @@ def test_vct(has_units, slit, num_varying_axes):
     # grid2 has coordinates outside the lut boundaries and should have nans
     world2 = vct(*grid2)
     assert np.any(np.isnan(list(world2)))
+
+
+def test_vct3d_uses_all_three_lookup_indices():
+    """
+    Select each 3D table entry using all three lookup indices.
+    """
+    lookups = np.indices((2, 2, 2)).reshape(3, -1)
+    crval_table = np.zeros((2, 2, 2, 2))
+    crval_table[..., 0] = 10 + np.arange(8).reshape(2, 2, 2)
+    vct = VaryingCelestialTransform3D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=crval_table, pc_table=np.identity(2))
+    zeros = np.zeros(8)
+
+    lon, lat = vct(zeros, zeros, *lookups)
+
+    assert np.allclose(lon, crval_table[tuple(lookups)][:, 0])
+    assert np.allclose(vct.inverse(lon, lat, *lookups), 0, atol=1e-9)
 
 
 def _evaluate_ravel(array_shape, inputs, order="C"):
@@ -685,6 +726,40 @@ def test_ravel_ordering(ndim, order):
         assert int(ravel_value) == values[tuple(inputs)]
 
 
+@pytest.mark.parametrize("n", [pytest.param(4, id="even"), pytest.param(5, id="odd")])
+def test_ravel_pixel_edges(n):
+    """
+    Ravel returns finite values at both outer pixel edges.
+    Coordinates beyond the array return NaN.
+    See DKISTDC/dkist#761.
+    """
+    ravel = Ravel((n, n))
+    edges, beyond, zeros = np.array([-0.5, n - 0.5]), np.array([-0.51, n - 0.49]), np.zeros(2)
+
+    # The last axis keeps its fraction, the others are rounded.
+    assert np.allclose(ravel(zeros, edges), [-0.5, n - 0.5])
+    assert np.allclose(ravel(edges, zeros), [0, (n - 1) * n])
+    assert np.isnan(ravel(zeros, beyond)).all()
+    assert np.isnan(ravel(beyond, zeros)).all()
+
+
+@pytest.mark.parametrize("order", ["C", "F"])
+@pytest.mark.parametrize("has_units", [True, False])
+def test_ravel_half_pixels_take_the_later_pixel(order, has_units):
+    """
+    A halfway coordinate on a rounded axis uses the later pixel.
+    """
+    ravel = Ravel((4, 4), order=order)
+    half_pixels = np.array([0.5, 1.5, 2.5])
+    zeros = np.zeros(3)
+    inputs = (half_pixels, zeros) if order == "C" else (zeros, half_pixels)
+    unit = u.pix if has_units else 1
+
+    result = ravel(*(axis * unit for axis in inputs))
+
+    assert np.allclose(result, np.array([4, 8, 12]) * unit)
+
+
 @pytest.mark.parametrize("ndim", [pytest.param(2, id="2D"), pytest.param(3, id="3D")])
 @pytest.mark.parametrize("order", ["C", "F"])
 def test_ravel_repr(ndim, order):
@@ -770,3 +845,34 @@ def test_varying_transform_crval_crpix():
     world_1 = trans1(0,0)
 
     assert world_0 == world_1
+
+
+@pytest.mark.parametrize("n_rows", [pytest.param(4, id="even"), pytest.param(5, id="odd")])
+def test_vct_pixel_edges_belong_to_the_first_and_last_rows(n_rows):
+    """
+    Pixel corners at both outer edges have finite coordinates.
+    Coordinates beyond the lookup table return NaN. See DKISTDC/dkist#761.
+    """
+    pc_table = np.broadcast_to(np.identity(2), (n_rows, n_rows, 2, 2))
+    vct = VaryingCelestialTransform2D(crpix_table=(0, 0), cdelt=(1, 1), crval_table=(0, 0), pc_table=pc_table)
+    edges, beyond, zeros = np.array([-0.5, n_rows - 0.5]), np.array([-0.51, n_rows - 0.49]), np.zeros(2)
+
+    for lookups in ((edges, zeros), (zeros, edges)):
+        world = vct(zeros, zeros, *lookups)
+        assert np.isfinite(world).all()
+        assert np.isfinite(vct.inverse(*world, *lookups)).all()
+    for lookups in ((beyond, zeros), (zeros, beyond)):
+        assert np.isnan(vct(zeros, zeros, *lookups)).all()
+
+
+def test_vct_half_pixels_take_the_later_row():
+    """
+    A lookup halfway between two rows uses the later row. See DKISTDC/dkist#761.
+    """
+    crval_table = np.stack([10 + np.arange(4), np.zeros(4)], axis=-1)
+    vct = VaryingCelestialTransform(crpix_table=(0, 0), cdelt=(1, 1), crval_table=crval_table, pc_table=np.identity(2))
+    zeros = np.zeros(3)
+
+    lon, _ = vct(zeros, zeros, [0.5, 1.5, 2.5])
+
+    assert np.allclose(lon, [11, 12, 13])

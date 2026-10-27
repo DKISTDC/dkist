@@ -1,5 +1,4 @@
 import importlib.resources as importlib_resources
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -19,8 +18,8 @@ def test_verify_tiled_dataset_schema(tiled_dataset_asdf_path):
 
 
 @pytest.mark.parametrize("slice", [np.s_[:2, :2], np.s_[:, 1]])
-def test_save_tiled_dataset_sliced(large_tiled_dataset, slice):
-    fname = "tds-save-test.asdf"
+def test_save_tiled_dataset_sliced(large_tiled_dataset, slice, tmp_path):
+    fname = tmp_path / "tds-save-test.asdf"
     ds = large_tiled_dataset
 
     ds1 = ds[slice]
@@ -36,8 +35,8 @@ def test_save_tiled_dataset_sliced(large_tiled_dataset, slice):
 
 
 @pytest.mark.parametrize("slice", [np.s_[0], np.s_[0, :100, 100:], np.s_[:, :, 0]])
-def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice):
-    fname = "tds-save-test.asdf"
+def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice, tmp_path):
+    fname = tmp_path / "tds-save-test.asdf"
     ds = large_tiled_dataset
 
     ds1 = ds.slice_tiles[slice]
@@ -53,8 +52,8 @@ def test_save_tiled_dataset_sliced_tiles(large_tiled_dataset, slice):
     assert ds1.meta["inventory"] == ds2.meta["inventory"]
 
 
-def test_save_tiled_dataset_to_existing_file(large_tiled_dataset):
-    fname = "tds-overwrite-test.asdf"
+def test_save_tiled_dataset_to_existing_file(large_tiled_dataset, tmp_path):
+    fname = tmp_path / "tds-overwrite-test.asdf"
     ds = large_tiled_dataset
 
     save_dataset(ds, fname)
@@ -68,6 +67,3 @@ def test_save_tiled_dataset_to_existing_file(large_tiled_dataset):
 
     # Just need to test enough to make sure it's the sliced ds and not the original in the file
     assert ds1.tiles_shape == ds2.tiles_shape
-
-    # Tidying. I'm sure there's a better fixture-based way to do this
-    Path(fname).unlink()
