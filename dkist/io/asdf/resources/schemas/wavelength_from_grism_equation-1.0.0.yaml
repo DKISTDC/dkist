@@ -1,0 +1,42 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/wavelength_from_grism_equation-1.0.0"
+
+title: Wavelength from the FITS -GRA/-GRI grism equation.
+description: |
+  Computes wavelength from the sines of the incident and refracted angles
+  using the FITS grism equation (Greisen et al. 2006, Eq. 70). The optional
+  grism terms (reference_wavelength, refractive_index,
+  refractive_index_derivative, out_of_plane_angle) take their identity values
+  when absent, reducing this to the classic grating equation.
+
+definitions:
+  scalar:
+    anyOf:
+      - type: number
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+
+allOf:
+  - $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.4.0"
+  - properties:
+      groove_density:
+        description: Grating ruling density.
+        $ref: "#/definitions/scalar"
+      spectral_order:
+        description: Spectral order.
+        $ref: "#/definitions/scalar"
+      reference_wavelength:
+        description: Wavelength at the reference pixel.
+        $ref: "#/definitions/scalar"
+      refractive_index:
+        description: Refractive index at the reference wavelength.
+        $ref: "#/definitions/scalar"
+      refractive_index_derivative:
+        description: Derivative of the refractive index with respect to wavelength.
+        $ref: "#/definitions/scalar"
+      out_of_plane_angle:
+        description: Out-of-plane grating angle.
+        $ref: "#/definitions/scalar"
+    required: [groove_density, spectral_order]
+...

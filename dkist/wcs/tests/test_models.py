@@ -10,15 +10,16 @@ from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
 from astropy.wcs import WCS
-from gwcs.spectroscopy import RefractedAngleSineModel
 
 from dkist.wcs.models import (
     AsymmetricMapping,
     Ravel,
+    RefractedAngleSineModel,
     Unravel,
     VaryingCelestialTransform,
     VaryingCelestialTransform2D,
     VaryingCelestialTransform3D,
+    build_grating_spectral_transform,
     generate_celestial_transform,
     update_celestial_transform_parameters,
     varying_celestial_transform_from_tables,
@@ -94,7 +95,7 @@ def test_build_grating_spectral_transform() -> None:
     result = transform(pixels)
 
     assert isinstance(transform, CompoundModel)
-    # The transform should contain the gwcs refracted-angle model.
+    # The transform should contain the refracted-angle model.
     assert any(
         isinstance(sm, RefractedAngleSineModel)
         for sm in transform.traverse_postorder()
