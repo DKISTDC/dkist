@@ -1,0 +1,54 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://dkist.nso.edu/schemas/refracted_angle_sine_model-1.0.0"
+
+title: Sine of the refracted angle for a FITS -GRA/-GRI spectral axis.
+description: |
+  Converts a pixel coordinate into the sine of the refracted (output) angle
+  of a grating or grism, following the FITS grism spectral-coordinate
+  formalism of Greisen et al. (2006), sections 5.1.2 and 5.2. The optional
+  grism terms (refractive_index, refractive_index_derivative,
+  out_of_plane_angle, camera_angle) take their identity values when absent.
+
+definitions:
+  scalar:
+    anyOf:
+      - type: number
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+
+allOf:
+  - $ref: "http://stsci.edu/schemas/asdf/transform/transform-1.4.0"
+  - properties:
+      reference_pixel:
+        description: Pixel coordinate of the reference point (0-indexed).
+        $ref: "#/definitions/scalar"
+      reference_wavelength:
+        description: Wavelength at the reference pixel.
+        $ref: "#/definitions/scalar"
+      dispersion:
+        description: Wavelength dispersion per pixel.
+        $ref: "#/definitions/scalar"
+      groove_density:
+        description: Grating ruling density.
+        $ref: "#/definitions/scalar"
+      spectral_order:
+        description: Spectral order.
+        $ref: "#/definitions/scalar"
+      incident_angle:
+        description: Incident grating angle.
+        $ref: "#/definitions/scalar"
+      refractive_index:
+        description: Refractive index at the reference wavelength.
+        $ref: "#/definitions/scalar"
+      refractive_index_derivative:
+        description: Derivative of the refractive index with respect to wavelength.
+        $ref: "#/definitions/scalar"
+      out_of_plane_angle:
+        description: Out-of-plane grating angle.
+        $ref: "#/definitions/scalar"
+      camera_angle:
+        description: Camera angle.
+        $ref: "#/definitions/scalar"
+    required: [reference_pixel, dispersion, groove_density, spectral_order, incident_angle]
+...
