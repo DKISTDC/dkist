@@ -101,7 +101,7 @@ Currently, {obj}`astropy.coordinates` supports:
 
 * Spatial coordinates via {obj}`astropy.coordinates.SkyCoord`
 * Spectral coordinates via {obj}`astropy.coordinates.SpectralCoord`
-* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (introduced in astropy 7.0)
+* Stokes profiles via {obj}`astropy.coordinates.StokesCoord` (introduced in astropy 5.3)
 
 ### Spatial Coordinates
 
@@ -141,6 +141,17 @@ There are few things to notice about the difference between these two `SkyCoord`
 1. The heliographic frame is three dimensional (it has a radius), when the input frame was not. This is because the distance from the observer was calculated using the `rsun` attribute.
 1. The `obstime` and `rsun` attributes are still present, but the `observer` attribute isn't. This is because heliographic coordinates are not observer dependent.
 1. The `obstime` attribute is still important to transform to other frames, as the heliographic frame needs to know the location of Earth.
+
++++
+
+Sunpy provides more equivalencies that might be useful here, for example if we wish to convert the solar angle values used for this SkyCoord into distance:
+
+```{code-cell} ipython3
+from sunpy.coordinates.utils import solar_angle_equivalency
+
+print((hpc1.Tx).to(u.km, equivalencies=solar_angle_equivalency(observer=hpc1.observer)))
+print((hpc1.Ty).to(u.km, equivalencies=solar_angle_equivalency(observer=hpc1.observer)))
+```
 
 ### Spectral Coordinates
 
