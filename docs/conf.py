@@ -3,7 +3,7 @@ Configuration file for the Sphinx documentation builder.
 """
 # -- stdlib imports ------------------------------------------------------------
 
-import datetime
+import datetime as dt
 import os
 
 from packaging.version import Version
@@ -40,7 +40,7 @@ is_release = not(_version.is_prerelease or _version.is_devrelease)
 
 project = "DKIST"
 author = "NSO / AURA"
-copyright = f"{datetime.datetime.now().year}, {author}"
+copyright = f"{dt.datetime.now().year}, {author}"
 
 # -- General configuration ---------------------------------------------------
 

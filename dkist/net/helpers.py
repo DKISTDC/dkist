@@ -1,7 +1,7 @@
 """
 Functions and classes for searching and downloading from the data center.
 """
-import datetime
+import datetime as dt
 from collections.abc import Iterable
 from os import PathLike
 from pathlib import Path
@@ -147,7 +147,7 @@ def transfer_complete_datasets(datasets: str | Iterable[str] | QueryResponseRow 
         destination_paths.append(Path(str(path).format(**path_inv)))
 
     if not label:
-        now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
+        now = dt.datetime.now().strftime("%Y-%m-%dT%H-%M")
         datasetids = ",".join(datasets["Dataset ID"])
         if len(datasetids) > 80:
             datasetids = f"{len(datasets['Dataset ID'])} datasets"

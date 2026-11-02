@@ -1,7 +1,7 @@
 """
 Hypothesis strategies for testing the DKIST client.
 """
-import datetime
+import datetime as dt
 import inspect
 import typing
 from functools import cache
@@ -77,8 +77,8 @@ def _unit_range(attr_type):
 
 @st.composite
 def _embargo_end(draw, time=Times(
-                 max_value=datetime.datetime(datetime.datetime.now(datetime.UTC).year, 1, 1, 0, 0),
-                 min_value=datetime.datetime(1981, 1, 1, 0, 0)),
+                 max_value=dt.datetime(dt.datetime.now(dt.UTC).year, 1, 1, 0, 0),
+                 min_value=dt.datetime(1981, 1, 1, 0, 0)),
                  delta=TimeDelta()):
     t1 = draw(time)
     t2 = t1 + draw(delta)
