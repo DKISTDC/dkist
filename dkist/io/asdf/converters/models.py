@@ -178,3 +178,78 @@ class AsymmetricMappingConverter(TransformConverterBase):
             node.get("forward_n_inputs"),
             node.get("backward_n_inputs"),
         )
+
+
+_GRISM_PARAMETER_DEFAULTS = {
+    "reference_wavelength": 0,
+    "refractive_index": 1,
+    "refractive_index_derivative": 0,
+    "out_of_plane_angle": 0,
+}
+
+
+def _grism_parameters_to_tree(model, node):
+    # Optional grism correction terms are omitted only when they are bare
+    # numbers at their identity values. A term that carries a unit is always
+    # written, even at its identity value, because dropping it would reload it
+    # as a unitless default and the model can't mix Quantities with bare numbers.
+    for name, default in _GRISM_PARAMETER_DEFAULTS.items():
+        param = getattr(model, name)
+        if param.unit is not None or param.value != default:
+            node[name] = parameter_to_value(param)
+    return node
+
+
+class RefractedAngleSineConverter(TransformConverterBase):
+    """
+    ASDF serialization support for RefractedAngleSineModel.
+    """
+
+    tags = [
+        "asdf://dkist.nso.edu/tags/refracted_angle_sine_model-*",
+    ]
+
+    types = ["dkist.wcs.models.RefractedAngleSineModel"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        node = {
+            "reference_pixel": parameter_to_value(model.reference_pixel),
+            "dispersion": parameter_to_value(model.dispersion),
+            "groove_density": parameter_to_value(model.groove_density),
+            "spectral_order": parameter_to_value(model.spectral_order),
+            "incident_angle": parameter_to_value(model.incident_angle),
+        }
+        if model.camera_angle.unit is not None or model.camera_angle.value != 0:
+            node["camera_angle"] = parameter_to_value(model.camera_angle)
+        return _grism_parameters_to_tree(model, node)
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import RefractedAngleSineModel
+
+        params = {name: node[name] for name in RefractedAngleSineModel.param_names if name in node}
+        return RefractedAngleSineModel(**params)
+
+
+class WavelengthFromGrismEquationConverter(TransformConverterBase):
+    """
+    ASDF serialization support for WavelengthFromGrismEquation.
+    """
+
+    tags = [
+        "asdf://dkist.nso.edu/tags/wavelength_from_grism_equation-*",
+    ]
+
+    types = ["dkist.wcs.models.WavelengthFromGrismEquation"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        node = {
+            "groove_density": parameter_to_value(model.groove_density),
+            "spectral_order": parameter_to_value(model.spectral_order),
+        }
+        return _grism_parameters_to_tree(model, node)
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import WavelengthFromGrismEquation
+
+        params = {name: node[name] for name in WavelengthFromGrismEquation.param_names if name in node}
+        return WavelengthFromGrismEquation(**params)
