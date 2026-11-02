@@ -1,7 +1,7 @@
 """
 Functions and helpers for orchestrating and monitoring transfers using Globus.
 """
-import datetime
+import datetime as dt
 import json
 import pathlib
 import re
@@ -108,7 +108,7 @@ def start_transfer_from_file_list(
 
     dst_endpoint = get_endpoint_id(dst_endpoint, tfr_client=tc)
 
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
+    now = dt.datetime.now().strftime("%Y-%m-%dT%H-%M")
     label = f"DKIST Python Tools - {now}" if label is None else label
     td_kwargs = {"source_endpoint": src_endpoint,
                  "destination_endpoint": dst_endpoint,

@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from pathlib import Path
 
 import pytest
@@ -39,7 +39,7 @@ def test_download_default_keywords(orchestrate_transfer_mock, keywords):
     )
 
     if keywords["label"] is None:
-        keywords["label"] = f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
+        keywords["label"] = f"DKIST Python Tools - {dt.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     orchestrate_transfer_mock.assert_called_once_with(
         [Path("/data/pm_1_10/AAAA")],
         recursive=True,
@@ -83,7 +83,7 @@ def test_transfer_from_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
+        label=f"DKIST Python Tools - {dt.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")
@@ -120,7 +120,7 @@ def test_transfer_from_multiple_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA,BBBB",
+        label=f"DKIST Python Tools - {dt.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA,BBBB",
     )
 
     get_inv_mock.assert_called_once_with(["AAAA", "BBBB"])
@@ -153,7 +153,7 @@ def test_transfer_from_many_dataset_id(mocker, orchestrate_transfer_mock):
         destination_endpoint=mocker.ANY,
         progress=mocker.ANY,
         wait=mocker.ANY,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - {len(many_ds)} datasets"
+        label=f"DKIST Python Tools - {dt.datetime.now().strftime('%Y-%m-%dT%H-%M')} - {len(many_ds)} datasets"
     )
 
 
@@ -290,7 +290,7 @@ def test_transfer_path_interpolation(orchestrate_transfer_mock, mocker):
         destination_endpoint=None,
         progress=True,
         wait=True,
-        label=f"DKIST Python Tools - {datetime.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
+        label=f"DKIST Python Tools - {dt.datetime.now().strftime('%Y-%m-%dT%H-%M')} - AAAA"
     )
 
     get_inv_mock.assert_called_once_with("AAAA")

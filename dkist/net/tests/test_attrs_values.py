@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import importlib
 import json
 import logging
@@ -67,7 +67,7 @@ def test_get_cached_json_local(tmp_homedir, values_in_home, user_file):
 
 
 def test_get_cached_json_local_out_of_date(tmp_homedir, values_in_home, user_file):
-    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
+    ten_ago = (dt.datetime.now() - dt.timedelta(days=10)).timestamp()
     os.utime(user_file, (ten_ago, ten_ago))
     return_file, update_needed = _get_cached_json()
     assert return_file == user_file
@@ -76,7 +76,7 @@ def test_get_cached_json_local_out_of_date(tmp_homedir, values_in_home, user_fil
 
 
 def test_get_cached_json_local_not_quite_out_of_date(tmp_homedir, values_in_home, user_file):
-    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=6)).timestamp()
+    ten_ago = (dt.datetime.now() - dt.timedelta(days=6)).timestamp()
     os.utime(user_file, (ten_ago, ten_ago))
     return_file, update_needed = _get_cached_json()
     assert return_file == user_file
@@ -154,7 +154,7 @@ def test_get_search_attrs_values_fail_invalid_download(mocker, user_file, values
     """
     mocker.patch("dkist.net.attrs_values._fetch_values",
                  new_callable=lambda: _definitely_not_json)
-    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
+    ten_ago = (dt.datetime.now() - dt.timedelta(days=10)).timestamp()
     os.utime(user_file, (ten_ago, ten_ago))
 
     attr_values = get_search_attrs_values()
@@ -194,7 +194,7 @@ def test_failed_download(mocker, caplog_dkist, user_file, values_in_home):
     mock = mocker.patch("dkist.net.attrs_values._fetch_values",
                         new_callable=lambda: _fetch_values_urlerror)
 
-    ten_ago = (datetime.datetime.now() - datetime.timedelta(days=10)).timestamp()
+    ten_ago = (dt.datetime.now() - dt.timedelta(days=10)).timestamp()
     os.utime(user_file, (ten_ago, ten_ago))
 
     attr_values = get_search_attrs_values(allow_update=True)
