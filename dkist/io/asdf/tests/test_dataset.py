@@ -37,6 +37,20 @@ def test_roundtrip_file_manager(file_manager):
     assert newobj == file_manager._fm
 
 
+def assert_extra_equal(new_extras, old_extras):
+    for new_extra_name in new_extras.keys():
+        if new_extra_name not in old_extras:
+            raise AssertionError(f"{new_extra_name} is in new_extras but not in old_extras")
+
+        new = new_extras[new_extra_name]
+        old = old_extras[new_extra_name]
+
+        assert len(old.headers) == len(new.headers)
+        assert old.headers.colnames == new.headers.colnames
+        assert old.name == new.name
+        assert old._ears == new._ears
+
+
 def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
     assert new.shape == old.shape
     old_headers = old.meta.pop("headers")
@@ -46,9 +60,17 @@ def assert_dataset_equal(new, old, skip_history=False, compare_wcs=True):
     if skip_history:
         old.meta.pop("history")
         new.meta.pop("history")
+    old_extras = old.meta.pop("extras", None)
+    new_extras = new.meta.pop("extras", None)
+    if (old_extras is None) != (new_extras is None):
+        raise AssertionError(f"{old_extras=} and {new_extras=} are not both the same type")
+    if old_extras is not None:
+        assert_extra_equal(new_extras, old_extras)
     assert old.meta == new.meta
     old.meta["headers"] = old_headers
     new.meta["headers"] = new_headers
+    old.meta["extras"] = old_extras
+    new.meta["extras"] = new_extras
     if compare_wcs:
         assert old.wcs.name == new.wcs.name
         assert len(old.wcs.available_frames) == len(new.wcs.available_frames)
@@ -93,7 +115,7 @@ def test_asdf_tags(dataset, tmp_path):
         afile.write_to(tmp_path / "test.asdf")
 
     with asdf.open(tmp_path / "test.asdf", _force_raw_types=True) as af:
-        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.3.0"
+        assert af.tree["dataset"]._tag == "asdf://dkist.nso.edu/tags/dataset-1.4.0"
         assert af.tree["dataset"]["data"]._tag == "asdf://dkist.nso.edu/tags/file_manager-1.1.0"
 
         extension_uris = [e.get("extension_uri") for e in af["history"]["extensions"]]
