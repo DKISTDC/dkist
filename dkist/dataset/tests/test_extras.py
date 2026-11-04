@@ -47,6 +47,12 @@ def test_headers_filters_extra_specific_columns(dataset_extras):
     assert "extra1_only" not in extra2.headers.colnames
     assert list(extra2.headers["extra2_only"]) == ["c", "d"]
 
+    # Ensure that no columns are removed from the full table.
+    assert "extra1_only" in extra1._full_header_table.colnames
+    assert "extra2_only" in extra1._full_header_table.colnames
+    assert "extra1_only" in extra2._full_header_table.colnames
+    assert "extra2_only" in extra2._full_header_table.colnames
+
 
 def test_data(dataset_extra_obj, dataset_extra_dir):
     data = dataset_extra_obj.data
