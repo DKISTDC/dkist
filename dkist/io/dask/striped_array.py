@@ -23,7 +23,7 @@ import dask.array
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 
-from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
+from astropy.utils import simplify_basic_index
 
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
@@ -284,7 +284,10 @@ class FileManager:
         return dedent(f"{prefix}\n{self.__str__()}")
 
     def __getitem__(self, item):
-        item = sanitize_slices(item, self._striped_external_array.ndim)
+        item = simplify_basic_index(
+            item,
+            shape=self._striped_external_array.loader_array.shape,
+        )
         return type(self)(StripedExternalArrayView(self._striped_external_array, item), None)
 
     def _array_slice_to_loader_slice(self, aslice):
@@ -292,7 +295,7 @@ class FileManager:
         Convert a slice for the reconstructed array to a slice for the loader_array.
         """
         fits_array_shape = self._striped_external_array.shape
-        aslice = list(sanitize_slices(aslice, len(self.output_shape)))
+        aslice = list(simplify_basic_index(aslice, shape=self.output_shape))
         if fits_array_shape[0] == 1:
             # Insert a blank slice for the dummy dimension
             aslice.insert(-(len(fits_array_shape)-1), slice(None))
