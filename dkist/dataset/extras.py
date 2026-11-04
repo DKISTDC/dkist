@@ -78,6 +78,7 @@ class DatasetExtra:
     @staticmethod
     def _drop_fully_masked_columns(table: Table) -> Table:
         """Remove columns where every row is masked."""
+        table = table.copy(copy_data=True)
         cols_to_remove = []
         for colname in table.colnames:
             col = table[colname]
