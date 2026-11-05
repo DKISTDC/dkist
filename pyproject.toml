@@ -198,30 +198,23 @@ MY = "No SunPy projects make heavy use of types"
 RF101 = "TODO"
 
 [tool.uv]
+# These are indirect dependencies which are incompatible with our oldestdeps job.
+# Each time we do a dependency update this list should be re-evaluated.
 constraint-dependencies = [
-  # Core deps
-  "zarr>=2.15.0",
-  "pandas>=2.2.0",
-  "isodate>=0.6.0",
-  "fasteners>=0.18",
-  "lxml>=5.2.0",
+  # Installation Errors
+  "zarr>=2.15.0",  # reproject
+  "pandas>=2.2.0",  # drms
+  "isodate>=0.6.0",  # zeep
+  "fasteners>=0.18",  # reproject > zarr > ...
+  "lxml>=5.2.0",  # zeep
   "soupsieve>=1.9",  # 1.2.1 (bs4's floor) does `from collections import Mapping`, removed in Py 3.10
-  "pyyaml>=6.0.2",
-  "cffi>=1.17.0",
-  "frozenlist>=1.5.0",
-  "pillow>=9.4.0",
-  "numcodecs>=0.11.0",
-  "pycparser>=2.22",
-  "asciitree>=0.3.3",
-  "entrypoints>=0.4",
-  "ply>=3.10",
-  "locket>=1.0.0",
-  "markupsafe>=3.0.2",
+  "pyyaml>=6.0.2",  # dask
+  "cffi>=1.17.0",  # globus-sdk > cryptograpy
+  "frozenlist>=1.5.0",  # aiohttp
+  "pillow>=9.4.0",  # matplotlib
+  "numcodecs>=0.11.0",  # zarr
+  # Runtime Errors
   "jinja2>=3.1.3",
-  "defusedxml>=0.7.1",
   "toolz>=1.0.0",
   "urllib3>=2.2.0",
-  # test deps
-  "py-cpuinfo>=9.0.0",
-  "iniconfig>=2.3.0",
 ]
