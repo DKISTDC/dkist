@@ -24,6 +24,7 @@ import numpy as np
 from numpy.typing import DTypeLike, NDArray
 
 from astropy.utils import simplify_basic_index
+from astropy.wcs.wcsapi.wrappers.sliced_wcs import combine_slices
 
 from dkist.io.dask.loaders import BaseFITSLoader
 from dkist.io.dask.utils import stack_loader_array
@@ -200,8 +201,25 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     __slots__ = ["parent", "parent_slice"]
 
     def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
+        new_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
+        if isinstance(parent, StripedExternalArrayView):
+            combined = []
+            new_iter = iter(new_slice)
+            # The new_slice we are combining with the parent_slice
+            # applies to non-int elements of the parent slice
+            # (i.e. axes which haven't already been sliced).
+            for slc in parent.parent_slice:
+                if isinstance(slc, slice):
+                    # If it's a slice, pop the next element of new_slice
+                    # and combine our slice with that slice.
+                    combined.append(combine_slices(slc, next(new_iter)))
+                else:
+                    # If it's an int, pass it through unchanged.
+                    combined.append(slc)
+            new_slice = tuple(combined)
+            parent = parent.parent
         self.parent = parent
-        self.parent_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
+        self.parent_slice = new_slice
 
     def __getattr__(self, attr):
         return getattr(self.parent, attr)
