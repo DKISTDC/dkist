@@ -105,6 +105,28 @@ def test_build_grating_spectral_transform() -> None:
     )
 
 
+
+@pytest.mark.parametrize(
+    ("name", "bad_value"),
+    [
+        pytest.param("groove_density", 23000.0 * u.m, id="groove_density_not_inverse_length"),
+        pytest.param("incident_angle", 65.696 * u.nm, id="incident_angle_not_angle"),
+        pytest.param("dispersion", 0.0023 * u.nm, id="dispersion_missing_per_pixel"),
+    ],
+)
+def test_build_grating_spectral_transform_rejects_wrong_units(name, bad_value) -> None:
+    params = {
+        "reference_pixel": 217,
+        "reference_wavelength": 854.1738582455826 * u.nm,
+        "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+        "groove_density": 23000.0 / u.m,
+        "spectral_order": 90 * u.one,
+        "incident_angle": 65.696 * u.deg,
+    }
+    params[name] = bad_value
+    with pytest.raises(u.UnitsError):
+        build_grating_spectral_transform(**params)
+
 def test_update_celestial():
     trsfm  = generate_celestial_transform(
               crpix=[0, 0] * u.pix,

@@ -7,9 +7,7 @@ title: Sine of the refracted angle for a FITS -GRA/-GRI spectral axis.
 description: |
   Converts a pixel coordinate into the sine of the refracted (output) angle
   of a grating or grism, following the FITS grism spectral-coordinate
-  formalism of Greisen et al. (2006), sections 5.1.2 and 5.2. The optional
-  grism terms (refractive_index, refractive_index_derivative,
-  out_of_plane_angle, camera_angle) take their identity values when absent.
+  formalism of Greisen et al. (2006), sections 5.1.2 and 5.2.
 
 definitions:
   scalar:
@@ -50,5 +48,7 @@ allOf:
       camera_angle:
         description: Camera angle.
         $ref: "#/definitions/scalar"
-    required: [reference_pixel, dispersion, groove_density, spectral_order, incident_angle]
+    required: [reference_pixel, reference_wavelength, dispersion, groove_density, spectral_order,
+               incident_angle, refractive_index, refractive_index_derivative, out_of_plane_angle,
+               camera_angle]
 ...

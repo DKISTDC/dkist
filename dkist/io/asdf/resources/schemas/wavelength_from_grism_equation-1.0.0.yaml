@@ -6,10 +6,9 @@ id: "asdf://dkist.nso.edu/schemas/wavelength_from_grism_equation-1.0.0"
 title: Wavelength from the FITS -GRA/-GRI grism equation.
 description: |
   Computes wavelength from the sines of the incident and refracted angles
-  using the FITS grism equation (Greisen et al. 2006, Eq. 70). The optional
-  grism terms (reference_wavelength, refractive_index,
-  refractive_index_derivative, out_of_plane_angle) take their identity values
-  when absent, reducing this to the classic grating equation.
+  using the FITS grism equation (Greisen et al. 2006, Eq. 70). With
+  refractive_index = 1 and refractive_index_derivative = out_of_plane_angle = 0
+  this reduces to the classic grating equation.
 
 definitions:
   scalar:
@@ -38,5 +37,6 @@ allOf:
       out_of_plane_angle:
         description: Out-of-plane grating angle.
         $ref: "#/definitions/scalar"
-    required: [groove_density, spectral_order]
+    required: [groove_density, spectral_order, reference_wavelength, refractive_index,
+               refractive_index_derivative, out_of_plane_angle]
 ...
