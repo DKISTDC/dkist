@@ -23,10 +23,10 @@ import dask.array
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 
-from astropy.wcs.wcsapi.wrappers.sliced_wcs import sanitize_slices
+from astropy.utils import simplify_basic_index
 
 from dkist.io.dask.loaders import BaseFITSLoader
-from dkist.io.dask.utils import stack_loader_array
+from dkist.io.dask.utils import combine_slices, stack_loader_array
 from dkist.io.utils import filemanager_info_str
 
 __all__ = ["FileManager", "StripedExternalArray"]
@@ -199,9 +199,29 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     # class.
     __slots__ = ["parent", "parent_slice"]
 
+    parent: StripedExternalArray
+    parent_slice: tuple
+
     def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
+        new_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
+        if isinstance(parent, StripedExternalArrayView):
+            combined = []
+            new_iter = iter(new_slice)
+            # The new_slice we are combining with the parent_slice
+            # applies to non-int elements of the parent slice
+            # (i.e. axes which haven't already been sliced).
+            for slc in parent.parent_slice:
+                if isinstance(slc, slice):
+                    # If it's a slice, pop the next element of new_slice
+                    # and combine our slice with that slice.
+                    combined.append(combine_slices(slc, next(new_iter)))
+                else:
+                    # If it's an int, pass it through unchanged.
+                    combined.append(slc)
+            new_slice = tuple(combined)
+            parent = parent.parent
         self.parent = parent
-        self.parent_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
+        self.parent_slice = new_slice
 
     def __getattr__(self, attr):
         return getattr(self.parent, attr)
@@ -231,7 +251,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         """
         # array call here to ensure that a length one array is returned rather
         # than a single element.
-        return np.array(self._fileuri_array[self.parent_slice])
+        return np.array(self.parent.fileuri_array[self.parent_slice])
 
     @property
     def loader_array(self) -> NDArray[np.object_]:
@@ -284,7 +304,10 @@ class FileManager:
         return dedent(f"{prefix}\n{self.__str__()}")
 
     def __getitem__(self, item):
-        item = sanitize_slices(item, self._striped_external_array.ndim)
+        item = simplify_basic_index(
+            item,
+            shape=self._striped_external_array.loader_array.shape,
+        )
         return type(self)(StripedExternalArrayView(self._striped_external_array, item), None)
 
     def _array_slice_to_loader_slice(self, aslice):
@@ -292,7 +315,7 @@ class FileManager:
         Convert a slice for the reconstructed array to a slice for the loader_array.
         """
         fits_array_shape = self._striped_external_array.shape
-        aslice = list(sanitize_slices(aslice, len(self.output_shape)))
+        aslice = list(simplify_basic_index(aslice, shape=self.output_shape))
         if fits_array_shape[0] == 1:
             # Insert a blank slice for the dummy dimension
             aslice.insert(-(len(fits_array_shape)-1), slice(None))

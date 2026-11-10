@@ -141,7 +141,7 @@ def level2_info_str(l2_in):
 
     s += "\n\n"
     s += "The above WCS information relates to only the pixel axes shared by all inversions, and the\n"
-    s += "corresponding world axes. Invdividual inversions may include other coordinate information.\n"
+    s += "corresponding world axes. Individual inversions may include other coordinate information.\n"
 
     # Make sure we get rid of the extra whitespace at the end of some lines
     return "\n".join([line.rstrip() for line in s.splitlines()])
