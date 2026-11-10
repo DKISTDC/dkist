@@ -231,7 +231,7 @@ class StripedExternalArrayView(BaseStripedExternalArray):
         """
         # array call here to ensure that a length one array is returned rather
         # than a single element.
-        return np.array(self._fileuri_array[self.parent_slice])
+        return np.array(self.parent.fileuri_array[self.parent_slice])
 
     @property
     def loader_array(self) -> NDArray[np.object_]:
