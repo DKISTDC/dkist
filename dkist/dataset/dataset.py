@@ -129,9 +129,10 @@ class Dataset(NDCube):
 
     def _slice_headers(self, slice_):
         idx = self.files._fm._array_slice_to_loader_slice(slice_)
-        full = simplify_basic_index(np.s_[:], shape=self.files._fm.fileuri_array.shape)
-        if idx == full:
-            return self.headers.copy()
+        if idx:
+            full = simplify_basic_index(np.s_[:], shape=self.files._fm.fileuri_array.shape)
+            if idx == full:
+                return self.headers.copy()
 
         files_shape = [i for i in self.files.fileuri_array.shape if i != 1]
         file_idx = []
