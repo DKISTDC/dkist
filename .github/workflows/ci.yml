@@ -73,6 +73,7 @@ jobs:
         - macos: py313
         - linux: py311
         - linux: py311-oldestdeps
+          toxdeps: tox-uv tox-pypi-filter pip
         - linux: py314-devdeps
 
   docs:
