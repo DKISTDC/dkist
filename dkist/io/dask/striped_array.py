@@ -24,10 +24,9 @@ import numpy as np
 from numpy.typing import DTypeLike, NDArray
 
 from astropy.utils import simplify_basic_index
-from astropy.wcs.wcsapi.wrappers.sliced_wcs import combine_slices
 
 from dkist.io.dask.loaders import BaseFITSLoader
-from dkist.io.dask.utils import stack_loader_array
+from dkist.io.dask.utils import combine_slices, stack_loader_array
 from dkist.io.utils import filemanager_info_str
 
 __all__ = ["FileManager", "StripedExternalArray"]
