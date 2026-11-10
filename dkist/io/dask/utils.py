@@ -64,7 +64,7 @@ if _astropy_version < Version("7.2.3") or (
 ):
     combine_slices = _combine_slices
 else:
-    from astropy.wcs.wcsapi.wrappers.sliced_wcs import combine_slices  # noqa F401
+    from astropy.wcs.wcsapi.wrappers.sliced_wcs import combine_slices  # type: ignore[no-redef] # noqa F401
 
 
 def stack_loader_array(loader_array, output_shape, chunksize=None):

@@ -199,6 +199,9 @@ class StripedExternalArrayView(BaseStripedExternalArray):
     # class.
     __slots__ = ["parent", "parent_slice"]
 
+    parent: StripedExternalArray
+    parent_slice: tuple
+
     def __init__(self, parent: StripedExternalArray, aslice: tuple | slice | int):
         new_slice = tuple(aslice) if isinstance(aslice, (tuple, list)) else (aslice,)
         if isinstance(parent, StripedExternalArrayView):
