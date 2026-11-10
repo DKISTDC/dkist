@@ -6,6 +6,7 @@ import pytest
 from numpy.testing import assert_allclose
 
 from dkist.data.test import rootdir
+from dkist.io.dask.loaders import AstropyFITSLoader
 from dkist.io.dask.striped_array import FileManager, StripedExternalArray, StripedExternalArrayView
 
 eitdir = Path(rootdir) / "EIT"
@@ -64,6 +65,45 @@ def test_collection_getitem(tmpdir, file_manager):
     assert isinstance(file_manager[1], FileManager)
     assert isinstance(file_manager[1]._striped_external_array, StripedExternalArrayView)
     assert len(file_manager[0]._striped_external_array) == len(file_manager[1]._striped_external_array) == 1
+
+
+def test_nested_slice_unwraps(tmpdir, file_manager):
+    assert isinstance(file_manager._striped_external_array, StripedExternalArray)
+    s_fm = file_manager[0:3]
+    assert isinstance(s_fm, FileManager)
+    assert isinstance(s_fm._striped_external_array, StripedExternalArrayView)
+    assert isinstance(s_fm._striped_external_array.parent, StripedExternalArray)
+    assert isinstance(s_fm[0], FileManager)
+    assert isinstance(s_fm[0]._striped_external_array, StripedExternalArrayView)
+    assert isinstance(s_fm[0]._striped_external_array.parent, StripedExternalArray)
+    assert len(file_manager[0]._striped_external_array) == len(s_fm[0]._striped_external_array) == 1
+    assert str(file_manager[0].fileuri_array) == str(s_fm[0].fileuri_array) == "efz20040301.000010_s.fits"
+
+
+def test_nested_slice_flattens_2d(tmp_path):
+    # A 2-D (4, 20) file manager so the flatten loop in __init__ combines
+    # across more than one axis, unlike the 1-D EIT fixture.
+    fileuris = np.array([f"file_{i:03d}.fits" for i in range(80)]).reshape(4, 20)
+    fm = FileManager.from_parts(
+        fileuris,
+        0,
+        float,
+        (50, 128),
+        loader=AstropyFITSLoader,
+        basepath=str(tmp_path),
+    )
+
+    # [0:2][0]: both parent axes are slices, so the flatten loop combines
+    # across two slice axes. Equals the direct slice fm[0].
+    nested = fm[0:2][0]
+    assert np.array_equal(nested.fileuri_array, fm[0].fileuri_array)
+    assert isinstance(nested._striped_external_array.parent, StripedExternalArray)
+
+    # [0][0:2]: the parent has an int axis (passed through) and a slice axis
+    # (combined). Equals the direct slice fm[0, 0:2].
+    nested2 = fm[0][0:2]
+    assert np.array_equal(nested2.fileuri_array, fm[0, 0:2].fileuri_array)
+    assert isinstance(nested2._striped_external_array.parent, StripedExternalArray)
 
 
 def test_basepath_change(file_manager):
@@ -179,14 +219,26 @@ def test_file_manager_slice_slice(large_visp_dataset):
     scan = stokesI[..., 0]
     assert len(scan.files) == len(stokesI.files) == 20
     assert scan.files._fm.output_shape == stokesI.files._fm.output_shape
-    assert scan.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
-    assert scan.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+    assert (
+        scan.files._fm._striped_external_array.loader_array.shape
+        == stokesI.files._fm._striped_external_array.loader_array.shape
+    )
+    assert (
+        scan.files._fm._striped_external_array.loader_array.shape
+        != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+    )
 
     line = scan[..., 0]
     assert len(line.files) == len(stokesI.files) == 20
     assert line.files._fm.output_shape == stokesI.files._fm.output_shape
-    assert line.files._fm._striped_external_array.loader_array.shape == stokesI.files._fm._striped_external_array.loader_array.shape
-    assert line.files._fm._striped_external_array.loader_array.shape != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+    assert (
+        line.files._fm._striped_external_array.loader_array.shape
+        == stokesI.files._fm._striped_external_array.loader_array.shape
+    )
+    assert (
+        line.files._fm._striped_external_array.loader_array.shape
+        != large_visp_dataset.files._fm._striped_external_array.loader_array.shape
+    )
 
     spectrum = stokesI[0]
     assert len(spectrum.files) == 1

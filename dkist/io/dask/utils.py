@@ -1,12 +1,70 @@
+import numbers
 import uuid
 import warnings
 
 import dask
 import numpy as np
+from packaging.version import Version
+
+import astropy
 
 from dkist.utils.exceptions import DKISTDeprecationWarning
 
 __all__ = ["stack_loader_array"]
+
+
+def _combine_slices(slice1, slice2):
+    """
+    Given two slices that can be applied to a 1-d array, find the resulting
+    slice that corresponds to the combination of both slices. We assume that
+    slice2 can be an integer, but slice1 cannot.
+    """
+    if isinstance(slice1, slice) and slice1.step not in (None, 1):
+        raise ValueError("Only slices with steps of 1 are supported")
+
+    if isinstance(slice2, slice) and slice2.step not in (None, 1):
+        raise ValueError("Only slices with steps of 1 are supported")
+
+    if isinstance(slice2, numbers.Integral):
+        if slice1.start is None:
+            return slice2
+        else:  # noqa RET505
+            return slice2 + slice1.start
+
+    if slice1.start is None:
+        if slice1.stop is None:
+            return slice2
+        else:  # noqa RET505
+            if slice2.stop is None:
+                return slice(slice2.start, slice1.stop)
+            else:  # noqa RET505
+                return slice(slice2.start, min(slice1.stop, slice2.stop))
+    else:
+        if slice2.start is None:
+            start = slice1.start
+        else:
+            start = slice1.start + slice2.start
+        if slice2.stop is None:
+            stop = slice1.stop
+        else:
+            if slice1.start is None:
+                stop = slice2.stop
+            else:
+                stop = slice2.stop + slice1.start
+            if slice1.stop is not None:
+                stop = min(slice1.stop, stop)
+    return slice(start, stop)
+
+
+# combine_slices was fixed to accept an explicit step of 1 in astropy 7.2.3
+# (backported to 8.0.2); use the vendored copy on versions that lack the fix.
+_astropy_version = Version(astropy.__version__)
+if _astropy_version < Version("7.2.3") or (
+    Version("8.0.0") <= _astropy_version < Version("8.0.2")
+):
+    combine_slices = _combine_slices
+else:
+    from astropy.wcs.wcsapi.wrappers.sliced_wcs import combine_slices  # type: ignore[no-redef] # noqa F401
 
 
 def stack_loader_array(loader_array, output_shape, chunksize=None):
