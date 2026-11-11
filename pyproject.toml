@@ -8,14 +8,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dkist"
 description = "DKIST User Tools"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license-files = ["licenses/LICENSE.rst"]
 authors = [
   { name = "NSO / AURA", email = "stuart@cadair.com" },
 ]
 dependencies = [
-  "aiohttp>=3.9",
+  "aiohttp>=3.12",
   # Provide minimum deps for all asdf packages used to generate or read asdf
   # files so that we test with these minimums and also generate asdf's with
   # them
@@ -25,21 +25,21 @@ dependencies = [
   "asdf>=4.0.0",  # Required for save_dataset()
   "asdf-astropy>=0.11.0", # Required for save_dataset()
   "asdf-coordinates-schemas>=0.4.0",  # required by asdf-astropy 0.10
-  "asdf-standard>=1.1.0",
+  "asdf-standard>=1.2.0",
   "asdf-transform-schemas>=0.6.0",
-  "asdf-wcs-schemas>=0.4.0",  # required by gwcs 0.24
-  "astropy>=6.1",  # required by ndcube 2.4; 8.0.1 introduces ValueError when saving some plots
-  "dask[array]>=2024.4.1",  # required by dask-image via reproject
+  "asdf-wcs-schemas>=0.5.0",  # required by gwcs 0.24
+  "astropy>=7",  # required by ndcube 2.4; 8.0.1 introduces ValueError when saving some plots
+  "dask[array]>=2024.12.0",  # required by dask-image via reproject
   "globus-sdk>=4.0",
   "gwcs>=0.24.0",  # Inverse transform fix
-  "matplotlib>=3.9",  # required by ndcube 2.4
+  "matplotlib>=3.10",  # required by ndcube 2.4
   "ndcube[plotting,reproject]>=2.4.0",
   "numpy>=1.26.4",  # required by asdf-astropy 0.10
   "parfive[ftp]>=2.2.0",
   "platformdirs>=4.5",
   "packaging>=25.0",
-  "sunpy[net,asdf]>=6",
-  "tqdm>=4.65",
+  "sunpy[net,asdf]>=6.1",
+  "tqdm>=4.68",
 ]
 dynamic = ["version"]
 
