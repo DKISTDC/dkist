@@ -205,16 +205,16 @@ constraint-dependencies = [
   "zarr>=2.15.0",  # reproject
   "pandas>=2.2.0",  # drms
   "isodate>=0.6.0",  # zeep
-  "fasteners>=0.18",  # reproject > zarr > ...
+  "netifaces>=0.10.5",  # reproject > zarr > fasteners > oslo-utils
   "lxml>=5.2.0",  # zeep
-  "soupsieve>=1.9",  # 1.2.1 (bs4's floor) does `from collections import Mapping`, removed in Py 3.10
   "pyyaml>=6.0.2",  # dask
   "cffi>=1.17.0",  # globus-sdk > cryptograpy
   "frozenlist>=1.5.0",  # aiohttp
-  "pillow>=9.4.0",  # matplotlib
-  "numcodecs>=0.11.0",  # zarr
-  # Runtime Errors
+  "pillow>=10.0.0",  # matplotlib
+  "numcodecs>=0.12.1",  # zarr
+  # # Runtime Errors
   "jinja2>=3.1.3",
   "toolz>=1.0.0",
   "urllib3>=2.2.0",
+  "pyerfa>=2.0.1.3",
 ]
