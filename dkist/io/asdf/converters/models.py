@@ -178,3 +178,45 @@ class AsymmetricMappingConverter(TransformConverterBase):
             node.get("forward_n_inputs"),
             node.get("backward_n_inputs"),
         )
+
+
+class RefractedAngleSineConverter(TransformConverterBase):
+    """
+    ASDF serialization support for RefractedAngleSineModel.
+    """
+
+    tags = [
+        "asdf://dkist.nso.edu/tags/refracted_angle_sine_model-*",
+    ]
+
+    types = ["dkist.wcs.models.RefractedAngleSineModel"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        return {name: parameter_to_value(getattr(model, name)) for name in model.param_names}
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import RefractedAngleSineModel
+
+        params = {name: node[name] for name in RefractedAngleSineModel.param_names}
+        return RefractedAngleSineModel(**params)
+
+
+class WavelengthFromGrismEquationConverter(TransformConverterBase):
+    """
+    ASDF serialization support for WavelengthFromGrismEquation.
+    """
+
+    tags = [
+        "asdf://dkist.nso.edu/tags/wavelength_from_grism_equation-*",
+    ]
+
+    types = ["dkist.wcs.models.WavelengthFromGrismEquation"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        return {name: parameter_to_value(getattr(model, name)) for name in model.param_names}
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import WavelengthFromGrismEquation
+
+        params = {name: node[name] for name in WavelengthFromGrismEquation.param_names}
+        return WavelengthFromGrismEquation(**params)

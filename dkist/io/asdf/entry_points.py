@@ -15,8 +15,10 @@ from dkist.io.asdf.converters import (
     InversionConverter,
     ProfilesConverter,
     RavelConverter,
+    RefractedAngleSineConverter,
     TiledDatasetConverter,
     VaryingCelestialConverter,
+    WavelengthFromGrismEquationConverter,
 )
 
 
@@ -46,7 +48,8 @@ def get_extensions():
     Get the list of extensions.
     """
     dkist_converters = [FileManagerConverter(), DatasetConverter(), TiledDatasetConverter(), InversionConverter(), ProfilesConverter(), DatasetExtraConverter()]
-    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter(), AsymmetricMappingConverter()]
+    wcs_converters = [VaryingCelestialConverter(), CoupledCompoundConverter(), RavelConverter(), AsymmetricMappingConverter(),
+                      RefractedAngleSineConverter(), WavelengthFromGrismEquationConverter()]
     return [
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.8.0", converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.7.0", converters=dkist_converters),
@@ -57,6 +60,7 @@ def get_extensions():
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.2.0", converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.1.0", converters=dkist_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-1.0.0", converters=dkist_converters),
+        ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.6.0", converters=wcs_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.5.0", converters=wcs_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.4.0", converters=wcs_converters),
         ManifestExtension.from_uri("asdf://dkist.nso.edu/manifests/dkist-wcs-1.3.0", converters=wcs_converters),
