@@ -1,4 +1,4 @@
-Drop support for Python 3.11 and update minimum versions of dependancies:
+Drop support for Python 3.11 and update minimum versions of dependencies:
 
 - Python >= 3.12
 - aiohttp >= 3.12
