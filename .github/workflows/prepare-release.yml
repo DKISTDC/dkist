@@ -50,7 +50,7 @@ jobs:
       - name: Setup Python 3.11
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.11"
+          python-version: "3.14"
 
       - name: Configure Git
         run: |
@@ -147,7 +147,7 @@ jobs:
           INPUTS_VERSION: ${{ inputs.version }}
         with:
           script: |
-            const { RELEASE_BODY } = process.env
+            const { RELEASE_BODY, INPUTS_VERSION } = process.env
             return await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
