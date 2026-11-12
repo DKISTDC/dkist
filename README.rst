@@ -9,8 +9,8 @@ DKIST User Tools
 .. image:: https://img.shields.io/matrix/dki-solar-telescope:openastronomy.org.svg?colorB=%23FE7900&label=Chat&logo=matrix&server_fqdn=matrix.org
    :target: https://app.element.io/#/room/#dki-solar-telescope:openastronomy.org
    :alt: DKIST chat room on matrix
-.. image:: https://github.com/DKISTDC/dkist/actions/workflows/main.yml/badge.svg?branch=main
-   :target: https://github.com/DKISTDC/dkist/actions/workflows/main.yml
+.. image:: https://github.com/DKISTDC/dkist/actions/workflows/ci.yml/badge.svg?branch=main
+   :target: https://github.com/DKISTDC/dkist/actions/workflows/ci.yml
    :alt: Latest CI Status for dkist package
 .. image:: https://codecov.io/github/dkistdc/dkist/branch/master/graph/badge.svg?token=A4ggaCurqz
    :target: https://codecov.io/github/dkistdc/dkist
