@@ -151,8 +151,8 @@ jobs:
             return await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: "v${INPUTS_VERSION}",
-              name: "v${INPUTS_VERSION}",
+              tag_name: `v${INPUTS_VERSION}`,
+              name: `v${INPUTS_VERSION}`,
               body: `${RELEASE_BODY}`,
               draft: true,
               prerelease: ${{ inputs.pre_release }}
