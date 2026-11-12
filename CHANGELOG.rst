@@ -1,3 +1,66 @@
+1.19.0 (2026-11-12)
+===================
+
+Backwards Incompatible Changes
+------------------------------
+
+- Drop support for Python 3.11 and update minimum versions of dependencies:
+
+  - Python >= 3.12
+  - aiohttp >= 3.12
+  - asdf-standard >= 1.2
+  - asdf-wcs-schemas >= 0.5
+  - astropy >= 7.0
+  - dask >= 2024.12.0
+  - matplotlib >= 3.10
+  - sunpy >= 6.1
+  - tqdm >= 4.68 (`#777 <https://github.com/DKISTDC/dkist/pull/777>`__)
+
+
+Deprecations and Removals
+-------------------------
+
+- Rename the ``figure=`` keyword argument of `.TiledDataset.plot`, `.Inversion.plot`, and `.Profiles.plot` to ``fig=``, for consistency with `ndcube.NDCube.plot`. (`#747 <https://github.com/DKISTDC/dkist/pull/747>`__)
+
+
+Features
+--------
+
+- Add support for dataset extras in `.Dataset.meta`, including reading headers from the ASDF file and lazy-loading the arrays from the FITS files. (`#694 <https://github.com/DKISTDC/dkist/pull/694>`__)
+- Added `dkist.wcs.models.RefractedAngleSineModel` and `dkist.wcs.models.WavelengthFromGrismEquation`, which implement the FITS ``-GRA``/``-GRI`` grating/grism spectral-coordinate formalism (Greisen et al. 2006), along with ASDF serialization for both. Added :func:`dkist.wcs.models.build_grating_spectral_transform` to compose them into a pixel-to-wavelength transform from FITS-facing grating parameters. (`#713 <https://github.com/DKISTDC/dkist/pull/713>`__)
+- Add an example notebook for retrieving DKIST dataset metadata and inspecting quality and processing metadata. (`#723 <https://github.com/DKISTDC/dkist/pull/723>`__)
+- Add a human readable name for the ``qualityDataObjectKey`` inventory key, which is displayed as "Quality Data Filename" and can be used as the ``{quality_data_filename}`` path interpolation key. (`#748 <https://github.com/DKISTDC/dkist/pull/748>`__)
+- Add `dkist.net.globus.use_transfer_client` to allow applications to supply an already-authorized Globus Transfer client for directory listings and dataset downloads. (`#771 <https://github.com/DKISTDC/dkist/pull/771>`__)
+
+
+Bug Fixes
+---------
+
+- Fix silent data corruption when combining two file-backed arrays in a single dask graph (for example stacking or mosaicking tiles of a `~dkist.TiledDataset`): every array built by `dkist.io.dask.utils.stack_loader_array` shared the dask graph layer name ``load_files``, so dask deduplicated their file loading tasks and used one array's data for all of them. Each array now gets a unique layer name. (`#735 <https://github.com/DKISTDC/dkist/pull/735>`__)
+- ``ignore_version_mismatch`` is now honored when `dkist.load_dataset` is given a string path, a list of inputs or `~parfive.Results`; previously it was silently ignored for these input types and only worked for `~pathlib.Path` input. (`#737 <https://github.com/DKISTDC/dkist/pull/737>`__)
+- Fix coordinate clipping behaviour of Ravel model. (`#751 <https://github.com/DKISTDC/dkist/pull/751>`__)
+- Fix `~dkist.wcs.models.VaryingCelestialTransform` and `~dkist.wcs.models.Ravel` returning NaN at the far pixel edge of an even-length axis.
+  A lookup halfway between two table rows now always uses the later row. (`#764 <https://github.com/DKISTDC/dkist/pull/764>`__)
+- Fix three bugs in varying celestial transforms:
+
+  * Fix 3D `~dkist.wcs.models.VaryingCelestialTransform` lookups that ignored the third index.
+  * Return NaN for inverse lookups outside the table.
+  * Allow scalar pixel coordinates without units alongside an array of lookup indices. (`#765 <https://github.com/DKISTDC/dkist/pull/765>`__)
+
+
+Improved Documentation
+----------------------
+
+- Add an example of plotting the extent of VISP data on an AIA image. (`#578 <https://github.com/DKISTDC/dkist/pull/578>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Fix some minor breakages to allow release (`#730 <https://github.com/DKISTDC/dkist/pull/730>`__)
+- Update representation of Inversion and Profiles classes for consistency with Dataset and TiledDataset. (`#745 <https://github.com/DKISTDC/dkist/pull/745>`__)
+
+
 1.18.1 (2026-08-26)
 ===================
 
