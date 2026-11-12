@@ -34,4 +34,6 @@ Alternatively we have instructions for running the tutorial as Jupyter Notebooks
 5_tileddataset
 6_downloading_data
 7_visualization
+exercises/exercises-1
+exercises/exercises-2
 ```
