@@ -1,0 +1,16 @@
+.. _dkist:whatsnew:1.19:
+
+*****
+v1.19
+*****
+
+ASDF File Updates
+=================
+
+This release includes changes to the ASDF schemas which mean that future ASDF files created by the DKIST Data center will not load with older versions of ``dkist``.
+
+There are two new features of the metadata ADSF files which are enabled by this release:
+
+* Inclusion of "Dataset Extras". These files are diagnostic or intermediate products created during processing, these are now listed in the metadata ASDF file and accessible from ``.meta["extras"]`` on a dataset object.
+
+* Accurate representation of the non-linear dispersion in some spectral axes. The FITS headers have for some time included a non-linear dispersion term, these are now supported in the gWCS object included in the ASDF files.
