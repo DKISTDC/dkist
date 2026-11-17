@@ -11,6 +11,7 @@ from dkist.wcs.models import (
     CoupledCompoundModel,
     InverseVaryingCelestialTransform,
     InverseVaryingCelestialTransform2D,
+    PixelFromGrismWavelength,
     Ravel,
     RefractedAngleSineModel,
     Unravel,
@@ -223,3 +224,22 @@ def test_roundtrip_grating_spectral_transform(with_grism_terms):
     assert isinstance(new_transform, CompoundModel)
     pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
     assert u.allclose(new_transform(pixels), transform(pixels))
+
+    # The analytic inverse must survive the roundtrip too, or world -> pixel
+    # stops working on datasets read back from ASDF.
+    assert isinstance(new_transform.inverse, PixelFromGrismWavelength)
+    wavelengths = transform(pixels * u.pix)
+    assert u.allclose(new_transform.inverse(wavelengths), pixels * u.pix, atol=1e-8 * u.pix)
+
+
+def test_roundtrip_pixel_from_grism_wavelength():
+    model = PixelFromGrismWavelength(**GRISM_PARAMS)
+    new_model = roundtrip_object(model)
+
+    assert isinstance(new_model, PixelFromGrismWavelength)
+    for name in model.param_names:
+        old_param, new_param = getattr(model, name), getattr(new_model, name)
+        assert new_param.unit == old_param.unit
+        assert np.allclose(new_param.value, old_param.value)
+    wavelengths = [854.0, 854.17, 854.5] * u.nm
+    assert u.allclose(new_model(wavelengths), model(wavelengths))

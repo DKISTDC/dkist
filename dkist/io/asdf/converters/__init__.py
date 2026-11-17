@@ -3,6 +3,7 @@ from .dataset_extra import DatasetExtraConverter
 from .file_manager import FileManagerConverter
 from .inversion import InversionConverter
 from .models import (AsymmetricMappingConverter, CoupledCompoundConverter,
+                     PixelFromGrismWavelengthConverter,
                      RavelConverter, RefractedAngleSineConverter,
                      VaryingCelestialConverter,
                      WavelengthFromGrismEquationConverter)
