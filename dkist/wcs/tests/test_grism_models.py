@@ -400,3 +400,51 @@ def test_wavelength_grism_equation_matches_astropy():
     assert_allclose(
         result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
     )
+
+
+# Parameter sets used to check pixel coordinates in u.pix: every PV term set,
+# and only PV0-PV2 as ViSP writes them.
+ALL_GRISM_TERMS = {
+    "reference_pixel": 217.0,
+    "reference_wavelength": 854.1738582455826 * u.nm,
+    "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+    "groove_density": 23000.0 / u.m,
+    "spectral_order": 90 * u.one,
+    "incident_angle": 65.696 * u.deg,
+    "refractive_index": 1.25 * u.one,
+    "refractive_index_derivative": 1000.0 / u.m,
+    "out_of_plane_angle": 1.5 * u.deg,
+    "camera_angle": 0.8 * u.deg,
+}
+GRATING_ONLY = {
+    "reference_pixel": 500.0,
+    "reference_wavelength": 589.6 * u.nm,
+    "dispersion": 0.0013 * u.nm / u.pix,
+    "groove_density": 316000.0 / u.m,
+    "spectral_order": 10 * u.one,
+    "incident_angle": 73.1 * u.deg,
+    # Identity-valued grism terms, as build_grating_spectral_transform passes
+    # when a header only has PV0-PV2. The models can't mix Quantity and
+    # plain-number parameters, so these can't fall back to the plain defaults.
+    "refractive_index": 1 * u.one,
+    "refractive_index_derivative": 0 / u.m,
+    "out_of_plane_angle": 0 * u.deg,
+    "camera_angle": 0 * u.deg,
+}
+GRISM_PARAMETER_SETS = [
+    pytest.param(ALL_GRISM_TERMS, id="all_grism_terms"),
+    pytest.param(GRATING_ONLY, id="grating_only"),
+]
+
+
+@pytest.mark.parametrize("params", GRISM_PARAMETER_SETS)
+def test_refracted_angle_sine_model_accepts_pixel_quantities(params) -> None:
+    """
+    Given: a RefractedAngleSineModel with Quantity parameters and a plain-number reference pixel
+    When: it is evaluated with pixel coordinates in u.pix, as gWCS passes them
+    Then: the result matches evaluating it with plain-number pixel coordinates
+    """
+    model = RefractedAngleSineModel(**params)
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
+
+    assert u.allclose(model(pixels * u.pix), model(pixels))

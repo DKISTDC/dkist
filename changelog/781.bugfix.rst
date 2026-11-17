@@ -1,0 +1,1 @@
+Fixed `dkist.wcs.models.RefractedAngleSineModel` raising a ``UnitConversionError`` when evaluated with pixel coordinates in ``u.pix``, as gWCS passes them, which made every FITS ``-GRA``/``-GRI`` spectral transform fail inside a dataset's WCS.

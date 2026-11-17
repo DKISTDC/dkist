@@ -275,9 +275,20 @@ class RefractedAngleSineModel(_GrismEquationBase):
 
     @staticmethod
     def _wavelength_offset(pixel, reference_pixel, dispersion):
-        pixel_offset = pixel - reference_pixel
+        r"""
+        Return the wavelength offset from the reference pixel, :math:`(p - p_r) \, \delta`.
+
+        When ``dispersion`` is a Quantity (length per pixel), both ``pixel``
+        and ``reference_pixel`` are interpreted in pixels, whether they are
+        given as plain numbers or as Quantities in ``u.pix``. gWCS passes pixel
+        coordinates as ``u.pix`` Quantities while ``reference_pixel`` is
+        usually a plain number, so both must be put in the same unit before
+        subtracting.
+        """
         if isinstance(dispersion, u.Quantity):
-            pixel_offset = pixel_offset * u.pix
+            pixel_offset = u.Quantity(pixel, u.pix) - u.Quantity(reference_pixel, u.pix)
+        else:
+            pixel_offset = pixel - reference_pixel
         return pixel_offset * dispersion
 
     @staticmethod
