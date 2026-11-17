@@ -15,6 +15,7 @@ from astropy.wcs import WCS
 
 from dkist.wcs.models import (
     AsymmetricMapping,
+    PixelFromGrismWavelength,
     Ravel,
     RefractedAngleSineModel,
     Unravel,
@@ -107,11 +108,12 @@ def test_build_grating_spectral_transform() -> None:
     )
 
 
-def test_build_grating_spectral_transform_in_gwcs():
+def test_build_grating_spectral_transform_gwcs_roundtrip():
     """
     Given: a gWCS whose spectral transform comes from build_grating_spectral_transform
-    When: pixels are mapped to world coordinates with the high-level gWCS API
-    Then: the result matches evaluating the transform directly
+    When: pixels are mapped to world coordinates and back with the high-level gWCS API
+    Then: the world coordinates match the transform, and the original pixels are
+          recovered, which needs the transform's analytic inverse
     """
     transform = build_grating_spectral_transform(
         reference_pixel=217,
@@ -121,6 +123,8 @@ def test_build_grating_spectral_transform_in_gwcs():
         spectral_order=90 * u.one,
         incident_angle=65.696 * u.deg,
     )
+    assert isinstance(transform.inverse, PixelFromGrismWavelength)
+
     pixel_frame = cf.CoordinateFrame(
         naxes=1, axes_type=("SPECTRAL",), axes_order=(0,), unit=(u.pix,), name="pixel"
     )
@@ -129,8 +133,10 @@ def test_build_grating_spectral_transform_in_gwcs():
     pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
 
     world = wcs.pixel_to_world(pixels)
+    recovered = wcs.world_to_pixel(world)
 
     assert u.allclose(world, transform(pixels))
+    np.testing.assert_allclose(recovered, pixels, atol=1e-8)
 
 
 @pytest.mark.parametrize(

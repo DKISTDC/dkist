@@ -10,7 +10,12 @@ from numpy.testing import assert_allclose
 import astropy.units as u
 from astropy.wcs import WCS
 
-from dkist.wcs.models import RefractedAngleSineModel, WavelengthFromGrismEquation
+from dkist.wcs.models import (
+    PixelFromGrismWavelength,
+    RefractedAngleSineModel,
+    WavelengthFromGrismEquation,
+    build_grating_spectral_transform,
+)
 
 
 def test_wavelength_grism_equation_incompatible_units_raises() -> None:
@@ -443,3 +448,106 @@ def test_refracted_angle_sine_model_unit_combinations(pixel_unit, reference_pixe
     result = model(pixels * pixel_unit)
 
     assert_allclose(u.Quantity(result).to_value(u.one), expected, rtol=1e-12)
+
+
+# Parameter sets used to check the pixel <-> wavelength relation in both
+# directions: every PV term set, and only PV0-PV2 as ViSP writes them.
+ALL_GRISM_TERMS = {
+    "reference_pixel": 217.0,
+    "reference_wavelength": 854.1738582455826 * u.nm,
+    "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+    "groove_density": 23000.0 / u.m,
+    "spectral_order": 90,
+    "incident_angle": 65.696 * u.deg,
+    "refractive_index": 1.25,
+    "refractive_index_derivative": 1000.0 / u.m,
+    "out_of_plane_angle": 1.5 * u.deg,
+    "camera_angle": 0.8 * u.deg,
+}
+GRATING_ONLY = {
+    "reference_pixel": 500.0,
+    "reference_wavelength": 589.6 * u.nm,
+    "dispersion": 0.0013 * u.nm / u.pix,
+    "groove_density": 316000.0 / u.m,
+    "spectral_order": 10,
+    "incident_angle": 73.1 * u.deg,
+    # Identity-valued grism terms, as build_grating_spectral_transform passes
+    # when a header only has PV0-PV2.
+    "refractive_index": 1,
+    "refractive_index_derivative": 0 / u.m,
+    "out_of_plane_angle": 0 * u.deg,
+    "camera_angle": 0 * u.deg,
+}
+GRISM_PARAMETER_SETS = [
+    pytest.param(ALL_GRISM_TERMS, id="all_grism_terms"),
+    pytest.param(GRATING_ONLY, id="grating_only"),
+]
+
+
+@pytest.mark.parametrize("params", GRISM_PARAMETER_SETS)
+def test_pixel_from_grism_wavelength_inverts_transform(params):
+    """
+    Given: a grating spectral transform built from Quantity parameters
+    When: pixels are mapped to wavelength and back through PixelFromGrismWavelength
+    Then: the original pixels are recovered, in u.pix
+    """
+    transform = build_grating_spectral_transform(**params)
+    inverse = PixelFromGrismWavelength(**params)
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0, 999.0]) * u.pix
+
+    recovered = inverse(transform(pixels))
+
+    assert recovered.unit == u.pix
+    assert u.allclose(recovered, pixels, atol=1e-8 * u.pix)
+
+
+def test_pixel_from_grism_wavelength_reference_wavelength_maps_to_reference_pixel():
+    """
+    Given: a PixelFromGrismWavelength model
+    When: it is evaluated at the reference wavelength
+    Then: it returns the reference pixel
+    """
+    inverse = PixelFromGrismWavelength(**ALL_GRISM_TERMS)
+
+    result = inverse(ALL_GRISM_TERMS["reference_wavelength"])
+
+    assert u.allclose(result, ALL_GRISM_TERMS["reference_pixel"] * u.pix)
+
+
+def test_pixel_from_grism_wavelength_bare_numbers():
+    """
+    Given: forward and inverse grism models built from plain numbers (lengths in m, angles in rad)
+    When: wavelengths from the forward relation are passed to PixelFromGrismWavelength
+    Then: the original pixels are recovered as plain numbers
+    """
+    params = {
+        "reference_pixel": 10,
+        "reference_wavelength": 5e-7,
+        "dispersion": 1e-12,
+        "groove_density": 2e6,
+        "spectral_order": 1,
+        "incident_angle": np.pi / 6,
+    }
+    alpha_out = RefractedAngleSineModel(**params)
+    to_wavelength = WavelengthFromGrismEquation(groove_density=2e6, spectral_order=1, reference_wavelength=5e-7)
+    pixels = np.array([0.0, 10.0, 20.0, 500.0])
+    wavelengths = to_wavelength(np.sin(np.pi / 6), alpha_out(pixels))
+
+    recovered = PixelFromGrismWavelength(**params)(wavelengths)
+
+    assert not isinstance(recovered, u.Quantity)
+    assert_allclose(recovered, pixels, atol=1e-8)
+
+
+def test_pixel_from_grism_wavelength_unphysical_wavelength_is_nan():
+    """
+    Given: a PixelFromGrismWavelength model
+    When: it is evaluated at a wavelength with no physical refracted ray
+    Then: it returns NaN rather than raising or warning
+    """
+    inverse = PixelFromGrismWavelength(**ALL_GRISM_TERMS)
+
+    result = inverse([854.17, 5000.0] * u.nm)
+
+    assert np.isfinite(result[0])
+    assert np.isnan(result[1])
