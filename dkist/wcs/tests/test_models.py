@@ -107,12 +107,11 @@ def test_build_grating_spectral_transform() -> None:
     )
 
 
-
-def test_build_grating_spectral_transform_in_gwcs() -> None:
+def test_build_grating_spectral_transform_in_gwcs():
     """
     Given: a gWCS whose spectral transform comes from build_grating_spectral_transform
     When: pixels are mapped to world coordinates with the high-level gWCS API
-    Then: the result matches evaluating the transform on plain-number pixels
+    Then: the result matches evaluating the transform directly
     """
     transform = build_grating_spectral_transform(
         reference_pixel=217,
@@ -129,9 +128,9 @@ def test_build_grating_spectral_transform_in_gwcs() -> None:
     wcs = gwcs.WCS([(pixel_frame, transform), (spectral_frame, None)])
     pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
 
-    world = wcs.pixel_to_world_values(pixels)
+    world = wcs.pixel_to_world(pixels)
 
-    np.testing.assert_allclose(world, transform(pixels).to_value(u.nm))
+    assert u.allclose(world, transform(pixels))
 
 
 @pytest.mark.parametrize(

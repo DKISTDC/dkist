@@ -402,49 +402,49 @@ def test_wavelength_grism_equation_matches_astropy():
     )
 
 
-# Parameter sets used to check pixel coordinates in u.pix: every PV term set,
-# and only PV0-PV2 as ViSP writes them.
-ALL_GRISM_TERMS = {
-    "reference_pixel": 217.0,
-    "reference_wavelength": 854.1738582455826 * u.nm,
-    "dispersion": 0.0022975580183395555 * u.nm / u.pix,
-    "groove_density": 23000.0 / u.m,
-    "spectral_order": 90 * u.one,
-    "incident_angle": 65.696 * u.deg,
-    "refractive_index": 1.25 * u.one,
-    "refractive_index_derivative": 1000.0 / u.m,
-    "out_of_plane_angle": 1.5 * u.deg,
-    "camera_angle": 0.8 * u.deg,
-}
-GRATING_ONLY = {
-    "reference_pixel": 500.0,
-    "reference_wavelength": 589.6 * u.nm,
-    "dispersion": 0.0013 * u.nm / u.pix,
-    "groove_density": 316000.0 / u.m,
-    "spectral_order": 10 * u.one,
-    "incident_angle": 73.1 * u.deg,
-    # Identity-valued grism terms, as build_grating_spectral_transform passes
-    # when a header only has PV0-PV2. The models can't mix Quantity and
-    # plain-number parameters, so these can't fall back to the plain defaults.
-    "refractive_index": 1 * u.one,
-    "refractive_index_derivative": 0 / u.m,
-    "out_of_plane_angle": 0 * u.deg,
-    "camera_angle": 0 * u.deg,
-}
-GRISM_PARAMETER_SETS = [
-    pytest.param(ALL_GRISM_TERMS, id="all_grism_terms"),
-    pytest.param(GRATING_ONLY, id="grating_only"),
-]
-
-
-@pytest.mark.parametrize("params", GRISM_PARAMETER_SETS)
-def test_refracted_angle_sine_model_accepts_pixel_quantities(params) -> None:
+@pytest.mark.parametrize("pixel_unit", [pytest.param(1, id="pixel_plain"), pytest.param(u.pix, id="pixel_pix")])
+@pytest.mark.parametrize(
+    "reference_pixel_unit", [pytest.param(1, id="reference_pixel_plain"), pytest.param(u.pix, id="reference_pixel_pix")]
+)
+@pytest.mark.parametrize(
+    "dispersion_unit", [pytest.param(1, id="dispersion_plain"), pytest.param(u.nm / u.pix, id="dispersion_nm_per_pix")]
+)
+def test_refracted_angle_sine_model_wavelength_offset_units(pixel_unit, reference_pixel_unit, dispersion_unit):
     """
-    Given: a RefractedAngleSineModel with Quantity parameters and a plain-number reference pixel
-    When: it is evaluated with pixel coordinates in u.pix, as gWCS passes them
-    Then: the result matches evaluating it with plain-number pixel coordinates
+    Given: a pixel, reference pixel and dispersion, each a plain number or a Quantity
+    When: the wavelength offset is computed
+    Then: it is (pixel - reference_pixel) * dispersion, with units only if the dispersion has them
     """
-    model = RefractedAngleSineModel(**params)
-    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
+    pixel = np.array([0.0, 10.0]) * pixel_unit
+    reference_pixel = 5.0 * reference_pixel_unit
+    dispersion = 2.0 * dispersion_unit
 
-    assert u.allclose(model(pixels * u.pix), model(pixels))
+    offset = RefractedAngleSineModel._wavelength_offset(pixel, reference_pixel, dispersion)
+
+    if isinstance(dispersion, u.Quantity):
+        assert u.allclose(offset, [-10.0, 10.0] * u.nm)
+    else:
+        assert not isinstance(offset, u.Quantity)
+        assert_allclose(offset, [-10.0, 10.0])
+
+
+def test_refracted_angle_sine_model_reference_pixel_in_pix():
+    """
+    Given: two RefractedAngleSineModels that differ only in whether reference_pixel is in u.pix
+    When: both are evaluated at the same pixels
+    Then: they give the same result
+    """
+    params = {
+        "reference_wavelength": 854.1738582455826 * u.nm,
+        "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+        "groove_density": 23000.0 / u.m,
+        "spectral_order": 90,
+        "incident_angle": 65.696 * u.deg,
+        "refractive_index_derivative": 0 / u.m,
+    }
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0]) * u.pix
+
+    plain = RefractedAngleSineModel(reference_pixel=217, **params)
+    in_pix = RefractedAngleSineModel(reference_pixel=217 * u.pix, **params)
+
+    assert u.allclose(in_pix(pixels), plain(pixels))
