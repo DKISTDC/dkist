@@ -510,8 +510,10 @@ class PixelFromGrismWavelength(_GrismPixelModelBase):
     objects. The length-dependent parameters (``reference_wavelength``,
     ``dispersion``, ``groove_density`` and ``refractive_index_derivative``)
     must either all be Quantities or all be plain numbers in one consistent
-    length unit. Plain-number angles are in radians. When ``dispersion`` is a
-    Quantity, the output is in ``u.pix``.
+    length unit. This is not checked when the model is created; mixing them
+    raises a `~astropy.units.UnitConversionError` when the model is evaluated.
+    Plain-number angles are in radians. When ``dispersion`` is a Quantity, the
+    output is in ``u.pix``.
 
     Parameters
     ----------
