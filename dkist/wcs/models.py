@@ -507,11 +507,11 @@ class PixelFromGrismWavelength(_GrismPixelModelBase):
     :math:`|\sin\beta| > 1` have no physical refracted ray and return NaN.
 
     Parameters may be given as plain numbers or as `~astropy.units.Quantity`
-    objects. The length-dependent parameters (``reference_wavelength``,
-    ``dispersion``, ``groove_density`` and ``refractive_index_derivative``)
-    must either all be Quantities or all be plain numbers in one consistent
-    length unit. This is not checked when the model is created; mixing them
-    raises a `~astropy.units.UnitConversionError` when the model is evaluated.
+    objects. ``reference_wavelength``, ``dispersion``, ``groove_density`` and
+    ``refractive_index_derivative`` must either all be Quantities or all be
+    plain numbers using one consistent length unit. This is not checked when
+    the model is created; mixing them raises a
+    `~astropy.units.UnitConversionError` when the model is evaluated.
     Plain-number angles are in radians. When ``dispersion`` is a Quantity, the
     output is in ``u.pix``.
 
