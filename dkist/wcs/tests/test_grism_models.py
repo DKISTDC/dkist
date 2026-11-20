@@ -402,49 +402,44 @@ def test_wavelength_grism_equation_matches_astropy():
     )
 
 
+# The same grating and detector geometry given as plain numbers (lengths in m,
+# angles in radians) and as Quantities.
+PLAIN_PARAMETERS = {
+    "reference_wavelength": 854.1738582455826e-9,
+    "dispersion": 0.0022975580183395555e-9,
+    "groove_density": 23000.0,
+    "spectral_order": 90,
+    "incident_angle": np.deg2rad(65.696),
+}
+QUANTITY_PARAMETERS = {
+    "reference_wavelength": 854.1738582455826 * u.nm,
+    "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+    "groove_density": 23000.0 / u.m,
+    "spectral_order": 90,
+    "incident_angle": 65.696 * u.deg,
+    "refractive_index_derivative": 0 / u.m,
+}
+
+
 @pytest.mark.parametrize("pixel_unit", [pytest.param(1, id="pixel_plain"), pytest.param(u.pix, id="pixel_pix")])
 @pytest.mark.parametrize(
     "reference_pixel_unit", [pytest.param(1, id="reference_pixel_plain"), pytest.param(u.pix, id="reference_pixel_pix")]
 )
 @pytest.mark.parametrize(
-    "dispersion_unit", [pytest.param(1, id="dispersion_plain"), pytest.param(u.nm / u.pix, id="dispersion_nm_per_pix")]
+    "parameters",
+    [pytest.param(PLAIN_PARAMETERS, id="parameters_plain"), pytest.param(QUANTITY_PARAMETERS, id="parameters_quantity")],
 )
-def test_refracted_angle_sine_model_wavelength_offset_units(pixel_unit, reference_pixel_unit, dispersion_unit):
+def test_refracted_angle_sine_model_unit_combinations(pixel_unit, reference_pixel_unit, parameters):
     """
-    Given: a pixel, reference pixel and dispersion, each a plain number or a Quantity
-    When: the wavelength offset is computed
-    Then: it is (pixel - reference_pixel) * dispersion, with units only if the dispersion has them
+    Given: a RefractedAngleSineModel whose reference pixel, and the pixels it is evaluated at,
+           are each plain numbers or in u.pix, with plain-number or Quantity parameters
+    When: the model is evaluated
+    Then: every combination gives the same result as plain numbers throughout
     """
-    pixel = np.array([0.0, 10.0]) * pixel_unit
-    reference_pixel = 5.0 * reference_pixel_unit
-    dispersion = 2.0 * dispersion_unit
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
+    expected = RefractedAngleSineModel(reference_pixel=217.0, **PLAIN_PARAMETERS)(pixels)
+    model = RefractedAngleSineModel(reference_pixel=217.0 * reference_pixel_unit, **parameters)
 
-    offset = RefractedAngleSineModel._wavelength_offset(pixel, reference_pixel, dispersion)
+    result = model(pixels * pixel_unit)
 
-    if isinstance(dispersion, u.Quantity):
-        assert u.allclose(offset, [-10.0, 10.0] * u.nm)
-    else:
-        assert not isinstance(offset, u.Quantity)
-        assert_allclose(offset, [-10.0, 10.0])
-
-
-def test_refracted_angle_sine_model_reference_pixel_in_pix():
-    """
-    Given: two RefractedAngleSineModels that differ only in whether reference_pixel is in u.pix
-    When: both are evaluated at the same pixels
-    Then: they give the same result
-    """
-    params = {
-        "reference_wavelength": 854.1738582455826 * u.nm,
-        "dispersion": 0.0022975580183395555 * u.nm / u.pix,
-        "groove_density": 23000.0 / u.m,
-        "spectral_order": 90,
-        "incident_angle": 65.696 * u.deg,
-        "refractive_index_derivative": 0 / u.m,
-    }
-    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0]) * u.pix
-
-    plain = RefractedAngleSineModel(reference_pixel=217, **params)
-    in_pix = RefractedAngleSineModel(reference_pixel=217 * u.pix, **params)
-
-    assert u.allclose(in_pix(pixels), plain(pixels))
+    assert_allclose(u.Quantity(result).to_value(u.one), expected, rtol=1e-12)

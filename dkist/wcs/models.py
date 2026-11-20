@@ -131,7 +131,7 @@ def _validate_dispersion_denominator(dispersion_denominator: float | u.Quantity[
         )
 
 
-def _pixel_value(pixel):
+def _pixel_value(pixel: float | np.ndarray | u.Quantity) -> float | np.ndarray:
     """Return ``pixel`` as a plain number of pixels, converting it from ``u.pix`` if it is a Quantity."""
     if isinstance(pixel, u.Quantity):
         return pixel.to_value(u.pix)
@@ -184,10 +184,12 @@ class RefractedAngleSineModel(_GrismEquationBase):
     (2006), especially Eqs. (77), (82), and (83).
 
     Parameters may be given as plain numbers or as `~astropy.units.Quantity`
-    objects. The length-dependent parameters (``reference_wavelength``,
-    ``dispersion``, ``groove_density`` and ``refractive_index_derivative``)
-    must either all be Quantities or all be plain numbers in one consistent
-    length unit. Plain-number angles are in radians.
+    objects. ``reference_wavelength``, ``dispersion``, ``groove_density`` and
+    ``refractive_index_derivative`` must either all be Quantities or all be
+    plain numbers using one consistent length unit. This is not checked when
+    the model is created; mixing them raises a
+    `~astropy.units.UnitConversionError` when the model is evaluated.
+    Plain-number angles are in radians.
 
     Parameters
     ----------
@@ -289,9 +291,9 @@ class RefractedAngleSineModel(_GrismEquationBase):
         Return the wavelength offset from the reference pixel, :math:`(p - p_r) \, \delta`.
 
         ``pixel`` and ``reference_pixel`` may each be a plain number or a
-        Quantity in ``u.pix``; both are interpreted in pixels. The result is a
-        Quantity in the units of ``dispersion`` times pixels if ``dispersion``
-        is a Quantity, and a plain number otherwise.
+        Quantity in ``u.pix``; both are interpreted in pixels. If ``dispersion``
+        is a Quantity, the result is a Quantity in the units of
+        ``dispersion * u.pix``; otherwise it is a plain number.
         """
         pixel_offset = _pixel_value(pixel) - _pixel_value(reference_pixel)
         if isinstance(dispersion, u.Quantity):
