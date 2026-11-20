@@ -1,0 +1,1 @@
+Added `dkist.wcs.models.PixelFromGrismWavelength`, the analytic inverse of the FITS ``-GRA``/``-GRI`` spectral transform, along with ASDF serialization. :func:`dkist.wcs.models.build_grating_spectral_transform` now attaches it as the transform's inverse, so world-to-pixel conversions work on datasets with non-linear spectral dispersion.

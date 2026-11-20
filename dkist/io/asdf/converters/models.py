@@ -220,3 +220,24 @@ class WavelengthFromGrismEquationConverter(TransformConverterBase):
 
         params = {name: node[name] for name in WavelengthFromGrismEquation.param_names}
         return WavelengthFromGrismEquation(**params)
+
+
+class PixelFromGrismWavelengthConverter(TransformConverterBase):
+    """
+    ASDF serialization support for PixelFromGrismWavelength.
+    """
+
+    tags = [
+        "asdf://dkist.nso.edu/tags/pixel_from_grism_wavelength-*",
+    ]
+
+    types = ["dkist.wcs.models.PixelFromGrismWavelength"]
+
+    def to_yaml_tree_transform(self, model, tag, ctx):
+        return {name: parameter_to_value(getattr(model, name)) for name in model.param_names}
+
+    def from_yaml_tree_transform(self, node, tag, ctx):
+        from dkist.wcs.models import PixelFromGrismWavelength
+
+        params = {name: node[name] for name in PixelFromGrismWavelength.param_names}
+        return PixelFromGrismWavelength(**params)
