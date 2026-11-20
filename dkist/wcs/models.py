@@ -131,6 +131,13 @@ def _validate_dispersion_denominator(dispersion_denominator: float | u.Quantity[
         )
 
 
+def _pixel_value(pixel: float | np.ndarray | u.Quantity) -> float | np.ndarray:
+    """Return ``pixel`` as a plain number of pixels, converting it from ``u.pix`` if it is a Quantity."""
+    if isinstance(pixel, u.Quantity):
+        return pixel.to_value(u.pix)
+    return pixel
+
+
 class _GrismEquationBase(Model):
     """
     Internal base class for FITS ``-GRA``/``-GRI`` grating-coordinate models.
@@ -177,13 +184,18 @@ class RefractedAngleSineModel(_GrismEquationBase):
     (2006), especially Eqs. (77), (82), and (83).
 
     Parameters may be given as plain numbers or as `~astropy.units.Quantity`
-    objects, but not a mixture of the two. Plain numbers must use one consistent
-    length unit for every length-dependent parameter, and radians for angles.
+    objects. ``reference_wavelength``, ``dispersion``, ``groove_density`` and
+    ``refractive_index_derivative`` must either all be Quantities or all be
+    plain numbers in one consistent length unit. Mixing Quantities and plain
+    numbers raises a `~astropy.units.UnitConversionError` when the model is
+    evaluated, but plain numbers in different length units are not detected
+    and give wrong results. Plain-number angles are in radians.
 
     Parameters
     ----------
-    reference_pixel : float
-        Pixel coordinate of the reference point (0-indexed).
+    reference_pixel : float or `~astropy.units.Quantity`, optional
+        Pixel coordinate of the reference point (0-indexed), as a plain number
+        or in ``u.pix``. Defaults to ``0``.
     reference_wavelength : float or `~astropy.units.Quantity`, optional
         Wavelength at the reference pixel, in units of length. Defaults to ``0``.
     dispersion : float or `~astropy.units.Quantity`, optional
@@ -220,7 +232,7 @@ class RefractedAngleSineModel(_GrismEquationBase):
 
     def __init__(
         self,
-        reference_pixel: float = 0,
+        reference_pixel: float | u.Quantity[u.pix] = 0,
         reference_wavelength: float | u.Quantity[u.nm] = 0,
         dispersion: float | u.Quantity[u.nm / u.pix] = 0,
         groove_density: float | u.Quantity[1 / u.m] = 1,
@@ -275,7 +287,15 @@ class RefractedAngleSineModel(_GrismEquationBase):
 
     @staticmethod
     def _wavelength_offset(pixel, reference_pixel, dispersion):
-        pixel_offset = pixel - reference_pixel
+        r"""
+        Return the wavelength offset from the reference pixel, :math:`(p - p_r) \, \delta`.
+
+        ``pixel`` and ``reference_pixel`` may each be a plain number or a
+        Quantity in ``u.pix``; both are interpreted in pixels. If ``dispersion``
+        is a Quantity, the result is a Quantity in the units of
+        ``dispersion * u.pix``; otherwise it is a plain number.
+        """
+        pixel_offset = _pixel_value(pixel) - _pixel_value(reference_pixel)
         if isinstance(dispersion, u.Quantity):
             pixel_offset = pixel_offset * u.pix
         return pixel_offset * dispersion

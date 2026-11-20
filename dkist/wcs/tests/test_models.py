@@ -6,6 +6,8 @@ from numpy.random import default_rng
 
 import astropy.modeling.models as m
 import astropy.units as u
+import gwcs
+import gwcs.coordinate_frames as cf
 from astropy.coordinates.matrix_utilities import rotation_matrix
 from astropy.modeling import CompoundModel
 from astropy.modeling.models import Tabular1D
@@ -104,6 +106,31 @@ def test_build_grating_spectral_transform() -> None:
         result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
     )
 
+
+def test_build_grating_spectral_transform_in_gwcs():
+    """
+    Given: a gWCS whose spectral transform comes from build_grating_spectral_transform
+    When: pixels are mapped to world coordinates with the high-level gWCS API
+    Then: the result matches evaluating the transform directly
+    """
+    transform = build_grating_spectral_transform(
+        reference_pixel=217,
+        reference_wavelength=854.1738582455826 * u.nm,
+        dispersion=0.0022975580183395555 * u.nm / u.pix,
+        groove_density=23000.0 / u.m,
+        spectral_order=90 * u.one,
+        incident_angle=65.696 * u.deg,
+    )
+    pixel_frame = cf.CoordinateFrame(
+        naxes=1, axes_type=("SPECTRAL",), axes_order=(0,), unit=(u.pix,), name="pixel"
+    )
+    spectral_frame = cf.SpectralFrame(unit=(u.nm,), axes_names=("wavelength",), name="spectral")
+    wcs = gwcs.WCS([(pixel_frame, transform), (spectral_frame, None)])
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
+
+    world = wcs.pixel_to_world(pixels)
+
+    assert u.allclose(world, transform(pixels))
 
 
 @pytest.mark.parametrize(
