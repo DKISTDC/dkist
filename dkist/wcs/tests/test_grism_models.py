@@ -400,3 +400,46 @@ def test_wavelength_grism_equation_matches_astropy():
     assert_allclose(
         result.to_value(u.nm), expected.to_value(u.nm), rtol=1e-10, atol=1e-10
     )
+
+
+# The same grating and detector geometry given as plain numbers (lengths in m,
+# angles in radians) and as Quantities.
+PLAIN_PARAMETERS = {
+    "reference_wavelength": 854.1738582455826e-9,
+    "dispersion": 0.0022975580183395555e-9,
+    "groove_density": 23000.0,
+    "spectral_order": 90,
+    "incident_angle": np.deg2rad(65.696),
+}
+QUANTITY_PARAMETERS = {
+    "reference_wavelength": 854.1738582455826 * u.nm,
+    "dispersion": 0.0022975580183395555 * u.nm / u.pix,
+    "groove_density": 23000.0 / u.m,
+    "spectral_order": 90,
+    "incident_angle": 65.696 * u.deg,
+    "refractive_index_derivative": 0 / u.m,
+}
+
+
+@pytest.mark.parametrize("pixel_unit", [pytest.param(1, id="pixel_plain"), pytest.param(u.pix, id="pixel_pix")])
+@pytest.mark.parametrize(
+    "reference_pixel_unit", [pytest.param(1, id="reference_pixel_plain"), pytest.param(u.pix, id="reference_pixel_pix")]
+)
+@pytest.mark.parametrize(
+    "parameters",
+    [pytest.param(PLAIN_PARAMETERS, id="parameters_plain"), pytest.param(QUANTITY_PARAMETERS, id="parameters_quantity")],
+)
+def test_refracted_angle_sine_model_unit_combinations(pixel_unit, reference_pixel_unit, parameters):
+    """
+    Given: a RefractedAngleSineModel whose reference pixel, and the pixels it is evaluated at,
+           are each plain numbers or in u.pix, with plain-number or Quantity parameters
+    When: the model is evaluated
+    Then: every combination gives the same result as plain numbers throughout
+    """
+    pixels = np.array([0.0, 100.0, 217.0, 300.0, 511.0])
+    expected = RefractedAngleSineModel(reference_pixel=217.0, **PLAIN_PARAMETERS)(pixels)
+    model = RefractedAngleSineModel(reference_pixel=217.0 * reference_pixel_unit, **parameters)
+
+    result = model(pixels * pixel_unit)
+
+    assert_allclose(u.Quantity(result).to_value(u.one), expected, rtol=1e-12)
