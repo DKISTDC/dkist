@@ -184,12 +184,13 @@ class RefractedAngleSineModel(_GrismEquationBase):
     (2006), especially Eqs. (77), (82), and (83).
 
     Parameters may be given as plain numbers or as `~astropy.units.Quantity`
-    objects. ``reference_wavelength``, ``dispersion``, ``groove_density`` and
-    ``refractive_index_derivative`` must either all be Quantities or all be
-    plain numbers in one consistent length unit. Mixing Quantities and plain
-    numbers raises a `~astropy.units.UnitConversionError` when the model is
-    evaluated, but plain numbers in different length units are not detected
-    and give wrong results. Plain-number angles are in radians.
+    objects. ``reference_wavelength``, ``dispersion``, ``groove_density``,
+    ``refractive_index_derivative`` and ``camera_angle`` must either all be
+    Quantities or all be plain numbers, with lengths in one consistent unit and
+    ``camera_angle`` in radians. Mixing Quantities and plain numbers raises a
+    `~astropy.units.UnitConversionError` when the model is evaluated, but plain
+    numbers in different length units are not detected and give wrong results.
+    The other angles may be plain numbers in radians either way.
 
     Parameters
     ----------
